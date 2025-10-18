@@ -1,0 +1,178 @@
+// registration.service.ts
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { UserRepository } from '../repositories/user/user.repository';
+import { AgencyRepository } from '../repositories/agency/agency.repository';
+import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
+import { EmailService } from '../email/email.service';
+import { generateToken } from '../utils/hash';
+import { t, SupportedLang } from '../locales';
+import { BaseRegistrationDtoFactory } from './dto/base-registration.dto';
+import { RegisterAgencyOwnerDtoFactory } from './dto/register-agency-owner.dto';
+import { RegisterAgentDtoFactory } from './dto/register-agent.dto';
+import { user_status } from '@prisma/client';
+import { UserCreationData } from './types/create-user-input';
+
+@Injectable()
+export class RegistrationService {
+  constructor(
+    private readonly userRepo: UserRepository,
+    private readonly agencyRepo: AgencyRepository,
+    private readonly requestRepo: RegistrationRequestRepository,
+    private readonly emailService: EmailService,
+  ) {}
+
+  // --------------------------
+  // COMMON VALIDATIONS
+  // --------------------------
+  private async validateUserBase(
+    dto: InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>,
+    language: SupportedLang,
+  ) {
+    const errors: Record<string, string[]> = {};
+
+    if (await this.userRepo.usernameExists(dto.username)) {
+      errors.username = [t('usernameExists', language)];
+    }
+
+    if (await this.userRepo.emailExists(dto.email)) {
+      errors.email = [t('emailExists', language)];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new BadRequestException(errors);
+    }
+  }
+
+  // --------------------------
+  // Helper to map DTO -> DB creation data
+  // --------------------------
+  private mapDtoToUserCreation(
+    dto: InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>,
+    role: 'user' | 'agency_owner' | 'agent',
+  ): UserCreationData {
+    const verification_token = generateToken();
+    const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    return {
+      username: dto.username,
+      email: dto.email,
+      password: dto.password,
+      first_name: dto.first_name,
+      last_name: dto.last_name,
+      role,
+      status: user_status.inactive,
+      verification_token,
+      verification_token_expires,
+    };
+  }
+
+  // --------------------------
+  // USER REGISTRATION
+  // --------------------------
+  async registerUser(
+    dto: InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>,
+    language: SupportedLang,
+  ) {
+    await this.validateUserBase(dto, language);
+
+    const userData = this.mapDtoToUserCreation(dto, 'user');
+    const userId = await this.userRepo.create(userData);
+
+    await this.emailService.sendVerificationEmail(
+      dto.email,
+      dto.username,
+      userData.verification_token,
+      language,
+    );
+
+    return { userId, message: t('registrationSuccess', language) };
+  }
+
+  // --------------------------
+  // AGENCY OWNER REGISTRATION
+  // --------------------------
+  async registerAgencyOwner(
+    dto: InstanceType<ReturnType<typeof RegisterAgencyOwnerDtoFactory>>,
+    language: SupportedLang,
+  ) {
+    await this.validateUserBase(dto, language);
+    const errors: Record<string, string[]> = {};
+
+    if (await this.agencyRepo.agencyNameExist(dto.agency_name)) {
+      errors.agency_name = [t('agencyExists', language)];
+    }
+
+    if (await this.agencyRepo.licenseExists(dto.license_number)) {
+      errors.license_number = [t('licenseExists', language)];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    const userData = this.mapDtoToUserCreation(dto, 'agency_owner');
+    const userId = await this.userRepo.create(userData);
+
+    await this.agencyRepo.create({
+      agency_name: dto.agency_name,
+      license_number: dto.license_number,
+      address: dto.address,
+      owner_user_id: userId,
+    });
+
+    await this.emailService.sendVerificationEmail(
+      dto.email,
+      `${dto.first_name} ${dto.last_name}`,
+      userData.verification_token,
+      language,
+    );
+
+    return { userId, message: t('registrationSuccess', language) };
+  }
+
+  // --------------------------
+  // AGENT REGISTRATION
+  // --------------------------
+  async registerAgent(
+    dto: InstanceType<ReturnType<typeof RegisterAgentDtoFactory>>,
+    language: SupportedLang,
+  ) {
+    await this.validateUserBase(dto, language);
+    const errors: Record<string, string[]> = {};
+
+    const agency = await this.agencyRepo.findByPublicCode(dto.public_code);
+    if (!agency) {
+      errors.public_code = [t('invalidPublicCode', language)];
+    }
+
+    if (await this.requestRepo.idCardExists(dto.id_card_number)) {
+      errors.id_card_number = [t('idCardExists', language)];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    const userData = this.mapDtoToUserCreation(dto, 'agent');
+    const userId = await this.userRepo.create(userData);
+
+    await this.requestRepo.create({
+      userId,
+      idCardNumber: dto.id_card_number,
+      status: 'pending',
+      agencyName: agency!.agency_name, 
+      agencyId: agency!.id,
+      requestedRole: dto.requested_role,
+      requestType: 'agent_license_verification',
+    });
+
+    await this.emailService.sendVerificationEmail(
+      dto.email,
+      `${dto.first_name} ${dto.last_name}`,
+      userData.verification_token,
+      language,
+    );
+
+    return { userId, message: t('registrationSuccess', language) };
+  }
+}
