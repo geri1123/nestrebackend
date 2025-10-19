@@ -1,26 +1,77 @@
 // registration.service.ts
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { UserRepository } from '../repositories/user/user.repository';
 import { AgencyRepository } from '../repositories/agency/agency.repository';
 import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
 import { EmailService } from '../email/email.service';
-import { generateToken } from '../utils/hash';
+import { comparePassword, generateToken } from '../utils/hash';
 import { t, SupportedLang } from '../locales';
 import { BaseRegistrationDtoFactory } from './dto/base-registration.dto';
 import { RegisterAgencyOwnerDtoFactory } from './dto/register-agency-owner.dto';
 import { RegisterAgentDtoFactory } from './dto/register-agent.dto';
 import { user_status } from '@prisma/client';
 import { UserCreationData } from './types/create-user-input';
-
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
-export class RegistrationService {
+export class AuthService {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly agencyRepo: AgencyRepository,
     private readonly requestRepo: RegistrationRequestRepository,
     private readonly emailService: EmailService,
+    private readonly jwtService:JwtService
   ) {}
+//Login
+async login(dto: LoginDto, language: SupportedLang="al") {
+    const { identifier, password, rememberMe } = dto;
 
+    // Find user by email or username
+    const user = await this.userRepo.findByIdentifier(identifier);
+    if (!user) {
+      throw new UnauthorizedException({
+        success: false,
+        message: t('invalidCredentials', language),
+      });
+    }
+
+    // Check if account is active
+    if (user.status !== 'active') {
+      throw new UnauthorizedException({
+        success: false,
+        message: t('accountNotActive', language),
+        errorCode: 'EMAIL_NOT_VERIFIED',
+      });
+    }
+
+    // Verify password
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException({
+        success: false,
+        message: t('invalidCredentials', language),
+      });
+    }
+
+    // Update last login timestamp
+    await this.userRepo.updateFieldsById(user.id, {
+      last_login: new Date(),
+    });
+
+    // Generate JWT token with appropriate expiry
+    const tokenExpiry = rememberMe ? '30d' : '1d';
+    const token = this.jwtService.sign(
+      {
+        userId: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      { expiresIn: tokenExpiry },
+    );
+
+    return { user, token };
+  }
   // --------------------------
   // COMMON VALIDATIONS
   // --------------------------

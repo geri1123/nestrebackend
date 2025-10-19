@@ -4,7 +4,7 @@ import { translations, SupportedLang } from '../locales';
 
 // 1️⃣ Extend Request type
 export interface RequestWithLang extends Request {
-  language: SupportedLang;
+  language: SupportedLang ;
 }
 
 @Injectable()

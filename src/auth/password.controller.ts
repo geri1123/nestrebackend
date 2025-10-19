@@ -8,16 +8,17 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ResetPasswordDtoFactory, ResetPasswordSwaggerDto } from './dto/reset-password.dto';
-import { RecoverPasswordDtoFactory } from './dto/recover-password.dto';
+import { ForgotPasswordFailedResponseDto, ForgotPasswordSuccessResponseDto, RecoverPasswordDtoFactory } from './dto/recover-password.dto';
 import type { RequestWithLang } from '../middlewares/language.middleware';
 import { RecoveryPasswordSwaggerDto } from './dto/recover-password.dto';
 import { SupportedLang, t } from '../locales';
 import { PasswordRecoveryService } from './password.service';
-import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
-
+import { ResetFailedResponseDto } from './dto/reset-password.dto';
+import { ResetSuccessResponseDto } from './dto/reset-password.dto';
 @ApiTags('password')
 @Controller('password')
 export class PasswordController {
@@ -28,6 +29,9 @@ export class PasswordController {
   @Post('reset-password')
   @ApiBody({ type: ResetPasswordSwaggerDto })
   @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
+    @ApiResponse({ status: 200, description: 'Password succesfully reset', type: ResetSuccessResponseDto })
+@ApiResponse({ status: 400, description: 'Failed too reset', type: ResetFailedResponseDto })
+
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
     const lang: SupportedLang = req.language || 'al';
@@ -59,6 +63,10 @@ export class PasswordController {
 
   @Post('forgot-password')
   @ApiBody({ type: RecoveryPasswordSwaggerDto })
+  @ApiResponse({})
+   @ApiResponse({ status: 200, description: 'TOKEN SUCCESFULLY SEND', type: ForgotPasswordSuccessResponseDto })
+@ApiResponse({ status: 400, description: 'Failed TO SEND TOKEN', type:ForgotPasswordFailedResponseDto })
+
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
     const lang: SupportedLang = req.language || 'al';

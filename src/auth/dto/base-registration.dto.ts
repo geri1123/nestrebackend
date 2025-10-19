@@ -34,3 +34,8 @@ export function BaseRegistrationDtoFactory(lang: SupportedLang = 'al') {
 
   return BaseRegistrationDto;
 }
+export class RegisterFailedResponseDto {
+  success: boolean;
+  message: string;
+  errors?: Record<string, string[]>; 
+}

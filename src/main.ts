@@ -29,14 +29,14 @@ async function bootstrap() {
     }),
   );
 
-  // ✅ Enable CORS
+  //  Enable CORS
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });
 
-  // ✅ Swagger Setup
+  //  Swagger Setup
   const swaggerConfig = new DocumentBuilder()
     .setTitle('My App API')
     .setDescription('API documentation for my NestJS backend')
@@ -47,7 +47,7 @@ async function bootstrap() {
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, swaggerDocument);
 
-  // ✅ Start server
+  // Start server
   await app.listen(configService.port);
   console.log(`🚀 Server running on port ${configService.port}`);
   console.log(`📘 Swagger available at http://localhost:${configService.port}/api/docs`);

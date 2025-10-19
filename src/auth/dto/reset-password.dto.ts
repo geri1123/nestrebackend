@@ -12,6 +12,21 @@ export class ResetPasswordSwaggerDto {
   @ApiProperty({ example: 'MyPass123', description: 'Repeat new password' })
   repeatPassword: string;
 }
+export class  ResetFailedResponseDto {
+  @ApiProperty({ example: false, description: 'Indicates if the request was successful' })
+  success: boolean;
+
+  @ApiProperty({ example: 'Token has expired...', description: 'Error message' })
+  message: string;
+}
+export class ResetSuccessResponseDto {
+  @ApiProperty({ example: true, description: 'Indicates if the request was successful' })
+  success: boolean;
+
+  @ApiProperty({ example: 'Password Succesfully reset', description: 'Message describing the result' })
+  message: string;
+}
+
 export function ResetPasswordDtoFactory(lang: SupportedLang) {
   class ResetPasswordDto {
    
