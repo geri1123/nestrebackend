@@ -5,10 +5,11 @@ export const en = {
     invalidRole: "Invalid user role",
    internalServerError: "An unexpected error occurred",
     notificationMarkedRead: "Notification marked as read",
-    tooManyLoginAttempts: "Too many login attempts from this IP, please try again after 15 minutes.",
+    tooManyLoginAttempts: "Too many login attempts from this IP, please try again after 5 minutes.",
     //login,registration
      registrationSuccess: "Registration successful. Please verify your email.",
     loginSuccess: "Login successful",
+    
      invalidCredentials: "Invalid credentials",
     accountNotActive: "Account not active. Verify email or contact support.",
     invalidPassword: "Invalid password",

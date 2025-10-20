@@ -5,7 +5,7 @@ export const it = {
      internalServerError: "Si è verificato un errore imprevisto",
         noTokenProvided: "Nessun token fornito",
         usernotfound: "Utente non trovato",
-     tooManyLoginAttempts: "Troppi tentativi di accesso da questo IP, riprova tra 15 minuti.",
+     tooManyLoginAttempts: "Troppi tentativi di accesso da questo IP, riprova tra 5 minuti.",
      invalidRole: "Ruolo utente non valido",
     //login,registration
       registrationSuccess: "Registrazione completata. Si prega di verificare la tua email.",
@@ -109,6 +109,7 @@ agencyWebsiteUpdated: "Sito web dell'agenzia aggiornato con successo",
 agencyNameUpdated: "Nome dell'agenzia aggiornato con successo",
 agencyNameExists:"Il nome dell'agenzia esiste già.",
 //
+
 successadded: "Prodotto registrato con successo",
     title: "Devi scrivere un titolo",
     price: "Devi scrivere un prezzo",

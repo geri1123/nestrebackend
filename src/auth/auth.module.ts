@@ -3,22 +3,18 @@ import { JwtModule } from '@nestjs/jwt'; // ✅ Add this import
 import { ConfigModule, ConfigService } from '@nestjs/config'; // ✅ Add this if using ConfigService
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UsersRepositoryModule } from '../repositories/user/users.repository.module';
-import { AgencyRepositoryModule } from '../repositories/agency/agency.repository.module';
-import { AgentRepositoryModule } from '../repositories/agent/agent.repository.module';
 import { PasswordController } from './password.controller';
 import { EmailModule } from '../email/email.module';
 import { PasswordRecoveryService } from './password.service';
-import { RegistrationRequestRepositoryModule } from '../repositories/registration-request/registration-request.module';
-import { PasswordResetTokenRepositoryModule } from '../repositories/passwordReset/password-reset.module';
-
+import { AgencyRepository } from '../repositories/agency/agency.repository';
+import { PrismaService } from '../prisma/prisma.service';
+import { AgentsRepository } from '../repositories/agent/agent.repository';
+import { UserRepository } from '../repositories/user/user.repository';
+import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
+import { PasswordResetTokenRepository } from '../repositories/passwordReset/password-reset.repository';
 @Module({
   imports: [
-    UsersRepositoryModule,
-    AgencyRepositoryModule,
-    AgentRepositoryModule,
-    RegistrationRequestRepositoryModule,
-    PasswordResetTokenRepositoryModule,
+  
     EmailModule,
     
     JwtModule.registerAsync({
@@ -32,8 +28,17 @@ import { PasswordResetTokenRepositoryModule } from '../repositories/passwordRese
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, PasswordRecoveryService],
+  providers: [
+    AuthService,
+    //  PrismaService, 
+    AgencyRepository, 
+    AgentsRepository,
+    PasswordRecoveryService,
+    UserRepository,
+    RegistrationRequestRepository,
+    PasswordResetTokenRepository
+  ],
   controllers: [AuthController, PasswordController],
-  exports: [AuthService, JwtModule], 
+  // exports: [AuthService, JwtModule], 
 })
 export class AuthModule {}

@@ -1,5 +1,10 @@
-import { user_status } from '@prisma/client';
 
+export enum UserStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
+  SUSPENDED = 'suspended',
+}
 export interface BaseRegistration {
   username: string;
   email: string;
@@ -56,7 +61,7 @@ export type RegistrationInput =
 
 // Type used for DB creation — generalized for all roles
 export type UserCreationData = Omit<BaseRegistration & { role: 'user' | 'agency_owner' | 'agent' }, 'repeatPassword' | 'terms_accepted'> & {
-  status: user_status;
+  status: UserStatus;
   verification_token: string;
   verification_token_expires: Date;
 };

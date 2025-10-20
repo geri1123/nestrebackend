@@ -9,7 +9,7 @@ import { t, SupportedLang } from '../locales';
 import { BaseRegistrationDtoFactory } from './dto/base-registration.dto';
 import { RegisterAgencyOwnerDtoFactory } from './dto/register-agency-owner.dto';
 import { RegisterAgentDtoFactory } from './dto/register-agent.dto';
-import { user_status } from '@prisma/client';
+import { UserStatus } from './types/create-user-input';
 import { UserCreationData } from './types/create-user-input';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -111,7 +111,7 @@ async login(dto: LoginDto, language: SupportedLang="al") {
       first_name: dto.first_name,
       last_name: dto.last_name,
       role,
-      status: user_status.inactive,
+      status: UserStatus.INACTIVE,
       verification_token,
       verification_token_expires,
     };
