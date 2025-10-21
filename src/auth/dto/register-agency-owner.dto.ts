@@ -22,3 +22,4 @@ export function RegisterAgencyOwnerDtoFactory(lang: SupportedLang = 'al') {
 
   return RegisterAgencyOwnerDto;
 }
+export type RegisterAgencyOwnerDto = InstanceType<ReturnType<typeof RegisterAgencyOwnerDtoFactory>>;

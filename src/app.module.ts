@@ -8,6 +8,10 @@ import { LanguageMiddleware } from './middlewares/language.middleware';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { FiltersModule } from './filters/filters.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { RolesGuard } from './auth/role-guard';
+
 @Module({
   imports: [
     AppConfigModule,
@@ -23,7 +27,18 @@ ThrottlerModule.forRoot([
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+   AuthModule,
+      {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, 
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard, 
+    },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

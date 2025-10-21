@@ -7,7 +7,7 @@ import { PasswordController } from './password.controller';
 import { EmailModule } from '../email/email.module';
 import { PasswordRecoveryService } from './password.service';
 import { AgencyRepository } from '../repositories/agency/agency.repository';
-import { PrismaService } from '../prisma/prisma.service';
+
 import { AgentsRepository } from '../repositories/agent/agent.repository';
 import { UserRepository } from '../repositories/user/user.repository';
 import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
@@ -20,7 +20,7 @@ import { PasswordResetTokenRepository } from '../repositories/passwordReset/pass
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
+        secret: configService.get<string>('JWT_SECRET') || 'secret',
         signOptions: {
           expiresIn: '1d', 
         },
@@ -39,6 +39,7 @@ import { PasswordResetTokenRepository } from '../repositories/passwordReset/pass
     PasswordResetTokenRepository
   ],
   controllers: [AuthController, PasswordController],
-  // exports: [AuthService, JwtModule], 
+  exports: [AuthService, JwtModule ,   UserRepository,   
+    AgencyRepository ], 
 })
 export class AuthModule {}

@@ -2,7 +2,7 @@
 
 import { ThrottlerGuard, ThrottlerLimitDetail } from '@nestjs/throttler';
 import { Injectable, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
-import { t } from '../../locales'; // ✅ Import your translation function
+import { t } from '../../locales'; 
 
 @Injectable()
 export class CustomThrottlerGuard extends ThrottlerGuard {

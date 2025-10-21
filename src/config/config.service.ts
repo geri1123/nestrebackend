@@ -62,19 +62,12 @@ export class AppConfigService {
   }
 
   //redis
-  get redisHost(): string {
-  return this.configService.get<string>('REDIS_HOST', 'localhost');
-}
-get redisPort(): number {
-  return Number(this.configService.get<number>('REDIS_PORT', 6379));
-}
-get redisUsername(): string {
-  return this.configService.get<string>('REDIS_USERNAME', 'default');
-}
-get redisPassword(): string {
-  return this.configService.get<string>('REDIS_PASSWORD', '');
-}
-get redisTTL(): number {
-  return Number(this.configService.get<number>('REDIS_TTL', 3600));
-}
+   get redisUrl(): string {
+    return this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
+  }
+
+  get redisTTL(): number {
+    return Number(this.configService.get<number>('REDIS_TTL', 3600));
+  }
+
 }

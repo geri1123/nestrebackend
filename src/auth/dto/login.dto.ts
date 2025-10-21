@@ -6,6 +6,7 @@ import { SupportedLang, t } from '../../locales';
 // DTO Factory for validation with translations
 export function LoginDtoFactory(lang: SupportedLang= 'al') {
   class LoginDto {
+    
     @IsString({ message: t('identifierRequired', lang) })
     @IsNotEmpty({ message: t('identifierRequired', lang) })
     identifier: string;
@@ -14,7 +15,6 @@ export function LoginDtoFactory(lang: SupportedLang= 'al') {
     @IsNotEmpty({ message: t('passwordRequired', lang) })
     password: string;
 
-    // @IsBoolean({ message: t('rememberme', lang) })
     @IsOptional()
     rememberMe?: boolean;
   }

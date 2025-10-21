@@ -4,12 +4,12 @@ import { FiltersController } from './filters.controller';
 import { CategoryRepository } from '../repositories/category/category.repository';
 import { ListingTypeRepo } from '../repositories/listingtype/listingtype.repository';
 import { AttributeRepo } from '../repositories/attributes/attributes.repository';
-import { PrismaService } from '../prisma/prisma.service';
 import { AppCacheModule } from '../cache/cache.module';
 import { LoationRepository } from '../repositories/location/location.repository';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [AppCacheModule],
+  imports: [AppCacheModule , AuthModule],
   controllers: [FiltersController],
   providers: [
     FiltersService,
@@ -17,6 +17,7 @@ import { LoationRepository } from '../repositories/location/location.repository'
     ListingTypeRepo,
     AttributeRepo,
     LoationRepository,
+  
     // PrismaService,
   ],
 })

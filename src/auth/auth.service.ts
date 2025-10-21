@@ -13,6 +13,9 @@ import { UserStatus } from './types/create-user-input';
 import { UserCreationData } from './types/create-user-input';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { RegisterAgencyOwnerDto } from './dto/register-agency-owner.dto';
+import { RegisterAgentDto } from './dto/register-agent.dto';
+import { BaseRegistrationDto } from './dto/base-registration.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -76,7 +79,7 @@ async login(dto: LoginDto, language: SupportedLang="al") {
   // COMMON VALIDATIONS
   // --------------------------
   private async validateUserBase(
-    dto: InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>,
+    dto: BaseRegistrationDto,
     language: SupportedLang,
   ) {
     const errors: Record<string, string[]> = {};
@@ -98,7 +101,7 @@ async login(dto: LoginDto, language: SupportedLang="al") {
   // Helper to map DTO -> DB creation data
   // --------------------------
   private mapDtoToUserCreation(
-    dto: InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>,
+    dto: BaseRegistrationDto,
     role: 'user' | 'agency_owner' | 'agent',
   ): UserCreationData {
     const verification_token = generateToken();
@@ -121,7 +124,7 @@ async login(dto: LoginDto, language: SupportedLang="al") {
   // USER REGISTRATION
   // --------------------------
   async registerUser(
-    dto: InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>,
+    dto: BaseRegistrationDto,
     language: SupportedLang,
   ) {
     await this.validateUserBase(dto, language);
@@ -143,7 +146,7 @@ async login(dto: LoginDto, language: SupportedLang="al") {
   // AGENCY OWNER REGISTRATION
   // --------------------------
   async registerAgencyOwner(
-    dto: InstanceType<ReturnType<typeof RegisterAgencyOwnerDtoFactory>>,
+    dto: RegisterAgencyOwnerDto,
     language: SupportedLang,
   ) {
     await this.validateUserBase(dto, language);
@@ -185,7 +188,7 @@ async login(dto: LoginDto, language: SupportedLang="al") {
   // AGENT REGISTRATION
   // --------------------------
   async registerAgent(
-    dto: InstanceType<ReturnType<typeof RegisterAgentDtoFactory>>,
+    dto: RegisterAgentDto,
     language: SupportedLang,
   ) {
     await this.validateUserBase(dto, language);

@@ -34,6 +34,8 @@ export function BaseRegistrationDtoFactory(lang: SupportedLang = 'al') {
 
   return BaseRegistrationDto;
 }
+export type BaseRegistrationDto = InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>;
+
 export class RegisterFailedResponseDto {
   success: boolean;
   message: string;

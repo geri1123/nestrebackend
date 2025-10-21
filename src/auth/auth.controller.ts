@@ -12,7 +12,7 @@ import { BaseRegistrationDtoFactory } from './dto/base-registration.dto';
 import { RegisterAgencyOwnerDtoFactory } from './dto/register-agency-owner.dto';
 import { RegisterAgentDtoFactory } from './dto/register-agent.dto';
 import type { SupportedLang } from '../locales';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
 import type { Response } from 'express'
@@ -24,13 +24,15 @@ import { LoginDtoFactory, LoginFailedResponseDto, LoginSuccessResponseDto, Login
 import { t } from '../locales';
 import { CustomThrottlerGuard } from './guards/custom-throttler.guard';
 import { Throttle } from '@nestjs/throttler';
+import { Public } from '../common/decorators/public.decorator';
 @ApiTags('auth')
 @Controller('auth')
-
+@Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   
   @Post('login') 
+
 @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } }) 
 @UseGuards(CustomThrottlerGuard)
    @HttpCode(HttpStatus.OK) 
@@ -41,12 +43,12 @@ export class AuthController {
   async login(
     @Body() body: Record<string, any>,
    @Query('lang') lang: SupportedLang = 'al',
-    @Req() req: RequestWithLang,
+   
     @Res({ passthrough: true }) res: Response,
   ) {
     // const lang: SupportedLang = req.language || 'al';
     const DtoClass = LoginDtoFactory(lang);
-    const dto = plainToClass(DtoClass, body);
+    const dto = plainToInstance(DtoClass, body);
 
     const errors = await validate(dto);
     if (errors.length > 0) throwValidationErrors(errors);
@@ -88,10 +90,10 @@ export class AuthController {
    @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
   @ApiResponse({ status: 201, description: 'User successfully registered',type:RegisterSuccessResponseDto })
   @ApiResponse({ status: 400, description: 'Validation failed' , type:RegisterFailedResponseDto })
-  async registerUser(@Body() body: Record<string, any>,  @Query('lang') lang: SupportedLang = 'al',@Req() req: any) {
+  async registerUser(@Body() body: Record<string, any>,  @Query('lang') lang: SupportedLang = 'al') {
     // const lang = (req.query.lang || 'al') as SupportedLang;
     const DtoClass = BaseRegistrationDtoFactory(lang);
-    const dto = plainToClass(DtoClass, body);
+    const dto = plainToInstance(DtoClass, body);
     
     const errors = await validate(dto);
     if (errors.length > 0) throwValidationErrors(errors);
@@ -111,7 +113,7 @@ export class AuthController {
   async registerAgencyOwner(@Body() body: Record<string, any>,  @Query('lang') lang: SupportedLang = 'al',@Req() req: any) {
     // const lang = (req.query.lang || 'al') as SupportedLang;
     const DtoClass = RegisterAgencyOwnerDtoFactory(lang);
-    const dto = plainToClass(DtoClass, body);
+    const dto = plainToInstance(DtoClass, body);
     
     const errors = await validate(dto);
     if (errors.length > 0) throwValidationErrors(errors);
@@ -131,7 +133,7 @@ export class AuthController {
   async registerAgent(@Body() body:Record<string, any>, @Query('lang') lang: SupportedLang = 'al', @Req() req: any) {
     // const lang = (req.query.lang || 'al') as SupportedLang;
     const DtoClass = RegisterAgentDtoFactory(lang);
-    const dto = plainToClass(DtoClass, body);
+    const dto = plainToInstance(DtoClass, body);
     
     const errors = await validate(dto);
     if (errors.length > 0) throwValidationErrors(errors);

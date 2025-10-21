@@ -24,3 +24,5 @@ export function RegisterAgentDtoFactory(lang: SupportedLang = 'al') {
 
   return RegisterAgentDto;
 }
+
+export type RegisterAgentDto = InstanceType<ReturnType<typeof RegisterAgentDtoFactory>>;

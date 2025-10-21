@@ -1,16 +1,18 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, Query } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Query, UseGuards } from '@nestjs/common';
 import { FiltersService } from './filters.service';
 import type { SupportedLang } from '../locales';
 import { FiltersResponseSwaggerDto } from './dto/filters.dto';
 import { ApiOkResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { AttributesResponseDto } from './dto/attribute.dto';
-
+import { CityDtoResponse, countryResponseDto } from './dto/location.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @Controller('filters')
 
 export class FiltersController {
   constructor(private readonly filtersService: FiltersService) {}
 
  @Get()
+ @UseGuards(JwtAuthGuard)
 @HttpCode(HttpStatus.OK) // explicitly sets status code
 @ApiOkResponse({ description: 'Filters fetched', type: FiltersResponseSwaggerDto })
 async getFilters(@Query('lang') lang: SupportedLang = 'al') {
@@ -36,5 +38,27 @@ async getFilters(@Query('lang') lang: SupportedLang = 'al') {
     const attributes = await this.filtersService.getAttributes(id, lang);
 
     return { success: true, attributes };
+  }
+
+   @Get('countries')
+   @HttpCode(HttpStatus.OK)
+   @ApiOkResponse({description:'Country Fetched' , type:countryResponseDto})
+  async getCountries() {
+    const countries = await this.filtersService.getCountries();
+    return { success: true, countries };
+  }
+
+  @Get('cities/:countryCode')   
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ 
+  name: 'countryCode', 
+  type: String,
+  description: 'Country code, e.g., "al", "it"' 
+})
+@ApiOkResponse({description:"Cities fetched", type:CityDtoResponse})
+
+  async getCities(@Param('countryCode') countryCode: string) {
+    const cities = await this.filtersService.getCities(countryCode);
+    return { success: true, cities };
   }
 }

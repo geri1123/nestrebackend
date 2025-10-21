@@ -1,23 +1,35 @@
-import { Module } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-ioredis';
-import { AppConfigService } from '../config/config.service';
+// src/cache/cache.module.ts
+import { Module, Global } from '@nestjs/common';
 import { AppConfigModule } from '../config/config.module';
+import { AppConfigService } from '../config/config.service';
+import Keyv from 'keyv';
+import KeyvRedis from '@keyv/redis';
+
+export const CACHE_KEYV = 'CACHE_KEYV';
+
+@Global()
 @Module({
-  imports: [
-    CacheModule.registerAsync({
-      imports: [AppConfigModule], 
+  imports: [AppConfigModule],
+  providers: [
+    {
+      provide: CACHE_KEYV,
       inject: [AppConfigService],
-      useFactory: (config: AppConfigService) => ({
-        store: redisStore,
-        host: config.redisHost,
-        port: config.redisPort,
-        username: config.redisUsername,
-        password: config.redisPassword,
-        ttl: config.redisTTL,
-      }),
-    }),
+      useFactory: async (config: AppConfigService) => {
+        const keyv = new Keyv({
+          store: new KeyvRedis({ url: config.redisUrl }) as any, // as any fixes TS type
+          ttl: config.redisTTL,
+        });
+
+        keyv.on('error', err => console.error('Keyv Redis Error', err));
+
+        await keyv.set('ping', 'pong'); // test connection
+        const pong = await keyv.get('ping');
+        console.log('Redis test:', pong); // should print "pong"
+
+        return keyv;
+      },
+    },
   ],
-  exports: [CacheModule],
+  exports: [CACHE_KEYV],
 })
 export class AppCacheModule {}
