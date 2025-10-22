@@ -11,7 +11,7 @@ import { FiltersModule } from './filters/filters.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/role-guard';
-
+import { ProductModule } from './product/product.module';
 @Module({
   imports: [
     AppConfigModule,
@@ -19,6 +19,7 @@ import { RolesGuard } from './auth/role-guard';
     FirebaseModule,
 AuthModule,
 FiltersModule,
+ProductModule,
 ThrottlerModule.forRoot([
       {
         ttl: 15 * 60, 

@@ -5,14 +5,14 @@ import { FiltersResponseSwaggerDto } from './dto/filters.dto';
 import { ApiOkResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { AttributesResponseDto } from './dto/attribute.dto';
 import { CityDtoResponse, countryResponseDto } from './dto/location.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Public } from '../common/decorators/public.decorator';
 @Controller('filters')
-
+@Public()
 export class FiltersController {
   constructor(private readonly filtersService: FiltersService) {}
 
  @Get()
- @UseGuards(JwtAuthGuard)
+ 
 @HttpCode(HttpStatus.OK) // explicitly sets status code
 @ApiOkResponse({ description: 'Filters fetched', type: FiltersResponseSwaggerDto })
 async getFilters(@Query('lang') lang: SupportedLang = 'al') {

@@ -4,8 +4,9 @@ import {   agency   } from '@prisma/client';
 import { AgencyInfo } from '../../agency/types/agency-info.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { PlainAgencyInput } from '../../agency/types/agency-create-input.js';
+import { IAgencyRepository } from './Iagency.repository.js';
 @Injectable()
-export class AgencyRepository {
+export class AgencyRepository implements IAgencyRepository {
   constructor(private prisma : PrismaService) {}
  async findAgencyByUserId(userId: number): Promise<AgencyInfo | null> {
   const agency = await this.prisma.agency.findFirst({

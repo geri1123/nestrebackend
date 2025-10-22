@@ -55,7 +55,23 @@ export class AppConfigService {
   get firebaseBucket(): string {
     return this.configService.get<string>('FIREBASE_STORAGE_BUCKET', '');
   }
+ get firebaseProjectId(): string {
+    return this.configService.get<string>('FIREBASE_PROJECT_ID')!;
+  }
 
+  get firebasePrivateKey(): string {
+    return this.configService.get<string>('FIREBASE_PRIVATE_KEY')!.replace(/\\n/g, '\n');
+  }
+
+  get firebaseClientEmail(): string {
+    return this.configService.get<string>('FIREBASE_CLIENT_EMAIL')!;
+  }
+
+  get firebaseClientId(): string {
+    return this.configService.get<string>('FIREBASE_CLIENT_ID')!;
+  }
+
+ 
   // Node environment
   get nodeEnv(): string {
     return this.configService.get<string>('NODE_ENV', 'development');

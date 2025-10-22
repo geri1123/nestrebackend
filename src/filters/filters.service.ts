@@ -13,6 +13,19 @@ import { LoationRepository } from '../repositories/location/location.repository'
 import { cityDto, CountryDto } from './dto/location.dto';
 @Injectable()
 export class FiltersService {
+    private ttlMap = {
+    categories: 2 * 24 * 3600 * 1000,  // 2 days
+    listingTypes: 12 * 3600 * 1000,    // 12 hours
+    attributes: 24 * 3600 * 1000,      // 1 day
+    countries: 7 * 24 * 3600 * 1000,   // 1 week
+    cities: 12 * 3600 * 1000,          // 12 hours
+    default: 3600 * 1000,              // 1 hour
+  };
+
+  private getTTL(key: string) {
+    return this.ttlMap[key] || this.ttlMap.default;
+  }
+
   constructor(
     private readonly categoryRepo: CategoryRepository,
     private readonly listingTypeRepo: ListingTypeRepo,
@@ -40,7 +53,8 @@ async getCategories(
 
     if (categories && categories.length > 0) {
       // TTL in milliseconds
-     await this.cache.set(cacheKey, categories, 3600 * 1000); 
+    await this.cache.set(cacheKey, categories, this.getTTL('categories'));
+      //  await this.cache.set(cacheKey, categories, 3600 * 1000); 
       console.log(`[CACHE SET] Cached categories for ${lang}`);
     } else {
       console.log(`[DB EMPTY] No categories found for ${lang}`);
@@ -65,7 +79,8 @@ async getListingTypes(
 
   if (listingTypes && listingTypes.length > 0) {
     // TTL in milliseconds
-    await this.cache.set(cacheKey, listingTypes, 3600 * 1000);
+    // await this.cache.set(cacheKey, listingTypes, 3600 * 1000);
+     await this.cache.set(cacheKey, listingTypes,this.getTTL("listingTypes"));
     console.log(`[CACHE SET] Cached listing types for ${lang}`);
   } else {
     console.log(`[DB EMPTY] No listing types found for ${lang}`);
@@ -99,7 +114,8 @@ async getListingTypes(
 
   if (attributes && attributes.length > 0) {
     // Set cache with TTL (1 hour in milliseconds)
-    await this.cache.set(cacheKey, attributes, 3600 * 1000);
+    // await this.cache.set(cacheKey, attributes, 3600 * 1000);
+    await this.cache.set(cacheKey, attributes, this.getTTL("attributes"));
     console.log(`[CACHE SET] Cached attributes for subcategory ${subcategoryId} (${lang})`);
   } else {
     console.log(`[DB EMPTY] No attributes found for subcategory ${subcategoryId} (${lang})`);
@@ -113,7 +129,8 @@ async getListingTypes(
 
     if (!countries) {
       countries = await this.locationRepo.getAllCountries();
-      await this.cache.set(cacheKey, countries, 3600 * 1000); // 1 hour
+      // await this.cache.set(cacheKey, countries, 3600 * 1000); // 1 hour
+      await this.cache.set(cacheKey ,countries , this.getTTL("countries") )
       console.log('[CACHE SET] Countries');
     } else {
       console.log('[CACHE HIT] Countries');
@@ -128,7 +145,8 @@ async getListingTypes(
 
     if (!cities) {
       cities = await this.locationRepo.getCitiesByCountry(countryCode);
-      await this.cache.set(cacheKey, cities, 3600 * 1000); // 1 hour
+      // await this.cache.set(cacheKey, cities, 3600 * 1000); 
+       await this.cache.set(cacheKey ,cities , this.getTTL("cities") )
       console.log(`[CACHE SET] Cities for ${countryCode}`);
     } else {
       console.log(`[CACHE HIT] Cities for ${countryCode}`);
