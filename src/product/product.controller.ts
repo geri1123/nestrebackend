@@ -1,86 +1,91 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
-import { SearchProductsService , ProductFrontend} from './search-product.service';
-import { SupportedLang } from '../locales';
+// products/search-products.controller.ts
+import { Controller, Get, Query } from '@nestjs/common';
+import { SearchProductsService } from './search-product.service';
+import type { SupportedLang } from '../locales';
 import { SearchFiltersDto } from './dto/product-filters.dto';
 import { Public } from '../common/decorators/public.decorator';
+import { ApiTags, ApiOkResponse, ApiQuery, ApiOperation, ApiExtraModels } from '@nestjs/swagger';
+import { ProductsSearchResponseDto } from './dto/product-frontend.dto';
+import { ApiSearchFilters } from '../common/decorators/api-search-filters.decorator';
 
+@ApiTags('products')
 @Controller('products')
+@Public()
 export class SearchProductsController {
   constructor(private readonly searchProductsService: SearchProductsService) {}
-@Public()
- @Get('search/:category/:subcategory')
-async getProductsBySearch(
-  @Param('category') categorySlug?: string,
-  @Param('subcategory') subcategorySlug?: string,
-  @Query() query?: any
- 
-  ) {
-    const language: SupportedLang = query.lang || 'al';
-
-    const {
-      pricelow,
-      pricehigh,
-      areaLow,
-      areaHigh,
-      city,
-      country,
-      listingtype,
-      sortBy,
-      page = '1',
-      ...attributeFilters
-    } = query || {};
-
+ @ApiOperation({
+    summary: 'Search and filter products',
+    description: 'Search products with various filters including category, price range, attributes, location, and more.',
+  })
+  @ApiOkResponse({
+    type: ProductsSearchResponseDto,
+    description: 'Returns paginated list of products matching the search criteria',
+  })
+  @ApiSearchFilters()
+ @ApiExtraModels(SearchFiltersDto)
+  @Get('search')
+  @ApiOkResponse({ type: ProductsSearchResponseDto })
+  async searchAll(
+    @Query() rawQuery: Record<string, any>,
+    @Query('page') page = '1',
+    @Query('lang') lang: SupportedLang = 'al'
+  ): Promise<ProductsSearchResponseDto> {
     const FIXED_LIMIT = 12;
-    const pageValue = Math.max(1, parseInt(page as string, 10) || 1);
+    const pageValue = Math.max(1, parseInt(page, 10) || 1);
     const offsetValue = (pageValue - 1) * FIXED_LIMIT;
 
-    // Parse cities
-    let cities: string[] | undefined;
-    if (city) {
-      cities = Array.isArray(city)
-        ? city.map(c => String(c).toLowerCase())
-        : String(city).split(',').map(c => c.trim().toLowerCase());
+    // Parse attributes from query params like attributes[1]=4,5 or attributes[1]=4&attributes[1]=5
+    const attributes: Record<number, number[]> = {};
+    for (const key in rawQuery) {
+      const match = key.match(/^attributes\[(\d+)\]$/);
+      if (match) {
+        const attrId = Number(match[1]);
+        const value = rawQuery[key];
+        
+        if (Array.isArray(value)) {
+          // Handle array: attributes[1]=4&attributes[1]=5
+          attributes[attrId] = value.flatMap(v => 
+            String(v).split(',').map(num => Number(num.trim()))
+          );
+        } else {
+          // Handle comma-separated: attributes[1]=4,5
+          attributes[attrId] = String(value).split(',').map(v => Number(v.trim()));
+        }
+      }
     }
 
-    // Parse attributes
-    const parsedAttributes: Record<string, string[]> = {};
-    for (const [key, value] of Object.entries(attributeFilters)) {
-      if (!value) continue;
-      if (Array.isArray(value)) parsedAttributes[key] = value.map(v => String(v).toLowerCase());
-      else if (typeof value === 'string' && value.includes(','))
-        parsedAttributes[key] = value.split(',').map(v => v.trim().toLowerCase());
-      else parsedAttributes[key] = [String(value).toLowerCase()];
+    // Parse cities - can be comma-separated or array: cities=tirana,durres or cities=tirana&cities=durres
+    let cities: string[] | undefined = undefined;
+    if (rawQuery.cities) {
+      if (Array.isArray(rawQuery.cities)) {
+        cities = rawQuery.cities.flatMap(city => 
+          String(city).split(',').map(c => c.trim())
+        );
+      } else {
+        cities = String(rawQuery.cities).split(',').map(c => c.trim());
+      }
     }
 
+    // Build filters object with proper type conversions
     const filters: SearchFiltersDto = {
-      categorySlug,
-      subcategorySlug,
-      pricelow: pricelow ? parseFloat(pricelow as string) : undefined,
-      pricehigh: pricehigh ? parseFloat(pricehigh as string) : undefined,
-      areaLow: areaLow ? parseFloat(areaLow as string) : undefined,
-      areaHigh: areaHigh ? parseFloat(areaHigh as string) : undefined,
+      categoryId: rawQuery.categoryId ? Number(rawQuery.categoryId) : undefined,
+      subcategoryId: rawQuery.subcategoryId ? Number(rawQuery.subcategoryId) : undefined,
+      listingTypeId: rawQuery.listingTypeId ? Number(rawQuery.listingTypeId) : undefined,
+      pricelow: rawQuery.pricelow ? Number(rawQuery.pricelow) : undefined,
+      pricehigh: rawQuery.pricehigh ? Number(rawQuery.pricehigh) : undefined,
+      areaLow: rawQuery.areaLow ? Number(rawQuery.areaLow) : undefined,
+      areaHigh: rawQuery.areaHigh ? Number(rawQuery.areaHigh) : undefined,
       cities,
-      country: country ? (country as string) : undefined,
-      listingtype: listingtype ? (listingtype as string) : undefined,
-      attributes: parsedAttributes,
+      country: rawQuery.country,
+      sortBy: rawQuery.sortBy as SearchFiltersDto['sortBy'],
+      attributes: Object.keys(attributes).length > 0 ? attributes : undefined,
       status: 'active',
-      sortBy: sortBy ? (sortBy as 'price_asc' | 'price_desc' | 'date_asc' | 'date_desc') : undefined,
       limit: FIXED_LIMIT,
       offset: offsetValue,
     };
 
-    const result = await this.searchProductsService.getProducts(filters, language);
+    console.log('Controller parsed filters:', JSON.stringify(filters, null, 2));
 
-    return {
-      success: true,
-      data: {
-        ...result,
-        filters: {
-          ...filters,
-          parsedPage: pageValue,
-          calculatedOffset: offsetValue,
-        },
-      },
-    };
+    return this.searchProductsService.getProducts(filters, lang);
   }
 }

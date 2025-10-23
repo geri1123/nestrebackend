@@ -12,6 +12,8 @@ import { AgentsRepository } from '../repositories/agent/agent.repository';
 import { UserRepository } from '../repositories/user/user.repository';
 import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
 import { PasswordResetTokenRepository } from '../repositories/passwordReset/password-reset.repository';
+import { EmailVerificationController } from './email-verification.controller';
+import { EmailVerificationService } from './email-verification.service';
 @Module({
   imports: [
   
@@ -30,6 +32,7 @@ import { PasswordResetTokenRepository } from '../repositories/passwordReset/pass
   ],
   providers: [
     AuthService,
+    EmailVerificationService,
     //  PrismaService, 
     AgencyRepository, 
     AgentsRepository,
@@ -38,7 +41,7 @@ import { PasswordResetTokenRepository } from '../repositories/passwordReset/pass
     RegistrationRequestRepository,
     PasswordResetTokenRepository
   ],
-  controllers: [AuthController, PasswordController],
+  controllers: [AuthController, PasswordController , EmailVerificationController],
   exports: [AuthService, JwtModule ,   UserRepository,   
     AgencyRepository ], 
 })

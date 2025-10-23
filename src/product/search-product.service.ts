@@ -4,22 +4,7 @@ import { SearchProductsRepo } from '../repositories/product/search-product.repos
 import { SearchFiltersDto } from './dto/product-filters.dto';
 import { SupportedLang } from '../locales/index';
 import { FirebaseService } from '../firebase/firebase.service';
-
-export interface ProductFrontend {
-  id: number;
-  title: string;
-  price: number;
-  city: string;
-  createdAt: Date;
-  image: { imageUrl: string | null }[];
-  categoryName: string;
-  subcategoryName: string;
-  listingTypeName: string;
-  agency: {
-    agency_name: string;
-    logo: string | null;
-  } | null;
-}
+import { ProductFrontendDto } from './dto/product-frontend.dto';
 
 @Injectable()
 export class SearchProductsService {
@@ -28,11 +13,11 @@ export class SearchProductsService {
     private readonly firebaseservice:FirebaseService
 ) {}
 
-  async getProducts(filters: SearchFiltersDto, language: SupportedLang) {
+  async getProducts(filters: SearchFiltersDto, language: SupportedLang):Promise<{ products: ProductFrontendDto[]; totalCount: number; currentPage: number; totalPages: number }> {
     const products = await this.repo.searchProducts(filters, language);
     const totalCount = await this.repo.getProductsCount(filters, language);
 
-    const productsForFrontend: ProductFrontend[] = products.map((product) => {
+    const productsForFrontend: ProductFrontendDto[] = products.map((product) => {
       const images = product.productimage.map((img) => ({
         imageUrl: img.imageUrl ? this.firebaseservice.getPublicUrl(img.imageUrl) : null,
         
@@ -43,7 +28,7 @@ export class SearchProductsService {
         title: product.title,
         price: product.price,
         city: product.city?.name || 'Unknown',
-        createdAt: product.createdAt,
+       createdAt: product.createdAt.toISOString(),
         image: images,
         categoryName:
           product.subcategory?.category?.categorytranslation?.[0]?.name || 'No Category',

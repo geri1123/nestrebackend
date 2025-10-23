@@ -10,7 +10,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { FiltersModule } from './filters/filters.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { RolesGuard } from './auth/role-guard';
+import { RolesGuard } from './auth/guards/role-guard';
 import { ProductModule } from './product/product.module';
 @Module({
   imports: [

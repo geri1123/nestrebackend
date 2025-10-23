@@ -79,23 +79,23 @@ export class LoginSuccessResponseDto {
 }
 
 // Failure Response DTO
+export class FieldErrors {
+  @ApiProperty({ type: [String], required: false })
+  identifier?: string[];
+
+  @ApiProperty({ type: [String], required: false })
+  password?: string[];
+
+  
+}
+
 export class LoginFailedResponseDto {
-  @ApiProperty({
-    example: false,
-    description: 'Indicates if the request failed',
-  })
+  @ApiProperty({ example: false, description: 'Indicates if the request failed' })
   success: boolean;
 
-  @ApiProperty({
-    example: 'Invalid credentials',
-    description: 'Error message',
-  })
+  @ApiProperty({ example: 'Validation failed', description: 'Error message' })
   message: string;
 
-  @ApiProperty({
-    example: 'EMAIL_NOT_VERIFIED',
-    description: 'Error code for specific errors',
-    required: false,
-  })
-  errorCode?: string;
+  @ApiProperty({ type: FieldErrors, description: 'Field-specific validation errors' })
+  errors: FieldErrors;
 }

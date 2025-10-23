@@ -39,7 +39,11 @@ export class AuthController {
    @ApiBody({type:LoginSwaggerDto})
     @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
   @ApiResponse({ status: 201, description: 'User successfully registered' ,type:LoginSuccessResponseDto})
- @ApiResponse({ status: 400, description: 'Validation failed' ,type:LoginFailedResponseDto})
+ @ApiResponse({
+  status: 400,
+  description: 'Validation failed',
+  type: LoginFailedResponseDto,
+})
   async login(
     @Body() body: Record<string, any>,
    @Query('lang') lang: SupportedLang = 'al',

@@ -1,8 +1,8 @@
 // repositories/products/SearchProductRepo.ts
+import { PrismaService } from "../../prisma/prisma.service.js";
 import { SupportedLang } from "../../locales/index.js";
 import { SearchFiltersDto } from "../../product/dto/product-filters.dto.js";
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service.js";
 @Injectable()
 export class SearchProductsRepo {
   constructor(private prisma: PrismaService) {}
@@ -76,30 +76,30 @@ export class SearchProductsRepo {
             },
           },
         },
-         productattributevalue: {  // Changed from attribute_values
-    select: {
-      attributes: {  // Changed from attribute
-        select: {
-          code: true,
-          attributeTranslation: {
-            where: { language },
-            select: { name: true },
-            take: 1, 
+        productattributevalue: {
+          select: {
+            attributes: {
+              select: {
+                code: true,
+                attributeTranslation: {
+                  where: { language },
+                  select: { name: true },
+                  take: 1, 
+                },
+              },
+            },
+            attribute_values: {
+              select: {
+                value_code: true, 
+                attributeValueTranslations: {
+                  where: { language },
+                  select: { name: true },
+                  take: 1,
+                },
+              },
+            },
           },
         },
-      },
-      attribute_values: {  
-        select: {
-          value_code: true, 
-          attributeValueTranslations: {
-            where: { language },
-            select: { name: true },
-            take: 1,
-          },
-        },
-      },
-    },
-  },
         agency: { select: { agency_name: true, logo: true } },
       },
     });
@@ -110,111 +110,88 @@ export class SearchProductsRepo {
     return this.prisma.product.count({ where: whereConditions });
   }
 
-  private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang) {
-    const whereConditions: any = {};
+private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang) {
+  const whereConditions: any = {};
 
-    if (filters.areaLow !== undefined || filters.areaHigh !== undefined) {
-      whereConditions.area = {}; 
-      if (filters.areaLow !== undefined) whereConditions.area.gte = filters.areaLow;
-      if (filters.areaHigh !== undefined) whereConditions.area.lte = filters.areaHigh;
-    }
-
-    if (filters.categorySlug || filters.subcategorySlug) {
-      whereConditions.subcategory = {};
-      
-    
-
-    if (filters.categorySlug) {
-      whereConditions.subcategory.category = {
-        categorytranslation: {
-          some: { language, slug: filters.categorySlug },
-        },
-      };
-    }
-
-    if (filters.subcategorySlug) {
-      whereConditions.subcategory.subcategorytranslation = {
-        some: { language, slug: filters.subcategorySlug },
-      };
-    
+  // Area filter
+  if (filters.areaLow !== undefined || filters.areaHigh !== undefined) {
+    whereConditions.area = {};
+    if (filters.areaLow !== undefined) whereConditions.area.gte = filters.areaLow;
+    if (filters.areaHigh !== undefined) whereConditions.area.lte = filters.areaHigh;
   }
 
+  // ✅ Category & Subcategory filter by ID
+  if (filters.subcategoryId || filters.categoryId) {
+    whereConditions.subcategory = {};
+
+    if (filters.subcategoryId) {
+      whereConditions.subcategory.id = filters.subcategoryId;
     }
 
-    if (filters.listingtype) {
-      whereConditions.listingType = {
-        listing_type_translation: {
+    if (filters.categoryId) {
+      whereConditions.subcategory.categoryId = filters.categoryId;
+    }
+  }
+
+  // ✅ Listing Type filter
+  if (filters.listingTypeId) {
+    whereConditions.listingTypeId = filters.listingTypeId;
+  }
+
+  // ✅ Attribute filter by IDs
+  if (filters.attributes && Object.keys(filters.attributes).length > 0) {
+    const attributeConditions: any[] = [];
+
+    for (const [attributeIdStr, valueIds] of Object.entries(filters.attributes)) {
+      const attributeId = Number(attributeIdStr);
+      const valueArray = Array.isArray(valueIds)
+        ? valueIds.map((v) => Number(v))
+        : [Number(valueIds)];
+
+      attributeConditions.push({
+        productattributevalue: {
           some: {
-            language,
-            slug: filters.listingtype,
+            attributeId,
+            attributeValueId: { in: valueArray },
           },
         },
+      });
+    }
+
+    if (attributeConditions.length > 0) {
+      whereConditions.AND = attributeConditions;
+    }
+  }
+
+  // ✅ Price filter
+  if (filters.pricelow !== undefined || filters.pricehigh !== undefined) {
+    whereConditions.price = {};
+    if (filters.pricelow !== undefined) whereConditions.price.gte = filters.pricelow;
+    if (filters.pricehigh !== undefined) whereConditions.price.lte = filters.pricehigh;
+  }
+
+  // ✅ City / Country filter
+  if (filters.cities || filters.country) {
+    whereConditions.city = {};
+    if (filters.cities && filters.cities.length > 0) {
+      whereConditions.city.name =
+        filters.cities.length === 1
+          ? filters.cities[0]
+          : { in: filters.cities };
+    }
+    if (filters.country) {
+      whereConditions.city.country = {
+        name: filters.country.toLowerCase(),
       };
     }
-
-    if (filters.attributes && Object.keys(filters.attributes).length > 0) {
-      const attributeConditions: any[] = [];
-
-      for (const [attributeSlug, valueSlug] of Object.entries(filters.attributes)) {
-        const valuesArray = Array.isArray(valueSlug) ? valueSlug : [valueSlug];
-
-        attributeConditions.push({
-          attributes: {
-            some: {
-              attribute: {
-                attributeTranslation: {
-                  some: { 
-                    language, 
-                    slug: attributeSlug
-                  },
-                },
-              },
-              attributeValue: {
-                attributeValueTranslations: {
-                  some: { 
-                    language, 
-                    slug: { in: valuesArray } 
-                  },
-                },
-              },
-            },
-          },
-        });
-      }
-
-      if (attributeConditions.length > 0) {
-        whereConditions.AND = attributeConditions;
-      }
-    }
-
-    if (filters.pricelow !== undefined || filters.pricehigh !== undefined) {
-      whereConditions.price = {};
-      if (filters.pricelow !== undefined) whereConditions.price.gte = filters.pricelow;
-      if (filters.pricehigh !== undefined) whereConditions.price.lte = filters.pricehigh;
-    }
-
-    // City and Country filters - MySQL compatible
-    if (filters.cities || filters.country) {
-      whereConditions.city = {};
-      
-      if (filters.cities && filters.cities.length > 0) {
-        // Use 'in' for multiple cities
-        whereConditions.city.name = filters.cities.length === 1 
-          ? filters.cities[0] 
-          : { in: filters.cities };
-      }
-      
-      if (filters.country) {
-        whereConditions.city.country = {
-          name: filters.country.toLowerCase()
-        };
-      }
-    }
-
-    if (filters.status) {
-      whereConditions.status = filters.status;
-    }
-
-    return whereConditions;
   }
+
+  // ✅ Status filter
+  if (filters.status) {
+    whereConditions.status = filters.status;
+  }
+
+  console.log('🔍 WHERE (IDs):', JSON.stringify(whereConditions, null, 2));
+  return whereConditions;
+}
 }

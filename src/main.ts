@@ -6,6 +6,7 @@ import { AppConfigService } from './config/config.service';
 
 // ✅ Swagger imports
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SupportedLang, t } from './locales';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,19 +16,31 @@ async function bootstrap() {
 
   // 💥 Validation formatting
   app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      exceptionFactory: (errors) => {
-        const formatted: Record<string, string[]> = {};
-        errors.forEach((err) => {
-          formatted[err.property] = Object.values(err.constraints ?? {});
-        });
-        return new BadRequestException(formatted);
-      },
-    }),
-  );
+  new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+
+    exceptionFactory: (errors) => {
+      const formatted: Record<string, string[]> = {};
+
+      for (const err of errors) {
+        if (err.constraints) {
+          formatted[err.property] = Object.values(err.constraints);
+        }
+      }
+
+      // you can later detect language from request middleware
+      const lang: SupportedLang = 'al';
+
+      return new BadRequestException({
+        success: false,
+        message: t('validationFailed', lang),
+        errors: formatted,
+      });
+    },
+  }),
+);
 
   //  Enable CORS
   app.enableCors({

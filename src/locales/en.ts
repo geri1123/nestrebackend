@@ -9,7 +9,6 @@ export const en = {
     //login,registration
      registrationSuccess: "Registration successful. Please verify your email.",
     loginSuccess: "Login successful",
-    
      invalidCredentials: "Invalid credentials",
     accountNotActive: "Account not active. Verify email or contact support.",
     invalidPassword: "Invalid password",
