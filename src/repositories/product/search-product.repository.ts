@@ -3,11 +3,12 @@ import { PrismaService } from "../../prisma/prisma.service.js";
 import { SupportedLang } from "../../locales/index.js";
 import { SearchFiltersDto } from "../../product/dto/product-filters.dto.js";
 import { Injectable } from "@nestjs/common";
+import { IsearchProductRepository } from "./Isearch-product.repository.js";
 @Injectable()
-export class SearchProductsRepo {
+export class SearchProductsRepo implements IsearchProductRepository{
   constructor(private prisma: PrismaService) {}
 
-  async searchProducts(filters: SearchFiltersDto, language: SupportedLang) {
+  async searchProducts(filters: SearchFiltersDto, language: SupportedLang):Promise<any[]>{
     const whereConditions: any = this.buildWhereConditions(filters, language);
 
     let orderBy: Record<string, "asc" | "desc"> = { createdAt: "desc" }; 
