@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { hashPassword } from '../../utils/hash.js';
+import { hashPassword } from '../../utils/hash';
 import type { IUserRepository } from './Iuser.repository';
 // import type { NewUser, PartialUserByToken } from '../../types/database.js';
 import type { BaseUserInfo } from '../../users/types/base-user-info';
 import { UserCreationData } from '../../auth/types/create-user-input';
 import type { UpdatableUserFields } from '../../users/types/update-user-info'
 import { PartialUserForLogin ,PartialUserByToken } from '../../types/user';
-// import { user_status } from '@prisma/client';
+
 import { user_status } from '@prisma/client';
 @Injectable()
 export class UserRepository implements IUserRepository {

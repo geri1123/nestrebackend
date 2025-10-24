@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {  registrationrequest_status } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service.js';
-import { AgentRequestQueryResult } from '../../registration-request/type/agent-request-query-result.js';
-import { IRegistrationRequestRepository } from './Iregistration-request.respository.js';
-import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create.js';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AgentRequestQueryResult } from '../../registration-request/type/agent-request-query-result';
+import { IRegistrationRequestRepository } from './Iregistration-request.respository';
+import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create';
+import { registrationrequest_status } from '@prisma/client';
 @Injectable()
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
  constructor(private prisma: PrismaService) {}

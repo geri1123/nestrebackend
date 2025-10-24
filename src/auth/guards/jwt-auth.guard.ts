@@ -3,10 +3,10 @@ import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { UserRepository } from '../repositories/user/user.repository';
-import { AgencyRepository } from '../repositories/agency/agency.repository';
-import { SupportedLang, t } from '../locales';
-import { IS_PUBLIC_KEY } from '../common/decorators/public.decorator';
+import { UserRepository } from '../../repositories/user/user.repository';
+import { AgencyRepository } from '../../repositories/agency/agency.repository';
+import { SupportedLang, t } from '../../locales';
+import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

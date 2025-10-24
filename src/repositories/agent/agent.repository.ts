@@ -1,9 +1,9 @@
 // import { prisma } from "../../config/prisma.js";
 import { Injectable } from "@nestjs/common";
-import { NewAgent } from "../../agent/types/create-agent.js";
-import { PrismaService } from "../../prisma/prisma.service.js";
-import { IAgentsRepository } from "./Iagent.repository.js";
-import { AgentInfo } from "../../agent/types/agent-info.js";
+import { NewAgent } from "../../agent/types/create-agent";
+import { PrismaService } from "../../prisma/prisma.service";
+import { IAgentsRepository } from "./Iagent.repository";
+import { AgentInfo } from "../../agent/types/agent-info";
 
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {

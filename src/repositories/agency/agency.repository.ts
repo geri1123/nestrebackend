@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { generatePublicCode } from '../../utils/hash.js';
+import { generatePublicCode } from '../../utils/hash';
 import {   agency   } from '@prisma/client';
-import { AgencyInfo } from '../../agency/types/agency-info.js';
-import { PrismaService } from '../../prisma/prisma.service.js';
-import { PlainAgencyInput } from '../../agency/types/agency-create-input.js';
-import { IAgencyRepository } from './Iagency.repository.js';
+import { AgencyInfo } from '../../agency/types/agency-info';
+import { PrismaService } from '../../prisma/prisma.service';
+import { PlainAgencyInput } from '../../agency/types/agency-create-input';
+import { IAgencyRepository } from './Iagency.repository';
 @Injectable()
 export class AgencyRepository implements IAgencyRepository {
   constructor(private prisma : PrismaService) {}
