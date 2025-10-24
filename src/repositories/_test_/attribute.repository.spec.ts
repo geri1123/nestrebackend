@@ -1,5 +1,5 @@
 import { AttributeRepo } from '../attributes/attributes.repository';
-import { PrismaService } from '../../prisma/prisma.service';
+
 import { LanguageCode } from '@prisma/client';
 
 describe('AttributeRepo', () => {

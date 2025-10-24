@@ -1,6 +1,6 @@
 import {  LanguageCode } from "@prisma/client";
-import { PrismaService } from "../../prisma/prisma.service.js";
-import { IAttributeRepo } from "./Iattribute.respository.js";
+import { PrismaService } from "../../prisma/prisma.service";
+import { IAttributeRepo } from "./Iattribute.respository";
 import { Injectable } from "@nestjs/common";
 @Injectable()
 export class AttributeRepo implements IAttributeRepo {

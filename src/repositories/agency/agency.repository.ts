@@ -59,12 +59,12 @@ async findWithOwnerById(agencyId: number): Promise<{ id: number; agency_name: st
   });
 }
   async findByOwnerUserId(ownerUserId: number): Promise<{ id: number } | null> {
-    const agency = await this.prisma.agency.findFirst({
-      where: { owner_user_id: ownerUserId },
-      select: { id: true },
-    });
-    return agency || null;
-  }
+  const agency = await this.prisma.agency.findFirst({
+    where: { owner_user_id: ownerUserId },
+    select: { id: true },
+  });
+  return agency || null;
+}
   
   async findByPublicCode(publicCode: string): Promise<agency | null> {
     return this.prisma.agency.findUnique({
@@ -104,13 +104,13 @@ async findWithOwnerById(agencyId: number): Promise<{ id: number; agency_name: st
     });
     return existing !== null;
   }
-
-  async activateAgency(agencyId: number): Promise<void> {
-    await this.prisma.agency.update({
-      where: { id: agencyId },
-      data: { status: 'active' },
-    });
-  }
+async activateAgency(agencyId: number): Promise<void> {
+  await this.prisma.agency.update({
+    where: { id: agencyId },
+    data: { status: 'active' },
+  });
+}
+  
 
   async updateAgencyFields(
     agencyId: number,

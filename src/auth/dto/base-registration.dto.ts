@@ -28,8 +28,8 @@ export function BaseRegistrationDtoFactory(lang: SupportedLang = 'al') {
     @Equals(true, { message: t('termsRequired', lang) })
     terms_accepted: boolean;
 
-    @IsEnum(['user', 'agency_owner', 'agent'], { message: t('invalidRole', lang) })
-    role: Role;
+    // @IsEnum(['user', 'agency_owner', 'agent'], { message: t('invalidRole', lang) })
+    // role: Role;
   }
 
   return BaseRegistrationDto;

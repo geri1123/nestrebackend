@@ -7,18 +7,23 @@ import { PasswordController } from './password.controller';
 import { EmailModule } from '../email/email.module';
 import { PasswordRecoveryService } from './password.service';
 import { AgencyRepository } from '../repositories/agency/agency.repository';
-
+import { RegistrationRequestModule } from '../registration-request/registration.request.module';
 import { AgentsRepository } from '../repositories/agent/agent.repository';
 import { UserRepository } from '../repositories/user/user.repository';
 import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
 import { PasswordResetTokenRepository } from '../repositories/passwordReset/password-reset.repository';
 import { EmailVerificationController } from './email-verification.controller';
 import { EmailVerificationService } from './email-verification.service';
+import { NotificationModule } from '../notification/notification.module';
+import { AgencyModule } from '../agency/agency.module';
+import { UserModule } from '../users/users.module';
 @Module({
   imports: [
-  
+  NotificationModule,
     EmailModule,
-    
+    UserModule,
+     AgencyModule,
+    RegistrationRequestModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -32,17 +37,12 @@ import { EmailVerificationService } from './email-verification.service';
   ],
   providers: [
     AuthService,
-    EmailVerificationService,
-    //  PrismaService, 
-    AgencyRepository, 
-    AgentsRepository,
-    PasswordRecoveryService,
-    UserRepository,
-    RegistrationRequestRepository,
+    
+   EmailVerificationService,
+   PasswordRecoveryService,
     PasswordResetTokenRepository
   ],
   controllers: [AuthController, PasswordController , EmailVerificationController],
-  exports: [AuthService, JwtModule ,   UserRepository,   
-    AgencyRepository ], 
+  exports: [AuthService, JwtModule ], 
 })
 export class AuthModule {}

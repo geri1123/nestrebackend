@@ -1,36 +1,226 @@
-// registration.service.ts
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { UserRepository } from '../repositories/user/user.repository';
-import { AgencyRepository } from '../repositories/agency/agency.repository';
-import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
+// // registration.service.ts
+// import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+// import { UserRepository } from '../repositories/user/user.repository';
+// import { AgencyRepository } from '../repositories/agency/agency.repository';
+// import { RegistrationRequestRepository } from '../repositories/registration-request/registration-request.repository';
+// import { EmailService } from '../email/email.service';
+// import { comparePassword, generateToken } from '../utils/hash';
+// import { t, SupportedLang } from '../locales';
+// import { BaseRegistrationDtoFactory } from './dto/base-registration.dto';
+// import { RegisterAgencyOwnerDtoFactory } from './dto/register-agency-owner.dto';
+// import { RegisterAgentDtoFactory } from './dto/register-agent.dto';
+// import { UserStatus } from './types/create-user-input';
+// import { UserCreationData } from './types/create-user-input';
+// import { LoginDto } from './dto/login.dto';
+// import { JwtService } from '@nestjs/jwt';
+// import { RegisterAgencyOwnerDto } from './dto/register-agency-owner.dto';
+// import { RegisterAgentDto } from './dto/register-agent.dto';
+// import { BaseRegistrationDto } from './dto/base-registration.dto';
+// import { RegistrationRequestService } from '../registration-request/registration.request.service';
+// import { AgencyService } from '../agency/agency.service';
+// @Injectable()
+// export class AuthService {
+//   constructor(
+//     private readonly userRepo: UserRepository,
+   
+//     private readonly emailService: EmailService,
+//     private readonly agencyService:AgencyService,
+//     private readonly jwtService:JwtService,
+//     private  readonly registrationrequest:RegistrationRequestService,
+
+//   ) {}
+// //Login
+// async login(dto: LoginDto, language: SupportedLang="al") {
+//     const { identifier, password, rememberMe } = dto;
+
+//     // Find user by email or username
+//     const user = await this.userRepo.findByIdentifier(identifier);
+//     if (!user) {
+//       throw new UnauthorizedException({
+//         success: false,
+//         message: t('invalidCredentials', language),
+//       });
+//     }
+
+//     // Check if account is active
+//     if (user.status !== 'active') {
+//       throw new UnauthorizedException({
+//         success: false,
+//         message: t('accountNotActive', language),
+//         errorCode: 'EMAIL_NOT_VERIFIED',
+//       });
+//     }
+
+//     // Verify password
+//     const isMatch = await comparePassword(password, user.password);
+//     if (!isMatch) {
+//       throw new UnauthorizedException({
+//         success: false,
+//         message: t('invalidCredentials', language),
+//       });
+//     }
+
+//     // Update last login timestamp
+//     await this.userRepo.updateFieldsById(user.id, {
+//       last_login: new Date(),
+//     });
+
+//     // Generate JWT token with appropriate expiry
+//     const tokenExpiry = rememberMe ? '30d' : '1d';
+//     const token = this.jwtService.sign(
+//       {
+//         userId: user.id,
+//         username: user.username,
+//         email: user.email,
+//         role: user.role,
+//       },
+//       { expiresIn: tokenExpiry },
+//     );
+
+//     return { user, token };
+//   }
+//   // --------------------------
+//   // COMMON VALIDATIONS
+//   // --------------------------
+//   private async validateUserBase(
+//     dto: BaseRegistrationDto,
+//     language: SupportedLang,
+//   ) {
+//     const errors: Record<string, string[]> = {};
+
+//     if (await this.userRepo.usernameExists(dto.username)) {
+//       errors.username = [t('usernameExists', language)];
+//     }
+
+//     if (await this.userRepo.emailExists(dto.email)) {
+//       errors.email = [t('emailExists', language)];
+//     }
+
+//     if (Object.keys(errors).length > 0) {
+//       throw new BadRequestException(errors);
+//     }
+//   }
+
+//   // --------------------------
+//   // Helper to map DTO -> DB creation data
+//   // --------------------------
+//   private mapDtoToUserCreation(
+//     dto: BaseRegistrationDto,
+//     role: 'user' | 'agency_owner' | 'agent',
+//   ): UserCreationData {
+//     const verification_token = generateToken();
+//     const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+//     return {
+//       username: dto.username,
+//       email: dto.email,
+//       password: dto.password,
+//       first_name: dto.first_name,
+//       last_name: dto.last_name,
+//       role,
+//       status: UserStatus.INACTIVE,
+//       verification_token,
+//       verification_token_expires,
+//     };
+//   }
+
+//   // --------------------------
+//   // USER REGISTRATION
+//   // --------------------------
+//   async registerUser(
+//     dto: BaseRegistrationDto,
+//     language: SupportedLang,
+//   ) {
+//     await this.validateUserBase(dto, language);
+
+//     const userData = this.mapDtoToUserCreation(dto, 'user');
+//     const userId = await this.userRepo.create(userData);
+
+//     await this.emailService.sendVerificationEmail(
+//       dto.email,
+//       dto.username,
+//       userData.verification_token,
+//       language,
+//     );
+
+//     return { userId, message: t('registrationSuccess', language) };
+//   }
+
+//   // --------------------------
+//   // AGENCY OWNER REGISTRATION
+//   // --------------------------
+//     async registerAgencyOwner(dto: RegisterAgencyOwnerDto, language: SupportedLang) {
+//     await this.validateUserBase(dto, language);
+
+//     const userData = this.mapDtoToUserCreation(dto, "agency_owner");
+//     const userId = await this.userRepo.create(userData);
+
+//     // ✅ call AgencyService to handle agency creation
+//     await this.agencyService.createAgency(dto, userId, language);
+
+//     await this.emailService.sendVerificationEmail(
+//       dto.email,
+//       `${dto.first_name} ${dto.last_name}`,
+//       userData.verification_token,
+//       language,
+//     );
+
+//     return { userId, message: t("registrationSuccess", language) };
+//   }
+//   // --------------------------
+//   // AGENT REGISTRATION
+//   // --------------------------
+//   async registerAgent(dto: RegisterAgentDto, language: SupportedLang) {
+//   await this.validateUserBase(dto, language);
+
+//   const userData = this.mapDtoToUserCreation(dto, 'agent');
+//   const userId = await this.userRepo.create(userData);
+
+//   // Delegate all request + notification logic to the service
+//   await this.registrationrequest.createAgentRequest(userId, dto, language);
+
+//   await this.emailService.sendVerificationEmail(
+//     dto.email,
+//     `${dto.first_name} ${dto.last_name}`,
+//     userData.verification_token,
+//     language,
+//   );
+
+//   return { userId, message: t('registrationSuccess', language) };
+// }
+// }
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { UserService } from '../users/users.service';
+import { AgencyService } from '../agency/agency.service';
+import { RegistrationRequestService } from '../registration-request/registration.request.service';
 import { EmailService } from '../email/email.service';
-import { comparePassword, generateToken } from '../utils/hash';
-import { t, SupportedLang } from '../locales';
-import { BaseRegistrationDtoFactory } from './dto/base-registration.dto';
-import { RegisterAgencyOwnerDtoFactory } from './dto/register-agency-owner.dto';
-import { RegisterAgentDtoFactory } from './dto/register-agent.dto';
-import { UserStatus } from './types/create-user-input';
-import { UserCreationData } from './types/create-user-input';
-import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../prisma/prisma.service';
+import { LoginDto } from './dto/login.dto';
 import { RegisterAgencyOwnerDto } from './dto/register-agency-owner.dto';
 import { RegisterAgentDto } from './dto/register-agent.dto';
+import { SupportedLang, t } from '../locales';
+import { comparePassword } from '../utils/hash';
 import { BaseRegistrationDto } from './dto/base-registration.dto';
+
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepo: UserRepository,
-    private readonly agencyRepo: AgencyRepository,
-    private readonly requestRepo: RegistrationRequestRepository,
+    private readonly userService: UserService,
     private readonly emailService: EmailService,
-    private readonly jwtService:JwtService
+    private readonly agencyService: AgencyService,
+    private readonly jwtService: JwtService,
+    private readonly registrationrequest: RegistrationRequestService,
+    private readonly prisma: PrismaService, // Add PrismaService for transactions
   ) {}
-//Login
-async login(dto: LoginDto, language: SupportedLang="al") {
+
+  // --------------------------
+  // LOGIN
+  // --------------------------
+  async login(dto: LoginDto, language: SupportedLang = 'al') {
     const { identifier, password, rememberMe } = dto;
 
-    // Find user by email or username
-    const user = await this.userRepo.findByIdentifier(identifier);
+    const user = await this.userService.findByIdentifier(identifier);
     if (!user) {
       throw new UnauthorizedException({
         success: false,
@@ -38,7 +228,6 @@ async login(dto: LoginDto, language: SupportedLang="al") {
       });
     }
 
-    // Check if account is active
     if (user.status !== 'active') {
       throw new UnauthorizedException({
         success: false,
@@ -47,7 +236,6 @@ async login(dto: LoginDto, language: SupportedLang="al") {
       });
     }
 
-    // Verify password
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
       throw new UnauthorizedException({
@@ -56,12 +244,8 @@ async login(dto: LoginDto, language: SupportedLang="al") {
       });
     }
 
-    // Update last login timestamp
-    await this.userRepo.updateFieldsById(user.id, {
-      last_login: new Date(),
-    });
+    await this.userService.updateLastLogin(user.id);
 
-    // Generate JWT token with appropriate expiry
     const tokenExpiry = rememberMe ? '30d' : '1d';
     const token = this.jwtService.sign(
       {
@@ -75,157 +259,101 @@ async login(dto: LoginDto, language: SupportedLang="al") {
 
     return { user, token };
   }
-  // --------------------------
-  // COMMON VALIDATIONS
-  // --------------------------
-  private async validateUserBase(
-    dto: BaseRegistrationDto,
-    language: SupportedLang,
-  ) {
-    const errors: Record<string, string[]> = {};
-
-    if (await this.userRepo.usernameExists(dto.username)) {
-      errors.username = [t('usernameExists', language)];
-    }
-
-    if (await this.userRepo.emailExists(dto.email)) {
-      errors.email = [t('emailExists', language)];
-    }
-
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
-  }
 
   // --------------------------
-  // Helper to map DTO -> DB creation data
+  // REGULAR USER REGISTRATION
   // --------------------------
-  private mapDtoToUserCreation(
-    dto: BaseRegistrationDto,
-    role: 'user' | 'agency_owner' | 'agent',
-  ): UserCreationData {
-    const verification_token = generateToken();
-    const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    return {
-      username: dto.username,
-      email: dto.email,
-      password: dto.password,
-      first_name: dto.first_name,
-      last_name: dto.last_name,
-      role,
-      status: UserStatus.INACTIVE,
-      verification_token,
-      verification_token_expires,
-    };
-  }
-
-  // --------------------------
-  // USER REGISTRATION
-  // --------------------------
-  async registerUser(
-    dto: BaseRegistrationDto,
-    language: SupportedLang,
-  ) {
-    await this.validateUserBase(dto, language);
-
-    const userData = this.mapDtoToUserCreation(dto, 'user');
-    const userId = await this.userRepo.create(userData);
-
-    await this.emailService.sendVerificationEmail(
-      dto.email,
-      dto.username,
-      userData.verification_token,
-      language,
-    );
-
-    return { userId, message: t('registrationSuccess', language) };
+  async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
+    return this.userService.registerUser(dto, lang);
   }
 
   // --------------------------
   // AGENCY OWNER REGISTRATION
   // --------------------------
-  async registerAgencyOwner(
-    dto: RegisterAgencyOwnerDto,
-    language: SupportedLang,
-  ) {
-    await this.validateUserBase(dto, language);
-    const errors: Record<string, string[]> = {};
+  async registerAgencyOwner(dto: RegisterAgencyOwnerDto, language: SupportedLang) {
+    console.log('🔐 [AuthService] Starting agency owner registration');
 
-    if (await this.agencyRepo.agencyNameExist(dto.agency_name)) {
-      errors.agency_name = [t('agencyExists', language)];
+    // VALIDATION FIRST (before creating anything)
+    // Check agency-specific validations to fail fast
+    await this.agencyService.validateAgencyData(dto, language);
+
+    let userId: number;
+    let verificationToken: string;
+
+    try {
+      // Use transaction to ensure atomicity
+      const result = await this.prisma.$transaction(async (tx) => {
+        console.log('🔄 [AuthService] Starting transaction');
+
+        // Create user with role 'agency_owner'
+        const userResult = await this.userService.createUserWithRole(
+          dto,
+          'agency_owner',
+          language,
+          false, // Don't send email yet
+        );
+
+        console.log(`✅ [AuthService] Agency owner user created with ID: ${userResult.userId}`);
+
+        // Create agency
+        const agencyId = await this.agencyService.createAgency(
+          dto,
+          userResult.userId,
+          language,
+        );
+
+        console.log(`✅ [AuthService] Agency created with ID: ${agencyId}`);
+
+        return {
+          userId: userResult.userId,
+          verificationToken: userResult.verificationToken,
+          agencyId,
+        };
+      });
+
+      userId = result.userId;
+      verificationToken = result.verificationToken;
+
+      console.log('✅ [AuthService] Transaction completed successfully');
+
+      // Send verification email AFTER successful transaction
+      await this.emailService.sendVerificationEmail(
+        dto.email,
+        dto.first_name || dto.username,
+        verificationToken,
+        language,
+      );
+
+      console.log('✅ [AuthService] Verification email sent');
+
+      return { userId, message: t('registrationSuccess', language) };
+    } catch (error) {
+      console.error('❌ [AuthService] Registration failed:', error);
+      
+      // Transaction automatically rolled back
+      // No orphaned user in database
+      throw error;
     }
-
-    if (await this.agencyRepo.licenseExists(dto.license_number)) {
-      errors.license_number = [t('licenseExists', language)];
-    }
-
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
-
-    const userData = this.mapDtoToUserCreation(dto, 'agency_owner');
-    const userId = await this.userRepo.create(userData);
-
-    await this.agencyRepo.create({
-      agency_name: dto.agency_name,
-      license_number: dto.license_number,
-      address: dto.address,
-      owner_user_id: userId,
-    });
-
-    await this.emailService.sendVerificationEmail(
-      dto.email,
-      `${dto.first_name} ${dto.last_name}`,
-      userData.verification_token,
-      language,
-    );
-
-    return { userId, message: t('registrationSuccess', language) };
   }
 
   // --------------------------
   // AGENT REGISTRATION
   // --------------------------
-  async registerAgent(
-    dto: RegisterAgentDto,
-    language: SupportedLang,
-  ) {
-    await this.validateUserBase(dto, language);
-    const errors: Record<string, string[]> = {};
+  async registerAgent(dto: RegisterAgentDto, language: SupportedLang) {
+    console.log('🔐 [AuthService] Starting agent registration');
 
-    const agency = await this.agencyRepo.findByPublicCode(dto.public_code);
-    if (!agency) {
-      errors.public_code = [t('invalidPublicCode', language)];
-    }
-
-    if (await this.requestRepo.idCardExists(dto.id_card_number)) {
-      errors.id_card_number = [t('idCardExists', language)];
-    }
-
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
-
-    const userData = this.mapDtoToUserCreation(dto, 'agent');
-    const userId = await this.userRepo.create(userData);
-
-    await this.requestRepo.create({
-      userId,
-      idCardNumber: dto.id_card_number,
-      status: 'pending',
-      agencyName: agency!.agency_name, 
-      agencyId: agency!.id,
-      requestedRole: dto.requested_role,
-      requestType: 'agent_license_verification',
-    });
-
-    await this.emailService.sendVerificationEmail(
-      dto.email,
-      `${dto.first_name} ${dto.last_name}`,
-      userData.verification_token,
+    // Create user with role 'agent'
+    const { userId } = await this.userService.createUserWithRole(
+      dto,
+      'agent',
       language,
+      true, // Send email immediately
     );
+
+    console.log(`✅ [AuthService] Agent user created with ID: ${userId}`);
+
+    // Delegate request + notification logic
+    await this.registrationrequest.createAgentRequest(userId, dto, language);
 
     return { userId, message: t('registrationSuccess', language) };
   }

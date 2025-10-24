@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
-import { PrismaService } from "../../prisma/prisma.service.js";
-import { ICatRepository } from "./Icategory.repository.js";
+import { PrismaService } from "../../prisma/prisma.service";
+import { ICatRepository } from "./Icategory.repository";
 import { LanguageCode } from "@prisma/client";
 import { product_status } from "@prisma/client";
 import { CategoryDto } from "../../filters/dto/filters.dto.js";

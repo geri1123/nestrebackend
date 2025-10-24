@@ -12,14 +12,20 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/role-guard';
 import { ProductModule } from './product/product.module';
+import { NotificationModule } from './notification/notification.module';
+import { AgencyModule } from './agency/agency.module';
+import { UserModule } from './users/users.module';
 @Module({
   imports: [
     AppConfigModule,
     PrismaModule,
+    UserModule,
     FirebaseModule,
+    AgencyModule,
 AuthModule,
 FiltersModule,
 ProductModule,
+NotificationModule,
 ThrottlerModule.forRoot([
       {
         ttl: 15 * 60, 
