@@ -6,6 +6,7 @@ export const al = {
      usernotfound: "Përdoruesi nuk u gjet",
        noTokenProvided: "Asnjë token nuk u sigurua",
      invalidRole: "Roli i përdoruesit është i pavlefshëm",
+     couldNotUpdateRequest:"Nuk mund të përditësohet kërkesa",
      tooManyLoginAttempts: "Shumë përpjekje për t'u kyçur nga ky IP, provoni përsëri pas 5 minutash.",
     //login,registration
      registrationSuccess: "Regjistrimi u krye me sukses. Ju lutemi verifikoni email-in tuaj.",

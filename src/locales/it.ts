@@ -7,6 +7,7 @@ export const it = {
         usernotfound: "Utente non trovato",
      tooManyLoginAttempts: "Troppi tentativi di accesso da questo IP, riprova tra 5 minuti.",
      invalidRole: "Ruolo utente non valido",
+      couldNotUpdateRequest:"Impossibile aggiornare la richiesta",
     //login,registration
       registrationSuccess: "Registrazione completata. Si prega di verificare la tua email.",
     loginSuccess: "Accesso riuscito",

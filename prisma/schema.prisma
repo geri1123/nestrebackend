@@ -32,7 +32,7 @@ model agencyagent {
   agency_id       Int
   agent_id        Int
   added_by        Int?
-  id_card_number  String?
+   id_card_number  String?   @unique 
   role_in_agency  agencyagent_role_in_agency @default(agent)
   commission_rate Decimal?                   @db.Decimal(5, 2)
   start_date      DateTime?

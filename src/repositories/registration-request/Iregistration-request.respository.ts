@@ -1,4 +1,5 @@
 import {
+  registrationrequest,
   registrationrequest_status,
 } from '@prisma/client';
 import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create.js';
@@ -16,8 +17,8 @@ export interface IRegistrationRequestRepository {
   ): Promise<{ data: AgentRequestQueryResult[]; total: number }>;
 
   countAgentRequestsByAgencyId(agencyId: number): Promise<number>;
-
-  updateStatus(
+setUnderReview(userId: number): Promise<registrationrequest | null>;
+  agencyReviewStatus(
     id: number,
     status: registrationrequest_status,
     reviewedBy?: number,

@@ -74,4 +74,11 @@ export class AgentsRepository implements IAgentsRepository {
       },
     });
   }
+
+  async findByIdCardNumber(idCardNumber: string) {
+    return await this.prisma.agencyagent.findUnique({
+      where: { id_card_number: idCardNumber },
+    });
+  }
+
 }

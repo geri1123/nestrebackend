@@ -6,35 +6,52 @@ import { SupportedLang, t } from "../locales";
 @Injectable()
 export class AgencyService {
   constructor(private readonly agencyRepo: AgencyRepository) {}
-
-  /**
-   * Validate agency data before creating user
-   * This allows us to fail fast before any database writes
-   */
-  async validateAgencyData(dto: RegisterAgencyOwnerDto, language: SupportedLang = 'al') {
+    async checkAgencyPublicCode(publicCode: string) {
+    return await this.agencyRepo.findByPublicCode(publicCode);
+  }
+  async getAgencyByPublicCode(publicCode: string) {
+    const agency = await this.agencyRepo.findByPublicCode(publicCode);
+    if (!agency) {
+      return null; // Or throw an error if you prefer
+    }
+    return agency;
+  }
+  async getAgencyByOwnerOrFail(ownerUserId: number, language: SupportedLang) {
+  const agency = await this.agencyRepo.findByOwnerUserId(ownerUserId);
+  if (!agency) {
+    throw new BadRequestException({
+      success: false,
+      message: t('agencyNotFound', language),
+    });
+  }
+  return agency;
+}
+  async checkAgencyExists(
+    agencyName: string,
+    licenseNumber: string,
+    language: SupportedLang = 'al'
+  ): Promise<Record<string, string[]>> {
     const errors: Record<string, string[]> = {};
 
-    if (await this.agencyRepo.agencyNameExist(dto.agency_name)) {
+    if (await this.agencyRepo.agencyNameExist(agencyName)) {
       errors.agency_name = [t("agencyExists", language)];
     }
 
-    if (await this.agencyRepo.licenseExists(dto.license_number)) {
+    if (await this.agencyRepo.licenseExists(licenseNumber)) {
       errors.license_number = [t("licenseExists", language)];
     }
 
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
+    return errors;
   }
 
+ 
   async createAgency(
-    dto: RegisterAgencyOwnerDto, 
-    userId: number, 
+    dto: RegisterAgencyOwnerDto,
+    userId: number,
     language: SupportedLang = "al"
-  ) {
-    // Note: Validation should be done BEFORE calling this method
-    // to avoid partial state in transactions
-    
+  ): Promise<number> {
+    console.log('🏢 [AgencyService] Creating agency');
+
     return this.agencyRepo.create({
       agency_name: dto.agency_name,
       license_number: dto.license_number,
@@ -44,27 +61,18 @@ export class AgencyService {
   }
 
   async activateAgencyByOwner(userId: number, language: SupportedLang = 'al') {
-    console.log('🏢 [AgencyService] activateAgencyByOwner called with userId:', userId);
-    
+    console.log('🏢 [AgencyService] Activating agency for user:', userId);
+
     const agency = await this.agencyRepo.findByOwnerUserId(userId);
-    console.log('🏢 [AgencyService] Agency lookup result:', agency);
-    
+
     if (!agency) {
-      console.error('❌ [AgencyService] No agency found for userId:', userId);
       throw new BadRequestException({
         success: false,
         message: t('agencyNotFound', language),
       });
     }
 
-    console.log('🏢 [AgencyService] Found agency, calling activateAgency with ID:', agency.id);
-    
-    try {
-      await this.agencyRepo.activateAgency(agency.id);
-      console.log('✅ [AgencyService] Agency activated successfully:', agency.id);
-    } catch (error) {
-      console.error('❌ [AgencyService] Failed to activate agency:', error);
-      throw error;
-    }
+    await this.agencyRepo.activateAgency(agency.id);
+    console.log('✅ [AgencyService] Agency activated:', agency.id);
   }
 }

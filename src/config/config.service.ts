@@ -71,7 +71,11 @@ export class AppConfigService {
     return this.configService.get<string>('FIREBASE_CLIENT_ID')!;
   }
 
- 
+ // PASSWORD_RESET_TOKEN_EXPIRATION=10
+
+get passwordResetTokenExpiration(): number {
+  return Number(this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRATION', 10)); // default 10 minutes
+}
   // Node environment
   get nodeEnv(): string {
     return this.configService.get<string>('NODE_ENV', 'development');

@@ -5,31 +5,27 @@ import { EmailService } from '../email/email.service';
 import { comparePassword, hashPassword, generateToken } from '../utils/hash';
 
 import { SupportedLang ,t} from '../locales';
+import { AppConfigService } from '../config/config.service';
+import { UserService } from '../users/users.service';
 @Injectable()
 export class PasswordRecoveryService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly tokenRepository: PasswordResetTokenRepository,
     private readonly emailService: EmailService,
+    private readonly userservice:UserService,
+    private readonly config: AppConfigService,
   ) {}
 
   async requestPasswordReset(email: string, lang: SupportedLang): Promise<void> {
-    const user = await this.userRepository.findByEmail(email);
-
-    if (!user) {
-      throw new NotFoundException({ email: [t('userNotFound', lang)] });
-    }
-
-    if (user.status !== 'active') {
-      throw new ForbiddenException({ email: [t('accountNotActive', lang)] });
-    }
+   const user = await this.userservice.findByEmailOrFailActive(email, lang);
 
     // Delete existing tokens
     await this.tokenRepository.deleteByUserId(user.id);
 
     // Generate new token
     const token = generateToken();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+   const expiresAt = new Date(Date.now() + this.config.passwordResetTokenExpiration * 60 * 1000);
 
     await this.tokenRepository.create(user.id, token, expiresAt);
 
@@ -77,9 +73,7 @@ export class PasswordRecoveryService {
     }
 
     // Hash and update password
-    const hashedPassword = await hashPassword(newPassword);
-    await this.userRepository.updateFieldsById(user.id, { password: hashedPassword });
-
+    await this.userservice.updatePassword(user.id, newPassword);
     // Delete used token
     await this.tokenRepository.delete(token);
   }

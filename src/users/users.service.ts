@@ -1,43 +1,99 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { UserRepository } from '../repositories/user/user.repository';
 import { EmailService } from '../email/email.service';
 import { BaseRegistrationDto } from '../auth/dto/base-registration.dto';
 import { UserStatus, UserCreationData } from '../auth/types/create-user-input';
-import { generateToken } from '../utils/hash';
+import { generateToken, hashPassword } from '../utils/hash';
 import { t, SupportedLang } from '../locales';
-
+import { UserStatusType } from './types/base-user-info';
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly emailService: EmailService,
   ) {}
+    async findByIdentifierOrFail(identifier: string, language: SupportedLang) {
+    const user = await this.userRepo.findByIdentifier(identifier);
+    if (!user) {
+      throw new NotFoundException({
+        success: false,
+        message: t('validationFailed', language),
+        errors: { email: [t('userNotFound', language)] },
+      });
+    }
+    return user;
+  }
+    async regenerateVerificationToken(userId: number): Promise<string> {
+    const token = generateToken();
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 24);
 
+    await this.userRepo.regenerateVerificationToken(userId, token, expires);
+
+    return token;
+  }
+  //
+  async updatePassword(userId: number, newPassword: string) {
+  const hashedPassword = await hashPassword(newPassword);
+  return this.userRepo.updateFieldsById(userId, { password: hashedPassword });
+}
+  //
+  async findByEmailOrFailActive(email: string, lang: SupportedLang) {
+  const user = await this.userRepo.findByEmail(email);
+  if (!user) {
+    throw new NotFoundException({ email: [t('userNotFound', lang)] });
+  }
+  if (user.status !== 'active') {
+    throw new ForbiddenException({ email: [t('accountNotActive', lang)] });
+  }
+  return user;
+}
+async verifyEmail(
+  userId: number,
+  emailVerified: boolean,
+  statusToUpdate: UserStatusType
+) {
+  return this.userRepo.verifyEmail(userId, emailVerified, statusToUpdate);
+}
   async findByIdentifier(identifier: string) {
     return this.userRepo.findByIdentifier(identifier);
   }
-
+ async findByVerificationTokenOrFail(token: string) {
+    const user = await this.userRepo.findByVerificationToken(token);
+    if (!user) {
+      throw new NotFoundException({
+        success: false,
+        message: 'Invalid or expired token',
+      });
+    }
+    return user;
+  }
   async updateLastLogin(userId: number) {
     return this.userRepo.updateFieldsById(userId, { last_login: new Date() });
   }
 
-  private async validateUserBase(dto: BaseRegistrationDto, language: SupportedLang) {
+  async checkUserExists(
+    username: string,
+    email: string,
+    language: SupportedLang
+  ): Promise<Record<string, string[]>> {
     const errors: Record<string, string[]> = {};
 
-    if (await this.userRepo.usernameExists(dto.username)) {
+    if (await this.userRepo.usernameExists(username)) {
       errors.username = [t('usernameExists', language)];
     }
 
-    if (await this.userRepo.emailExists(dto.email)) {
+    if (await this.userRepo.emailExists(email)) {
       errors.email = [t('emailExists', language)];
     }
 
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
+    return errors;
   }
 
-  private mapDtoToUserCreation(dto: BaseRegistrationDto, role: 'user' | 'agency_owner' | 'agent'): UserCreationData {
+  private mapDtoToUserCreation(
+    dto: BaseRegistrationDto,
+    role: 'user' | 'agency_owner' | 'agent'
+  ): UserCreationData {
     const verification_token = generateToken();
     const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
@@ -59,7 +115,12 @@ export class UserService {
   // --------------------------
   async registerUser(dto: BaseRegistrationDto, language: SupportedLang) {
     console.log('👤 [UserService] Registering regular user');
-    await this.validateUserBase(dto, language);
+
+    // Check first
+    const errors = await this.checkUserExists(dto.username, dto.email, language);
+    if (Object.keys(errors).length > 0) {
+      throw new BadRequestException(errors);
+    }
 
     const userData = this.mapDtoToUserCreation(dto, 'user');
     const userId = await this.userRepo.create(userData);
@@ -75,35 +136,24 @@ export class UserService {
   }
 
   // --------------------------
-  // CREATE USER WITH SPECIFIC ROLE (internal use)
-  // Used by AuthService for agency_owner and agent registration
+  // CREATE USER WITH SPECIFIC ROLE
+  // Used by AuthService after validation
   // --------------------------
   async createUserWithRole(
     dto: BaseRegistrationDto,
     role: 'user' | 'agency_owner' | 'agent',
     language: SupportedLang,
-    sendEmail: boolean = true
   ): Promise<{ userId: number; verificationToken: string }> {
     console.log(`👤 [UserService] Creating user with role: ${role}`);
-    await this.validateUserBase(dto, language);
 
     const userData = this.mapDtoToUserCreation(dto, role);
     const userId = await this.userRepo.create(userData);
 
-    console.log(`✅ [UserService] User created with ID: ${userId}, role: ${role}`);
+    
 
-    if (sendEmail) {
-      await this.emailService.sendVerificationEmail(
-        dto.email,
-        dto.first_name || dto.username,
-        userData.verification_token,
-        language,
-      );
-    }
-
-    return { 
-      userId, 
-      verificationToken: userData.verification_token 
+    return {
+      userId,
+      verificationToken: userData.verification_token
     };
   }
 }

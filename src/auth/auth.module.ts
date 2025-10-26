@@ -17,11 +17,13 @@ import { EmailVerificationService } from './email-verification.service';
 import { NotificationModule } from '../notification/notification.module';
 import { AgencyModule } from '../agency/agency.module';
 import { UserModule } from '../users/users.module';
+import { AppConfigModule } from '../config/config.module';
 @Module({
   imports: [
   NotificationModule,
     EmailModule,
     UserModule,
+    AppConfigModule,
      AgencyModule,
     RegistrationRequestModule,
     JwtModule.registerAsync({

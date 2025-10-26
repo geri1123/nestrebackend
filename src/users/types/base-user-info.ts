@@ -1,3 +1,4 @@
+export type UserStatusType = 'active' | 'inactive' | 'pending' | 'suspended';
 export type BaseUserInfo = {
   id: number;
   username: string;
@@ -9,7 +10,7 @@ export type BaseUserInfo = {
   phone: string | null;
   website: string | null;
   role: 'user' | 'agent' | 'agency_owner';
-  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  status: UserStatusType;
   email_verified?: boolean;
   last_login?: Date | null;
   last_active?: Date | null;

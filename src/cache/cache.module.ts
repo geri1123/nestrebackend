@@ -16,7 +16,7 @@ export const CACHE_KEYV = 'CACHE_KEYV';
       inject: [AppConfigService],
       useFactory: async (config: AppConfigService) => {
         const keyv = new Keyv({
-          store: new KeyvRedis({ url: config.redisUrl }) as any, // as any fixes TS type
+          store: new KeyvRedis({ url: config.redisUrl }) as any, 
           ttl: config.redisTTL,
         });
 
@@ -24,7 +24,7 @@ export const CACHE_KEYV = 'CACHE_KEYV';
 
         await keyv.set('ping', 'pong'); // test connection
         const pong = await keyv.get('ping');
-        console.log('Redis test:', pong); // should print "pong"
+        console.log('Redis test:', pong); 
 
         return keyv;
       },

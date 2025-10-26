@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AgentRequestQueryResult } from '../../registration-request/type/agent-request-query-result';
 import { IRegistrationRequestRepository } from './Iregistration-request.respository';
 import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create';
-import { registrationrequest_status } from '@prisma/client';
+import { registrationrequest, registrationrequest_status } from '@prisma/client';
 @Injectable()
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
  constructor(private prisma: PrismaService) {}
@@ -108,10 +108,20 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       },
     });
   }
+async setUnderReview(userId: number): Promise<registrationrequest | null> {
+  const latestRequest = await this.prisma.registrationrequest.findFirst({
+    where: { user_id: userId },
+    orderBy: { created_at: 'desc' },
+  });
 
-  
+  if (!latestRequest) return null;
 
-   async updateStatus(
+  return this.prisma.registrationrequest.update({
+    where: { id: latestRequest.id },
+    data: { status: registrationrequest_status.under_review },
+  });
+}
+   async agencyReviewStatus(
     id: number,
     status: registrationrequest_status,
     reviewedBy?: number,

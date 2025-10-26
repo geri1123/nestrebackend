@@ -210,7 +210,7 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly agencyService: AgencyService,
     private readonly jwtService: JwtService,
-    private readonly registrationrequest: RegistrationRequestService,
+    private readonly registrationrequestservice: RegistrationRequestService,
     private readonly prisma: PrismaService, // Add PrismaService for transactions
   ) {}
 
@@ -260,101 +260,96 @@ export class AuthService {
     return { user, token };
   }
 
-  // --------------------------
-  // REGULAR USER REGISTRATION
-  // --------------------------
-  async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
+    async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
     return this.userService.registerUser(dto, lang);
   }
 
-  // --------------------------
-  // AGENCY OWNER REGISTRATION
-  // --------------------------
+
   async registerAgencyOwner(dto: RegisterAgencyOwnerDto, language: SupportedLang) {
-    console.log('🔐 [AuthService] Starting agency owner registration');
+ 
 
-    // VALIDATION FIRST (before creating anything)
-    // Check agency-specific validations to fail fast
-    await this.agencyService.validateAgencyData(dto, language);
+    
+    const errors: Record<string, string[]> = {};
 
-    let userId: number;
-    let verificationToken: string;
+    
+    const userErrors = await this.userService.checkUserExists(dto.username, dto.email, language);
+    Object.assign(errors, userErrors);
 
-    try {
-      // Use transaction to ensure atomicity
-      const result = await this.prisma.$transaction(async (tx) => {
-        console.log('🔄 [AuthService] Starting transaction');
+    
+    const agencyErrors = await this.agencyService.checkAgencyExists(dto.agency_name, dto.license_number, language);
+    Object.assign(errors, agencyErrors);
 
-        // Create user with role 'agency_owner'
-        const userResult = await this.userService.createUserWithRole(
-          dto,
-          'agency_owner',
-          language,
-          false, // Don't send email yet
-        );
-
-        console.log(`✅ [AuthService] Agency owner user created with ID: ${userResult.userId}`);
-
-        // Create agency
-        const agencyId = await this.agencyService.createAgency(
-          dto,
-          userResult.userId,
-          language,
-        );
-
-        console.log(`✅ [AuthService] Agency created with ID: ${agencyId}`);
-
-        return {
-          userId: userResult.userId,
-          verificationToken: userResult.verificationToken,
-          agencyId,
-        };
-      });
-
-      userId = result.userId;
-      verificationToken = result.verificationToken;
-
-      console.log('✅ [AuthService] Transaction completed successfully');
-
-      // Send verification email AFTER successful transaction
-      await this.emailService.sendVerificationEmail(
-        dto.email,
-        dto.first_name || dto.username,
-        verificationToken,
-        language,
-      );
-
-      console.log('✅ [AuthService] Verification email sent');
-
-      return { userId, message: t('registrationSuccess', language) };
-    } catch (error) {
-      console.error('❌ [AuthService] Registration failed:', error);
-      
-      // Transaction automatically rolled back
-      // No orphaned user in database
-      throw error;
+  
+    if (Object.keys(errors).length > 0) {
+      throw new BadRequestException(errors);
     }
+
+    console.log('✅ [AuthService] All checks passed, creating user and agency...');
+
+   
+    const { userId, verificationToken } = await this.userService.createUserWithRole(
+      dto,
+      'agency_owner',
+      language,
+    );
+
+   
+    await this.agencyService.createAgency(dto, userId, language);
+
+    
+    await this.emailService.sendVerificationEmail(
+      dto.email,
+      dto.first_name || dto.username,
+      verificationToken,
+      language,
+    );
+
+    return {
+      userId,
+      message: t('registrationSuccess', language),
+    };
   }
 
-  // --------------------------
-  // AGENT REGISTRATION
-  // --------------------------
   async registerAgent(dto: RegisterAgentDto, language: SupportedLang) {
-    console.log('🔐 [AuthService] Starting agent registration');
+   
+    const errors: Record<string, string[]> = {};
 
-    // Create user with role 'agent'
-    const { userId } = await this.userService.createUserWithRole(
+   
+    const userErrors = await this.userService.checkUserExists(dto.username, dto.email, language);
+    Object.assign(errors, userErrors);
+
+   
+    const agentErrors = await this.registrationrequestservice.checkAgentData(dto.public_code, dto.id_card_number, language);
+    Object.assign(errors, agentErrors);
+
+  
+    if (Object.keys(errors).length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+
+
+    
+    const { userId, verificationToken } = await this.userService.createUserWithRole(
       dto,
       'agent',
       language,
-      true, // Send email immediately
     );
 
-    console.log(`✅ [AuthService] Agent user created with ID: ${userId}`);
+   
+    await this.registrationrequestservice.createAgentRequest(userId, dto, language);
 
-    // Delegate request + notification logic
-    await this.registrationrequest.createAgentRequest(userId, dto, language);
+ 
+    await this.emailService.sendVerificationEmail(
+      dto.email,
+      dto.first_name || dto.username,
+      verificationToken,
+      language,
+    );
 
-    return { userId, message: t('registrationSuccess', language) };
+    return {
+      userId,
+      message: t('registrationSuccess', language),
+    };
   }
 }

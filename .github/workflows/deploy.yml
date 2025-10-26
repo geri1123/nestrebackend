@@ -63,5 +63,5 @@ jobs:
 
       - name: Deploy to server
         run: |
-          # Replace the following line with your actual deployment commands
+          
           ssh user@your-server "cd /path/to/app && npm ci && npm run build && pm2 restart all"

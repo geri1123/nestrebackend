@@ -9,7 +9,7 @@ describe('AgencyRepository', () => {
   let prisma: any;
 
   beforeEach(() => {
-    // Force Prisma methods to be Jest mocks
+  
     prisma = {
       agency: {
         findFirst: jest.fn(),
