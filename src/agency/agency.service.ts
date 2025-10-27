@@ -61,7 +61,7 @@ export class AgencyService {
   }
 
   async activateAgencyByOwner(userId: number, language: SupportedLang = 'al') {
-    console.log('🏢 [AgencyService] Activating agency for user:', userId);
+   
 
     const agency = await this.agencyRepo.findByOwnerUserId(userId);
 
@@ -73,6 +73,10 @@ export class AgencyService {
     }
 
     await this.agencyRepo.activateAgency(agency.id);
-    console.log('✅ [AgencyService] Agency activated:', agency.id);
+    
   }
+  async getAgencyWithOwnerById(agencyId: number) {
+    return this.agencyRepo.findWithOwnerById(agencyId);
+  }
+
 }

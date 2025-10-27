@@ -39,7 +39,7 @@ async getNotifications(params: {
   limit?: number;
   offset?: number;
   languageCode?: LanguageCode;
-}): Promise<Array<{ id: number; translations: Array<{ languageCode: LanguageCode; message: string }> }>> {
+}): Promise<Array<{ id: number; status: NotificationStatus; translations: Array<{ languageCode: LanguageCode; message: string }> }>> {
   const notifications = await this.prisma.notification.findMany({
     where: { userId: params.userId },
     take: params.limit,
@@ -56,7 +56,7 @@ async getNotifications(params: {
   
   return notifications.map((n) => ({
     id: n.id,
-    
+      status: n.status,
     translations: n.notificationtranslation ?? [],
     
   }));

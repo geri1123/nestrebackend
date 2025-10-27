@@ -5,7 +5,8 @@ import { SupportedLang, t } from "../locales";
 import { RegisterAgentDto } from "../auth/dto/register-agent.dto";
 
 import { AgencyService } from "../agency/agency.service";
-import { AgentsRepository } from "../repositories/agent/agent.repository";
+
+import { AgentService } from "../agent/agent.service";
 
 @Injectable()
 export class RegistrationRequestService {
@@ -13,7 +14,7 @@ export class RegistrationRequestService {
     private readonly requestRepo: RegistrationRequestRepository,
     private readonly notificationService: NotificationService,
     private readonly agencyservice:AgencyService,
-    private readonly agentRepo:AgentsRepository
+    private readonly agentservice:AgentService
   ) {}
 async setUnderReview(userId: number, language: SupportedLang = "al"): Promise<void> {
   // Find the latest registration request for this user
@@ -37,6 +38,9 @@ if (!updatedRequest) {
   });
 }
 }
+async getRequestsByUserId(userId: number) {
+    return this.requestRepo.findByUserId(userId);
+  }
 
   async checkAgentData(
     publicCode: string,
@@ -55,11 +59,7 @@ if (!updatedRequest) {
     if (await this.requestRepo.idCardExists(idCardNumber)) {
       errors.id_card_number = [t("idCardExists", language)];
     }
- const existingAgent = await this.agentRepo.findByIdCardNumber(idCardNumber);
-if (existingAgent) {
-  errors.id_card_number = [t("idCardExists", language)];
-}
-   
+ await this.agentservice.ensureIdCardIsUnique(idCardNumber, language);
    
     return errors;
   }

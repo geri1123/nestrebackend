@@ -14,6 +14,7 @@ export class NotificationService {
   async getUserNotifications(userId: number, language: SupportedLang="al", limit = 10, offset = 0) {
     return this.notificationRepo.getNotifications({
       userId,
+   
       languageCode: language,
       limit,
       offset,
