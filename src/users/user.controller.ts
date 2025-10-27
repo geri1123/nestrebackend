@@ -2,24 +2,25 @@
 import { Controller, Patch, Body, Req, UseGuards } from '@nestjs/common';
 import { ProfileInfoService } from './profile-info.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import type { Request } from 'express';
-import { SupportedLang, t } from '../locales';
-import type { RequestWithLang } from '../middlewares/language.middleware';
-import type { RequestWithUserAndLang } from '../types/request-with-user';
 
-@UseGuards(JwtAuthGuard)
+
+import { SupportedLang, t } from '../locales';
+
+import type { RequestWithUserAndLang } from '../types/request-with-user';
+import type { RequestWithLang } from '../middlewares/language.middleware';
+
+
 @Controller('profile')
-export class ProfileController {
+export class UserController{
   constructor(private readonly profileService: ProfileInfoService) {}
 
-  @Patch()
+  @Patch('update')
   async updateProfile(
-    @Req() req: RequestWithUserAndLang,
+    @Req() req: RequestWithLang,
     @Body() data: UpdateProfileDto,
   ) {
-      const userId=req.userId;
-   const language: SupportedLang = req.language || 'al';
+    const userId = req["userId"];
+   const language = req.language || 'al';
 
     const messages: string[] = [];
 

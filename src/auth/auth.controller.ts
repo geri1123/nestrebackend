@@ -94,8 +94,8 @@ export class AuthController {
    @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
   @ApiResponse({ status: 201, description: 'User successfully registered',type:RegisterSuccessResponseDto })
   @ApiResponse({ status: 400, description: 'Validation failed' , type:RegisterFailedResponseDto })
-  async registerUser(@Body() body: Record<string, any>,  @Query('lang') lang: SupportedLang = 'al') {
-    // const lang = (req.query.lang || 'al') as SupportedLang;
+  async registerUser(@Body() body: Record<string, any>,  @Req() req: RequestWithLang) {
+    const lang = req.language;
     const DtoClass = BaseRegistrationDtoFactory(lang);
     const dto = plainToInstance(DtoClass, body);
     
@@ -114,8 +114,8 @@ export class AuthController {
    @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
  @ApiResponse({ status: 201, description: 'Agency successfully registered',type:RegisterSuccessResponseDto })
   @ApiResponse({ status: 400, description: 'Validation failed' , type:RegisterFailedResponseDto })
-  async registerAgencyOwner(@Body() body: Record<string, any>,  @Query('lang') lang: SupportedLang = 'al',@Req() req: any) {
-    // const lang = (req.query.lang || 'al') as SupportedLang;
+  async registerAgencyOwner(@Body() body: Record<string, any>,@Req() req: RequestWithLang) {
+   const lang=req.language;
     const DtoClass = RegisterAgencyOwnerDtoFactory(lang);
     const dto = plainToInstance(DtoClass, body);
     

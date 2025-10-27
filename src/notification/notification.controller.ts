@@ -6,6 +6,7 @@ import { CreateNotificationDto } from "./dto/create-notification.dto.js";
 import type { SupportedLang } from "../locales/index.js";
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GetNotificationsResponseDto } from "./dto/notification.response.dto.js";
+import type { RequestWithLang } from "../middlewares/language.middleware.js";
 @ApiTags("notifications")
 @Controller("notifications")
 export class NotificationController {
@@ -23,17 +24,18 @@ export class NotificationController {
     @Get()
     
      @ApiOperation({ summary: "Get all notifications for the logged-in user" })
-  @ApiQuery({ name: "lang", required: false, description: "Language code", example: "en" })
+  // @ApiQuery({ name: "lang", required: false, description: "Language code", example: "en" })
   @ApiQuery({ name: "limit", required: false, description: "Number of notifications to fetch", example: 10 })
   @ApiQuery({ name: "offset", required: false, description: "Pagination offset", example: 0 })
   @ApiResponse({ status: 200, description: "List of notifications with unread count", type: GetNotificationsResponseDto })
 
   async getMyNotifications(
-  @Req() req: Request,
-  @Query("lang") language: SupportedLang = "al",
+  @Req() req: RequestWithLang,
+  // @Query("lang") language: SupportedLang = "al",
   @Query("limit") limit = 10,
   @Query("offset") offset = 0
 ) {
+  const language = req.language;
   const userId = req["userId"];
 
   const notifications = await this.notificationService.getUserNotifications(

@@ -20,7 +20,7 @@ import { UserModule } from './users/users.module';
     AppConfigModule,
     PrismaModule,
     UserModule,
-    
+     
     FirebaseModule,
     AgencyModule,
 AuthModule,
@@ -37,7 +37,7 @@ ThrottlerModule.forRoot([
   controllers: [AppController],
   providers: [
     AppService,
-   AuthModule,
+  
       {
       provide: APP_GUARD,
       useClass: JwtAuthGuard, 
