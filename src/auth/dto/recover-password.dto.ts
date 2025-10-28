@@ -23,19 +23,11 @@ export class ForgotPasswordFailedResponseDto {
   @ApiProperty({ example: 'Email not found or invalid', description: 'Error message' })
   message: string;
 }
-export function RecoverPasswordDtoFactory(lang: SupportedLang) {
-  class RecoverPasswordDto {
-    @ApiProperty({ example: 'user@example.com' })
-    @IsString({ message: t('emailMustBeString', lang) })
-    @IsEmail({}, { message: t('emailInvalid', lang) })
-    @IsNotEmpty({ message: t('emailRequired', lang) })
-    email: string;
-  }
-
-  return RecoverPasswordDto;
-}
-
-// Type for the DTO instance
-export type RecoverPasswordDto = {
+export class RecoverPasswordDto {
+  @ApiProperty({ example: 'user@example.com' })
+  @IsString({ message: 'emailMustBeString' })
+  @IsEmail({}, { message: 'emailInvalid' })
+  @IsNotEmpty({ message: 'emailRequired' })
   email: string;
-};
+}
+// Type for the DTO instance

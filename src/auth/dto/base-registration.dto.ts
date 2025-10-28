@@ -1,40 +1,34 @@
+import { Transform } from 'class-transformer';
+import { IsEmail, Equals, IsNotEmpty, MinLength, ValidateIf, Matches } from 'class-validator';
 
-import { IsEmail, Equals, IsNotEmpty, MinLength, IsBoolean, IsEnum, ValidateIf } from 'class-validator';
-import { t, SupportedLang } from '../../locales';
+export class BaseRegistrationDto {
+  @MinLength(4, { message: 'usernameLength' })
+    @Matches(/^\S+$/, { message: 'usernameNoSpaces' }) 
+  username: string;
 
-export type Role = 'user' | 'agency_owner' | 'agent';
+  @IsNotEmpty({ message: 'emailRequired' })
+  @IsEmail({}, { message: 'emailInvalid' })
+  email: string;
 
-export function BaseRegistrationDtoFactory(lang: SupportedLang = 'al') {
-  class BaseRegistrationDto {
-    @MinLength(4, { message: t('usernameMin', lang) })
-    username: string;
-    @IsNotEmpty({ message: t('emailRequired', lang) })
-    @IsEmail({}, { message: t('emailInvalid', lang) })
-    email: string;
+  @MinLength(8, { message: 'passwordMin' })
+   @Matches(/^\S+$/, { message: 'passwordNoSpaces' }) 
+  password: string;
 
-    @MinLength(8, { message: t('passwordMin', lang) })
-    password: string;
+  @ValidateIf(o => o.password !== undefined)
+  @IsNotEmpty({ message: 'passwordsMismatch' })
+  repeatPassword: string;
 
-    @ValidateIf(o => o.password !== undefined)
-    @IsNotEmpty({ message: t('passwordsMismatch', lang) })
-    repeatPassword: string;
+  @IsNotEmpty({ message: 'firstNameRequired' })
+    @Transform(({ value }) => value?.trim())
+  first_name: string;
 
-    @IsNotEmpty({ message: t('firstNameRequired', lang) })
-    first_name: string;
+  @IsNotEmpty({ message: 'lastNameRequired' })
+    @Transform(({ value }) => value?.trim())
+  last_name: string;
 
-    @IsNotEmpty({ message: t('lastNameRequired', lang) })
-    last_name: string;
-
-    @Equals(true, { message: t('termsRequired', lang) })
-    terms_accepted: boolean;
-
-    // @IsEnum(['user', 'agency_owner', 'agent'], { message: t('invalidRole', lang) })
-    // role: Role;
-  }
-
-  return BaseRegistrationDto;
+  @Equals(true, { message: 'termsRequired' })
+  terms_accepted: boolean;
 }
-export type BaseRegistrationDto = InstanceType<ReturnType<typeof BaseRegistrationDtoFactory>>;
 
 export class RegisterFailedResponseDto {
   success: boolean;

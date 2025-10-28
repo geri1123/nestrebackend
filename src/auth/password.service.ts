@@ -49,11 +49,23 @@ export class PasswordRecoveryService {
     const tokenRecord = await this.tokenRepository.findByToken(token);
 
     if (!tokenRecord) {
-      throw new BadRequestException({ token: [t('invalidToken', lang)] });
+     throw new BadRequestException({
+  success: false,
+  message: t('validationFailed', lang),
+  errors: {
+    token: [t('invalidToken', lang)],
+  },
+});
     }
 
     if (tokenRecord.expiresAt < new Date()) {
-      throw new BadRequestException({ token: [t('tokenExpired', lang)] });
+      throw new BadRequestException({
+         success: false,
+         message: t('validationFailed', lang),
+          errors: {
+         token: [t('tokenExpired', lang)] 
+          },
+        });
     }
 
     const user = await this.userRepository.findByIdWithPassword(
@@ -68,7 +80,11 @@ export class PasswordRecoveryService {
     const isSamePassword = await comparePassword(newPassword, user.password);
     if (isSamePassword) {
       throw new BadRequestException({ 
+        success: false,
+        message: t('validationFailed', lang),
+        errors: {
         newPassword: [t('passwordSameAsCurrent', lang)] 
+        }
       });
     }
 
@@ -78,3 +94,5 @@ export class PasswordRecoveryService {
     await this.tokenRepository.delete(token);
   }
 }
+
+

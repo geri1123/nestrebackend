@@ -19,17 +19,3 @@ export class cityDto{
     countryId:number
 
 }
-export class countryResponseDto{
-    @ApiProperty({ example: true })
-  success: boolean;
-  @ApiProperty({type:[CountryDto]})
-  country:CountryDto[];
-}
-export class CityDtoResponse{
-    @ApiProperty({example:true})
-    success:boolean
-    @ApiProperty({type:[cityDto]})
-    cities:cityDto[]
-    
-    
-}

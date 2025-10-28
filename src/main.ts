@@ -20,7 +20,9 @@ async function bootstrap() {
     transform: true,
     whitelist: true,
     forbidNonWhitelisted: true,
-
+ transformOptions: {
+        enableImplicitConversion: true,
+      },
     exceptionFactory: (errors) => {
       const formatted: Record<string, string[]> = {};
 

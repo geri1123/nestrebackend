@@ -4,26 +4,19 @@ import { IsNotEmpty, IsBoolean, IsOptional, IsString } from 'class-validator';
 import { SupportedLang, t } from '../../locales';
 
 // DTO Factory for validation with translations
-export function LoginDtoFactory(lang: SupportedLang= 'al') {
-  class LoginDto {
-    
-    @IsString({ message: t('identifierRequired', lang) })
-    @IsNotEmpty({ message: t('identifierRequired', lang) })
-    identifier: string;
 
-    @IsString({ message: t('passwordRequired', lang) })
-    @IsNotEmpty({ message: t('passwordRequired', lang) })
-    password: string;
+export class LoginDto {
+  @IsString({ message: 'identifierRequired' })
+  @IsNotEmpty({ message: 'identifierRequired' })
+  identifier: string;
 
-    @IsOptional()
-    rememberMe?: boolean;
-  }
+  @IsString({ message: 'passwordRequired' })
+  @IsNotEmpty({ message: 'passwordRequired' })
+  password: string;
 
-  return LoginDto;
+  @IsOptional()
+  rememberMe?: boolean;
 }
-
-
-export type LoginDto = InstanceType<ReturnType<typeof LoginDtoFactory>>;
 
 
 export class LoginSwaggerDto {

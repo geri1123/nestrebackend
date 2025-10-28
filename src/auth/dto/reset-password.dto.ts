@@ -27,32 +27,28 @@ export class ResetSuccessResponseDto {
   message: string;
 }
 
-export function ResetPasswordDtoFactory(lang: SupportedLang) {
-  class ResetPasswordDto {
-   
-   
-    @IsNotEmpty({ message: t('tokenRequired', lang) })
-    token: string;
 
-  
-    @IsString({ message: t('passwordMustBeString', lang) })
-    @MinLength(8, { message: t('newPasswordMinLength', lang) })
-    
-    @IsNotEmpty({ message: t('passwordRequired', lang) })
-    newPassword: string;
 
-    
-    @IsString({ message: t('passwordMustBeString', lang) })
-    @IsNotEmpty({ message: t('confirmPasswordRequired', lang) })
-    repeatPassword: string;
-  }
+export class ResetPasswordDto {
+  @ApiProperty({ example: 'token-from-email' })
+  @IsNotEmpty({ message: 'tokenRequired' })
+  token: string;
 
-  return ResetPasswordDto;
+  @ApiProperty({ example: 'newStrongPassword123' })
+  @IsString({ message: 'passwordMustBeString' })
+  @MinLength(8, { message: 'newPasswordMinLength' })
+  @IsNotEmpty({ message: 'passwordRequired' })
+  newPassword: string;
+
+  @ApiProperty({ example: 'newStrongPassword123' })
+  @IsString({ message: 'passwordMustBeString' })
+  @IsNotEmpty({ message: 'confirmPasswordRequired' })
+  repeatPassword: string;
 }
 
 
-export type ResetPasswordDto = {
-  token: string;
-  newPassword: string;
-  repeatPassword: string;
-};
+// export type ResetPasswordDto = {
+//   token: string;
+//   newPassword: string;
+//   repeatPassword: string;
+// };

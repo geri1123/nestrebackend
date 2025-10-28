@@ -1,25 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { BaseRegistrationDtoFactory } from './base-registration.dto';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
+import { BaseRegistrationDto } from './base-registration.dto'; // static DTO now
 import { t, SupportedLang } from '../../locales';
 
-export function RegisterAgencyOwnerDtoFactory(lang: SupportedLang = 'al') {
-  const BaseRegistrationDto = BaseRegistrationDtoFactory(lang);
+export class RegisterAgencyOwnerDto extends BaseRegistrationDto {
+  @IsNotEmpty({ message: 'agencyNameRequired' })
+  agency_name: string;
 
-  class RegisterAgencyOwnerDto extends BaseRegistrationDto {
-   
-    @IsNotEmpty({ message: t('agencyNameRequired', lang) })
-    agency_name: string;
+  @IsNotEmpty({ message: 'licenseRequired' })
+  license_number: string;
 
-    
-    @IsNotEmpty({ message: t('licenseRequired', lang) })
-    license_number: string;
-
-   
-    @IsNotEmpty({ message: t('addressRequired', lang) })
-    address: string;
-  }
-
-  return RegisterAgencyOwnerDto;
+  @IsNotEmpty({ message: 'addressRequired' })
+  address: string;
 }
-export type RegisterAgencyOwnerDto = InstanceType<ReturnType<typeof RegisterAgencyOwnerDtoFactory>>;

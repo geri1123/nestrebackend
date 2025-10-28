@@ -13,6 +13,8 @@ import { SupportedLang, t } from '../locales';
 import { comparePassword } from '../utils/hash';
 import { BaseRegistrationDto } from './dto/base-registration.dto';
 import { RegistrationService } from '../users/RegistrationService';
+import { throwValidationErrors } from '../common/helpers/validation.helper';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -25,9 +27,6 @@ export class AuthService {
     private readonly registerservice:RegistrationService,
   ) {}
 
-  // --------------------------
-  // LOGIN
-  // --------------------------
   async login(dto: LoginDto, language: SupportedLang = 'al') {
     const { identifier, password, rememberMe } = dto;
 
@@ -71,93 +70,116 @@ export class AuthService {
     return { user, token };
   }
 
-    async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
-    return this.registerservice.registerUser(dto, lang);
+ async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
+  const errors = await validate(dto);
+  const extraErrors: Record<string, string[]> = {};
+
+  if (dto.password !== dto.repeatPassword) {
+    extraErrors.repeatPassword = [t('passwordsMismatch', lang)];
   }
 
+  const dbErrors = await this.registerservice.checkUserExists(dto.username, dto.email, lang);
+  Object.assign(extraErrors, dbErrors);
 
-  async registerAgencyOwner(dto: RegisterAgencyOwnerDto, language: SupportedLang) {
- 
-
-    
-    const errors: Record<string, string[]> = {};
-
-    
-    const userErrors = await this.registerservice.checkUserExists(dto.username, dto.email, language);
-    Object.assign(errors, userErrors);
-
-    
-    const agencyErrors = await this.agencyService.checkAgencyExists(dto.agency_name, dto.license_number, language);
-    Object.assign(errors, agencyErrors);
-
-  
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
-
-    const { userId, verificationToken } = await this.registerservice.createUserWithRole(
-      dto,
-      'agency_owner',
-      language,
-    );
-
-   
-    await this.agencyService.createAgency(dto, userId, language);
-
-    
-    await this.emailService.sendVerificationEmail(
-      dto.email,
-      dto.first_name || dto.username,
-      verificationToken,
-      language,
-    );
-
-    return {
-      userId,
-      message: t('registrationSuccess', language),
-    };
+  if (errors.length > 0 || Object.keys(extraErrors).length > 0) {
+    throwValidationErrors(errors, lang, extraErrors);
   }
 
-  async registerAgent(dto: RegisterAgentDto, language: SupportedLang) {
-   
-    const errors: Record<string, string[]> = {};
+  return this.registerservice.registerUser(dto, lang);
+}
+async registerAgencyOwner(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
+  // 1️⃣ Validate class-validator rules
+  const errors = await validate(dto);
+  const extraErrors: Record<string, string[]> = {};
 
-   
-    const userErrors = await this.registerservice.checkUserExists(dto.username, dto.email, language);
-    Object.assign(errors, userErrors);
+  // 2️⃣ Extra checks
+  if (dto.password !== dto.repeatPassword) {
+    extraErrors.repeatPassword = [t('passwordsMismatch', lang)];
+  }
 
-   
-    const agentErrors = await this.registrationrequestservice.checkAgentData(dto.public_code, dto.id_card_number, language);
-    Object.assign(errors, agentErrors);
+  // Check DB for existing username/email
+  const userErrors = await this.registerservice.checkUserExists(dto.username, dto.email, lang);
+  Object.assign(extraErrors, userErrors);
 
-  
-    if (Object.keys(errors).length > 0) {
-      throw new BadRequestException(errors);
-    }
+  // Check agency name / license number
+  const agencyErrors = await this.agencyService.checkAgencyExists(dto.agency_name, dto.license_number, lang);
+  Object.assign(extraErrors, agencyErrors);
 
+  // 3️⃣ Throw all validation errors together
+  if (errors.length > 0 || Object.keys(extraErrors).length > 0) {
+    throwValidationErrors(errors, lang, extraErrors);
+  }
 
+  // 4️⃣ Create user & agency
+  const { userId, verificationToken } = await this.registerservice.createUserWithRole(
+    dto,
+    'agency_owner',
+    lang
+  );
 
-    
-    const { userId, verificationToken } = await this.registerservice.createUserWithRole(
-      dto,
-      'agent',
-      language,
-    );
+  await this.agencyService.createAgency(dto, userId, lang);
 
-   
-    await this.registrationrequestservice.createAgentRequest(userId, dto, language);
+  await this.emailService.sendVerificationEmail(
+    dto.email,
+    dto.first_name || dto.username,
+    verificationToken,
+    lang
+  );
+
+  return {
+    userId,
+    message: t('registrationSuccess', lang),
+  };
+}
+
+async registerAgent(dto: RegisterAgentDto, lang: SupportedLang) {
+
+  const errors = await validate(dto);
 
  
-    await this.emailService.sendVerificationEmail(
-      dto.email,
-      dto.first_name || dto.username,
-      verificationToken,
-      language,
-    );
+  const extraErrors: Record<string, string[]> = {};
 
-    return {
-      userId,
-      message: t('registrationSuccess', language),
-    };
+
+  if (dto.password !== dto.repeatPassword) {
+    extraErrors.repeatPassword = [t('passwordsMismatch', lang)];
   }
+
+ 
+  const userErrors = await this.registerservice.checkUserExists(dto.username, dto.email, lang);
+  Object.assign(extraErrors, userErrors);
+
+ 
+  const agentErrors = await this.registrationrequestservice.checkAgentData(
+    dto.public_code,
+    dto.id_card_number,
+    lang
+  );
+  Object.assign(extraErrors, agentErrors);
+
+  // 3️⃣ Throw all validation errors together
+  if (errors.length > 0 || Object.keys(extraErrors).length > 0) {
+    throwValidationErrors(errors, lang, extraErrors);
+  }
+  
+  const { userId, verificationToken } = await this.registerservice.createUserWithRole(
+    dto,
+    'agent',
+    lang,
+  );
+
+  await this.registrationrequestservice.createAgentRequest(userId, dto, lang);
+
+  await this.emailService.sendVerificationEmail(
+    dto.email,
+    dto.first_name || dto.username,
+    verificationToken,
+    lang,
+  );
+
+  return {
+    userId,
+    message: t('registrationSuccess', lang),
+  };
+}
+
 }

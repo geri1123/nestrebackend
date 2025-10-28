@@ -3,6 +3,7 @@ import { UserRepository } from '../repositories/user/user.repository';
 import { generateToken, hashPassword } from '../utils/hash';
 import { t, SupportedLang } from '../locales';
 import { UserStatusType } from './types/base-user-info';
+import { UpdatableUserFields } from './types/update-user-info';
 @Injectable()
 export class UserService {
   constructor(
@@ -30,6 +31,40 @@ export class UserService {
     return token;
   }
   //
+  async findByIdOrFail(userId: number, lang: SupportedLang) {
+  const user = await this.userRepo.findById(userId);
+  if (!user) {
+    throw new NotFoundException({
+      success: false,
+      message: t('validationFailed', lang),
+      errors: { 
+      user: [t('userNotFound', lang)]
+      },
+     });
+  
+  }
+  return user;
+}
+async usernameExists(username: string , language:SupportedLang="al"): Promise<boolean> {
+    const exist = await this.userRepo.usernameExists(username);
+    if (exist) {
+      throw new BadRequestException({
+        success: false,
+        message: t('validationFailed',language),
+        errors: {
+        username: [t('usernameExists',language)]
+        }
+      });
+    }
+    return true; 
+  }
+  async updateFields(
+  userId: number,
+  fields: Partial<UpdatableUserFields>
+): Promise<void> {
+  return this.userRepo.updateFieldsById(userId, fields);
+}
+  //
   async updatePassword(userId: number, newPassword: string) {
   const hashedPassword = await hashPassword(newPassword);
   return this.userRepo.updateFieldsById(userId, { password: hashedPassword });
@@ -38,10 +73,23 @@ export class UserService {
   async findByEmailOrFailActive(email: string, lang: SupportedLang) {
   const user = await this.userRepo.findByEmail(email);
   if (!user) {
-    throw new NotFoundException({ email: [t('userNotFound', lang)] });
+    throw new NotFoundException({
+      success: false,
+      message: t('validationFailed', lang),
+      errors: {
+        email: [t('userNotFound', lang)],
+      },
+    });
   }
+
   if (user.status !== 'active') {
-    throw new ForbiddenException({ email: [t('accountNotActive', lang)] });
+    throw new ForbiddenException({
+      success: false,
+      message: t('validationFailed', lang),
+      errors: {
+        email: [t('accountNotActive', lang)],
+      },
+    });
   }
   return user;
 }

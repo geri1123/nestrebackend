@@ -6,11 +6,12 @@ import { UserService } from './users.service';
 import { RegistrationService } from './RegistrationService';
 import { ProfileInfoService } from './profile-info.service';
 import { UserController } from './user.controller';
-// import { UserController } from './user.controller';
+import { UsernameService } from './username.service';
+import { UsernameHistoryRepository } from '../repositories/usernamehistory/usernamehistory.repository';
 @Module({
   controllers:[UserController],
   imports: [EmailModule ],
-  providers: [UserService, UserRepository , RegistrationService , ProfileInfoService],
-  exports: [UserRepository , UserService, RegistrationService],
+  providers: [UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
+  exports: [UserRepository , UserService, RegistrationService , RegistrationService],
 })
 export class UserModule {}

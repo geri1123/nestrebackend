@@ -7,14 +7,14 @@ import {
   HttpCode,
   BadRequestException,
 } from '@nestjs/common';
-import { ResetPasswordDtoFactory, ResetPasswordSwaggerDto } from './dto/reset-password.dto';
-import { ForgotPasswordFailedResponseDto, ForgotPasswordSuccessResponseDto, RecoverPasswordDtoFactory } from './dto/recover-password.dto';
+import { ResetPasswordDto, ResetPasswordSwaggerDto } from './dto/reset-password.dto';
+import { ForgotPasswordFailedResponseDto, ForgotPasswordSuccessResponseDto, RecoverPasswordDto } from './dto/recover-password.dto';
 import type { RequestWithLang } from '../middlewares/language.middleware';
 import { RecoveryPasswordSwaggerDto } from './dto/recover-password.dto';
 import { SupportedLang, t } from '../locales';
 import { PasswordRecoveryService } from './password.service';
 import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
 import { ResetFailedResponseDto } from './dto/reset-password.dto';
@@ -26,64 +26,51 @@ export class PasswordController {
     private readonly passwordRecoveryService: PasswordRecoveryService,
   ) {}
 
-  @Post('reset-password')
-  @ApiBody({ type: ResetPasswordSwaggerDto })
-  @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
-    @ApiResponse({ status: 200, description: 'Password succesfully reset', type: ResetSuccessResponseDto })
-@ApiResponse({ status: 400, description: 'Failed too reset', type: ResetFailedResponseDto })
+ @Post('reset-password')
+@ApiBody({ type: ResetPasswordSwaggerDto })
+@ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
+@ApiResponse({ status: 200, description: 'Password successfully reset', type: ResetSuccessResponseDto })
+@ApiResponse({ status: 400, description: 'Failed to reset', type: ResetFailedResponseDto })
+@HttpCode(HttpStatus.OK)
+async resetPassword(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
+  const lang: SupportedLang = req.language || 'al';
+  const dto = plainToInstance(ResetPasswordDto, body);
+ 
 
-  @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
-    const lang: SupportedLang = req.language || 'al';
-    const DtoClass = ResetPasswordDtoFactory(lang);
-    const dto = plainToClass(DtoClass, body);
-    
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors);
+  const errors = await validate(dto);
+  if (errors.length > 0) throwValidationErrors(errors, lang);
 
-    // Manual password match validation
-    if (dto.newPassword !== dto.repeatPassword) {
-      throw new BadRequestException({
-        repeatPassword: [t('passwordsMismatch', lang)],
-      });
-    }
-
-    // Call service to reset password
-    await this.passwordRecoveryService.resetPassword(
-      dto.token,
-      dto.newPassword,
-      lang,
-    );
-
-    return {
-      
-      message: t('passwordResetSuccess', lang),
-    };
+  if (dto.newPassword !== dto.repeatPassword) {
+    throw new BadRequestException({
+      repeatPassword: [t('passwordsMismatch', lang)],
+    });
   }
 
+  await this.passwordRecoveryService.resetPassword(dto.token, dto.newPassword, lang);
+
+  return {
+    success: true,
+    message: t('passwordResetSuccess', lang),
+  };
+}
   @Post('forgot-password')
-  @ApiBody({ type: RecoveryPasswordSwaggerDto })
-  @ApiResponse({})
-   @ApiResponse({ status: 200, description: 'TOKEN SUCCESFULLY SEND', type: ForgotPasswordSuccessResponseDto })
-@ApiResponse({ status: 400, description: 'Failed TO SEND TOKEN', type:ForgotPasswordFailedResponseDto })
+@ApiBody({ type: RecoveryPasswordSwaggerDto })
+@ApiResponse({ status: 200, description: 'Token successfully sent', type: ForgotPasswordSuccessResponseDto })
+@ApiResponse({ status: 400, description: 'Failed to send token', type: ForgotPasswordFailedResponseDto })
+@HttpCode(HttpStatus.OK)
+async forgotPassword(@Body() body:  Record<string, any>, @Req() req: RequestWithLang) {
+  const lang: SupportedLang = req.language || 'al';
 
-  @HttpCode(HttpStatus.OK)
-  async forgotPassword(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
-    const lang: SupportedLang = req.language || 'al';
-    const DtoClass = RecoverPasswordDtoFactory(lang);
-    const dto = plainToClass(DtoClass, body);
-    
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors);
+  // Validate DTO
+  const dto = plainToInstance(RecoverPasswordDto, body);
+  const errors = await validate(dto);
+  if (errors.length > 0) throwValidationErrors(errors, lang);
 
-    await this.passwordRecoveryService.requestPasswordReset(
-      dto.email,
-      lang,
-    );
+  await this.passwordRecoveryService.requestPasswordReset(dto.email, lang);
 
-    return {
-        success:true,
-      message: t('passwordResetLinkSent', lang),
-    };
-  }
+  return {
+    success: true,
+    message: t('passwordResetLinkSent', lang),
+  };
+}
 }

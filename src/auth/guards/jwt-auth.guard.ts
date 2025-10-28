@@ -34,7 +34,11 @@ export class JwtAuthGuard implements CanActivate {
       (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
 
     if (!token) {
-      throw new UnauthorizedException(t('noTokenProvided', lang));
+     throw new UnauthorizedException({
+  success: false,
+  message: t('noTokenProvided', lang),
+  errors: { token: [t('noTokenProvided', lang)] },
+});
     }
 
     try {
@@ -56,7 +60,11 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch {
-      throw new UnauthorizedException(t('invalidOrExpiredToken', lang));
+      throw new UnauthorizedException({
+    success: false,
+    message: t('invalidOrExpiredToken', lang),
+    errors: { token: [t('invalidOrExpiredToken', lang)] },
+  });
     }
   }
 }
