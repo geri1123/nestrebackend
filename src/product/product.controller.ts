@@ -4,27 +4,17 @@ import { SearchProductsService } from './search-product.service';
 import type { SupportedLang } from '../locales';
 import { SearchFiltersDto } from './dto/product-filters.dto';
 import { Public } from '../common/decorators/public.decorator';
-import { ApiTags, ApiOkResponse, ApiQuery, ApiOperation, ApiExtraModels } from '@nestjs/swagger';
 import { ProductsSearchResponseDto } from './dto/product-frontend.dto';
-import { ApiSearchFilters } from '../common/decorators/api-search-filters.decorator';
 
-@ApiTags('products')
+
 @Controller('products')
-@Public()
 export class SearchProductsController {
   constructor(private readonly searchProductsService: SearchProductsService) {}
- @ApiOperation({
-    summary: 'Search and filter products',
-    description: 'Search products with various filters including category, price range, attributes, location, and more.',
-  })
-  @ApiOkResponse({
-    type: ProductsSearchResponseDto,
-    description: 'Returns paginated list of products matching the search criteria',
-  })
-  @ApiSearchFilters()
- @ApiExtraModels(SearchFiltersDto)
+ 
+@Public()
+
   @Get('search')
-  @ApiOkResponse({ type: ProductsSearchResponseDto })
+
   async searchAll(
     @Query() rawQuery: Record<string, any>,
     @Query('page') page = '1',

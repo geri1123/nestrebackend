@@ -2,16 +2,18 @@ import { Module } from '@nestjs/common';
 import { UserRepository } from '../repositories/user/user.repository';
 
 import { EmailModule } from '../email/email.module';
-import { UserService } from './users.service';
-import { RegistrationService } from './RegistrationService';
-import { ProfileInfoService } from './profile-info.service';
-import { UserController } from './user.controller';
-import { UsernameService } from './username.service';
+import { UserService } from './services/users.service';
+import { RegistrationService } from './services/RegistrationService';
+import { ProfileInfoService } from './services/profile-info.service';
+import { UserController } from './controllers/user.controller';
+import { UsernameService } from './services/username.service';
 import { UsernameHistoryRepository } from '../repositories/usernamehistory/usernamehistory.repository';
+import { ProfilePictureService } from './services/profile-picture.service';
+import { ProfilePictureController } from './controllers/profile-picture.controller';
 @Module({
-  controllers:[UserController],
+  controllers:[UserController , ProfilePictureController],
   imports: [EmailModule ],
-  providers: [UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
+  providers: [ProfilePictureService,UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
   exports: [UserRepository , UserService, RegistrationService , RegistrationService],
 })
 export class UserModule {}

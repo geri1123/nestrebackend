@@ -6,7 +6,7 @@ import { PartialUserForLogin , PartialUserByToken } from '../../types/user.js';
 import { UpdatableUserFields } from '../../users/types/update-user-info.js';
 export interface IUserRepository {
   create(userData: UserCreationData): Promise<number>;
-
+updateProfileImage(userId: number, imageUrl: string): Promise<void> ;
   findByIdWithPassword(userId: number): Promise<{ id: number; password: string } | null>;
   findById(userId: number): Promise<BaseUserInfo | null>;
   findByIdentifier(identifier: string): Promise<PartialUserForLogin | null>;

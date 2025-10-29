@@ -1,6 +1,6 @@
 
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { UserService } from '../users/users.service';
+import { UserService } from '../users/services/users.service';
 import { AgencyService } from '../agency/agency.service';
 import { RegistrationRequestService } from '../registration-request/registration.request.service';
 import { EmailService } from '../email/email.service';
@@ -12,7 +12,7 @@ import { RegisterAgentDto } from './dto/register-agent.dto';
 import { SupportedLang, t } from '../locales';
 import { comparePassword } from '../utils/hash';
 import { BaseRegistrationDto } from './dto/base-registration.dto';
-import { RegistrationService } from '../users/RegistrationService';
+import { RegistrationService } from '../users/services/RegistrationService';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
 import { validate } from 'class-validator';
 

@@ -5,6 +5,7 @@ export const al = {
     internalServerError: "Ndodhi një gabim i papritur",
      usernotfound: "Përdoruesi nuk u gjet",
        noTokenProvided: "Asnjë token nuk u sigurua",
+       emailrequired: "Kërkohet email-i",
      invalidRole: "Roli i përdoruesit është i pavlefshëm",
      couldNotUpdateRequest:"Nuk mund të përditësohet kërkesa",
      tooManyLoginAttempts: "Shumë përpjekje për t'u kyçur nga ky IP, provoni përsëri pas 5 minutash.",
@@ -81,6 +82,7 @@ phoneInvalidChars: "Numri i telefonit përmban karaktere të pavlefshme",
   tokenExpired: "Tokeni i rivendosjes ka skaduar. Ju lutemi kërkoni një të ri.",
   passwordResetSuccess: "Fjalëkalimi juaj u rivendos me sukses.",
 //
+
   agencyActivationFailed: "Dështoi aktivizimi i agjencisë.",
     agentNotificationFailed: "Procesi i njoftimit për agjentin dështoi.",
   agencyOrOwnerNotFound: "Agjencia ose pronari i agjencisë nuk u gjet.",
@@ -144,12 +146,15 @@ successadded: "Produkti u regjistrua me sukses",
     buildYearMin: "Viti i ndërtimit nuk mund të jetë më i hershëm se 1900",
     buildYearMax: "Viti i ndërtimit nuk mund të jetë në të ardhmen",
     //
+    imageUploadFailed: "Ngarkimi i imazhit dështoi",
+    imagesuccessfullyUploaded: "Imazhi u ngarkuan me sukses",
     documentTooLarge:"Dokumenti është shumë i madh",
     tooManyDocuments:"Janë ngarkuar shumë dokumente",
-      invalidImageType: "Lejohen vetëm skedarë imazhi (jpeg, jpg, png, webp, gif, avif).",
+      invalidImageType: "Lejohen vetëm skedarë imazhi (jpeg, jpg, png, webp).",
   imageTooLarge: "Imazhi i ngarkuar është shumë i madh. Madhësia maksimale e lejuar është 5MB.",
   tooManyImages: "Janë ngarkuar shumë imazhe. Ju lutemi zvogëloni numrin e skedarëve.",
   noImageUploaded: "Nuk u ngarkua asnjë imazh.",
   invalidDocumentType:"Lloji i dokumentit i pavlefshëm",
-insufficientPermissions:"Nuk keni leje të mjaftueshme"
+insufficientPermissions:"Nuk keni leje të mjaftueshme",
+imagesuccessfullydeleted: "Imazhi u fshi me sukses",
 } as const

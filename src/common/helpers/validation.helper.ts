@@ -47,7 +47,7 @@ function translateValidationMessage(code: string, lang: SupportedLang): string {
     case 'passwordNoSpaces': return t('passwordNoSpaces', lang);
     case 'usernamePatternError': return t('usernameInvalidChars', lang);
     //agency
-    
+    case "noTokenProvided": return t('noTokenProvided', lang);
      case 'agencyNameRequired': return t('agencyNameRequired', lang);
     case 'licenseRequired': return t('licenseRequired', lang);
     case 'addressRequired': return t('addressRequired', lang);
@@ -62,6 +62,7 @@ function translateValidationMessage(code: string, lang: SupportedLang): string {
     case 'emailMustBeString': return t('emailMustBeString', lang);
     case 'emailInvalid': return t('emailInvalid', lang);
     case 'emailRequired': return t('emailRequired', lang);
+    case 'emailrequired': return t('emailrequired', lang);
      // Reset password
     case 'tokenRequired': return t('tokenRequired', lang);
     case 'passwordRequired': return t('passwordRequired', lang);

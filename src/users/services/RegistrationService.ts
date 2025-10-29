@@ -1,10 +1,10 @@
 import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { UserRepository } from '../repositories/user/user.repository';
-import { EmailService } from '../email/email.service';
-import { BaseRegistrationDto } from '../auth/dto/base-registration.dto';
-import { UserStatus, UserCreationData } from '../auth/types/create-user-input';
-import { generateToken } from '../utils/hash';
-import { t, SupportedLang } from '../locales';
+import { UserRepository } from '../../repositories/user/user.repository';
+import { EmailService } from '../../email/email.service';
+import { BaseRegistrationDto } from '../../auth/dto/base-registration.dto';
+import { UserStatus, UserCreationData } from '../../auth/types/create-user-input';
+import { generateToken } from '../../utils/hash';
+import { t, SupportedLang } from '../../locales';
 
 @Injectable()
 export class RegistrationService {

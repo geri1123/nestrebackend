@@ -1,4 +1,3 @@
-// src/common/swagger/response.helper.ts
 import { applyDecorators } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 
@@ -36,7 +35,7 @@ export const ApiBadRequestResponse = (exampleMessage: string, errorsExample?: ob
     }),
   );
 
-// 200 Success
+// ✅ FIXED 200 Success
 export const ApiSuccessResponse = (exampleMessage: string, dataExample?: object) =>
   applyDecorators(
     ApiResponse({
@@ -46,7 +45,7 @@ export const ApiSuccessResponse = (exampleMessage: string, dataExample?: object)
         example: {
           success: true,
           message: exampleMessage,
-          ...(dataExample ? { data: dataExample } : {}),
+          ...(dataExample ?? {}), // ✅ spread data directly
         },
       },
     }),

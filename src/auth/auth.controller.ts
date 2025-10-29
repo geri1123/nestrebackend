@@ -3,43 +3,37 @@ import {
   Req,
   Res,
   UseGuards,
-  Query
+  
 } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiResponse, ApiQuery } from '@nestjs/swagger';
+
 import { AuthService } from './auth.service';
-import { RegisterUserSwaggerDto, RegisterAgencyOwnerSwaggerDto, RegisterAgentSwaggerDto } from './dto/register-all-roles.swagger.dto';
 import { BaseRegistrationDto } from './dto/base-registration.dto';
 import { RegisterAgencyOwnerDto } from './dto/register-agency-owner.dto';
 import { RegisterAgentDto } from './dto/register-agent.dto';
 import type { SupportedLang } from '../locales';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import {  plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
 import type { Response } from 'express'
-
-import { RegisterSuccessResponseDto } from './dto/register-all-roles.swagger.dto';
-import { RegisterFailedResponseDto } from './dto/register-all-roles.swagger.dto';
 import type { RequestWithLang } from '../middlewares/language.middleware';
-import { LoginDto, LoginFailedResponseDto, LoginSuccessResponseDto, LoginSwaggerDto } from './dto/login.dto';
+import { LoginDto} from './dto/login.dto';
 import { t } from '../locales';
 import { CustomThrottlerGuard } from './guards/custom-throttler.guard';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../common/decorators/public.decorator';
-import { RegistrationService } from '../users/RegistrationService';
-@ApiTags('auth')
-@Controller('auth')
+import { AuthSwagger } from './swagger/auth.swagger';
+
+
 @Public()
+@Controller('auth')
+
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  
+  @AuthSwagger.Login()
   @Post('login')
 @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
 @UseGuards(CustomThrottlerGuard)
 @HttpCode(HttpStatus.OK)
-@ApiBody({ type: LoginSwaggerDto })
-@ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
-@ApiResponse({ status: 201, description: 'User successfully logged in', type: LoginSuccessResponseDto })
-@ApiResponse({ status: 400, description: 'Validation failed', type: LoginFailedResponseDto })
 async login(
   @Body() body: Record<string, any>,
   @Req() req: RequestWithLang,
@@ -77,37 +71,30 @@ async login(
     },
   };
 }
-
+  @AuthSwagger.RegisterUser()
   @Post('register/user')
   @HttpCode(HttpStatus.CREATED)
-  @ApiBody({ type: RegisterUserSwaggerDto }) 
-   @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
-  @ApiResponse({ status: 201, description: 'User successfully registered',type:RegisterSuccessResponseDto })
-  @ApiResponse({ status: 400, description: 'Validation failed' , type:RegisterFailedResponseDto })
+ 
 
 async registerUser(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
   const lang = req.language || 'al';
   const dto = plainToInstance(BaseRegistrationDto, body);
   return this.authService.registerUser(dto, lang);
 }
+
+@AuthSwagger.RegisterAgencyOwner()
   @Post('register/agency_owner')
   @HttpCode(HttpStatus.CREATED)
-  @ApiBody({ type: RegisterAgencyOwnerSwaggerDto })
-   @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
- @ApiResponse({ status: 201, description: 'Agency successfully registered',type:RegisterSuccessResponseDto })
-  @ApiResponse({ status: 400, description: 'Validation failed' , type:RegisterFailedResponseDto })
+ 
 async registerAgencyOwner(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
   const lang = req.language || 'al';
   const dto = plainToInstance(RegisterAgencyOwnerDto, body);
   return this.authService.registerAgencyOwner(dto, lang);
 }
-
+@AuthSwagger.RegisterAgent()
   @Post('register/agent')
   @HttpCode(HttpStatus.CREATED)
-  @ApiBody({ type: RegisterAgentSwaggerDto })
-   @ApiQuery({ name: 'lang', required: false, description: 'Language', example: 'al' })
-@ApiResponse({ status: 201, description: 'Agent successfully registered',type:RegisterSuccessResponseDto })
-  @ApiResponse({ status: 400, description: 'Validation failed' , type:RegisterFailedResponseDto })
+  
   async registerAgent(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
   const lang = req.language || 'al';
   const dto = plainToInstance(RegisterAgentDto, body);

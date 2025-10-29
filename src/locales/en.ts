@@ -13,6 +13,7 @@ export const en = {
      usernamePatternError: "Username can only contain letters, numbers, and underscores",
     firstNameMustBeString: "First name must be text",
   lastNameMustBeString: "Last name must be text",
+  emailrequired: "Email is required",
   aboutMeMustBeString: "About me must be text",
   phoneMustBeString: "Phone must be text",
     phoneLength: "Phone number must be between 5 and 20 characters",
@@ -145,13 +146,15 @@ agencyNameExists:"Agency name already exists.",
   
 
     //
+    imageUploadFailed: "Image upload failed",
     documentTooLarge:"Document is too large",
     tooManyDocuments:"Too many documents uploaded",
      invalidImageType: "Only image files (jpeg, jpg, png, webp, gif, avif) are allowed.",
   imageTooLarge: "The uploaded image is too large. Maximum allowed size is 5MB.",
   tooManyImages: "Too many images uploaded. Please reduce the number of files.",
    invalidDocumentType:"Invalid document type",
-
+imagesuccessfullyUploaded: "Image uploaded successfully",
   noImageUploaded: "No image was uploaded.",
-  insufficientPermissions:"Insufficient permissions"
+  insufficientPermissions:"Insufficient permissions",
+  imagesuccessfullydeleted: "Image deleted successfully",
 } as const

@@ -19,6 +19,7 @@ export const it = {
    phoneLength: "Il numero di telefono deve essere compreso tra 5 e 20 caratteri",
      aboutMeLength: "La sezione 'about me' deve contenere al massimo 500 caratteri",
      //
+     emailrequired: "È richiesto l'email",
       agencyActivationFailed: "Impossibile attivare l'agenzia.",
        agentNotificationFailed: "Il processo di notifica dell'agente non è riuscito.",
   agencyOrOwnerNotFound: "Agenzia o proprietario dell'agenzia non trovati.",
@@ -141,6 +142,7 @@ successadded: "Prodotto registrato con successo",
     buildYearMin: "L'anno di costruzione non può essere prima del 1900",
     buildYearMax: "L'anno di costruzione non può essere nel futuro",
  //
+ imageUploadFailed: "Caricamento immagine non riuscito",
  documentTooLarge:"Il documento è troppo grande",
     tooManyDocuments:"Troppi documenti caricati",
   invalidImageType: "Sono consentiti solo file immagine (jpeg, jpg, png, webp, gif, avif).",
@@ -148,5 +150,7 @@ successadded: "Prodotto registrato con successo",
   tooManyImages: "Sono state caricate troppe immagini. Riduci il numero di file.",
   noImageUploaded: "Nessuna immagine è stata caricata.",
 invalidDocumentType:"Tipo di documento non valido",
-   insufficientPermissions:"Permessi insufficienti"
+   insufficientPermissions:"Permessi insufficienti",
+   imagesuccessfullyUploaded: "Immagine caricata con successo",
+   imagesuccessfullydeleted: "Immagine eliminata con successo",
    } as const

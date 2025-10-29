@@ -3,32 +3,23 @@ import type { Request } from "express";
 import { NotificationService } from "./notification.service.js";
 import { LanguageCode } from "@prisma/client";
 import { CreateNotificationDto } from "./dto/create-notification.dto.js";
-import type { SupportedLang } from "../locales/index.js";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { GetNotificationsResponseDto } from "./dto/notification.response.dto.js";
+
+import {  ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
+import { NotificationSwagger } from "./swagger/notification.swagger.js";
 import type { RequestWithLang } from "../middlewares/language.middleware.js";
-@ApiTags("notifications")
+
 @Controller("notifications")
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Post()
-    @ApiOperation({ summary: "Create a notification for a user" })
-  @ApiBody({ type: CreateNotificationDto })
-  @ApiResponse({ status: 201, description: "Notification created successfully" })
-  @ApiResponse({ status: 400, description: "Validation failed" })
+  @NotificationSwagger.CreateNotification()
   async createNotification(@Body() data: CreateNotificationDto) {
     return this.notificationService.sendNotification(data);
   }
 
     @Get()
-    
-     @ApiOperation({ summary: "Get all notifications for the logged-in user" })
-  // @ApiQuery({ name: "lang", required: false, description: "Language code", example: "en" })
-  @ApiQuery({ name: "limit", required: false, description: "Number of notifications to fetch", example: 10 })
-  @ApiQuery({ name: "offset", required: false, description: "Pagination offset", example: 0 })
-  @ApiResponse({ status: 200, description: "List of notifications with unread count", type: GetNotificationsResponseDto })
-
+   @NotificationSwagger.GetMyNotifications()
   async getMyNotifications(
   @Req() req: RequestWithLang,
   // @Query("lang") language: SupportedLang = "al",

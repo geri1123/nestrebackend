@@ -6,7 +6,7 @@ import { comparePassword, hashPassword, generateToken } from '../utils/hash';
 
 import { SupportedLang ,t} from '../locales';
 import { AppConfigService } from '../config/config.service';
-import { UserService } from '../users/users.service';
+import { UserService } from '../users/services/users.service';
 @Injectable()
 export class PasswordRecoveryService {
   constructor(

@@ -1,19 +1,19 @@
 // src/users/profile.controller.ts
 import { Controller, Patch, Body, Req, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { ProfileInfoService } from './profile-info.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ProfileInfoService } from '../services/profile-info.service';
+import { UpdateProfileDto } from '../dto/update-profile.dto';
 
-import { UsernameService } from './username.service';
-import { SupportedLang, t } from '../locales';
+import { UsernameService } from '../services/username.service';
+import { SupportedLang, t } from '../../locales';
 
-import { UsernameDto } from './dto/username.dto';
-import type { RequestWithLang } from '../middlewares/language.middleware';
-import { ProfileSwagger } from './swager/profile.swagger';
+import { UsernameDto } from '../dto/username.dto';
+import type { RequestWithLang } from '../../middlewares/language.middleware';
+import { ProfileSwagger } from '../swager/profile.swagger';
 
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { throwValidationErrors } from '../common/helpers/validation.helper';
+import { throwValidationErrors } from '../../common/helpers/validation.helper';
 
  @ProfileSwagger.ApiTagsProfile()
 @Controller('profile')

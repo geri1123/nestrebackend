@@ -66,7 +66,15 @@ export class UserRepository implements IUserRepository {
       select: { id: true, profile_img: true },
     });
   }
-
+async updateProfileImage(userId: number, imageUrl: string): Promise<void> {
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      profile_img: imageUrl,
+      updated_at: new Date(),
+    },
+  });
+}
   async getUsernameById(userId: number): Promise<string | null> {
     const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
     return user?.username ?? null;

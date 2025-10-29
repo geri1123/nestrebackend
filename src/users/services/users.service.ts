@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { UserRepository } from '../repositories/user/user.repository';
-import { generateToken, hashPassword } from '../utils/hash';
-import { t, SupportedLang } from '../locales';
-import { UserStatusType } from './types/base-user-info';
-import { UpdatableUserFields } from './types/update-user-info';
+import { UserRepository } from '../../repositories/user/user.repository';
+import { generateToken, hashPassword } from '../../utils/hash';
+import { t, SupportedLang } from '../../locales';
+import { UserStatusType } from '../types/base-user-info';
+import { UpdatableUserFields } from '../types/update-user-info';
 @Injectable()
 export class UserService {
   constructor(
@@ -117,5 +117,8 @@ async verifyEmail(
     return this.userRepo.updateFieldsById(userId, { last_login: new Date() });
   }
 
-  
+async updateProfileImage(userId: number, imagePath: string) {
+  // store only the path, not the full URL
+  await this.userRepo.updateProfileImage(userId, imagePath);
+}
 }

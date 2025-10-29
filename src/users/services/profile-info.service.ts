@@ -1,6 +1,6 @@
 // src/users/profile-info.service.ts
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../repositories/user/user.repository.js';
+import { UserRepository } from '../../repositories/user/user.repository.js';
 import { UserService } from './users.service.js';
 
 

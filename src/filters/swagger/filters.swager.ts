@@ -138,7 +138,7 @@ export class FiltersSwagger {
         description: 'Country code, e.g., "al", "it"',
       }),
       ApiSuccessResponse('Cities fetched successfully', {
-        cities: [{ name: 'Tirana' }, { name: 'Durres' }],
+        cities: [{id:1, name: 'Tirana' , countryId: 1 }, {id:2, name: 'Durres' , countryId: 1  }],
       }),
       ApiBadRequestResponse('validationFailed', {
         countryCode: ['Invalid or unsupported country code'],

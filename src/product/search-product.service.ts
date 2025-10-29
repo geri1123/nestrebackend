@@ -5,7 +5,8 @@ import { SearchFiltersDto } from './dto/product-filters.dto';
 import { SupportedLang } from '../locales/index';
 import { FirebaseService } from '../firebase/firebase.service';
 import { ProductFrontendDto } from './dto/product-frontend.dto';
-
+import { ProductImageDto } from './dto/product-frontend.dto';
+import { ProductImageEntity } from './types/product.type';
 @Injectable()
 export class SearchProductsService {
   constructor(
@@ -18,7 +19,7 @@ export class SearchProductsService {
     const totalCount = await this.repo.getProductsCount(filters, language);
 
     const productsForFrontend: ProductFrontendDto[] = products.map((product) => {
-      const images = product.productimage.map((img) => ({
+      const images: ProductImageDto[]  = product.productimage.map((img:ProductImageEntity) => ({
         imageUrl: img.imageUrl ? this.firebaseservice.getPublicUrl(img.imageUrl) : null,
         
       }));

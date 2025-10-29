@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { UserService } from '../users/users.service';
-import { UsernameHistoryRepository } from '../repositories/usernamehistory/usernamehistory.repository';
-import { t, SupportedLang } from '../locales';
+import { UserService } from './users.service';
+import { UsernameHistoryRepository } from '../../repositories/usernamehistory/usernamehistory.repository';
+import { t, SupportedLang } from '../../locales';
 
 @Injectable()
 export class UsernameService {
@@ -45,10 +45,10 @@ const now = new Date();
     nextUpdateDate.setDate(now.getDate() + 10); // 10-day cooldown
     await this.usernameHistoryRepo.saveUsernameChange(userId, oldUsername, newUsername, nextUpdateDate);
 
-    // 6️⃣ Return success message
+    
     return {
       success: true,
-      message: t('successfullyUpdatedUsername', language), // "Username updated successfully"
+      message: t('successfullyUpdatedUsername', language), 
       nextChangeAllowed: nextUpdateDate,
     };
   }

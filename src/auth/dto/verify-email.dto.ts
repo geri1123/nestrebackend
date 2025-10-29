@@ -1,19 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { SupportedLang, t } from '../../locales';
-export function VerificationEmalFactory(lang: SupportedLang= 'al'){
- class VerifyEmailDto {
+ export class VerifyEmailDto {
     @ApiProperty({
     description: 'Verification token sent to user email',
     example: 'abc123def456',
   })
-  @IsNotEmpty({ message: t('noTokenProvided', lang) })
+  @IsNotEmpty({ message:'noTokenProvided' })
   
   token: string;
 }
-return VerifyEmailDto;
-}
-export type VerifyEmailDto = InstanceType<ReturnType<typeof VerificationEmalFactory>>;
+
+// export type VerifyEmailDto = InstanceType<ReturnType<typeof VerificationEmalFactory>>;
 
 export class VerifyEmailDtoSwagger{
 @ApiProperty({
