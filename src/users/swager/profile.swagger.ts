@@ -5,7 +5,7 @@ import { UsernameDto } from '../dto/username.dto';
 import { ApiUnauthorizedResponse,ApiBadRequestResponse ,ApiSuccessResponse} from '../../common/swagger/response.helper.ts';
 export class ProfileSwagger {
   static ApiTagsProfile() {
-    return applyDecorators(ApiTags('user'));
+    return applyDecorators(ApiTags('User'));
   }
 
   static ApiUpdateProfile() {

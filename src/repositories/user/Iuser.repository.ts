@@ -17,7 +17,7 @@ updateProfileImage(userId: number, imageUrl: string): Promise<void> ;
   emailExists(email: string): Promise<boolean>;
   usernameExists(username: string): Promise<boolean>;
   findByEmail(email: string): Promise<{ id: number; email: string; first_name: string | null; email_verified: boolean; status: user_status } | null>;
-
+ getNavbarUser(userId: number): Promise<{ username: string; email: string; profile_img: string | null; last_login: Date | null } | null>;
   updateFieldsById(userId: number, fields: Partial<UpdatableUserFields>): Promise<void>;
   verifyEmail(userId: number, emailVerified: boolean, statusToUpdate: user_status): Promise<void>;
   regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<void>;

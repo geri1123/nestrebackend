@@ -4,11 +4,12 @@ import { generateToken, hashPassword } from '../../utils/hash';
 import { t, SupportedLang } from '../../locales';
 import { UserStatusType } from '../types/base-user-info';
 import { UpdatableUserFields } from '../types/update-user-info';
+import { FirebaseService } from '../../firebase/firebase.service';
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepo: UserRepository,
-    
+     private readonly firebaseService: FirebaseService
   ) {}
     async findByIdentifierOrFail(identifier: string, language: SupportedLang) {
     const user = await this.userRepo.findByIdentifier(identifier);
@@ -117,8 +118,31 @@ async verifyEmail(
     return this.userRepo.updateFieldsById(userId, { last_login: new Date() });
   }
 
-async updateProfileImage(userId: number, imagePath: string) {
-  // store only the path, not the full URL
-  await this.userRepo.updateProfileImage(userId, imagePath);
+ async updateProfileImage(userId: number, imageUrl: string) {
+  await this.userRepo.updateProfileImage(userId, imageUrl);
+}
+
+async getNavbarUser(
+  userId: number,
+  language: SupportedLang = "al"
+): Promise<{ username: string; email: string; profile_img: string | null; last_login: Date | null } | null> {
+  
+  const navusers = await this.userRepo.getNavbarUser(userId); 
+
+  if (!navusers) {
+    throw new NotFoundException({
+      success: false,
+      message: t('userNotFound', language),
+    });
+  }
+
+  const publicUrl = navusers.profile_img
+    ? this.firebaseService.getPublicUrl(navusers.profile_img)
+    : null;
+
+  return {
+    ...navusers,
+    profile_img: publicUrl,
+  };
 }
 }

@@ -11,13 +11,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilePictureService } from '../services/profile-picture.service';
 import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../locales';
-
+import { ApiProfilePictureUpload ,ApiProfilePictureDelete} from '../swager/upload-image.swager';
+import { ProfileSwagger } from '../swager/profile.swagger';
 @Controller('profile-image')
+@ProfileSwagger.ApiTagsProfile()
 export class ProfilePictureController {
   constructor(private readonly profilePictureService: ProfilePictureService) {}
 
   
   @Patch()
+  @ApiProfilePictureUpload()
   @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
     @UploadedFile() file: Express.Multer.File,
@@ -47,6 +50,7 @@ export class ProfilePictureController {
   }
 
   @Delete()
+  @ApiProfilePictureDelete()
   async deleteProfilePicture(@Req() req: RequestWithLang) {
     const userId = req['userId'];
     const language: SupportedLang = req.language || 'en';

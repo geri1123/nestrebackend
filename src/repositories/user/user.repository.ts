@@ -45,7 +45,17 @@ export class UserRepository implements IUserRepository {
     });
     return user ? (user as BaseUserInfo) : null;
   }
-
+async getNavbarUser(userId: number) {
+  return this.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      username: true,
+      email: true,
+      profile_img: true,
+      last_login: true,
+    },
+  });
+}
   async findByIdentifier(identifier: string): Promise<PartialUserForLogin | null> {
     return this.prisma.user.findFirst({
       where: { OR: [{ username: identifier }, { email: identifier }] },

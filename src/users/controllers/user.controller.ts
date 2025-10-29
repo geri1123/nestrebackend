@@ -1,5 +1,5 @@
 // src/users/profile.controller.ts
-import { Controller, Patch, Body, Req, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Patch, Body, Req, UseGuards, HttpCode, HttpStatus, Get } from '@nestjs/common';
 import { ProfileInfoService } from '../services/profile-info.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 
@@ -14,15 +14,29 @@ import { ProfileSwagger } from '../swager/profile.swagger';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../common/helpers/validation.helper';
+import { UserService } from '../services/users.service';
 
  @ProfileSwagger.ApiTagsProfile()
 @Controller('profile')
 export class UserController{
   constructor(
     private readonly profileService: ProfileInfoService,
-     private readonly usernameservice:UsernameService
-
+     private readonly usernameservice:UsernameService,
+ private readonly Userservice: UserService
   ) {}
+
+  @Get('navbar')
+  async getProfile(@Req() req: RequestWithLang) {
+    const userId = req["userId"];
+    const language: SupportedLang = req.language || 'en';
+    const profile = await this.Userservice.getNavbarUser(userId , language);
+    return {
+      success: true,
+      message:"SUCCESS",
+      profile,
+    };
+  }
+
  @ProfileSwagger.ApiUpdateProfile()
   @Patch('update')
   
