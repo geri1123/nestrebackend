@@ -13,6 +13,7 @@ import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../locales';
 import { ApiProfilePictureUpload ,ApiProfilePictureDelete} from '../swager/upload-image.swager';
 import { ProfileSwagger } from '../swager/profile.swagger';
+import type { RequestWithUser } from '../../common/types/request-with-user.interface';
 @Controller('profile-image')
 @ProfileSwagger.ApiTagsProfile()
 export class ProfilePictureController {
@@ -51,8 +52,11 @@ export class ProfilePictureController {
 
   @Delete()
   @ApiProfilePictureDelete()
-  async deleteProfilePicture(@Req() req: RequestWithLang) {
-    const userId = req['userId'];
+  async deleteProfilePicture(@Req() req: RequestWithUser) {
+    if (!req.userId) {
+      throw new BadRequestException(t('userNotAuthenticated', req.language));
+    }
+    const userId = req.userId;
     const language: SupportedLang = req.language || 'en';
 
     await this.profilePictureService.deleteProfileImage(userId, language);

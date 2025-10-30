@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException, ForbiddenException 
 import { UserRepository } from '../../repositories/user/user.repository';
 import { generateToken, hashPassword } from '../../utils/hash';
 import { t, SupportedLang } from '../../locales';
-import { UserStatusType } from '../types/base-user-info';
+import { NavbarUser, UserStatusType } from '../types/base-user-info';
 import { UpdatableUserFields } from '../types/update-user-info';
 import { FirebaseService } from '../../firebase/firebase.service';
 @Injectable()
@@ -125,7 +125,7 @@ async verifyEmail(
 async getNavbarUser(
   userId: number,
   language: SupportedLang = "al"
-): Promise<{ username: string; email: string; profile_img: string | null; last_login: Date | null } | null> {
+): Promise<NavbarUser> {
   
   const navusers = await this.userRepo.getNavbarUser(userId); 
 

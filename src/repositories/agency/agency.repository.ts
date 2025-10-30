@@ -8,9 +8,9 @@ import { IAgencyRepository } from './Iagency.repository';
 @Injectable()
 export class AgencyRepository implements IAgencyRepository {
   constructor(private prisma : PrismaService) {}
- async findAgencyByUserId(userId: number): Promise<AgencyInfo | null> {
+ async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfo | null> {
   const agency = await this.prisma.agency.findFirst({
-    where: { owner_user_id: userId },
+    where: { id: agencyId },
     select: {
       id: true,
       agency_name: true,
@@ -111,7 +111,18 @@ async activateAgency(agencyId: number): Promise<void> {
   });
 }
   
-
+async getAllAgencies(skip: number, take: number): Promise<agency[]> {
+  return this.prisma.agency.findMany({
+    where: { status: 'active' },
+    orderBy: { created_at: 'desc' },
+    skip,
+    take,
+  });
+} async countAgencies(): Promise<number> {
+    return this.prisma.agency.count({
+      where: { status: 'active' },
+    });
+  }
   async updateAgencyFields(
     agencyId: number,
     fields: Partial<PlainAgencyInput>
@@ -140,4 +151,5 @@ async activateAgency(agencyId: number): Promise<void> {
       data: { ...filteredData },
     });
   }
+  
 }

@@ -1,5 +1,5 @@
 // src/users/profile.controller.ts
-import { Controller, Patch, Body, Req, UseGuards, HttpCode, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Patch, Body, Req, UseGuards, HttpCode, HttpStatus, Get, UnauthorizedException } from '@nestjs/common';
 import { ProfileInfoService } from '../services/profile-info.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 
@@ -15,6 +15,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../common/helpers/validation.helper';
 import { UserService } from '../services/users.service';
+import type { RequestWithUser } from '../../common/types/request-with-user.interface';
 
  @ProfileSwagger.ApiTagsProfile()
 @Controller('profile')
@@ -26,8 +27,13 @@ export class UserController{
   ) {}
 
   @Get('navbar')
-  async getProfile(@Req() req: RequestWithLang) {
-    const userId = req["userId"];
+  async getProfile(@Req() req: RequestWithUser) {
+      if (!req.userId) {
+    throw new UnauthorizedException(
+      t('userNotAuthenticated', req.language)
+    );
+  }
+    const userId = req.userId;
     const language: SupportedLang = req.language || 'en';
     const profile = await this.Userservice.getNavbarUser(userId , language);
     return {
@@ -41,10 +47,15 @@ export class UserController{
   @Patch('update')
   
   async updateProfile(
-    @Req() req: RequestWithLang,
+    @Req() req: RequestWithUser,
     @Body() data: Record<string, any>,
   ) {
-    const userId = req["userId"];
+    if( !req.userId) {
+      throw new UnauthorizedException(
+        t('userNotAuthenticated', req.language)
+      );
+    }
+    const userId = req.userId;
    const language = req.language;
   const dto = plainToInstance(UpdateProfileDto, data);
 
@@ -76,10 +87,15 @@ export class UserController{
   @HttpCode(HttpStatus.OK)
  
   async changeUsername(
-    @Req() req: RequestWithLang,
+    @Req() req: RequestWithUser,
     @Body() body: Record<string, any>,
   ) {
-   const userId = req["userId"];
+    if (!req.userId) {
+      throw new UnauthorizedException(
+        t('userNotAuthenticated', req.language)
+      );
+    }
+   const userId = req.userId;
     const language = req.language || 'al';
     
   const DtoClass = UsernameDto;

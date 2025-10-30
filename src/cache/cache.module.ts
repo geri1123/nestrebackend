@@ -22,7 +22,7 @@ export const CACHE_KEYV = 'CACHE_KEYV';
 
         keyv.on('error', err => console.error('Keyv Redis Error', err));
 
-        await keyv.set('ping', 'pong'); // test connection
+        await keyv.set('ping', 'pong'); 
         const pong = await keyv.get('ping');
         console.log('Redis test:', pong); 
 

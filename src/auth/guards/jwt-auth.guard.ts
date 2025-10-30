@@ -7,6 +7,7 @@ import { UserRepository } from '../../repositories/user/user.repository';
 import { AgencyRepository } from '../../repositories/agency/agency.repository';
 import { t } from '../../locales';
 import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
+import { RequestWithUser } from '../../common/types/request-with-user.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -25,7 +26,7 @@ export class JwtAuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const req = context.switchToHttp().getRequest<RequestWithLang>();
+    const req = context.switchToHttp().getRequest<RequestWithUser>();
     const lang = req.language; 
 
     const authHeader = req.headers.authorization;

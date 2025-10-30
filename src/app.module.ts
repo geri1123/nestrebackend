@@ -20,7 +20,7 @@ import { UserModule } from './users/users.module';
     AppConfigModule,
     PrismaModule,
     UserModule,
-     
+     AgencyModule,
     FirebaseModule,
     AgencyModule,
 AuthModule,

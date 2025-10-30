@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { hashPassword } from '../../utils/hash';
 import type { IUserRepository } from './Iuser.repository';
 // import type { NewUser, PartialUserByToken } from '../../types/database.js';
-import type { BaseUserInfo } from '../../users/types/base-user-info';
+import type { BaseUserInfo, NavbarUser } from '../../users/types/base-user-info';
 import { UserCreationData } from '../../auth/types/create-user-input';
 import type { UpdatableUserFields } from '../../users/types/update-user-info'
 import { PartialUserForLogin ,PartialUserByToken } from '../../types/user';
@@ -45,7 +45,7 @@ export class UserRepository implements IUserRepository {
     });
     return user ? (user as BaseUserInfo) : null;
   }
-async getNavbarUser(userId: number) {
+async getNavbarUser(userId: number):Promise<NavbarUser | null> {
   return this.prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -53,6 +53,7 @@ async getNavbarUser(userId: number) {
       email: true,
       profile_img: true,
       last_login: true,
+      role:true,
     },
   });
 }

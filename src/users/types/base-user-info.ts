@@ -1,4 +1,5 @@
 export type UserStatusType = 'active' | 'inactive' | 'pending' | 'suspended';
+export type roleType = 'user' | 'agent' | 'agency_owner';
 export type BaseUserInfo = {
   id: number;
   username: string;
@@ -9,11 +10,18 @@ export type BaseUserInfo = {
   profile_img: string | null;
   phone: string | null;
   website: string | null;
-  role: 'user' | 'agent' | 'agency_owner';
+  role:roleType;
   status: UserStatusType;
   email_verified?: boolean;
   last_login?: Date | null;
   last_active?: Date | null;
   created_at?: Date;
   updated_at?: Date | null;
+};
+export type NavbarUser = {
+  username: string;
+  email: string;
+  profile_img: string | null;
+  last_login: Date | null;
+  role: roleType;
 };

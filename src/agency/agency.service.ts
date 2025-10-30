@@ -2,10 +2,15 @@ import { Injectable, BadRequestException } from "@nestjs/common";
 import { AgencyRepository } from "../repositories/agency/agency.repository";
 import { RegisterAgencyOwnerDto } from "../auth/dto/register-agency-owner.dto";
 import { SupportedLang, t } from "../locales";
-
+import { agency } from "@prisma/client";
+import { AgencyInfo } from "./types/agency-info";
+import { FirebaseService } from "../firebase/firebase.service";
 @Injectable()
 export class AgencyService {
-  constructor(private readonly agencyRepo: AgencyRepository) {}
+  constructor(
+    private readonly agencyRepo: AgencyRepository,
+    private readonly firebaseService: FirebaseService
+  ) {}
     async checkAgencyPublicCode(publicCode: string) {
     return await this.agencyRepo.findByPublicCode(publicCode);
   }
@@ -78,5 +83,37 @@ export class AgencyService {
   async getAgencyWithOwnerById(agencyId: number) {
     return this.agencyRepo.findWithOwnerById(agencyId);
   }
+async getPaginatedAgencies(page = 1, limit = 10) {
+  const skip = (page - 1) * limit;
+
+  // Fetch agencies and total count in parallel
+  const [agencies, total] = await Promise.all([
+    this.agencyRepo.getAllAgencies(skip, limit),
+    this.agencyRepo.countAgencies(),
+  ]);
+
+  return {
+    total,
+    page,
+    limit,
+    agencies: agencies.map(a => ({
+      id: a.id,
+      name: a.agency_name,
+      logo: a.logo ? this.firebaseService.getPublicUrl(a.logo) : null, // map each logo
+      address: a.address,
+      created_at: a.created_at.toLocaleDateString('en-GB'),
+    })),
+  };
+}
+async getAgencyInfoByOwner( agencyid:number ,language: SupportedLang='al'): Promise<AgencyInfo | null> {
+  const agencyinfo= this.agencyRepo.getAgencyInfoByOwner(agencyid);
+  if(!agencyinfo){
+    throw new BadRequestException({
+      success: false,
+      message: t('agencyNotFound', language),
+    });
+  }
+  return agencyinfo;
+}
 
 }
