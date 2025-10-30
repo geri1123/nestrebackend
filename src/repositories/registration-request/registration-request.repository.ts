@@ -34,64 +34,80 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
 
     return result !== null;
   }
-//findagentRequestsByAgencyId
- async findAgentRequestsByAgencyId(
-    agencyId: number,
-    limit: number,
-    offset: number
-  ): Promise<{ data: AgentRequestQueryResult[]; total: number }> {
 
-    const whereCondition = {
+  async findByAgencyIdUnderReview(
+  agencyId: number,
+  skip ?: number,
+  take  ?: number,
+) {
+  return this.prisma.registrationrequest.findMany({
+    where: {
       agency_id: agencyId,
-      user: {
-        email_verified: true,
-      },
-    };
+      status: 'under_review',
+    },
+    orderBy: { created_at: 'desc' },
+    skip,
+    take,
+  });
+}
+//findagentRequestsByAgencyId
+//  async findAgentRequestsByAgencyId(
+//     agencyId: number,
+//     limit: number,
+//     offset: number
+//   ): Promise<{ data: AgentRequestQueryResult[]; total: number }> {
 
-    const [registrationRequests, totalCount] = await Promise.all([
-      this.prisma.registrationrequest.findMany({
-        where: whereCondition,
-        include: {
-          user: {
-            select: {
-              username: true,
-              email: true,
-              first_name: true,
-              last_name: true,
-              email_verified: true,
-            },
-          },
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip: offset,
-      }),
+//     const whereCondition = {
+//       agency_id: agencyId,
+//       user: {
+//         email_verified: true,
+//       },
+//     };
+
+//     const [registrationRequests, totalCount] = await Promise.all([
+//       this.prisma.registrationrequest.findMany({
+//         where: whereCondition,
+//         include: {
+//           user: {
+//             select: {
+//               username: true,
+//               email: true,
+//               first_name: true,
+//               last_name: true,
+//               email_verified: true,
+//             },
+//           },
+//         },
+//         orderBy: {
+//           created_at: 'desc',
+//         },
+//         take: limit,
+//         skip: offset,
+//       }),
       
-      this.prisma.registrationrequest.count({
-        where: whereCondition,
-      }),
-    ]);
+//       this.prisma.registrationrequest.count({
+//         where: whereCondition,
+//       }),
+//     ]);
 
-    const formattedData: AgentRequestQueryResult[] = registrationRequests.map((request) => ({
-      id: request.id,
-      requestType: request.request_type,
-      idCardNumber: request.id_card_number,
-      status: request.status,
-      username: request.user.username,
-      email: request.user.email,
-      firstName: request.user.first_name,
-      lastName: request.user.last_name,
-      emailVerified: request.user.email_verified,
-      createdAt: request.created_at,
-    }));
+//     const formattedData: AgentRequestQueryResult[] = registrationRequests.map((request) => ({
+//       id: request.id,
+//       requestType: request.request_type,
+//       idCardNumber: request.id_card_number,
+//       status: request.status,
+//       username: request.user.username,
+//       email: request.user.email,
+//       firstName: request.user.first_name,
+//       lastName: request.user.last_name,
+//       emailVerified: request.user.email_verified,
+//       createdAt: request.created_at,
+//     }));
 
-    return {
-      data: formattedData,
-      total: totalCount,
-    };
-  }
+//     return {
+//       data: formattedData,
+//       total: totalCount,
+//     };
+//   }
  
    async countAgentRequestsByAgencyId(agencyId: number): Promise<number> {
     return await this.prisma.registrationrequest.count({
@@ -141,27 +157,27 @@ async setUnderReview(userId: number): Promise<registrationrequest | null> {
   /**
    * Get all pending registration requests
    */
-   async findPendingRequests(limit?: number) {
-    return await this.prisma.registrationrequest.findMany({
-      where: {
-        status: 'pending',
-      },
-      include: {
-        user: {
-          select: {
-            username: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-          },
-        },
-      },
-      orderBy: {
-        created_at: 'asc', 
-      },
-      ...(limit && { take: limit }),
-    });
-  }
+  //  async findPendingRequests(limit?: number) {
+  //   return await this.prisma.registrationrequest.findMany({
+  //     where: {
+  //       status: 'pending',
+  //     },
+  //     include: {
+  //       user: {
+  //         select: {
+  //           username: true,
+  //           email: true,
+  //           first_name: true,
+  //           last_name: true,
+  //         },
+  //       },
+  //     },
+  //     orderBy: {
+  //       created_at: 'asc', 
+  //     },
+  //     ...(limit && { take: limit }),
+  //   });
+  // }
 
   //find byUserId
    async findByUserId(userId: number) {

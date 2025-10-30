@@ -16,6 +16,26 @@ export class RegistrationRequestService {
     private readonly agencyservice:AgencyService,
     private readonly agentservice:AgentService
   ) {}
+async getunderreviewRequests(
+  agencyId: number,
+  limit = 10,
+  offset = 0,
+) {
+  const requests = await this.requestRepo.findByAgencyIdUnderReview(
+    agencyId,
+    offset,
+    limit,
+  );
+
+  
+  return requests.map(r => ({
+    id: r.id,
+    userId: r.user_id,
+    status: r.status,
+    requestedRole: r.requested_role,
+    createdAt: r.created_at,
+  }));
+}
 async setUnderReview(userId: number, language: SupportedLang = "al"): Promise<void> {
   // Find the latest registration request for this user
   const requests = await this.requestRepo.findByUserId(userId);
@@ -28,7 +48,7 @@ async setUnderReview(userId: number, language: SupportedLang = "al"): Promise<vo
     });
   }
 
-  // Call the repository method to update status
+ 
  const updatedRequest = await this.requestRepo.setUnderReview(userId);
 
 if (!updatedRequest) {

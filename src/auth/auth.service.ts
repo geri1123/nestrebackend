@@ -88,7 +88,7 @@ export class AuthService {
   return this.registerservice.registerUser(dto, lang);
 }
 async registerAgencyOwner(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
-  // 1️⃣ Validate class-validator rules
+  
   const errors = await validate(dto);
   const extraErrors: Record<string, string[]> = {};
 

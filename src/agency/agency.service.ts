@@ -2,14 +2,16 @@ import { Injectable, BadRequestException } from "@nestjs/common";
 import { AgencyRepository } from "../repositories/agency/agency.repository";
 import { RegisterAgencyOwnerDto } from "../auth/dto/register-agency-owner.dto";
 import { SupportedLang, t } from "../locales";
-import { agency } from "@prisma/client";
+
 import { AgencyInfo } from "./types/agency-info";
 import { FirebaseService } from "../firebase/firebase.service";
+import { RegistrationRequestService } from "../registration-request/registration.request.service";
 @Injectable()
 export class AgencyService {
   constructor(
     private readonly agencyRepo: AgencyRepository,
-    private readonly firebaseService: FirebaseService
+    private readonly firebaseService: FirebaseService,
+    private readonly registrationRequestService:RegistrationRequestService
   ) {}
     async checkAgencyPublicCode(publicCode: string) {
     return await this.agencyRepo.findByPublicCode(publicCode);
@@ -116,4 +118,12 @@ async getAgencyInfoByOwner( agencyid:number ,language: SupportedLang='al'): Prom
   return agencyinfo;
 }
 
+
+// async getUnderReviewRequestsForAgencyOwner(
+//   agencyId: number, 
+//   limit = 10, 
+//   offset = 0
+// ) {
+//   return this.registrationRequestService.getunderreviewRequests(agencyId, limit, offset);
+// }
 }

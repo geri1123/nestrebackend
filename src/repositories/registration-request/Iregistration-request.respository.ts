@@ -10,11 +10,11 @@ export interface IRegistrationRequestRepository {
 
   idCardExists(idCard: string): Promise<boolean>;
 
-  findAgentRequestsByAgencyId(
-    agencyId: number,
-    limit: number,
-    offset: number,
-  ): Promise<{ data: AgentRequestQueryResult[]; total: number }>;
+  // findAgentRequestsByAgencyId(
+  //   agencyId: number,
+  //   limit: number,
+  //   offset: number,
+  // ): Promise<{ data: AgentRequestQueryResult[]; total: number }>;
 
   countAgentRequestsByAgencyId(agencyId: number): Promise<number>;
 setUnderReview(userId: number): Promise<registrationrequest | null>;
@@ -25,7 +25,7 @@ setUnderReview(userId: number): Promise<registrationrequest | null>;
     reviewNotes?: string,
   ): Promise<unknown>;
 
-  findPendingRequests(limit?: number):any;
+  // findPendingRequests(limit?: number):any;
 
   findByUserId(userId: number):any;
 
