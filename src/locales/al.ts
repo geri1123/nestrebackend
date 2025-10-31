@@ -157,4 +157,13 @@ successadded: "Produkti u regjistrua me sukses",
   invalidDocumentType:"Lloji i dokumentit i pavlefshëm",
 insufficientPermissions:"Nuk keni leje të mjaftueshme",
 imagesuccessfullydeleted: "Imazhi u fshi me sukses",
+
+//requestsacceptreject
+requestApproved: "Kërkesa u miratua me sukses",
+roleInAgencyRequired: "Roli në agjenci është i detyrueshëm për miratimin e kërkesës",
+commissionRateRequired: "Norma e komisionit është e detyrueshme për miratimin e kërkesës",
+invalidCommissionRate: "Norma e komisionit duhet të jetë midis 0 dhe 100",
+
+//
+
 } as const

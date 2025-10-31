@@ -79,6 +79,9 @@ case 'aboutMeMustBeString': return t('aboutMeMustBeString', lang);
 
 case 'phoneMustBeString': return t('phoneMustBeString', lang);
 case 'phoneLength': return t('phoneLength', lang);
+case "roleInAgencyRequired": return t('roleInAgencyRequired', lang);
+case "commissionRateRequired": return t('commissionRateRequired', lang);
+case "invalidCommissionRate": return t('invalidCommissionRate', lang);
     default: return code; // fallback
   }
 }

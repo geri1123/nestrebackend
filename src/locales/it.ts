@@ -153,4 +153,9 @@ invalidDocumentType:"Tipo di documento non valido",
    insufficientPermissions:"Permessi insufficienti",
    imagesuccessfullyUploaded: "Immagine caricata con successo",
    imagesuccessfullydeleted: "Immagine eliminata con successo",
+//requestsacceptreject
+requestApproved: "Richiesta approvata con successo",
+roleInAgencyRequired: "Il ruolo in agenzia è obbligatorio per approvare la richiesta",
+commissionRateRequired: "La percentuale di commissione è obbligatoria per approvare la richiesta",
+invalidCommissionRate: "La percentuale di commissione deve essere tra 0 e 100",
    } as const

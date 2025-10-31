@@ -157,4 +157,10 @@ imagesuccessfullyUploaded: "Image uploaded successfully",
   noImageUploaded: "No image was uploaded.",
   insufficientPermissions:"Insufficient permissions",
   imagesuccessfullydeleted: "Image deleted successfully",
+
+  //requestsacceptreject
+  requestApproved: "Request approved successfully",
+  roleInAgencyRequired: "Role in agency is required for approving the request",
+  commissionRateRequired: "Commission rate is required for approving the request",
+  invalidCommissionRate: "Commission rate must be between 0 and 100",
 } as const

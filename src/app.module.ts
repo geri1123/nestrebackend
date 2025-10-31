@@ -15,11 +15,13 @@ import { ProductModule } from './product/product.module';
 import { NotificationModule } from './notification/notification.module';
 import { AgencyModule } from './agency/agency.module';
 import { UserModule } from './users/users.module';
+import { AgencyRequestsModule } from './agency-requests/agency-requests.module';
 @Module({
   imports: [
     AppConfigModule,
     PrismaModule,
     UserModule,
+    AgencyRequestsModule,
      AgencyModule,
     FirebaseModule,
     AgencyModule,

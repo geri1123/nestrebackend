@@ -7,6 +7,7 @@ import { RegisterAgentDto } from "../auth/dto/register-agent.dto";
 import { AgencyService } from "../agency/agency.service";
 
 import { AgentService } from "../agent/agent.service";
+import { registrationrequest_status } from "@prisma/client";
 
 @Injectable()
 export class RegistrationRequestService {
@@ -16,25 +17,32 @@ export class RegistrationRequestService {
     private readonly agencyservice:AgencyService,
     private readonly agentservice:AgentService
   ) {}
-async getunderreviewRequests(
+async getRequests(
   agencyId: number,
   limit = 10,
   offset = 0,
+  status?: registrationrequest_status, 
 ) {
-  const requests = await this.requestRepo.findByAgencyIdUnderReview(
+  const requests = await this.requestRepo.findByAgencyIdAndStatus(
     agencyId,
+    status, 
     offset,
     limit,
   );
 
-  
   return requests.map(r => ({
     id: r.id,
     userId: r.user_id,
+    username: r.user.username,
+    email: r.user.email,
+    requestType: r.request_type,
     status: r.status,
     requestedRole: r.requested_role,
     createdAt: r.created_at,
   }));
+}
+async getrequestscount(agencyId:number , status:any):Promise<number>{
+  return this.requestRepo.countAgentRequestsByAgencyId(agencyId ,status);
 }
 async setUnderReview(userId: number, language: SupportedLang = "al"): Promise<void> {
   // Find the latest registration request for this user
@@ -116,7 +124,4 @@ async getRequestsByUserId(userId: number) {
    
   }
 
-  async changeRequststatus(){
-
-  }
 }

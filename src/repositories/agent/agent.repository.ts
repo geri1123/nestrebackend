@@ -4,81 +4,113 @@ import { NewAgent } from "../../agent/types/create-agent";
 import { PrismaService } from "../../prisma/prisma.service";
 import { IAgentsRepository } from "./Iagent.repository";
 import { AgentInfo } from "../../agent/types/agent-info";
+import { agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
 
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {
  constructor(private readonly prisma: PrismaService) {}
-  async findAgentByUserId(userId: number): Promise<AgentInfo | null> {
-  const agent = await this.prisma.agencyagent.findFirst({
-    where: { agent_id: userId },
-    select: {
-      id: true,
-      agent_id: true,
-      agency_id: true,
-      role_in_agency: true,
-      id_card_number: true,
-      status: true,
-      commission_rate: true,
-      start_date: true,
-      end_date: true,
-      created_at: true,
-      updated_at: true, 
-      agency: {
-        select: {
-          id: true,
-          agency_name: true,
-          logo: true,
-          phone: true,
-          website: true,
-          status: true,
-          public_code: true,
-          agency_email: true,
-          address: true,
-          license_number: true,
-          owner_user_id: true,  
-          created_at: true,   
-          updated_at: true,     
-        },
-      },
-      addedByUser: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-        },
-      },
-    },
-  });
+//   async findAgentByUserId(userId: number): Promise<AgentInfo | null> {
+//   const agent = await this.prisma.agencyagent.findFirst({
+//     where: { agent_id: userId },
+//     select: {
+//       id: true,
+//       agent_id: true,
+//       agency_id: true,
+//       role_in_agency: true,
+//       id_card_number: true,
+//       status: true,
+//       commission_rate: true,
+//       start_date: true,
+//       end_date: true,
+//       created_at: true,
+//       updated_at: true, 
+//       agency: {
+//         select: {
+//           id: true,
+//           agency_name: true,
+//           logo: true,
+//           phone: true,
+//           website: true,
+//           status: true,
+//           public_code: true,
+//           agency_email: true,
+//           address: true,
+//           license_number: true,
+//           owner_user_id: true,  
+//           created_at: true,   
+//           updated_at: true,     
+//         },
+//       },
+//       addedByUser: {
+//         select: {
+//           id: true,
+//           username: true,
+//           email: true,
+//         },
+//       },
+//     },
+//   });
 
-  if (!agent) return null;
+//   if (!agent) return null;
 
-  return {
-    ...agent,
-    commission_rate: agent.commission_rate !== null ? Number(agent.commission_rate) : undefined,
-  } as AgentInfo;
-}
+//   return {
+//     ...agent,
+//     commission_rate: agent.commission_rate !== null ? Number(agent.commission_rate) : undefined,
+//   } as AgentInfo;
+// }
 
-  async create(agentData: NewAgent) {
-    
-    return await this.prisma.agencyagent.create({
+  
+  
+   async createAgencyAgent(data: {
+    agencyId: number;
+    agentId: number;
+    addedBy: number;
+    idCardNumber: string;
+    roleInAgency: agencyagent_role_in_agency;
+    commissionRate?: number;
+    endDate?: Date;
+    status: agencyagent_status;
+  }): Promise<NewAgent> {
+    // create the agent in the database
+    const agent = await this.prisma.agencyagent.create({
       data: {
-        agent_id: agentData.userId,
-        agency_id: agentData.agency_id,
-        added_by: agentData.added_by,
-        id_card_number: agentData.id_card_number,
-        role_in_agency: agentData.role_in_agency,
-        status: agentData.status,
-        commission_rate: agentData.commission_rate,
-        start_date: agentData.start_date,
-        end_date: agentData.end_date,
+        agency_id: data.agencyId,
+        agent_id: data.agentId,
+        added_by: data.addedBy,
+        id_card_number: data.idCardNumber,
+        role_in_agency: data.roleInAgency,
+        commission_rate: data.commissionRate,
+        start_date: new Date(),
+        end_date: data.endDate,
+        status: data.status,
+      },
+      select: {
+        agent_id: true,
+        agency_id: true,
+        added_by: true,
+        id_card_number: true,
+        role_in_agency: true,
+        status: true,
+        commission_rate: true,
+        start_date: true,
       },
     });
-  }
 
-  async findByIdCardNumber(idCardNumber: string) {
-    return await this.prisma.agencyagent.findUnique({
-      where: { id_card_number: idCardNumber },
-    });
+   
+    return agent;
   }
+async findByIdCardNumber(
+  idCardNumber: string
+): Promise<{ id_card_number: string | null } | null> {
+  return this.prisma.agencyagent.findUnique({
+    where: { id_card_number: idCardNumber },
+    select: { id_card_number: true },
+  });
+}
+  // async findByIdCardNumber(idCardNumber: string) {
+  //   return await this.prisma.agencyagent.findUnique({
+  //     where: { id_card_number: idCardNumber },
+  //   });
+  // }
 
 }

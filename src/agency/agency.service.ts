@@ -5,13 +5,12 @@ import { SupportedLang, t } from "../locales";
 
 import { AgencyInfo } from "./types/agency-info";
 import { FirebaseService } from "../firebase/firebase.service";
-import { RegistrationRequestService } from "../registration-request/registration.request.service";
 @Injectable()
 export class AgencyService {
   constructor(
     private readonly agencyRepo: AgencyRepository,
     private readonly firebaseService: FirebaseService,
-    private readonly registrationRequestService:RegistrationRequestService
+   
   ) {}
     async checkAgencyPublicCode(publicCode: string) {
     return await this.agencyRepo.findByPublicCode(publicCode);

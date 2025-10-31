@@ -35,23 +35,23 @@ async getAgencyInfo(@Req() req: RequestWithUser) {
  const agencyId = req.agencyId;
   return this.agencyservice.getAgencyInfoByOwner( agencyId,language);
 }
-@Roles('agency_owner')
-@Get('registration-requests')
-async getregistrationRequests(
-  @Req() req: RequestWithUser,
-  @Query('limit') limit = 10,
-  @Query('offset') offset = 0
-) {
-  if (!req.agencyId) {
-    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-  }
+// @Roles('agency_owner')
+// @Get('registration-requests')
+// async getregistrationRequests(
+//   @Req() req: RequestWithUser,
+//   @Query('limit') limit = 10,
+//   @Query('offset') offset = 0
+// ) {
+//   if (!req.agencyId) {
+//     throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+//   }
 
-  const language: SupportedLang = req.language || 'al';
+//   const language: SupportedLang = req.language || 'al';
 
 //   return this.agencyservice.getUnderReviewRequestsForAgencyOwner(
 //     req.agencyId,
 //     Number(limit),
 //     Number(offset)
 //   );
-}
+// }
 }
