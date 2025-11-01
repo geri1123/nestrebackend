@@ -3,9 +3,11 @@ import { RegistrationRequestModule } from "../registration-request/registration.
 
 import { AgencyRequestsService } from "./agency-requests.service";
 import { AgencyRequestsController } from "./agency-requests.controller";
+import { AgentModule } from "../agent/agent.module";
+import { UserModule } from "../users/users.module";
 
 @Module({
-        imports: [RegistrationRequestModule],
+        imports: [RegistrationRequestModule ,AgentModule ,UserModule],
             controllers: [AgencyRequestsController],
         providers: [AgencyRequestsService],
         exports: [AgencyRequestsService],

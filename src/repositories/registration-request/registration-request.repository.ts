@@ -4,6 +4,7 @@ import { AgentRequestQueryResult } from '../../registration-request/type/agent-r
 import { IRegistrationRequestRepository } from './Iregistration-request.respository';
 import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create';
 import { registrationrequest, registrationrequest_status } from '@prisma/client';
+import { userInfo } from 'os';
 @Injectable()
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
  constructor(private prisma: PrismaService) {}
@@ -84,24 +85,107 @@ async setUnderReview(userId: number): Promise<registrationrequest | null> {
     data: { status: registrationrequest_status.under_review },
   });
 }
-   async agencyReviewStatus(
-    id: number,
-    status: registrationrequest_status,
-    reviewedBy?: number,
-    reviewNotes?: string
-  ) {
-    return await this.prisma.registrationrequest.update({
-      where: { id },
-      data: {
-        status,
-        reviewed_by: reviewedBy,
-        review_notes: reviewNotes,
-        reviewed_at: new Date(),
+//    async UpdateRequestFields(
+//   id: number,
+//   status: registrationrequest_status,
+//   reviewedBy?: number,
+//   reviewNotes?: string,
+// ) {
+//   return this.prisma.registrationrequest.update({
+//     where: { id },
+//     data: {
+//       status,
+//       ...(reviewedBy && { reviewed_by: reviewedBy }),
+//       ...(reviewNotes && { review_notes: reviewNotes }),
+//       reviewed_at: new Date(),
+//     },
+//   });
+// }
+
+async UpdateRequestFields(
+  id: number,
+  status: registrationrequest_status,
+  reviewedBy?: number,
+  reviewNotes?: string,
+): Promise<{
+  id: number;
+  status: registrationrequest_status;
+  reviewed_by: number | null;
+  review_notes: string | null;
+  reviewed_at: Date | null;
+}> {
+  return this.prisma.registrationrequest.update({
+    where: { id },
+    data: {
+      status,
+      ...(reviewedBy && { reviewed_by: reviewedBy }),
+      ...(reviewNotes && { review_notes: reviewNotes }),
+      reviewed_at: new Date(),
+    },
+    select: {
+      id: true,
+      status: true,
+      reviewed_by: true,
+      review_notes: true,
+      reviewed_at: true,
+    },
+  });
+}
+   async findByUserId(userId: number) {
+    return await this.prisma.registrationrequest.findMany({
+      where: {
+        user_id: userId,
+      },
+      orderBy: {
+        created_at: 'desc',
       },
     });
   }
 
-  /**
+async findRequestById(id: number): Promise<{ id: number; user_id: number } | null> {
+  return this.prisma.registrationrequest.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      user_id: true,
+    },
+  });
+}
+
+}
+//findById
+  //   async findById(id: number) {
+  //   return await this.prisma.registrationrequest.findUnique({
+  //     where: { id },
+  //     include: {
+  //       user: {
+  //         select: {
+  //           id: true,
+  //           username: true,
+  //           email: true,
+  //           first_name: true,
+  //           last_name: true,
+  //           role: true,
+  //         },
+  //       },
+  //       agency: {
+  //         select: {
+  //           id: true,
+  //           agency_name: true,
+  //           license_number: true,
+  //         },
+  //       },
+  //       reviewedByUser: {
+  //         select: {
+  //           id: true,
+  //           username: true,
+  //           email: true,
+  //         },
+  //       },
+  //     },
+  //   });
+  // }
+   /**
    * Get all pending registration requests
    */
   //  async findPendingRequests(limit?: number) {
@@ -127,48 +211,3 @@ async setUnderReview(userId: number): Promise<registrationrequest | null> {
   // }
 
   //find byUserId
-   async findByUserId(userId: number) {
-    return await this.prisma.registrationrequest.findMany({
-      where: {
-        user_id: userId,
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-    });
-  }
-//findById
-    async findById(id: number) {
-    return await this.prisma.registrationrequest.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-            role: true,
-          },
-        },
-        agency: {
-          select: {
-            id: true,
-            agency_name: true,
-            license_number: true,
-          },
-        },
-        reviewedByUser: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-          },
-        },
-      },
-    });
-  }
-}
-
- 

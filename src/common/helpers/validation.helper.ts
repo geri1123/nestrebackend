@@ -31,7 +31,7 @@ export function throwValidationErrors(
     });
   }
 }
-function translateValidationMessage(code: string, lang: SupportedLang): string {
+export function translateValidationMessage(code: string, lang: SupportedLang): string {
   switch (code) {
     case 'usernameMustBeString': return t('usernameStringError', lang);
     case 'usernameLength': return t('usernameMin', lang);

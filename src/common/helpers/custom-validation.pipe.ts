@@ -12,7 +12,7 @@ export class CustomValidationPipe extends ValidationPipe implements PipeTransfor
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (errors: ValidationError[], req?: any) => {
-        // ✅ Use request language if available
+       
         const lang: SupportedLang = req?.language || 'al';
         return throwValidationErrors(errors, lang);
       },

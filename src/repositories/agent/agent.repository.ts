@@ -1,6 +1,6 @@
 // import { prisma } from "../../config/prisma.js";
 import { Injectable } from "@nestjs/common";
-import { NewAgent } from "../../agent/types/create-agent";
+import { Createagentdata, NewAgent } from "../../agent/types/create-agent";
 import { PrismaService } from "../../prisma/prisma.service";
 import { IAgentsRepository } from "./Iagent.repository";
 import { AgentInfo } from "../../agent/types/agent-info";
@@ -61,16 +61,7 @@ export class AgentsRepository implements IAgentsRepository {
 
   
   
-   async createAgencyAgent(data: {
-    agencyId: number;
-    agentId: number;
-    addedBy: number;
-    idCardNumber: string;
-    roleInAgency: agencyagent_role_in_agency;
-    commissionRate?: number;
-    endDate?: Date;
-    status: agencyagent_status;
-  }): Promise<NewAgent> {
+   async createAgencyAgent(data: Createagentdata): Promise<NewAgent> {
     // create the agent in the database
     const agent = await this.prisma.agencyagent.create({
       data: {
@@ -81,7 +72,7 @@ export class AgentsRepository implements IAgentsRepository {
         role_in_agency: data.roleInAgency,
         commission_rate: data.commissionRate,
         start_date: new Date(),
-        end_date: data.endDate,
+        
         status: data.status,
       },
       select: {

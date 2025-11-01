@@ -1,12 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { RegistrationRequestService } from "../registration-request/registration.request.service";
 import { SupportedLang } from "../locales";
-import { registrationrequest_status } from "@prisma/client";
+import { agencyagent_role_in_agency, registrationrequest_status } from "@prisma/client";
+import { AgentService } from "../agent/agent.service";
+import { UserService } from "../users/services/users.service";
 
 @Injectable()
 
 export class AgencyRequestsService {
-  constructor(private readonly registrationrequestService:RegistrationRequestService) {}
+  constructor(
+    private readonly registrationrequestService:RegistrationRequestService,
+      private readonly agentsSerivice:AgentService,
+      private readonly userservice:UserService
+  ) {}
 async getRequestsForAgencyOwner(
   agencyId: number,
   page = 1,           
@@ -28,8 +34,44 @@ async getRequestsForAgencyOwner(
     requests,
   };
 }
-async updateRequestStatus(requestId:number, agencyId:number, approvedBy:number, action:'approve' | 'reject', roleInAgency?:string, commissionRate?:number, reviewNotes?:string){
+async updateRequestStatus(
+  requestId: number,
+  agencyId: number,
+  approvedBy: number,
+  action: 'approved' | 'rejected',
+  roleInAgency: agencyagent_role_in_agency,
+  commissionRate?: number,
+  reviewNotes?: string,
+  language: SupportedLang = "al"
+) {
+  const request = await this.registrationrequestService.findRequestById(requestId, language);
 
+  // If approved, create the agent first
+  if (action === 'approved') {
+    if (!roleInAgency) {
+      throw new Error('roleInAgency is required when approving');
+    }
 
+    await this.agentsSerivice.createAgencyAgent({
+      agencyId,
+      agentId: request.user_id,
+      addedBy: approvedBy,
+      idCardNumber: "",
+      roleInAgency,
+      commissionRate,
+      status: "active",
+    }, language);
+  }
+
+  return this.registrationrequestService.updateRequests(
+    {
+      requestId,
+      action,
+      commissionRate,
+      reviewNotes,
+      reviewedBy: approvedBy,
+    },
+    language
+  );
 }
 }

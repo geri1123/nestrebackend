@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Query, Req, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Query, Req, UnauthorizedException } from "@nestjs/common";
 import { AgencyRequestsService } from "./agency-requests.service";
 import { Roles } from "../common/decorators/roles.decorator";
 import type { RequestWithUser } from "../common/types/request-with-user.interface";
 import { SupportedLang, t } from "../locales";
 import { UpdateRequestStatusDto } from "./dto/agency-request.dto";
 import { CustomValidationPipe } from "../common/helpers/custom-validation.pipe";
+import { plainToInstance } from "class-transformer";
 
 
 
@@ -37,28 +38,43 @@ export class AgencyRequestsController {
     );
   }
   //add agents or reject
-    @Roles('agency_owner')
- @Patch('registration-requests/:id/status')
+  @Roles('agency_owner')
+@Patch('registration-requests/:id/status')
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
-  @Body(new CustomValidationPipe(UpdateRequestStatusDto)) body: UpdateRequestStatusDto,
+  @Body() dto: UpdateRequestStatusDto,
 ) {
-   const userid=req.userId;
-    if (!req.agencyId) {
-    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+  // 🔍 Add this debugging
+  console.log('Received DTO:', dto);
+  console.log('Action value:', dto.action);
+  console.log('Action type:', typeof dto.action);
+  console.log('Action length:', dto.action?.length);
+  console.log('Action charCodes:', dto.action?.split('').map(c => c.charCodeAt(0)));
+
+  const language = req.language || 'al';
+  const userid = req.userId;
+
+  if (!req.agencyId) {
+    throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
   if (!userid) {
-    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+    throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
+
+  if (dto.action === 'approved' && !dto.roleInAgency) {
+    throw new BadRequestException(t('roleInAgencyRequired', language));
+  }
+
   return this.agencyRequestsService.updateRequestStatus(
     requestId,
     req.agencyId,
     userid,
-    body.action,
-    body.roleInAgency,
-    body.commissionRate,
-    body.reviewNotes,
+    dto.action,
+    dto.roleInAgency!,
+    dto.commissionRate,
+    dto.reviewNotes,
+    language
   );
 }
 }

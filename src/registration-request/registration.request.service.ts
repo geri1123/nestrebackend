@@ -3,7 +3,7 @@ import { RegistrationRequestRepository } from "../repositories/registration-requ
 import { NotificationService } from "../notification/notification.service";
 import { SupportedLang, t } from "../locales";
 import { RegisterAgentDto } from "../auth/dto/register-agent.dto";
-
+import { UpdateRequestStatusType } from "./type/updatestatus-type";
 import { AgencyService } from "../agency/agency.service";
 
 import { AgentService } from "../agent/agent.service";
@@ -123,5 +123,22 @@ async getRequestsByUserId(userId: number) {
 
    
   }
+
+  async updateRequests(data:UpdateRequestStatusType, language:SupportedLang="al"){
+    return this.requestRepo.UpdateRequestFields(data.requestId, data.action,  data.reviewedBy ,data.reviewNotes);
+  }
+ async findRequestById(
+  id: number,
+  language: SupportedLang
+): Promise<{ id: number; user_id: number }> { 
+  const request = await this.requestRepo.findRequestById(id);
+  if (!request) {
+    throw new NotFoundException({
+      success: false,
+      message: t('validationFailed', language),
+    });
+  }
+  return request;
+}
 
 }

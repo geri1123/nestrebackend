@@ -18,16 +18,22 @@ export interface IRegistrationRequestRepository {
 
   countAgentRequestsByAgencyId(agencyId: number): Promise<number>;
 setUnderReview(userId: number): Promise<registrationrequest | null>;
-  agencyReviewStatus(
-    id: number,
-    status: registrationrequest_status,
-    reviewedBy?: number,
-    reviewNotes?: string,
-  ): Promise<unknown>;
+  UpdateRequestFields(
+  id: number,
+  status: registrationrequest_status,
+  reviewedBy?: number,
+  reviewNotes?: string,
+): Promise<{
+  id: number;
+  status: registrationrequest_status;
+  reviewed_by: number | null;
+  review_notes: string | null;
+  reviewed_at: Date | null;
+}>
 
   // findPendingRequests(limit?: number):any;
 
   findByUserId(userId: number):any;
-
-  findById(id: number):any;
+findRequestById(id: number): Promise<{ id: number; user_id: number } | null>  ;
+  // findById(id: number):any;
 }

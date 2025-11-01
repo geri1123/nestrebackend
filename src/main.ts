@@ -3,11 +3,11 @@ import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { AppConfigService } from './config/config.service';
-
 // ✅ Swagger imports
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { SupportedLang, t } from './locales';
-
+import { ValidationError } from 'class-validator';
+import { translateValidationMessage } from './common/helpers/validation.helper';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(AppConfigService);
@@ -15,35 +15,62 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // 💥 Validation formatting
+//   app.useGlobalPipes(
+//   new ValidationPipe({
+//     transform: true,
+//     whitelist: true,
+//     forbidNonWhitelisted: true,
+//  transformOptions: {
+//         enableImplicitConversion: true,
+//       },
+//     exceptionFactory: (errors) => {
+//       const formatted: Record<string, string[]> = {};
+
+//       for (const err of errors) {
+//         if (err.constraints) {
+//           formatted[err.property] = Object.values(err.constraints);
+//         }
+//       }
+
+//       // you can later detect language from request middleware
+//       const lang: SupportedLang = 'al';
+
+//       return new BadRequestException({
+//         success: false,
+//         message: t('validationFailed', lang),
+//         errors: formatted,
+//       });
+//     },
+//   }),
+// );
   app.useGlobalPipes(
-  new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
- transformOptions: {
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transformOptions: {
         enableImplicitConversion: true,
       },
-    exceptionFactory: (errors) => {
-      const formatted: Record<string, string[]> = {};
+      exceptionFactory: (errors: ValidationError[]) => {
+        const formatted: Record<string, string[]> = {};
+        const lang: SupportedLang = 'al';
 
-      for (const err of errors) {
-        if (err.constraints) {
-          formatted[err.property] = Object.values(err.constraints);
+        for (const err of errors) {
+          if (err.constraints) {
+            formatted[err.property] = Object.values(err.constraints).map(code =>
+              translateValidationMessage(code, lang) // ✅ Use the imported function
+            );
+          }
         }
-      }
 
-      // you can later detect language from request middleware
-      const lang: SupportedLang = 'al';
-
-      return new BadRequestException({
-        success: false,
-        message: t('validationFailed', lang),
-        errors: formatted,
-      });
-    },
-  }),
-);
-
+        return new BadRequestException({
+          success: false,
+          message: t('validationFailed', lang),
+          errors: formatted,
+        });
+      },
+    }),
+  );
   //  Enable CORS
   app.enableCors({
     origin: '*',
