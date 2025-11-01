@@ -61,6 +61,14 @@ async updateRequestStatus(
       commissionRate,
       status: "active",
     }, language);
+    await this.userservice.updateFields(request.user_id ,{
+      status:"active"
+    })
+  } else if(action==="rejected"){
+     await this.userservice.updateFields(request.user_id, {
+    status: "active",
+    role: "agent"
+  });
   }
 
   return this.registrationrequestService.updateRequests(
