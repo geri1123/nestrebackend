@@ -98,6 +98,14 @@ async findByIdCardNumber(
     select: { id_card_number: true },
   });
 }
+async findExistingAgent(agent_id: number) {
+  return await this.prisma.agencyagent.findFirst({
+    where: { agent_id },
+  });
+}
+
+
+
   // async findByIdCardNumber(idCardNumber: string) {
   //   return await this.prisma.agencyagent.findUnique({
   //     where: { id_card_number: idCardNumber },

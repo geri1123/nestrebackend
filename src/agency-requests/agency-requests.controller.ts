@@ -37,28 +37,60 @@ export class AgencyRequestsController {
       status as any,           
     );
   }
-  //add agents or reject
-  @Roles('agency_owner')
+  
+//   @Roles('agency_owner')
+// @Patch('registration-requests/:id/status')
+// async updateRegistrationRequestStatus(
+//   @Req() req: RequestWithUser,
+//   @Param('id', ParseIntPipe) requestId: number,
+//   @Body() dto: UpdateRequestStatusDto,
+// ) {
+ 
+//   console.log('Received DTO:', dto);
+//   console.log('Action value:', dto.action);
+//   console.log('Action type:', typeof dto.action);
+//   console.log('Action length:', dto.action?.length);
+//   console.log('Action charCodes:', dto.action?.split('').map(c => c.charCodeAt(0)));
+
+//   const language = req.language || 'al';
+//   const userid = req.userId;
+
+//   if (!req.agencyId) {
+//     throw new UnauthorizedException(t('userNotAuthenticated', language));
+//   }
+//   if (!userid) {
+//     throw new UnauthorizedException(t('userNotAuthenticated', language));
+//   }
+
+//   if (dto.action === 'approved' && !dto.roleInAgency) {
+//     throw new BadRequestException(t('roleInAgencyRequired', language));
+//   }
+
+//   return this.agencyRequestsService.updateRequestStatus(
+//     requestId,
+//     req.agencyId,
+//     userid,
+//     dto.action,
+//     dto.roleInAgency!,
+//     dto.commissionRate,
+//     dto.reviewNotes,
+//     language
+//   );
+// }
+@Roles('agency_owner')
 @Patch('registration-requests/:id/status')
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
   @Body() dto: UpdateRequestStatusDto,
 ) {
-  // 🔍 Add this debugging
-  console.log('Received DTO:', dto);
-  console.log('Action value:', dto.action);
-  console.log('Action type:', typeof dto.action);
-  console.log('Action length:', dto.action?.length);
-  console.log('Action charCodes:', dto.action?.split('').map(c => c.charCodeAt(0)));
-
   const language = req.language || 'al';
-  const userid = req.userId;
+  const userId = req.userId;
 
   if (!req.agencyId) {
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
-  if (!userid) {
+  if (!userId) {
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
 
@@ -66,15 +98,26 @@ async updateRegistrationRequestStatus(
     throw new BadRequestException(t('roleInAgencyRequired', language));
   }
 
-  return this.agencyRequestsService.updateRequestStatus(
-    requestId,
-    req.agencyId,
-    userid,
-    dto.action,
-    dto.roleInAgency!,
-    dto.commissionRate,
-    dto.reviewNotes,
-    language
-  );
+  try {
+    // ✅ Call the service
+    return await this.agencyRequestsService.updateRequestStatus(
+      requestId,
+      req.agencyId,
+      userId,
+      dto.action,
+      dto.roleInAgency!,
+      dto.commissionRate,
+      dto.reviewNotes,
+      language
+    );
+  } catch (err) {
+    console.error(err);
+
+    throw new BadRequestException({
+      success: false,
+      message: err?.message || t('somethingWentWrong', language),
+      errors: err?.response?.errors || { general: [err?.message || 'Unknown error'] },
+    });
+  }
 }
 }

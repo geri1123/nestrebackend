@@ -1,4 +1,5 @@
 export const al = {
+      somethingWentWrong: 'Diçka shkoi gabim',
   validationFailed: "Validimi dështoi",
      userNotAuthenticated: "Përdoruesi nuk është autentikuar",
     notificationMarkedRead: "Njoftimi u shënua si i lexuar",
@@ -18,7 +19,7 @@ export const al = {
   aboutMeMustBeString: "Fusha 'rreth meje' duhet të jetë tekst",
   phoneMustBeString: "Numri i telefonit duhet të jetë tekst",
    phoneLength: "Numri i telefonit duhet të jetë midis 5 dhe 20 karaktereve",
-    //login,registration
+ agentExist: 'Ky agjent ekziston tashmë',
      registrationSuccess: "Regjistrimi u krye me sukses. Ju lutemi verifikoni email-in tuaj.",
     loginSuccess: "Hyrja ishte e suksesshme",
       invalidCredentials: "Të dhënat e identifikimit nuk janë të sakta",

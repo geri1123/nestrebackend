@@ -39,18 +39,23 @@ export class AuthService {
     }
 
     if (user.status !== 'active') {
-      throw new UnauthorizedException({
-        success: false,
-        message: t('accountNotActive', language),
-        errorCode: 'EMAIL_NOT_VERIFIED',
-      });
+    throw new UnauthorizedException({
+  success: false,
+  message: t('accountNotActive', language),
+  errors: {
+    general: [t('accountNotActive', language)],
+  },
+});
     }
 
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
       throw new UnauthorizedException({
         success: false,
-        message: t('invalidCredentials', language),
+        message: t('accountNotActive', language),
+        errors: {
+    general: [t('accountNotActive', language)],
+  },
       });
     }
 

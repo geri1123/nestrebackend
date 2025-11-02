@@ -1,4 +1,5 @@
 export const it = {
+   somethingWentWrong: 'Qualcosa è andato storto',
  validationFailed: "Convalida non riuscita",
      userNotAuthenticated: "Utente non autenticato",
     notificationMarkedRead: "Notifica contrassegnata come letta",
@@ -153,6 +154,7 @@ invalidDocumentType:"Tipo di documento non valido",
    insufficientPermissions:"Permessi insufficienti",
    imagesuccessfullyUploaded: "Immagine caricata con successo",
    imagesuccessfullydeleted: "Immagine eliminata con successo",
+     agentExist: 'Questo agente esiste già',
 //requestsacceptreject
 requestApproved: "Richiesta approvata con successo",
 roleInAgencyRequired: "Il ruolo in agenzia è obbligatorio per approvare la richiesta",

@@ -2,6 +2,7 @@ import {  BadRequestException, Injectable } from "@nestjs/common";
 import { AgentsRepository } from "../repositories/agent/agent.repository";
 import { SupportedLang, t } from "../locales";
 import { Createagentdata } from "./types/create-agent";
+import { error } from "console";
 
 @Injectable()
 
@@ -18,4 +19,19 @@ export class AgentService{
   async createAgencyAgent(data: Createagentdata  ,language: SupportedLang="al"){
     return this.agentrepo.createAgencyAgent(data);
   }
+ async findExistingAgent(agentId: number, language: SupportedLang) {
+  const existingAgent = await this.agentrepo.findExistingAgent(agentId);
+
+  if (existingAgent) {
+    throw new BadRequestException({
+      success: false,
+      message: t('validationFailed', language),
+      errors: {
+        general: [t('agentExist', language)],
+      },
+    });
+  }
+
+  return existingAgent; 
+}
 }

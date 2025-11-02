@@ -51,7 +51,7 @@ async updateRequestStatus(
     if (!roleInAgency) {
       throw new Error('roleInAgency is required when approving');
     }
-
+  await this.agentsSerivice.findExistingAgent(request.user_id, language);
     await this.agentsSerivice.createAgencyAgent({
       agencyId,
       agentId: request.user_id,

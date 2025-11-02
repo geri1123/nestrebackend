@@ -1,4 +1,5 @@
 export const en = {
+  somethingWentWrong: 'Something went wrong',
    noTokenProvided: "No token provided",
    validationFailed: "Validation failed",
   userNotAuthenticated: "User not authenticated",
@@ -60,7 +61,7 @@ export const en = {
 phoneMaxLength: "Phone number must be at most 15 digits",
 phoneInvalidChars: "Phone number contains invalid characters",
 atLeastOneFieldRequired: "At least one field must be provided",
-
+ agentExist: 'This agent already exists',
     //
     //email
     emailMustBeString:"Email must be a string",

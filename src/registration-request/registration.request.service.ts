@@ -140,5 +140,7 @@ async getRequestsByUserId(userId: number) {
   }
   return request;
 }
+async findExistingAgent (agentId:number){
 
+}
 }

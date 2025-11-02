@@ -4,7 +4,7 @@ import { AgentRequestQueryResult } from '../../registration-request/type/agent-r
 import { IRegistrationRequestRepository } from './Iregistration-request.respository';
 import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create';
 import { registrationrequest, registrationrequest_status } from '@prisma/client';
-import { userInfo } from 'os';
+
 @Injectable()
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
  constructor(private prisma: PrismaService) {}
