@@ -12,9 +12,9 @@ export const verificationEmailTemplate = (name: string, verificationLink: string
 `;
 
 export const AgentRejectedEmailTemplate = (name: string) => `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>Hello, ${name}!</h2>
-    <p>Your Request has been rejected by Agency owner and you can not login.</p>
-    <p>Thank you for your time!</p>
-  </div>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Hello, ${name}!</h2>
+      <p>Your request has been rejected by the agency owner and you cannot log in as an agent.</p>
+      <p>Thank you for your time!</p>
+    </div>
 `;

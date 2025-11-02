@@ -127,10 +127,14 @@ async getRequestsByUserId(userId: number) {
   async updateRequests(data:UpdateRequestStatusType, language:SupportedLang="al"){
     return this.requestRepo.UpdateRequestFields(data.requestId, data.action,  data.reviewedBy ,data.reviewNotes);
   }
- async findRequestById(
+async findRequestById(
   id: number,
   language: SupportedLang
-): Promise<{ id: number; user_id: number }> { 
+): Promise<{
+  id: number;
+  user_id: number;
+  user: { email: string; first_name: string | null; last_name: string | null };
+}> {
   const request = await this.requestRepo.findRequestById(id);
   if (!request) {
     throw new NotFoundException({
@@ -140,7 +144,5 @@ async getRequestsByUserId(userId: number) {
   }
   return request;
 }
-async findExistingAgent (agentId:number){
 
-}
 }

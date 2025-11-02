@@ -4,6 +4,7 @@ import { SupportedLang } from "../locales";
 import { agencyagent_role_in_agency, registrationrequest_status } from "@prisma/client";
 import { AgentService } from "../agent/agent.service";
 import { UserService } from "../users/services/users.service";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 
@@ -11,7 +12,8 @@ export class AgencyRequestsService {
   constructor(
     private readonly registrationrequestService:RegistrationRequestService,
       private readonly agentsSerivice:AgentService,
-      private readonly userservice:UserService
+      private readonly userservice:UserService,
+      private readonly emailService:EmailService
   ) {}
 async getRequestsForAgencyOwner(
   agencyId: number,
@@ -64,11 +66,19 @@ async updateRequestStatus(
     await this.userservice.updateFields(request.user_id ,{
       status:"active"
     })
+await this.emailService.sendAgentWelcomeEmail(
+  request.user.email,
+  `${request.user.first_name || ''} ${request.user.last_name || ''}`.trim()
+);
   } else if(action==="rejected"){
      await this.userservice.updateFields(request.user_id, {
     status: "active",
     role: "agent"
   });
+    await this.emailService.sendAgentRejectedEmail(
+    request.user.email,
+    `${request.user.first_name || ''} ${request.user.last_name || ''}`.trim()
+  );
   }
 
   return this.registrationrequestService.updateRequests(

@@ -142,16 +142,39 @@ async UpdateRequestFields(
     });
   }
 
-async findRequestById(id: number): Promise<{ id: number; user_id: number } | null> {
+// async findRequestById(id: number): Promise<{ id: number; user_id: number } | null> {
+//   return this.prisma.registrationrequest.findUnique({
+//     where: { id },
+//     select: {
+//       id: true,
+//       user_id: true,
+//     },
+//   });
+// }
+async findRequestById(id: number): Promise<{
+  id: number;
+  user_id: number;
+  user: {
+    email: string;
+    first_name: string | null;
+    last_name: string | null;
+  };
+} | null> {
   return this.prisma.registrationrequest.findUnique({
     where: { id },
     select: {
       id: true,
       user_id: true,
+      user: {
+        select: {
+          email: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
     },
   });
 }
-
 }
 //findById
   //   async findById(id: number) {
