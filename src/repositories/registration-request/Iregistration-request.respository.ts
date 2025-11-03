@@ -17,7 +17,9 @@ export interface IRegistrationRequestRepository {
   // ): Promise<{ data: AgentRequestQueryResult[]; total: number }>;
 
   countAgentRequestsByAgencyId(agencyId: number): Promise<number>;
+
 setUnderReview(userId: number): Promise<registrationrequest | null>;
+
   UpdateRequestFields(
   id: number,
   status: registrationrequest_status,

@@ -98,7 +98,11 @@ nofileUpload:'No file upload.',
     phoneUpdated: "Phone updated successfully",  
     TooManyUsernameRequestsError:"You can only update your username once every 10 days.",
   successfullyUpdatedUsername:"Username updated successfully",
-//agency
+//attvalprod
+  duplicateAttributeValue: "This attribute already exists for this product.",
+
+
+  //agency
 
   
     approved: "Request approved successfully",

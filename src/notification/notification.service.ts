@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { NotificationRepository } from "../repositories/notifications/notifications.repository.js";
+import { NotificationRepository } from "../repositories/notification/notification.repository.js";
 import { NotificationData } from "../repositories/notification/Inotification.repository.js";
 import { NotificationStatus } from "@prisma/client";
 import { SupportedLang } from "../locales/index.js";

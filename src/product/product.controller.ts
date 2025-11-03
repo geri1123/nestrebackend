@@ -1,18 +1,25 @@
 // products/search-products.controller.ts
-import { Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { SearchProductsService } from './search-product.service';
-import type { SupportedLang } from '../locales';
+import { t, type SupportedLang } from '../locales';
 import { SearchFiltersDto } from './dto/product-filters.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { ProductsSearchResponseDto } from './dto/product-frontend.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { CreateProductDto } from './dto/create-product.dto';
+import { plainToInstance } from 'class-transformer';
+import type { RequestWithUser } from '../common/types/request-with-user.interface';
+import { validate } from 'class-validator';
+import { throwValidationErrors } from '../common/helpers/validation.helper';
+import { LanguageCode } from '@prisma/client';
 
 
 @Controller('products')
 export class SearchProductsController {
   constructor(private readonly searchProductsService: SearchProductsService) {}
  
-@Public()
 
+@Public()
   @Get('search')
 
   async searchAll(
@@ -77,5 +84,24 @@ export class SearchProductsController {
     console.log('Controller parsed filters:', JSON.stringify(filters, null, 2));
 
     return this.searchProductsService.getProducts(filters, lang);
+  }
+
+  
+    @Post()
+  @UseInterceptors(FilesInterceptor('images', 5)) 
+  async createProduct(
+    @Body()  body: Record<string, any>,
+    @UploadedFiles() images: Express.Multer.File[],
+    @Req() req:RequestWithUser
+  ) {
+   const language =req.language;
+   const userId=req.userId;
+   if (!userId) {
+      throw new BadRequestException(t('userNotAuthenticated', req.language));
+    }
+ const dto = plainToInstance(CreateProductDto, body);
+const errors = await validate(dto);
+  if (errors.length > 0) throwValidationErrors(errors, language);
+   
   }
 }

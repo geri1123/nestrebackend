@@ -57,7 +57,7 @@ async getNotifications(params: {
   
   return notifications.map((n) => ({
     id: n.id,
-    
+     status: n.status,
     translations: n.notificationtranslation ?? [],
     
   }));

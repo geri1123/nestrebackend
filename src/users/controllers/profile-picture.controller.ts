@@ -25,15 +25,17 @@ export class ProfilePictureController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithLang,
+    @Req() req: RequestWithUser,
   ) {
-    const userId = req['userId'];
-    const language: SupportedLang = req.language || 'en';
-
+   const userId = req.userId;
+    const language: SupportedLang = req.language || 'al';
+     if (!userId) {
+      throw new BadRequestException(t('userNotAuthenticated', req.language));
+    }
     if (!file) {
       throw new BadRequestException({
         success: false,
-        message: language === 'al' ? 'Asnjë skedar nuk është ngarkuar' : 'No file uploaded',
+        message:t("noImageUploaded" , language),
       });
     }
 

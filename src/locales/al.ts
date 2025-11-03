@@ -83,8 +83,11 @@ phoneInvalidChars: "Numri i telefonit përmban karaktere të pavlefshme",
   tokenExpired: "Tokeni i rivendosjes ka skaduar. Ju lutemi kërkoni një të ri.",
   passwordResetSuccess: "Fjalëkalimi juaj u rivendos me sukses.",
 //
+//attvalueprod
+duplicateAttributeValue:"Ky attribut egsiston tashme.",
+//
 
-  agencyActivationFailed: "Dështoi aktivizimi i agjencisë.",
+agencyActivationFailed: "Dështoi aktivizimi i agjencisë.",
     agentNotificationFailed: "Procesi i njoftimit për agjentin dështoi.",
   agencyOrOwnerNotFound: "Agjencia ose pronari i agjencisë nuk u gjet.",
   noAgencyIdInRequest: "ID e agjencisë nuk u gjet në kërkesën e regjistrimit.",
@@ -168,4 +171,5 @@ invalidCommissionRate: "Norma e komisionit duhet të jetë midis 0 dhe 100",
 //
 registrationApprovedSuccessfully:"Kërkesa për regjistrim u aprovua me sukses",
 registrationRejectedSuccessfully:"Kërkesa për regjistrim u refuzua me sukses",
+
 } as const

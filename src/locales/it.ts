@@ -143,6 +143,10 @@ successadded: "Prodotto registrato con successo",
     buildYearMin: "L'anno di costruzione non può essere prima del 1900",
     buildYearMax: "L'anno di costruzione non può essere nel futuro",
  //
+
+ //attvalprod
+   duplicateAttributeValue: "Questo attributo esiste già per questo prodotto.",
+ //
  imageUploadFailed: "Caricamento immagine non riuscito",
  documentTooLarge:"Il documento è troppo grande",
     tooManyDocuments:"Troppi documenti caricati",
