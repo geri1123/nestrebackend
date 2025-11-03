@@ -164,4 +164,6 @@ imagesuccessfullyUploaded: "Image uploaded successfully",
   roleInAgencyRequired: "Role in agency is required for approving the request",
   commissionRateRequired: "Commission rate is required for approving the request",
   invalidCommissionRate: "Commission rate must be between 0 and 100",
+  registrationApprovedSuccessfully:"Registration request approved successfully",
+  registrationRejectedSuccessfully:"Registration request rejected successfully",
 } as const

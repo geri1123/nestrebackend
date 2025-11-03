@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { RegistrationRequestService } from "../registration-request/registration.request.service";
-import { SupportedLang } from "../locales";
+import { SupportedLang, t } from "../locales";
 import { agencyagent_role_in_agency, registrationrequest_status } from "@prisma/client";
 import { AgentService } from "../agent/agent.service";
 import { UserService } from "../users/services/users.service";
@@ -13,7 +13,8 @@ export class AgencyRequestsService {
     private readonly registrationrequestService:RegistrationRequestService,
       private readonly agentsSerivice:AgentService,
       private readonly userservice:UserService,
-      private readonly emailService:EmailService
+      private readonly emailService:EmailService,
+      
   ) {}
 async getRequestsForAgencyOwner(
   agencyId: number,
@@ -73,7 +74,7 @@ await this.emailService.sendAgentWelcomeEmail(
   } else if(action==="rejected"){
      await this.userservice.updateFields(request.user_id, {
     status: "active",
-    role: "agent"
+    role: "user"
   });
     await this.emailService.sendAgentRejectedEmail(
     request.user.email,
@@ -81,7 +82,7 @@ await this.emailService.sendAgentWelcomeEmail(
   );
   }
 
-  return this.registrationrequestService.updateRequests(
+   this.registrationrequestService.updateRequests(
     {
       requestId,
       action,
@@ -91,5 +92,14 @@ await this.emailService.sendAgentWelcomeEmail(
     },
     language
   );
+   const message =
+    action === 'approved'
+      ? t('registrationApprovedSuccessfully', language)
+      : t('registrationRejectedSuccessfully', language);
+
+  return {
+    success: true,
+    message,
+  };
 }
 }

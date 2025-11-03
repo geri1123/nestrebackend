@@ -166,5 +166,6 @@ commissionRateRequired: "Norma e komisionit është e detyrueshme për miratimin
 invalidCommissionRate: "Norma e komisionit duhet të jetë midis 0 dhe 100",
 
 //
-
+registrationApprovedSuccessfully:"Kërkesa për regjistrim u aprovua me sukses",
+registrationRejectedSuccessfully:"Kërkesa për regjistrim u refuzua me sukses",
 } as const

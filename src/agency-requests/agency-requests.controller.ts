@@ -4,8 +4,10 @@ import { Roles } from "../common/decorators/roles.decorator";
 import type { RequestWithUser } from "../common/types/request-with-user.interface";
 import { SupportedLang, t } from "../locales";
 import { UpdateRequestStatusDto } from "./dto/agency-request.dto";
-import { CustomValidationPipe } from "../common/helpers/custom-validation.pipe";
 import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
+import { throwValidationErrors } from "../common/helpers/validation.helper";
+
 
 
 
@@ -14,8 +16,7 @@ import { plainToInstance } from "class-transformer";
 export class AgencyRequestsController {
     constructor(private readonly agencyRequestsService: AgencyRequestsService) {}
 
- @Roles('agency_owner')
-  @Get('registration-requests')
+
     @Roles('agency_owner')
   @Get('registration-requests')
   async getRegistrationRequests(
@@ -38,27 +39,20 @@ export class AgencyRequestsController {
     );
   }
   
-//   @Roles('agency_owner')
+// @Roles('agency_owner')
 // @Patch('registration-requests/:id/status')
 // async updateRegistrationRequestStatus(
 //   @Req() req: RequestWithUser,
 //   @Param('id', ParseIntPipe) requestId: number,
 //   @Body() dto: UpdateRequestStatusDto,
 // ) {
- 
-//   console.log('Received DTO:', dto);
-//   console.log('Action value:', dto.action);
-//   console.log('Action type:', typeof dto.action);
-//   console.log('Action length:', dto.action?.length);
-//   console.log('Action charCodes:', dto.action?.split('').map(c => c.charCodeAt(0)));
-
 //   const language = req.language || 'al';
-//   const userid = req.userId;
+//   const userId = req.userId;
 
 //   if (!req.agencyId) {
 //     throw new UnauthorizedException(t('userNotAuthenticated', language));
 //   }
-//   if (!userid) {
+//   if (!userId) {
 //     throw new UnauthorizedException(t('userNotAuthenticated', language));
 //   }
 
@@ -66,27 +60,43 @@ export class AgencyRequestsController {
 //     throw new BadRequestException(t('roleInAgencyRequired', language));
 //   }
 
-//   return this.agencyRequestsService.updateRequestStatus(
-//     requestId,
-//     req.agencyId,
-//     userid,
-//     dto.action,
-//     dto.roleInAgency!,
-//     dto.commissionRate,
-//     dto.reviewNotes,
-//     language
-//   );
+//   try {
+  
+//     return await this.agencyRequestsService.updateRequestStatus(
+//       requestId,
+//       req.agencyId,
+//       userId,
+//       dto.action,
+//       dto.roleInAgency!,
+//       dto.commissionRate,
+//       dto.reviewNotes,
+//       language
+//     );
+//   } catch (err) {
+//     console.error(err);
+
+//     throw new BadRequestException({
+//       success: false,
+//       message: err?.message || t('somethingWentWrong', language),
+//       errors: err?.response?.errors || { general: [err?.message || 'Unknown error'] },
+//     });
+//   }
 // }
+
+
+
 @Roles('agency_owner')
 @Patch('registration-requests/:id/status')
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
-  @Body() dto: UpdateRequestStatusDto,
+ @Body() body: Record<string, any>,
 ) {
   const language = req.language || 'al';
   const userId = req.userId;
-
+const dto = plainToInstance(UpdateRequestStatusDto, body);
+  const errors = await validate(dto);
+  if (errors.length > 0) throwValidationErrors(errors, language);
   if (!req.agencyId) {
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
@@ -94,12 +104,12 @@ async updateRegistrationRequestStatus(
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
 
-  if (dto.action === 'approved' && !dto.roleInAgency) {
+  if (body.action === 'approved' && !body.roleInAgency) {
     throw new BadRequestException(t('roleInAgencyRequired', language));
   }
 
   try {
-    // ✅ Call the service
+  
     return await this.agencyRequestsService.updateRequestStatus(
       requestId,
       req.agencyId,

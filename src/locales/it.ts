@@ -160,4 +160,7 @@ requestApproved: "Richiesta approvata con successo",
 roleInAgencyRequired: "Il ruolo in agenzia è obbligatorio per approvare la richiesta",
 commissionRateRequired: "La percentuale di commissione è obbligatoria per approvare la richiesta",
 invalidCommissionRate: "La percentuale di commissione deve essere tra 0 e 100",
-   } as const
+registrationApprovedSuccessfully:"La richiesta di registrazione è stata approvata con successo",
+registrationRejectedSuccessfully:"La richiesta di registrazione è stata rifiutata con successo",  
+
+} as const

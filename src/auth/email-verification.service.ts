@@ -7,6 +7,7 @@ import { UserService } from '../users/services/users.service';
 import { RegistrationRequestService } from '../registration-request/registration.request.service';
 import { NotificationService } from '../notification/notification.service';
 import { LanguageCode } from '@prisma/client';
+import { NotificationTemplateService } from '../notification/notifications-template.service';
 
 @Injectable()
 export class EmailVerificationService {
@@ -15,6 +16,7 @@ export class EmailVerificationService {
     private emailService: EmailService,
     private userservice: UserService,
     private notificationservice: NotificationService,
+     private notificationTemplateService: NotificationTemplateService,
     private registrationRequestService: RegistrationRequestService
   ) {}
 
@@ -91,25 +93,17 @@ export class EmailVerificationService {
             errors,
           });
         }
+const translations = this.notificationTemplateService.getAllTranslations(
+  'agent_email_confirmed',
+  user
+);
 
-        await this.notificationservice.sendNotification({
-          userId: agency.owner_user_id,
-          type: 'agent_email_confirmed',
-          translations: [
-            {
-              languageCode: LanguageCode.al,
-              message: `${user.first_name || 'Agent'} ${user.last_name || ''} ka konfirmuar email-in dhe dëshiron të bashkohet me agjensionin tuaj.`,
-            },
-            {
-              languageCode: LanguageCode.en,
-              message: `${user.first_name || 'Agent'} ${user.last_name || ''} has confirmed their email and wants to join your agency.`,
-            },
-            {
-              languageCode: LanguageCode.it,
-              message: `${user.first_name || 'Agent'} ${user.last_name || ''} ha confermato la propria email e desidera unirsi alla tua agenzia.`,
-            },
-          ],
-        });
+await this.notificationservice.sendNotification({
+  userId: agency.owner_user_id,
+  type: 'agent_email_confirmed',
+  translations,
+});
+       
       } catch (err) {
         errors.notification = [t('agentNotificationFailed', language)];
         throw new BadRequestException({
@@ -145,3 +139,24 @@ export class EmailVerificationService {
     await this.emailService.sendVerificationEmail(user.email, user.first_name ?? 'User', token, language);
   }
 }
+
+
+
+ // await this.notificationservice.sendNotification({
+        //   userId: agency.owner_user_id,
+        //   type: 'agent_email_confirmed',
+        //   translations: [
+        //     {
+        //       languageCode: LanguageCode.al,
+        //       message: `${user.first_name || 'Agent'} ${user.last_name || ''} ka konfirmuar email-in dhe dëshiron të bashkohet me agjensionin tuaj.`,
+        //     },
+        //     {
+        //       languageCode: LanguageCode.en,
+        //       message: `${user.first_name || 'Agent'} ${user.last_name || ''} has confirmed their email and wants to join your agency.`,
+        //     },
+        //     {
+        //       languageCode: LanguageCode.it,
+        //       message: `${user.first_name || 'Agent'} ${user.last_name || ''} ha confermato la propria email e desidera unirsi alla tua agenzia.`,
+        //     },
+        //   ],
+        // });
