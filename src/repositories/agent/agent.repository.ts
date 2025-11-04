@@ -4,62 +4,22 @@ import { Createagentdata, NewAgent } from "../../agent/types/create-agent";
 import { PrismaService } from "../../prisma/prisma.service";
 import { IAgentsRepository } from "./Iagent.repository";
 import { AgentInfo } from "../../agent/types/agent-info";
-import { agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
+import { agencyagent, agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
 
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {
  constructor(private readonly prisma: PrismaService) {}
-//   async findAgentByUserId(userId: number): Promise<AgentInfo | null> {
-//   const agent = await this.prisma.agencyagent.findFirst({
-//     where: { agent_id: userId },
-//     select: {
-//       id: true,
-//       agent_id: true,
-//       agency_id: true,
-//       role_in_agency: true,
-//       id_card_number: true,
-//       status: true,
-//       commission_rate: true,
-//       start_date: true,
-//       end_date: true,
-//       created_at: true,
-//       updated_at: true, 
-//       agency: {
-//         select: {
-//           id: true,
-//           agency_name: true,
-//           logo: true,
-//           phone: true,
-//           website: true,
-//           status: true,
-//           public_code: true,
-//           agency_email: true,
-//           address: true,
-//           license_number: true,
-//           owner_user_id: true,  
-//           created_at: true,   
-//           updated_at: true,     
-//         },
-//       },
-//       addedByUser: {
-//         select: {
-//           id: true,
-//           username: true,
-//           email: true,
-//         },
-//       },
-//     },
-//   });
 
-//   if (!agent) return null;
+   async findAgencyIdByAgent(userId: number): Promise<number | null> {
+    const agent = await this.prisma.agencyagent.findFirst({
+      where: { agent_id: userId },
+      select: { agency_id: true }, 
+    });
 
-//   return {
-//     ...agent,
-//     commission_rate: agent.commission_rate !== null ? Number(agent.commission_rate) : undefined,
-//   } as AgentInfo;
-// }
+   
+    return agent ? agent.agency_id : null;
+  }
 
-  
   
    async createAgencyAgent(data: Createagentdata): Promise<NewAgent> {
     // create the agent in the database
@@ -98,10 +58,11 @@ async findByIdCardNumber(
     select: { id_card_number: true },
   });
 }
-async findExistingAgent(agent_id: number) {
+async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
   return await this.prisma.agencyagent.findFirst({
-    where: { agent_id },
+    where: { agent_id },  // Find the first agencyagent with the given agent_id
   });
+}
 }
 
 
@@ -112,4 +73,3 @@ async findExistingAgent(agent_id: number) {
   //   });
   // }
 
-}

@@ -129,19 +129,27 @@ async getRequestsByUserId(userId: number) {
   }
 async findRequestById(
   id: number,
-  language: SupportedLang
+  language: SupportedLang = "al"
 ): Promise<{
   id: number;
   user_id: number;
-  user: { email: string; first_name: string | null; last_name: string | null };
+  agency_id: number | null;
+  user: {
+    email: string;
+    first_name: string | null;
+    last_name: string | null;
+  };
 }> {
   const request = await this.requestRepo.findRequestById(id);
+
   if (!request) {
     throw new NotFoundException({
       success: false,
       message: t('validationFailed', language),
     });
   }
+
+  // Return exactly as Prisma gives it
   return request;
 }
 

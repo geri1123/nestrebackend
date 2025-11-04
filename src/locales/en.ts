@@ -177,4 +177,9 @@ imagesuccessfullyUploaded: "Image uploaded successfully",
   errorUploadingProductImages: "An error occurred while uploading product images.",
   imageUrlMissingAfterUpload: "Image URL is missing after upload.",
    failedCreatingProduct: "Failed to create the product.",
+   invalidAttributeForSubcategory:"Invalid attribute for this subcategory",
+
+
+
+     cannotApproveOtherAgency: "You cannot approve/reject requests for another agency",
 } as const

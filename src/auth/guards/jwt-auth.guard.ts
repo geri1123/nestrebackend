@@ -8,7 +8,6 @@ import { AgencyRepository } from '../../repositories/agency/agency.repository';
 import { t } from '../../locales';
 import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 import { RequestWithUser } from '../../common/types/request-with-user.interface';
-
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
@@ -27,7 +26,7 @@ export class JwtAuthGuard implements CanActivate {
     if (isPublic) return true;
 
     const req = context.switchToHttp().getRequest<RequestWithUser>();
-    const lang = req.language; 
+    const lang = req.language;
 
     const authHeader = req.headers.authorization;
     const token =
@@ -35,24 +34,34 @@ export class JwtAuthGuard implements CanActivate {
       (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
 
     if (!token) {
-     throw new UnauthorizedException({
-  success: false,
-  message: t('noTokenProvided', lang),
-  errors: { token: [t('noTokenProvided', lang)] },
-});
+      throw new UnauthorizedException({
+        success: false,
+        message: t('noTokenProvided', lang),
+        errors: { token: [t('noTokenProvided', lang)] },
+      });
     }
 
     try {
+      console.log('Verifying token:', token);  
+      
       const decoded = this.jwtService.verify(token, {
         secret: this.config.get<string>('JWT_SECRET'),
       });
 
+      console.log('Decoded token:', decoded); 
+
       req['user'] = decoded;
       req['userId'] = decoded.userId;
+      const agencyId = decoded.agencyId;
 
-      if (decoded.role === 'agency_owner') {
-        const agency = await this.agencyRepo.findByOwnerUserId(decoded.userId);
-        if (agency) req['agencyId'] = agency.id;
+      if (agencyId) {
+        req['agencyId'] = agencyId;
+      } else if (decoded.role === 'agent' || decoded.role === 'agency_owner') {
+        throw new UnauthorizedException({
+          success: false,
+          message: t('agencyNotFound', lang),
+          errors: { agency: [t('agencyNotFound', lang)] },
+        });
       }
 
       await this.userRepo.updateFieldsById(decoded.userId, {
@@ -60,75 +69,14 @@ export class JwtAuthGuard implements CanActivate {
       });
 
       return true;
-    } catch {
+    } catch (error) {
+      console.error('Error verifying token:', error);  // Debugging: Log error during verification
+      
       throw new UnauthorizedException({
-    success: false,
-    message: t('invalidOrExpiredToken', lang),
-    errors: { token: [t('invalidOrExpiredToken', lang)] },
-  });
+        success: false,
+        message: t('invalidOrExpiredToken', lang),
+        errors: { token: [t('invalidOrExpiredToken', lang)] },
+      });
     }
   }
 }
-
-
-// import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-// import { Reflector } from '@nestjs/core';
-// import { ConfigService } from '@nestjs/config';
-// import { JwtService } from '@nestjs/jwt';
-// import { Request } from 'express';
-// import { UserRepository } from '../../repositories/user/user.repository';
-// import { AgencyRepository } from '../../repositories/agency/agency.repository';
-// import { SupportedLang, t } from '../../locales';
-// import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
-
-// @Injectable()
-// export class JwtAuthGuard implements CanActivate {
-//   constructor(
-//     private readonly jwtService: JwtService,
-//     private readonly userRepo: UserRepository,
-//     private readonly agencyRepo: AgencyRepository,
-//     private readonly config: ConfigService,
-//     private readonly reflector: Reflector, // Add Reflector
-//   ) {}
-
-//   async canActivate(context: ExecutionContext): Promise<boolean> {
-//     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-//       context.getHandler(),
-//       context.getClass(),
-//     ]);
-//     if (isPublic) return true; // skip guard for public routes
-
-//     const req: Request = context.switchToHttp().getRequest();
-//     const lang: SupportedLang = (req.query.lang as SupportedLang) || (req.headers['accept-language'] as SupportedLang) || 'al';
-    
-//     const authHeader = req.headers.authorization;
-//     const token =
-//       req.cookies?.token ||
-//       (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
-
-//     if (!token) {
-//       throw new UnauthorizedException(t('noTokenProvided', lang));
-//     }
-
-//     try {
-//       const decoded = this.jwtService.verify(
-//         token,
-//         { secret: this.config.get<string>('JWT_SECRET') },
-//       );
-
-//       req['user'] = decoded;
-//       req['userId'] = decoded.userId;
-
-//       if (decoded.role === 'agency_owner') {
-//         const agency = await this.agencyRepo.findByOwnerUserId(decoded.userId);
-//         if (agency) req['agencyId'] = agency.id;
-//       }
-
-//       await this.userRepo.updateFieldsById(decoded.userId, { last_active: new Date() });
-
-//       return true;
-//     } catch {
-//       throw new UnauthorizedException(t('invalidOrExpiredToken', lang));
-//     }
-//   }
-// }

@@ -18,6 +18,7 @@ import { NotificationModule } from '../notification/notification.module';
 import { AgencyModule } from '../agency/agency.module';
 import { UserModule } from '../users/users.module';
 import { AppConfigModule } from '../config/config.module';
+import { AgentModule } from '../agent/agent.module';
 @Module({
   imports: [
   NotificationModule,
@@ -25,6 +26,7 @@ import { AppConfigModule } from '../config/config.module';
     UserModule,
     AppConfigModule,
      AgencyModule,
+     AgentModule,
     RegistrationRequestModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -55,10 +55,11 @@ export class CreateProductService {
       tasks.push(
         dto.attributes?.length
           ? this.productAttributeValueService.createPrAttValues(
-              product.id,
-              dto.attributes,
-              language
-            )
+  product.id,
+  dto.subcategoryId,  // pass subcategoryId from product DTO
+  dto.attributes,     // the array from request
+  language
+)
           : Promise.resolve(undefined)
       );
 

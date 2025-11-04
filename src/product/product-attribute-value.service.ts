@@ -1,22 +1,44 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { ProductAttributeValueRepo } from "../repositories/product-attribute-value/product-attribute-value.repository";
 import { SupportedLang, t } from "../locales";
+import { AttributeRepo } from "../repositories/attributes/attributes.repository";
 
 @Injectable()
 export class ProductAttributeValueService {
-  constructor(private readonly prAttValueRepo: ProductAttributeValueRepo) {}
+  constructor(
+    private readonly prAttValueRepo: ProductAttributeValueRepo,
+    private readonly attributeRepo: AttributeRepo,
+  ) {}
 
-  
- async createPrAttValues(
-  productId: number,
-  attributes: { attributeId: number; attributeValueId: number }[],
-  language: SupportedLang = "al"
-): Promise<void> {
-  try {
+  async createPrAttValues(
+    productId: number,
+    subcategoryId: number,
+    attributes: { attributeId: number; attributeValueId: number }[],
+    language: SupportedLang = "al"
+  ): Promise<void> {
+    if (!attributes || attributes.length === 0) return;
+
+    
+    const validAttributeIds = await this.attributeRepo.getValidAttributeIdsBySubcategory(subcategoryId);
+
+
+    const validAttributeIdsSet = new Set(validAttributeIds);
+
+    
+    for (const attr of attributes) {
+      if (!validAttributeIdsSet.has(attr.attributeId)) {
+        console.warn(` Invalid attribute ${attr.attributeId} for subcategory ${subcategoryId}`);
+        throw new BadRequestException({
+          success: false,
+          message: t("validationFailed", language),
+          errors: {
+            attributes: [t("invalidAttributeForSubcategory", language)],
+          },
+        });
+      }
+    }
+
+    // 4️⃣ If all are valid, create in DB
     await this.prAttValueRepo.createMultipleAttributes(productId, attributes, language);
-  } catch (error) {
-    console.error('Failed to create product attributes', error);
-   
   }
-}
 }

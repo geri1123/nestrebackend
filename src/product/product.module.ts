@@ -9,6 +9,7 @@ import { ProductAttributeValueRepo } from "../repositories/product-attribute-val
 import { CreateProductImageService } from "./create-product-images.service";
 import { ProductImagesRepository } from "../repositories/productImage/product-image.repository";
 import { FirebaseService } from "../firebase/firebase.service";
+import { AttributeRepo } from "../repositories/attributes/attributes.repository";
 @Module({
   controllers: [SearchProductsController],
   providers: [
@@ -20,6 +21,7 @@ import { FirebaseService } from "../firebase/firebase.service";
     SearchProductsService,
     CreateProductImageService, 
     ProductImagesRepository,   
+    AttributeRepo
            
   ],
 })

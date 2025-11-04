@@ -57,7 +57,7 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsOptional()
   @IsString()
-  area?: string = "";
+  area?: Number ;
 
   @Type(() => Number)
   @IsOptional()

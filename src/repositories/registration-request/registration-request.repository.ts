@@ -142,18 +142,11 @@ async UpdateRequestFields(
     });
   }
 
-// async findRequestById(id: number): Promise<{ id: number; user_id: number } | null> {
-//   return this.prisma.registrationrequest.findUnique({
-//     where: { id },
-//     select: {
-//       id: true,
-//       user_id: true,
-//     },
-//   });
-// }
+
 async findRequestById(id: number): Promise<{
   id: number;
   user_id: number;
+  agency_id: number | null; // match Prisma
   user: {
     email: string;
     first_name: string | null;
@@ -165,6 +158,7 @@ async findRequestById(id: number): Promise<{
     select: {
       id: true,
       user_id: true,
+      agency_id: true,
       user: {
         select: {
           email: true,

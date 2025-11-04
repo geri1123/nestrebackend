@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { RegistrationRequestService } from "../registration-request/registration.request.service";
 import { SupportedLang, t } from "../locales";
 import { agencyagent_role_in_agency, registrationrequest_status } from "@prisma/client";
@@ -37,6 +37,9 @@ async getRequestsForAgencyOwner(
     requests,
   };
 }
+
+
+//update
 async updateRequestStatus(
   requestId: number,
   agencyId: number,
@@ -49,11 +52,20 @@ async updateRequestStatus(
 ) {
   const request = await this.registrationrequestService.findRequestById(requestId, language);
 
+  // 2️⃣ Check if the request belongs to the agency
+ if (request.agency_id !== agencyId) {
+  throw new ForbiddenException(t('cannotApproveOtherAgency' , language));
+}
+
   // If approved, create the agent first
   if (action === 'approved') {
     if (!roleInAgency) {
       throw new Error('roleInAgency is required when approving');
     }
+    
+
+
+    
   await this.agentsSerivice.findExistingAgent(request.user_id, language);
     await this.agentsSerivice.createAgencyAgent({
       agencyId,

@@ -172,4 +172,9 @@ registrationRejectedSuccessfully:"La richiesta di registrazione è stata rifiuta
    errorUploadingProductImages: "Si è verificato un errore durante il caricamento delle immagini del prodotto.",
 imageUrlMissingAfterUpload: "L'URL dell'immagine manca dopo il caricamento.",
  failedCreatingProduct: "Creazione del prodotto non riuscita.",
+    invalidAttributeForSubcategory:"Attributo non valido per questa sottocategoria",
+
+
+
+    cannotApproveOtherAgency: "Non puoi approvare/rifiutare richieste per un'altra agenzia",
   } as const

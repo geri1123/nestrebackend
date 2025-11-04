@@ -2,7 +2,7 @@ import {  BadRequestException, Injectable } from "@nestjs/common";
 import { AgentsRepository } from "../repositories/agent/agent.repository";
 import { SupportedLang, t } from "../locales";
 import { Createagentdata } from "./types/create-agent";
-import { error } from "console";
+
 
 @Injectable()
 
@@ -34,4 +34,9 @@ export class AgentService{
 
   return existingAgent; 
 }
+
+
+  async getAgencyIdForAgent(agentId: number): Promise<number | null> {
+    return await this.agentrepo.findAgencyIdByAgent(agentId);
+  }
 }

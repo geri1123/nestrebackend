@@ -179,5 +179,8 @@ registrationRejectedSuccessfully:"Kërkesa për regjistrim u refuzua me sukses",
 errorUploadingProductImages: "Ndodhi një gabim gjatë ngarkimit të imazheve të produktit.",
 imageUrlMissingAfterUpload: "URL i imazhit mungon pas ngarkimit.",
 faailedcreatingProduct:"Dështoi krijimi i produktit.",
+invalidAttributeForSubcategory:"Atribut i pavlefshëm për këtë nënkategori",
 
+
+  cannotApproveOtherAgency: "Nuk mund të aprovoheni/refuzoni kërkesat për një agjenci tjetër",
 } as const

@@ -1,5 +1,5 @@
 // products/search-products.controller.ts
-import { BadRequestException, Body, Controller, Get, Post, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { SearchProductsService } from './search-product.service';
 import { t, type SupportedLang } from '../locales';
 import { SearchFiltersDto } from './dto/product-filters.dto';
@@ -13,6 +13,7 @@ import { validate } from 'class-validator';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
 import { LanguageCode } from '@prisma/client';
 import { CreateProductService } from './create-product.service';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class SearchProductsController {
@@ -99,12 +100,45 @@ export class SearchProductsController {
   ) {
    const language =req.language;
    const userId=req.userId;
+   const agencyId=req.agencyId;
    if (!userId) {
       throw new BadRequestException(t('userNotAuthenticated', req.language));
     }
  const dto = plainToInstance(CreateProductDto, body);
 const errors = await validate(dto);
   if (errors.length > 0) throwValidationErrors(errors, language);
-   return this.createproductService.createProduct(dto ,images , language ,userId);
+   return this.createproductService.createProduct(dto ,images , language ,userId , agencyId);
   }
+
+
+
+  ///update
+  @Patch('update/:id')
+async updateProduct(
+  @Param('id') id: string,
+  @Body() body: Record<string, any>,
+  @UploadedFiles() images: Express.Multer.File[],
+  @Req() req: RequestWithUser
+) {
+  const language = req.language;
+  const userId = req.userId;
+  const agencyId = req.agencyId;
+
+  if (!userId) {
+    throw new BadRequestException(t('userNotAuthenticated', language));
+  }
+
+  const dto = plainToInstance(UpdateProductDto, body);
+  const errors = await validate(dto);
+  if (errors.length > 0) throwValidationErrors(errors, language);
+
+  // return this.createproductService.updateProduct(
+  //   Number(id),
+  //   dto,
+  //   images,
+  //   language,
+  //   userId,
+  //   agencyId
+  // );
+}
 }
