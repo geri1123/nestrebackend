@@ -6,10 +6,9 @@ import { PrismaService } from "../../prisma/prisma.service";
 export class ProductImagesRepository implements IProductImageRepo {
   constructor(private prisma: PrismaService) {}
 
-  async addImage(data: Prisma.productimageCreateInput): Promise<productimage> {
+   async addImage(data: { imageUrl: string; productId: number; userId: number }): Promise<productimage> {
     return this.prisma.productimage.create({ data });
   }
-
   async getImagesByProduct(productId: number): Promise<productimage[]> {
     return this.prisma.productimage.findMany({
       where: { productId },

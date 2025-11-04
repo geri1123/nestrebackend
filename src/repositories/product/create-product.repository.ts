@@ -1,28 +1,14 @@
-// import { PrismaService } from "../../prisma/prisma.service";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CreateProductInput } from "../../product/types/create-product-input.type";
+@Injectable()
+export class CreateProductsRepository {
+  constructor(private prisma: PrismaService) {}
 
-// export class CreateProductsRepository {
-//   constructor(private prisma: PrismaClient) {}
+    async createProduct(data: CreateProductInput) {
   
-//   async createProduct(
-//     data:CreateProductInput
-   
-//   ): Promise<Product> {
-//     // Create product first
-//     const product = await this.prisma.product.create({
-//       data: {
-//         title: data.title,
-//         price: data.price,
-//         description: data.description,
-//         cityId: data.cityId,
-//           streetAddress: data.streetAddress, 
-//         subcategoryId: data.subcategoryId,
-//         listingTypeId: data.listingTypeId,
-//         userId: data.userId,
-//         agencyId: data.agencyId,
-//         area:data.area,
-//         buildYear: data.buildYear,
-//         status: data.status || "draft",
-//       },
-//     });
-//   }
-// }
+    return await this.prisma.product.create({
+      data,
+    });
+  }
+}

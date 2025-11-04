@@ -12,11 +12,14 @@ import type { RequestWithUser } from '../common/types/request-with-user.interfac
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../common/helpers/validation.helper';
 import { LanguageCode } from '@prisma/client';
-
+import { CreateProductService } from './create-product.service';
 
 @Controller('products')
 export class SearchProductsController {
-  constructor(private readonly searchProductsService: SearchProductsService) {}
+  constructor(
+    private readonly searchProductsService: SearchProductsService,
+    private readonly createproductService: CreateProductService
+  ) {}
  
 
 @Public()
@@ -87,8 +90,8 @@ export class SearchProductsController {
   }
 
   
-    @Post()
-  @UseInterceptors(FilesInterceptor('images', 5)) 
+    @Post("add")
+  @UseInterceptors(FilesInterceptor('images', 7)) 
   async createProduct(
     @Body()  body: Record<string, any>,
     @UploadedFiles() images: Express.Multer.File[],
@@ -102,6 +105,6 @@ export class SearchProductsController {
  const dto = plainToInstance(CreateProductDto, body);
 const errors = await validate(dto);
   if (errors.length > 0) throwValidationErrors(errors, language);
-   
+   return this.createproductService.createProduct(dto ,images , language ,userId);
   }
 }

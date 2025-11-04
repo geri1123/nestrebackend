@@ -142,7 +142,7 @@ successadded: "Prodotto registrato con successo",
     buildYearInt: "L'anno di costruzione deve essere un numero intero",
     buildYearMin: "L'anno di costruzione non può essere prima del 1900",
     buildYearMax: "L'anno di costruzione non può essere nel futuro",
- //
+    productstatus: "Stato non valido.",
 
  //attvalprod
    duplicateAttributeValue: "Questo attributo esiste già per questo prodotto.",
@@ -166,5 +166,10 @@ commissionRateRequired: "La percentuale di commissione è obbligatoria per appro
 invalidCommissionRate: "La percentuale di commissione deve essere tra 0 e 100",
 registrationApprovedSuccessfully:"La richiesta di registrazione è stata approvata con successo",
 registrationRejectedSuccessfully:"La richiesta di registrazione è stata rifiutata con successo",  
-
-} as const
+ noImage: "Nessuna immagine fornita.",
+  maxFiveImagesAllowed: "Puoi caricare al massimo 5 immagini.",
+  invalidFileType: "Tipo di file non valido. Carica solo immagini.",
+   errorUploadingProductImages: "Si è verificato un errore durante il caricamento delle immagini del prodotto.",
+imageUrlMissingAfterUpload: "L'URL dell'immagine manca dopo il caricamento.",
+ failedCreatingProduct: "Creazione del prodotto non riuscita.",
+  } as const

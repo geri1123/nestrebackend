@@ -11,12 +11,15 @@ export function throwValidationErrors(
 
   // DTO validation errors
   errors.forEach(err => {
-    if (err.constraints) {
-      formatted[err.property] = Object.values(err.constraints).map(code =>
-        translateValidationMessage(code, lang)
-      );
-    }
-  });
+  if (err.constraints) {
+    const messages = Object.values(err.constraints).map(code =>
+      translateValidationMessage(code, lang)
+    );
+
+   
+    formatted[err.property] = Array.from(new Set(messages));
+  }
+});
 
   // Merge extra custom errors
   if (extraErrors) {
@@ -82,6 +85,19 @@ case 'phoneLength': return t('phoneLength', lang);
 case "roleInAgencyRequired": return t('roleInAgencyRequired', lang);
 case "commissionRateRequired": return t('commissionRateRequired', lang);
 case "invalidCommissionRate": return t('invalidCommissionRate', lang);
-    default: return code; // fallback
+
+case "cityId"  :return t('cityId' , lang);
+case "subcategoryId"  :return t('subcategoryId' , lang);
+case "subcategoryId"  :return t('subcategoryId' , lang);
+case "listingTypeId": return t('listingTypeId', lang);
+case "buildYearMin": return t('buildYearMin' , lang);
+case "buildYearMax": return t('buildYearMax' , lang);
+case "buildYearInt": return t('buildYearInt', lang);
+case "buildYear": return t('buildYear' ,lang);
+case "price": return t("price" , lang);
+case "pricePositive": return t("pricePositive" , lang);
+case "title": return t("title" , lang);
+case "productstatus": return t("productstatus", lang);
+default: return code; // fallback
   }
 }

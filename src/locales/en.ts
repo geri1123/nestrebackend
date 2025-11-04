@@ -148,7 +148,8 @@ agencyNameExists:"Agency name already exists.",
     buildYearInt: "Build year must be an integer",
     buildYearMin: "Build year cannot be before 1900",
     buildYearMax: "Build year cannot be in the future",
-  
+  productstatus:"Invalid status.",
+
 
     //
     imageUploadFailed: "Image upload failed",
@@ -170,4 +171,10 @@ imagesuccessfullyUploaded: "Image uploaded successfully",
   invalidCommissionRate: "Commission rate must be between 0 and 100",
   registrationApprovedSuccessfully:"Registration request approved successfully",
   registrationRejectedSuccessfully:"Registration request rejected successfully",
+  noImage: "No images provided.",
+  maxFiveImagesAllowed: "You can upload up to 5 images only.",
+  invalidFileType: "Invalid file type. Please upload only images.",
+  errorUploadingProductImages: "An error occurred while uploading product images.",
+  imageUrlMissingAfterUpload: "Image URL is missing after upload.",
+   failedCreatingProduct: "Failed to create the product.",
 } as const

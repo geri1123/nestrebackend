@@ -149,6 +149,7 @@ successadded: "Produkti u regjistrua me sukses",
     buildYearInt: "Viti i ndërtimit duhet të jetë një numër i plotë",
     buildYearMin: "Viti i ndërtimit nuk mund të jetë më i hershëm se 1900",
     buildYearMax: "Viti i ndërtimit nuk mund të jetë në të ardhmen",
+    productstatus:"Statusi i pavlefshem .",
     //
     imageUploadFailed: "Ngarkimi i imazhit dështoi",
     imagesuccessfullyUploaded: "Imazhi u ngarkuan me sukses",
@@ -171,5 +172,12 @@ invalidCommissionRate: "Norma e komisionit duhet të jetë midis 0 dhe 100",
 //
 registrationApprovedSuccessfully:"Kërkesa për regjistrim u aprovua me sukses",
 registrationRejectedSuccessfully:"Kërkesa për regjistrim u refuzua me sukses",
+
+  noImage: "Asnjë imazh nuk është dërguar.",
+  maxFiveImagesAllowed: "Mund të ngarkosh maksimumi 5 imazhe.",
+  invalidFileType: "Lloj skedari i pavlefshëm. Ngarko vetëm imazhe.",
+errorUploadingProductImages: "Ndodhi një gabim gjatë ngarkimit të imazheve të produktit.",
+imageUrlMissingAfterUpload: "URL i imazhit mungon pas ngarkimit.",
+faailedcreatingProduct:"Dështoi krijimi i produktit.",
 
 } as const

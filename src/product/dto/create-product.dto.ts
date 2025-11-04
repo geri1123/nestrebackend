@@ -6,8 +6,9 @@ import {
   Min, 
   Max, 
   IsEnum, 
-  ValidateNested, 
-  ArrayMinSize 
+  ValidateNested,
+  ArrayMinSize,
+  IsNotEmpty
 } from 'class-validator';
 
 export class ProductAttributeValueDto {
@@ -19,25 +20,30 @@ export class ProductAttributeValueDto {
 }
 
 export class CreateProductDto {
-  @IsString({ message: 'Title is required' })
+  @IsString({ message: 'title' })
+  @IsNotEmpty({ message: 'title' })
   title: string;
 
   @Type(() => Number)
-  @IsNumber({}, { message: 'Price must be a number' })
-  @Min(0, { message: 'Price must be greater than 0' })
+  @IsNumber({}, { message: 'price' })
+  @Min(0, { message: 'pricePositive' })
+  @IsNotEmpty({ message: 'price' })
   price: number;
 
   @Type(() => Number)
-  @IsNumber({}, { message: 'City ID must be a number' })
-  @Min(1, { message: 'City ID must be greater than 0' })
+  @IsNumber({}, { message: 'cityId' })
+  @Min(1, { message: 'cityId' })
+  @IsNotEmpty({ message: 'cityId' })
   cityId: number;
 
   @Type(() => Number)
-  @IsNumber({}, { message: 'Subcategory ID must be a number' })
+  @IsNumber({}, { message: 'subcategoryId' })
+  @IsNotEmpty({ message: 'subcategoryId' })
   subcategoryId: number;
 
   @Type(() => Number)
-  @IsNumber({}, { message: 'Listing Type ID must be a number' })
+  @IsNumber({}, { message: "listingTypeId" })
+  @IsNotEmpty({ message: 'listingTypeId' })
   listingTypeId: number;
 
   @IsOptional()
@@ -50,20 +56,20 @@ export class CreateProductDto {
 
   @Type(() => Number)
   @IsOptional()
-  @IsNumber({}, { message: 'Area must be a number' })
-  area?: number = 0;
+  @IsString()
+  area?: string = "";
 
   @Type(() => Number)
   @IsOptional()
-  @IsNumber({}, { message: 'Build year must be a number' })
-  @Min(1900, { message: 'Build year must be >= 1900' })
-  @Max(new Date().getFullYear(), { message: `Build year cannot exceed ${new Date().getFullYear()}` })
+  @IsNumber({}, { message: 'buildYearInt' })
+  @Min(1900, { message: 'buildYearMin' })
+  @Max(new Date().getFullYear(), { message: `buildYearMax` })
   buildYear?: number | null = null;
 
-@IsOptional()
-@ValidateNested({ each: true })
-@Type(() => ProductAttributeValueDto)
-attributes?: ProductAttributeValueDto[];
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ProductAttributeValueDto)
+  attributes?: ProductAttributeValueDto[];
 
   @IsOptional()
   @IsEnum(['active', 'inactive', 'sold', 'pending', 'draft'], { message: 'Invalid status' })

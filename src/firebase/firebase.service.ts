@@ -45,19 +45,11 @@ export class FirebaseService implements OnModuleInit {
       .substring(0, 100);
   }
 
-  /**
-   * Upload file to Firebase Storage
-   * @param file - Multer file object
-   * @param destination - Destination path (e.g., 'profile-images/38')
-   * @returns Full file path in storage
-   */
   async uploadFile(file: Express.Multer.File, destination: string): Promise<string> {
     const safeName = this.sanitizeFileName(file.originalname);
     const timestamp = Date.now();
     
-    // ✅ IMPORTANT: Create full path with destination folder
-    // destination = "profile-images/38"
-    // fileName = "profile-images/38/1761762584295_photo.jpg"
+ 
     const fileName = `${destination}/${timestamp}_${safeName}`;
     
     console.log(`📁 Uploading to: ${fileName}`);
@@ -92,7 +84,7 @@ export class FirebaseService implements OnModuleInit {
       }
     }
 
-    // Upload to Firebase Storage
+    
     await fileUpload.save(buffer, {
       metadata: {
         contentType,
@@ -105,9 +97,7 @@ export class FirebaseService implements OnModuleInit {
       public: true,
     });
 
-    console.log(`✅ Uploaded: ${fileName} (${buffer.length} bytes)`);
-    
-    // ✅ Return the FULL path including userId folder
+  
     return fileName;
   }
 
@@ -168,11 +158,7 @@ export class FirebaseService implements OnModuleInit {
     }
   }
 
-  /**
-   * Delete all files in a user's folder
-   * @param userId - User ID
-   * @param folderPrefix - Folder prefix (e.g., 'profile-images')
-   */
+ 
   async deleteUserFolder(userId: number, folderPrefix: string = 'profile-images'): Promise<void> {
     try {
       const prefix = `${folderPrefix}/${userId}/`;
