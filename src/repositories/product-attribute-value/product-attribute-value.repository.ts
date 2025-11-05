@@ -2,17 +2,23 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SupportedLang, t } from '../../locales';
 import { Prisma } from '@prisma/client';
+import { IProductAttributeValueRepo } from './Iproduct-attribute-value.repository';
 
 @Injectable()
-export class ProductAttributeValueRepo {
+export class ProductAttributeValueRepo implements IProductAttributeValueRepo{
   constructor(private prisma: PrismaService) {}
-
+async deleteAttribute(productId: number): Promise<{ count: number }> {
+  const result = await this.prisma.productattributevalue.deleteMany({
+    where: { productId },
+  });
+  return result;
+}
   
   async createMultipleAttributes(
     productId: number,
     attributes: { attributeId: number; attributeValueId: number }[],
     language: SupportedLang
-  ) {
+  ):Promise<void> {
     if (!attributes || attributes.length === 0) return;
 
     const promises = attributes.map(attr =>

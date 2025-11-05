@@ -173,8 +173,8 @@ registrationRejectedSuccessfully:"La richiesta di registrazione è stata rifiuta
 imageUrlMissingAfterUpload: "L'URL dell'immagine manca dopo il caricamento.",
  failedCreatingProduct: "Creazione del prodotto non riuscita.",
     invalidAttributeForSubcategory:"Attributo non valido per questa sottocategoria",
-
-
-
+ forbiddenProduct: "Non sei autorizzato a modificare questo prodotto",
+ productNotFound: "Prodotto non trovato.",
+productUpdated: "Prodotto aggiornato con successo.",
     cannotApproveOtherAgency: "Non puoi approvare/rifiutare richieste per un'altra agenzia",
   } as const

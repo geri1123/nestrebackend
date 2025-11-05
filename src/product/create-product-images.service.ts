@@ -9,7 +9,22 @@ export class CreateProductImageService {
     private readonly productImageRepo: ProductImagesRepository,
     private readonly firebaseService: FirebaseService
   ) {}
+  async deleteImagesByProductId(productId: number) {
+  // Get all images of the product
+  const images = await this.productImageRepo.getImagesByProduct(productId);
 
+  if (images && images.length > 0) {
+    // Delete files from Firebase
+    await Promise.all(
+      images.map(img => img.imageUrl && this.firebaseService.deleteFile(img.imageUrl))
+    );
+
+    // Delete images from DB
+    await this.productImageRepo.deleteByProductId(productId);
+  }
+
+  return true;
+}
   async uploadProductImages(
     files: Express.Multer.File[],
     productId: number,

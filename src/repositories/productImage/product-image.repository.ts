@@ -14,4 +14,17 @@ export class ProductImagesRepository implements IProductImageRepo {
       where: { productId },
     });
   }
+
+  async findById(id: number): Promise<productimage | null> {
+    return this.prisma.productimage.findUnique({
+      where: { id },
+    });
+  }
+
+  
+  async deleteByProductId(productId: number): Promise<void> {
+    await this.prisma.productimage.deleteMany({
+      where: { productId },
+    });
+  }
 }

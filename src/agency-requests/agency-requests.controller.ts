@@ -39,64 +39,21 @@ export class AgencyRequestsController {
     );
   }
   
-// @Roles('agency_owner')
-// @Patch('registration-requests/:id/status')
-// async updateRegistrationRequestStatus(
-//   @Req() req: RequestWithUser,
-//   @Param('id', ParseIntPipe) requestId: number,
-//   @Body() dto: UpdateRequestStatusDto,
-// ) {
-//   const language = req.language || 'al';
-//   const userId = req.userId;
-
-//   if (!req.agencyId) {
-//     throw new UnauthorizedException(t('userNotAuthenticated', language));
-//   }
-//   if (!userId) {
-//     throw new UnauthorizedException(t('userNotAuthenticated', language));
-//   }
-
-//   if (dto.action === 'approved' && !dto.roleInAgency) {
-//     throw new BadRequestException(t('roleInAgencyRequired', language));
-//   }
-
-//   try {
-  
-//     return await this.agencyRequestsService.updateRequestStatus(
-//       requestId,
-//       req.agencyId,
-//       userId,
-//       dto.action,
-//       dto.roleInAgency!,
-//       dto.commissionRate,
-//       dto.reviewNotes,
-//       language
-//     );
-//   } catch (err) {
-//     console.error(err);
-
-//     throw new BadRequestException({
-//       success: false,
-//       message: err?.message || t('somethingWentWrong', language),
-//       errors: err?.response?.errors || { general: [err?.message || 'Unknown error'] },
-//     });
-//   }
-// }
-
-
 
 @Roles('agency_owner')
 @Patch('registration-requests/:id/status')
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
- @Body() body: Record<string, any>,
+  @Body() body: Record<string, any>,
 ) {
   const language = req.language || 'al';
   const userId = req.userId;
-const dto = plainToInstance(UpdateRequestStatusDto, body);
+  
+  const dto = plainToInstance(UpdateRequestStatusDto, body);
   const errors = await validate(dto);
   if (errors.length > 0) throwValidationErrors(errors, language);
+  
   if (!req.agencyId) {
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
@@ -108,26 +65,16 @@ const dto = plainToInstance(UpdateRequestStatusDto, body);
     throw new BadRequestException(t('roleInAgencyRequired', language));
   }
 
-  try {
   
-    return await this.agencyRequestsService.updateRequestStatus(
-      requestId,
-      req.agencyId,
-      userId,
-      dto.action,
-      dto.roleInAgency!,
-      dto.commissionRate,
-      dto.reviewNotes,
-      language
-    );
-  } catch (err) {
-    console.error(err);
-
-    throw new BadRequestException({
-      success: false,
-      message: err?.message || t('somethingWentWrong', language),
-      errors: err?.response?.errors || { general: [err?.message || 'Unknown error'] },
-    });
-  }
+  return await this.agencyRequestsService.updateRequestStatus(
+    requestId,
+    req.agencyId,
+    userId,
+    dto.action,
+    dto.roleInAgency!,
+    dto.commissionRate,
+    dto.reviewNotes,
+    language
+  );
 }
 }

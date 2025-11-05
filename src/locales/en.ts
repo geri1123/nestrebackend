@@ -178,8 +178,8 @@ imagesuccessfullyUploaded: "Image uploaded successfully",
   imageUrlMissingAfterUpload: "Image URL is missing after upload.",
    failedCreatingProduct: "Failed to create the product.",
    invalidAttributeForSubcategory:"Invalid attribute for this subcategory",
-
-
-
+   forbiddenProduct: "You are not allowed to modify this product",
+ productNotFound: "Product not found.",
+ productUpdated: "Product updated successfully.",
      cannotApproveOtherAgency: "You cannot approve/reject requests for another agency",
 } as const

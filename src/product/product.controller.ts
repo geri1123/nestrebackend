@@ -14,12 +14,14 @@ import { throwValidationErrors } from '../common/helpers/validation.helper';
 import { LanguageCode } from '@prisma/client';
 import { CreateProductService } from './create-product.service';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { UpdateProductService } from './update-product.service';
 
 @Controller('products')
 export class SearchProductsController {
   constructor(
     private readonly searchProductsService: SearchProductsService,
-    private readonly createproductService: CreateProductService
+    private readonly createproductService: CreateProductService,
+    private readonly updateProductService:UpdateProductService
   ) {}
  
 
@@ -111,9 +113,8 @@ const errors = await validate(dto);
   }
 
 
-
-  ///update
-  @Patch('update/:id')
+@Patch('update/:id')
+@UseInterceptors(FilesInterceptor('images', 7))
 async updateProduct(
   @Param('id') id: string,
   @Body() body: Record<string, any>,
@@ -122,7 +123,6 @@ async updateProduct(
 ) {
   const language = req.language;
   const userId = req.userId;
-  const agencyId = req.agencyId;
 
   if (!userId) {
     throw new BadRequestException(t('userNotAuthenticated', language));
@@ -132,13 +132,40 @@ async updateProduct(
   const errors = await validate(dto);
   if (errors.length > 0) throwValidationErrors(errors, language);
 
-  // return this.createproductService.updateProduct(
-  //   Number(id),
-  //   dto,
-  //   images,
-  //   language,
-  //   userId,
-  //   agencyId
-  // );
+  return this.updateProductService.updateProduct(
+    Number(id),
+    dto,
+    userId,
+    language,
+    images, // pass uploaded files here
+  );
 }
+//   ///update
+//   @Patch('update/:id')
+// async updateProduct(
+//   @Param('id') id: string,
+//   @Body() body: Record<string, any>,
+//   @UploadedFiles() images: Express.Multer.File[],
+//   @Req() req: RequestWithUser
+// ) {
+//   const language = req.language;
+//   const userId = req.userId;
+//   const agencyId = req.agencyId;
+
+//   if (!userId) {
+//     throw new BadRequestException(t('userNotAuthenticated', language));
+//   }
+
+//   const dto = plainToInstance(UpdateProductDto, body);
+//   const errors = await validate(dto);
+//   if (errors.length > 0) throwValidationErrors(errors, language);
+  
+//  return await this.updateProductService.updateProduct(
+//     Number(id), 
+//     dto,
+//     userId,
+//     language
+//   );
+ 
+// }
 }

@@ -9,6 +9,11 @@ export class ProductAttributeValueService {
     private readonly prAttValueRepo: ProductAttributeValueRepo,
     private readonly attributeRepo: AttributeRepo,
   ) {}
+  async deleteAttributes(productId: number): Promise<{ count: number }> {
+    // Call the repository method
+    const result = await this.prAttValueRepo.deleteAttribute(productId);
+    return result;
+  }
 
   async createPrAttValues(
     productId: number,

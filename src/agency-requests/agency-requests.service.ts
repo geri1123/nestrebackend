@@ -52,9 +52,13 @@ async updateRequestStatus(
 ) {
   const request = await this.registrationrequestService.findRequestById(requestId, language);
 
-  // 2️⃣ Check if the request belongs to the agency
- if (request.agency_id !== agencyId) {
-  throw new ForbiddenException(t('cannotApproveOtherAgency' , language));
+
+if (request.agency_id !== agencyId) {
+  throw new ForbiddenException({
+    success: false,
+    message: t('cannotApproveOtherAgency', language),
+    errors: { general: [t('cannotApproveOtherAgency', language)] }
+  });
 }
 
   // If approved, create the agent first

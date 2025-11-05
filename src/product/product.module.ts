@@ -10,6 +10,7 @@ import { CreateProductImageService } from "./create-product-images.service";
 import { ProductImagesRepository } from "../repositories/productImage/product-image.repository";
 import { FirebaseService } from "../firebase/firebase.service";
 import { AttributeRepo } from "../repositories/attributes/attributes.repository";
+import { UpdateProductService } from "./update-product.service";
 @Module({
   controllers: [SearchProductsController],
   providers: [
@@ -21,7 +22,8 @@ import { AttributeRepo } from "../repositories/attributes/attributes.repository"
     SearchProductsService,
     CreateProductImageService, 
     ProductImagesRepository,   
-    AttributeRepo
+    AttributeRepo,
+    UpdateProductService
            
   ],
 })
