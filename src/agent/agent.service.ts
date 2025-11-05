@@ -1,7 +1,8 @@
-import {  BadRequestException, Injectable } from "@nestjs/common";
+import {  BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { AgentsRepository } from "../repositories/agent/agent.repository";
 import { SupportedLang, t } from "../locales";
 import { Createagentdata } from "./types/create-agent";
+import { error } from "console";
 
 
 @Injectable()
@@ -19,6 +20,17 @@ export class AgentService{
   async createAgencyAgent(data: Createagentdata  ,language: SupportedLang="al"){
     return this.agentrepo.createAgencyAgent(data);
   }
+  async findByAgencyAndAgent(agencyId: number, agentId: number, language: SupportedLang = "al") {
+  const agent = await this.agentrepo.findByAgencyAndAgent(agencyId, agentId); 
+  if (!agent) {
+    throw new NotFoundException({
+      success: false,
+      message: t("userNotFound", language),
+      errors: { general: t("userNotFound", language) },
+    });
+  }
+  return agent;
+}
  async findExistingAgent(agentId: number, language: SupportedLang) {
   const existingAgent = await this.agentrepo.findExistingAgent(agentId);
 

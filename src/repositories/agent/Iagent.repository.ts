@@ -6,6 +6,7 @@ export interface IAgentsRepository {
 findByIdCardNumber(
   idCardNumber: string
 ): Promise<{ id_card_number: string | null } | null> 
+ findByAgencyAndAgent(agencyId: number, agentId: number): Promise<agencyagent | null>;
 findAgencyIdByAgent(userId: number): Promise<number | null>
   createAgencyAgent(data: Createagentdata): Promise<NewAgent>
  findByIdCardNumber(

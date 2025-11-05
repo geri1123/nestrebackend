@@ -123,7 +123,7 @@ async updateProduct(
 ) {
   const language = req.language;
   const userId = req.userId;
-
+const agencyId=req.agencyId;
   if (!userId) {
     throw new BadRequestException(t('userNotAuthenticated', language));
   }
@@ -136,36 +136,10 @@ async updateProduct(
     Number(id),
     dto,
     userId,
+    agencyId,
     language,
     images, // pass uploaded files here
   );
 }
-//   ///update
-//   @Patch('update/:id')
-// async updateProduct(
-//   @Param('id') id: string,
-//   @Body() body: Record<string, any>,
-//   @UploadedFiles() images: Express.Multer.File[],
-//   @Req() req: RequestWithUser
-// ) {
-//   const language = req.language;
-//   const userId = req.userId;
-//   const agencyId = req.agencyId;
 
-//   if (!userId) {
-//     throw new BadRequestException(t('userNotAuthenticated', language));
-//   }
-
-//   const dto = plainToInstance(UpdateProductDto, body);
-//   const errors = await validate(dto);
-//   if (errors.length > 0) throwValidationErrors(errors, language);
-  
-//  return await this.updateProductService.updateProduct(
-//     Number(id), 
-//     dto,
-//     userId,
-//     language
-//   );
- 
-// }
 }

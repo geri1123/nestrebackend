@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Query, Req, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Query, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AgencyRequestsService } from "./agency-requests.service";
 import { Roles } from "../common/decorators/roles.decorator";
 import type { RequestWithUser } from "../common/types/request-with-user.interface";
@@ -7,17 +7,19 @@ import { UpdateRequestStatusDto } from "./dto/agency-request.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { throwValidationErrors } from "../common/helpers/validation.helper";
+import { AgencyAgentRoles } from "../common/decorators/agency-agent-roles.decorator";
+import { AgencyAgentRolesGuard } from "../agent/guards/agency-agent-roles.guard";
 
 
 
-
+@UseGuards(AgencyAgentRolesGuard)
 @Controller('agencies')
 
 export class AgencyRequestsController {
     constructor(private readonly agencyRequestsService: AgencyRequestsService) {}
 
-
-    @Roles('agency_owner')
+@AgencyAgentRoles("team_lead")
+    
   @Get('registration-requests')
   async getRegistrationRequests(
     @Req() req: RequestWithUser,
@@ -40,7 +42,8 @@ export class AgencyRequestsController {
   }
   
 
-@Roles('agency_owner')
+@AgencyAgentRoles("team_lead")
+
 @Patch('registration-requests/:id/status')
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,

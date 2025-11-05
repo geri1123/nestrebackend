@@ -20,7 +20,16 @@ export class AgentsRepository implements IAgentsRepository {
     return agent ? agent.agency_id : null;
   }
 
-  
+    async findByAgencyAndAgent(agencyId: number, agentId: number): Promise<agencyagent | null> {
+    return this.prisma.agencyagent.findUnique({
+      where: {
+        agency_id_agent_id: {
+          agency_id: agencyId,
+          agent_id: agentId,
+        },
+      },
+    });
+  }
    async createAgencyAgent(data: Createagentdata): Promise<NewAgent> {
     // create the agent in the database
     const agent = await this.prisma.agencyagent.create({
