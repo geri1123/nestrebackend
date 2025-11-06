@@ -55,6 +55,7 @@ async findWithOwnerById(agencyId: number): Promise<{ id: number; agency_name: st
       id: true,
       agency_name: true,
       owner_user_id: true,
+      status:true,
     },
   });
 }

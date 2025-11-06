@@ -76,10 +76,13 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
 
   async getAgentWithPermissions(
     agencyAgentId: number,
-  ): Promise<Prisma.agencyagentGetPayload<{ include: { permission: true } }> | null> {
+  ): Promise<Prisma.agencyagentGetPayload<{ include: { permission: true , agency: true } }> | null> {
     return this.prisma.agencyagent.findUnique({
       where: { id: agencyAgentId },
-      include: { permission: true },
+      include: { 
+        permission: true ,
+          agency: true,
+      },
     });
   }
 }

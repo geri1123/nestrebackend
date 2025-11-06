@@ -1,5 +1,8 @@
 export const al = {
   agentInactive: "Agjenti është i pavlefshëm",
+  agencyInactive:"Agjencia nuk është aktive",
+  
+  agencySuspended:" Agjencia është pezulluar",
       somethingWentWrong: 'Diçka shkoi gabim',
       userNotAssociatedWithAgency:"Përdoruesi nuk është i lidhur me asnjë agjenci",
   validationFailed: "Validimi dështoi",

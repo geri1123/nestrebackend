@@ -1,5 +1,7 @@
 export const it = {
    agentInactive: "L'agente è inattivo",
+   agencyInactive: "L'agenzia non è attiva",
+   agencySuspended: "L'agenzia è sospesa",
    somethingWentWrong: 'Qualcosa è andato storto',
    userNotAssociatedWithAgency:"L'utente non è associato a nessuna agenzia",
  validationFailed: "Convalida non riuscita",

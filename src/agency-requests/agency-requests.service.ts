@@ -81,6 +81,7 @@ if (request.agency_id !== agencyId) {
 
     
   await this.agentsSerivice.findExistingAgent(request.user_id, language);
+  
      const agent = await this.agentsSerivice.createAgencyAgent({
     agencyId,
     agentId: request.user_id,
