@@ -8,12 +8,13 @@ import { AgencyRepository } from '../../repositories/agency/agency.repository';
 import { t } from '../../locales';
 import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 import { RequestWithUser } from '../../common/types/request-with-user.interface';
+import { AgentService } from '../../agent/agent.service';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepo: UserRepository,
-    private readonly agencyRepo: AgencyRepository,
+    private readonly agentService:AgentService,
     private readonly config: ConfigService,
     private readonly reflector: Reflector,
   ) {}
@@ -34,49 +35,85 @@ export class JwtAuthGuard implements CanActivate {
       (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
 
     if (!token) {
-      throw new UnauthorizedException({
-        success: false,
-        message: t('noTokenProvided', lang),
-        errors: { token: [t('noTokenProvided', lang)] },
-      });
-    }
-
-    try {
-      console.log('Verifying token:', token);  
+      throw new UnauthorizedException(
       
-      const decoded = this.jwtService.verify(token, {
-        secret: this.config.get<string>('JWT_SECRET'),
-      });
-
-      console.log('Decoded token:', decoded); 
-
-      req['user'] = decoded;
-      req['userId'] = decoded.userId;
-      const agencyId = decoded.agencyId;
-
-      if (agencyId) {
-        req['agencyId'] = agencyId;
-      } else if (decoded.role === 'agent' || decoded.role === 'agency_owner') {
-        throw new UnauthorizedException({
-          success: false,
-          message: t('agencyNotFound', lang),
-          errors: { agency: [t('agencyNotFound', lang)] },
-        });
-      }
-
-      await this.userRepo.updateFieldsById(decoded.userId, {
-        last_active: new Date(),
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Error verifying token:', error);  // Debugging: Log error during verification
-      
-      throw new UnauthorizedException({
-        success: false,
-        message: t('invalidOrExpiredToken', lang),
-        errors: { token: [t('invalidOrExpiredToken', lang)] },
-      });
+        t('noTokenProvided', lang),
+        );
     }
+try {
+  const decoded = this.jwtService.verify(token, {
+    secret: this.config.get<string>('JWT_SECRET'),
+  });
+
+  req['user'] = decoded;
+  req['userId'] = decoded.userId;
+
+  const agencyId = decoded.agencyId;
+  req['agencyId'] = agencyId;
+
+  // Populate agencyAgentId only for agents (not owners)
+  if (decoded.role === 'agent') {
+    const agentRecord = await this.agentService.findByAgencyAndAgent(agencyId, decoded.userId , lang);
+    if (!agentRecord) {
+      throw new UnauthorizedException(
+       
+      t('userNotAssociatedWithAgency', req.language),
+      
+      );
+    }
+    req['agencyAgentId'] = agentRecord.id; 
+  }
+
+  // Owners don't need agencyAgentId
+  if (decoded.role === 'agency_owner') {
+    req['agencyAgentId'] = null;
+  }
+
+  await this.userRepo.updateFieldsById(decoded.userId, { last_active: new Date() });
+
+  return true;
+} catch (error) {
+  throw new UnauthorizedException(
+   
+   t('invalidOrExpiredToken', req.language),
+  );
+}
+    // try {
+    //   console.log('Verifying token:', token);  
+      
+    //   const decoded = this.jwtService.verify(token, {
+    //     secret: this.config.get<string>('JWT_SECRET'),
+    //   });
+
+    //   console.log('Decoded token:', decoded); 
+
+    //   req['user'] = decoded;
+    //   req['userId'] = decoded.userId;
+    //   const agencyId = decoded.agencyId;
+
+    //   if (agencyId) {
+    //     req['agencyId'] = agencyId;
+    //   } else if (decoded.role === 'agent' || decoded.role === 'agency_owner') {
+    //     throw new UnauthorizedException({
+    //       success: false,
+    //       message: t('agencyNotFound', lang),
+    //       errors: { agency: [t('agencyNotFound', lang)] },
+    //     });
+    //   }
+
+    //   await this.userRepo.updateFieldsById(decoded.userId, {
+    //     last_active: new Date(),
+    //   });
+
+    //   return true;
+    // } catch (error) {
+    //   console.error('Error verifying token:', error);  // Debugging: Log error during verification
+      
+    //   throw new UnauthorizedException({
+    //     success: false,
+    //     message: t('invalidOrExpiredToken', lang),
+    //     errors: { token: [t('invalidOrExpiredToken', lang)] },
+    //   });
+    // }
   }
 }

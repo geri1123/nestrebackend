@@ -13,4 +13,5 @@ export interface RequestWithUser extends Request {
   user?: DecodedUser;
   userId?: number;
   agencyId?: number; 
+ agencyAgentId?: number | null; 
 }

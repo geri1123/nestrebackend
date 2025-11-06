@@ -22,6 +22,7 @@ model agency {
   created_at          DateTime              @default(now())
   updated_at          DateTime?             @updatedAt
   user                user                  @relation(fields: [owner_user_id], references: [id], map: "Agency_owner_user_id_fkey")
+   permissions         agencyagent_permission[]
   agencyagent         agencyagent[]
   product             product[]
   registrationrequest registrationrequest[]
@@ -32,7 +33,7 @@ model agencyagent {
   agency_id       Int
   agent_id        Int
   added_by        Int?
-   id_card_number  String?   @unique 
+  id_card_number String?  @unique
   role_in_agency  agencyagent_role_in_agency @default(agent)
   commission_rate Decimal?                   @db.Decimal(5, 2)
   start_date      DateTime?
@@ -43,7 +44,7 @@ model agencyagent {
   addedByUser     user?                      @relation("AgencyAgentAddedBy", fields: [added_by], references: [id])
   agency          agency                     @relation(fields: [agency_id], references: [id])
   agentUser       user                       @relation("AgencyAgentAgent", fields: [agent_id], references: [id])
-
+ permission      agencyagent_permission?
   @@unique([agency_id, agent_id], map: "AgencyAgent_agency_id_agent_id_key")
   @@index([added_by], map: "AgencyAgent_added_by_fkey")
   @@index([agent_id], map: "AgencyAgent_agent_id_fkey")
@@ -341,7 +342,22 @@ model productimage {
   @@index([productId], map: "ProductImage_productId_fkey")
   @@index([userId], map: "ProductImage_userId_fkey")
 }
+model agencyagent_permission {
+  id               Int           @id @default(autoincrement())
+  agency_agent_id  Int           @unique
+  agency_id        Int
+  can_edit_own_post      Boolean @default(true)
+  can_edit_others_post   Boolean @default(false)
+  can_approve_requests   Boolean @default(false)
+  can_view_all_posts     Boolean @default(false)
+  can_delete_posts       Boolean @default(false)
+  can_manage_agents      Boolean @default(false)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime?     @updatedAt
 
+  agencyagent agencyagent @relation(fields: [agency_agent_id], references: [id], onDelete: Cascade)
+  agency      agency      @relation(fields: [agency_id], references: [id])
+}
 enum LanguageCode {
   en
   al

@@ -5,6 +5,7 @@ import { agencyagent_role_in_agency, registrationrequest_status } from "@prisma/
 import { AgentService } from "../agent/agent.service";
 import { UserService } from "../users/services/users.service";
 import { EmailService } from "../email/email.service";
+import { AgentPermisionService } from "../agent/agent-permision.service";
 
 @Injectable()
 
@@ -12,6 +13,7 @@ export class AgencyRequestsService {
   constructor(
     private readonly registrationrequestService:RegistrationRequestService,
       private readonly agentsSerivice:AgentService,
+      private readonly agentpermisonService:AgentPermisionService,
       private readonly userservice:UserService,
       private readonly emailService:EmailService,
       
@@ -48,6 +50,14 @@ async updateRequestStatus(
   roleInAgency: agencyagent_role_in_agency,
   commissionRate?: number,
   reviewNotes?: string,
+    permissions?: {
+    can_edit_own_post?: boolean;
+    can_edit_others_post?: boolean;
+    can_approve_requests?: boolean;
+    can_view_all_posts?: boolean;
+    can_delete_posts?: boolean;
+    can_manage_agents?: boolean;
+  },
   language: SupportedLang = "al"
 ) {
   const request = await this.registrationrequestService.findRequestById(requestId, language);
@@ -71,18 +81,26 @@ if (request.agency_id !== agencyId) {
 
     
   await this.agentsSerivice.findExistingAgent(request.user_id, language);
-    await this.agentsSerivice.createAgencyAgent({
-      agencyId,
-      agentId: request.user_id,
-      addedBy: approvedBy,
-      idCardNumber: "",
-      roleInAgency,
-      commissionRate,
-      status: "active",
-    }, language);
-    await this.userservice.updateFields(request.user_id ,{
-      status:"active"
-    })
+     const agent = await this.agentsSerivice.createAgencyAgent({
+    agencyId,
+    agentId: request.user_id,
+    addedBy: approvedBy,
+    idCardNumber:request.id_card_number ||"",
+    roleInAgency,
+    commissionRate,
+    status: "active",
+  }, language);
+
+  await this.userservice.updateFields(request.user_id, {
+    status: "active",
+    
+  });
+    
+  if (permissions && Object.keys(permissions).length > 0) {
+    await this.agentpermisonService.addPermissions(agent.id, agencyId, permissions);
+  }
+  
+
 await this.emailService.sendAgentWelcomeEmail(
   request.user.email,
   `${request.user.first_name || ''} ${request.user.last_name || ''}`.trim()

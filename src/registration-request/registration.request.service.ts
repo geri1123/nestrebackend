@@ -134,6 +134,7 @@ async findRequestById(
   id: number;
   user_id: number;
   agency_id: number | null;
+  id_card_number: string | null; // <- match Prisma
   user: {
     email: string;
     first_name: string | null;
@@ -149,8 +150,7 @@ async findRequestById(
     });
   }
 
-  // Return exactly as Prisma gives it
-  return request;
+  return request; 
 }
 
 }

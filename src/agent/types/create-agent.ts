@@ -11,6 +11,7 @@ export type Createagentdata = {
   status: agencyagent_status;
 };
 export type NewAgent = {
+  id:number;
   agent_id: number;
   agency_id: number;
   added_by: number | null;

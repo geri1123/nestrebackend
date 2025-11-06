@@ -1,5 +1,7 @@
 export const al = {
+  agentInactive: "Agjenti është i pavlefshëm",
       somethingWentWrong: 'Diçka shkoi gabim',
+      userNotAssociatedWithAgency:"Përdoruesi nuk është i lidhur me asnjë agjenci",
   validationFailed: "Validimi dështoi",
      userNotAuthenticated: "Përdoruesi nuk është autentikuar",
     notificationMarkedRead: "Njoftimi u shënua si i lexuar",

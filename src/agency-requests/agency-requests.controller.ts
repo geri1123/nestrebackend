@@ -8,11 +8,12 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { throwValidationErrors } from "../common/helpers/validation.helper";
 import { AgencyAgentRoles } from "../common/decorators/agency-agent-roles.decorator";
-import { AgencyAgentRolesGuard } from "../agent/guards/agency-agent-roles.guard";
+import { PermissionsGuard } from "../agent/guards/permision.guard";
+import { Permissions } from "../common/decorators/permissions.decorator";
 
 
 
-@UseGuards(AgencyAgentRolesGuard)
+@UseGuards(PermissionsGuard)
 @Controller('agencies')
 
 export class AgencyRequestsController {
@@ -21,6 +22,8 @@ export class AgencyRequestsController {
 @AgencyAgentRoles("team_lead")
     
   @Get('registration-requests')
+  @Roles('agent', 'agency_owner')
+  @Permissions(['can_approve_requests']) 
   async getRegistrationRequests(
     @Req() req: RequestWithUser,
     @Query('page') page = 1,        
@@ -42,9 +45,11 @@ export class AgencyRequestsController {
   }
   
 
-@AgencyAgentRoles("team_lead")
+
 
 @Patch('registration-requests/:id/status')
+@Roles('agent', 'agency_owner')
+ @Permissions(['can_approve_requests']) 
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
@@ -77,6 +82,7 @@ async updateRegistrationRequestStatus(
     dto.roleInAgency!,
     dto.commissionRate,
     dto.reviewNotes,
+     dto.permissions ,
     language
   );
 }

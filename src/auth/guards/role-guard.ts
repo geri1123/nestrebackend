@@ -8,7 +8,7 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    // Get allowed roles from @Roles() decorator
+   
     const roles = this.reflector.getAllAndOverride<string[]>('roles', [
       context.getHandler(),
       context.getClass(),
@@ -16,10 +16,11 @@ export class RolesGuard implements CanActivate {
     if (!roles) return true; 
 
     const req = context.switchToHttp().getRequest<RequestWithUser>();
-    const lang: SupportedLang = req.language || 'al'; // Use language from middleware
+    const lang: SupportedLang = req.language || 'al'; 
 
     if (!req.user) {
-      throw new ForbiddenException(t('userNotAuthenticated', lang));
+      throw new ForbiddenException(
+        t('userNotAuthenticated', lang));
     }
 
     if (!roles.includes(req.user.role)) {

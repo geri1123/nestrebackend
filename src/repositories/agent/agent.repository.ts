@@ -4,7 +4,7 @@ import { Createagentdata, NewAgent } from "../../agent/types/create-agent";
 import { PrismaService } from "../../prisma/prisma.service";
 import { IAgentsRepository } from "./Iagent.repository";
 import { AgentInfo } from "../../agent/types/agent-info";
-import { agencyagent, agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
+import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status, Prisma } from "@prisma/client";
 
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {
@@ -45,6 +45,7 @@ export class AgentsRepository implements IAgentsRepository {
         status: data.status,
       },
       select: {
+        id:true,
         agent_id: true,
         agency_id: true,
         added_by: true,
@@ -69,9 +70,18 @@ async findByIdCardNumber(
 }
 async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
   return await this.prisma.agencyagent.findFirst({
-    where: { agent_id },  // Find the first agencyagent with the given agent_id
+    where: { agent_id },  
   });
 }
+
+  async getAgentWithPermissions(
+    agencyAgentId: number,
+  ): Promise<Prisma.agencyagentGetPayload<{ include: { permission: true } }> | null> {
+    return this.prisma.agencyagent.findUnique({
+      where: { id: agencyAgentId },
+      include: { permission: true },
+    });
+  }
 }
 
 

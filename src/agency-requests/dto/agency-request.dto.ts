@@ -2,7 +2,7 @@ import { IsIn, IsEnum, IsNumber, IsOptional, IsString, Min, ValidateIf, IsNotEmp
 import { agencyagent_role_in_agency } from '@prisma/client';
 
 export class UpdateRequestStatusDto {
-  @IsNotEmpty({ message: 'action is required' })  // ✅ Add this
+  @IsNotEmpty({ message: 'action is required' })  
   @IsIn(['approved', 'rejected'], { message: 'action must be either approved or rejected' })
   action: 'approved' | 'rejected';
 
@@ -18,4 +18,14 @@ export class UpdateRequestStatusDto {
   @IsOptional()
   @IsString({ message: 'reviewNotesMustBeString' })
   reviewNotes?: string;
+
+   @ValidateIf(o => o.action === 'approved')
+  permissions?: {
+    can_edit_own_post?: boolean;
+    can_edit_others_post?: boolean;
+    can_approve_requests?: boolean;
+    can_view_all_posts?: boolean;
+    can_delete_posts?: boolean;
+    can_manage_agents?: boolean;
+  };
 }

@@ -16,6 +16,7 @@ import { NotificationModule } from './notification/notification.module';
 import { AgencyModule } from './agency/agency.module';
 import { UserModule } from './users/users.module';
 import { AgencyRequestsModule } from './agency-requests/agency-requests.module';
+import { AgentModule } from './agent/agent.module';
 @Module({
   imports: [
     AppConfigModule,
@@ -35,6 +36,7 @@ ThrottlerModule.forRoot([
         limit: 5,     
       },
     ]),
+    AgentModule, 
   ],
   controllers: [AppController],
   providers: [

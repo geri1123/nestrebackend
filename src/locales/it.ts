@@ -1,5 +1,7 @@
 export const it = {
+   agentInactive: "L'agente è inattivo",
    somethingWentWrong: 'Qualcosa è andato storto',
+   userNotAssociatedWithAgency:"L'utente non è associato a nessuna agenzia",
  validationFailed: "Convalida non riuscita",
      userNotAuthenticated: "Utente non autenticato",
     notificationMarkedRead: "Notifica contrassegnata come letta",

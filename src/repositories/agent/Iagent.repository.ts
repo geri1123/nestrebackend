@@ -1,6 +1,6 @@
 import { Createagentdata, NewAgent } from "../../agent/types/create-agent.js";
 import { AgentInfo } from "../../agent/types/agent-info.js";
-import { agencyagent, agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
+import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
 export interface IAgentsRepository {
 
 findByIdCardNumber(
@@ -12,5 +12,8 @@ findAgencyIdByAgent(userId: number): Promise<number | null>
  findByIdCardNumber(
   idCardNumber: string
 ): Promise<{ id_card_number: string | null } | null>;
- findExistingAgent(agent_id: number): Promise<agencyagent | null>
+ findExistingAgent(agent_id: number): Promise<agencyagent | null>;
+getAgentWithPermissions(agencyAgentId: number): Promise<
+  (agencyagent & { permission: agencyagent_permission | null }) | null
+>;
 }

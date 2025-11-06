@@ -1,5 +1,8 @@
 export const en = {
+
+     agentInactive: "Agent is inactive",
   somethingWentWrong: 'Something went wrong',
+  userNotAssociatedWithAgency:"User is not associated with any agency",
    noTokenProvided: "No token provided",
    validationFailed: "Validation failed",
   userNotAuthenticated: "User not authenticated",

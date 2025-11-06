@@ -17,6 +17,7 @@ export class AgentService{
       });
     }
   }
+ 
   async createAgencyAgent(data: Createagentdata  ,language: SupportedLang="al"){
     return this.agentrepo.createAgencyAgent(data);
   }
@@ -51,4 +52,8 @@ export class AgentService{
   async getAgencyIdForAgent(agentId: number): Promise<number | null> {
     return await this.agentrepo.findAgencyIdByAgent(agentId);
   }
+
+  async getAgentWithPermissions(agencyAgentId: number) {
+  return this.agentrepo.getAgentWithPermissions(agencyAgentId);
+}
 }
