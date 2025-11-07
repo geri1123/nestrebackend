@@ -1,43 +1,103 @@
-# NestJS Real Estate API
+NestJS Real Estate API
 
-A starter project using [NestJS](https://nestjs.com/) with TypeScript for managing real estate properties, agencies, and user permissions. Features Redis caching for optimized performance on filtering, registration, and permission checks.
+A scalable Real Estate Management API built with NestJS + TypeScript.
+It provides a modular architecture for handling properties, agencies, agents, and permissions, with Redis caching and Prisma ORM for performance and reliability.
 
----
+ Key Features
+ User & Role Management
 
-## Features
+Users can register, browse, and filter properties.
 
-- **User Management**
-  - Normal users can register and view properties.
-  - Agency owners can manage properties and agents.
-  - Agent permissions are controlled via roles and cached in Redis.
+Agency Owners can create and manage properties and agents.
 
-- **Property Management**
-  - Create, update, and publish properties.
-  - Filter and search properties with caching for faster queries.
+Agents have controlled access to actions based on assigned roles and permissions.
 
-- **Agency Management**
-  - Register agencies and activate/deactivate them.
-  - Fetch paginated agency lists with logo URLs.
+Role-based permissions are cached in Redis for faster authorization checks.
 
-- **Permissions**
-  - Fine-grained access control with `PermissionsGuard`.
-  - Agency owners bypass agent permission checks.
-  - Agents have status-based permission checks.
-  - Redis caching for permissions to reduce database load.
+ Agency Management
 
-- **Redis Caching**
-  - Property filtering results
-  - Temporary registration tokens/OTP
-  - Cached permissions for users/agents
+Create and manage agencies with activation and deactivation support.
 
-- **Localization**
-  - Supports multiple languages (default: Albanian)
-  - Messages localized via `t('messageKey', lang)`
+Assign and manage agents under each agency.
 
-- **Database**
-  - Uses Prisma ORM
-  - PostgreSQL/MySQL support (configurable)
-  - Data models: `User`, `Agency`, `Property`, `Agent`, `Permissions`
+Fetch paginated agency lists with logo URLs and localized details.
+
+ Property Management
+
+Create, update, and delete properties.
+
+Attach multiple images to properties (Firebase storage integration).
+
+Advanced search and filter functionality by category, subcategory, price, city, and more.
+
+
+
+-- Permissions & Access Control
+
+Fine-grained permission system powered by a custom PermissionsGuard.
+
+Agency owners automatically bypass agent-level permission checks.
+
+Agents are validated against their role-based permissions and current status.
+
+=
+
+-- Redis Caching
+
+Property filters (categories, subcategories, cities, states).
+
+
+
+
+Significantly reduces repeated database calls and improves response times.
+
+-- Localization
+
+Full multilingual support, default language: Albanian (al).
+
+All responses and error messages are localized using the t('key', lang) helper.
+
+--- Database & ORM
+
+Prisma ORM with PostgreSQL/MySQL support (configurable).
+
+Well-structured data models:
+
+User
+
+Agency
+
+Agent
+
+Property
+
+Permission
+
+RegistrationRequest
+
+Includes migration-ready schema for fast setup and scaling.
+
+-- Tech Stack
+Layer	Technology
+Framework	NestJS (TypeScript)
+ORM	Prisma
+Database	PostgreSQL / MySQL
+Cache	Redis
+File Storage	Firebase Storage
+Validation	class-validator + custom pipes
+Authentication	JWT + Guards
+Localization	Custom t() translation helper
+-- Project Highlights
+
+Modular NestJS structure with clear separation of concerns.
+
+Reusable guards for authentication, roles, and permissions.
+
+Redis caching integrated for performance-critical endpoints.
+
+Fully localized for multi-language real estate platforms.
+
+Extensible design — easy to add more entities (e.g., reviews, favorites, etc.)
 ## Project setup
 
 ```bash
