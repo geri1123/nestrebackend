@@ -2,13 +2,13 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { RequestWithLang } from '../../../middlewares/language.middleware';
-import { UserRepository } from '../../../repositories/user/user.repository';
-import { AgencyRepository } from '../../../repositories/agency/agency.repository';
-import { t } from '../../../locales';
-import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
-import { RequestWithUser } from '../../../common/types/request-with-user.interface';
-import { AgentService } from '../../agent/agent.service';
+import { RequestWithLang } from '../../middlewares/language.middleware';
+import { UserRepository } from '../../repositories/user/user.repository';
+import { AgencyRepository } from '../../repositories/agency/agency.repository';
+import { t } from '../../locales';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { RequestWithUser } from '../types/request-with-user.interface';
+import { AgentService } from '../../modules/agent/agent.service';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(

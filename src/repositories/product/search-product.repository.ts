@@ -7,7 +7,18 @@ import { IsearchProductRepository } from "./Isearch-product.repository.js";
 @Injectable()
 export class SearchProductsRepo implements IsearchProductRepository{
   constructor(private prisma: PrismaService) {}
-
+async getProductForPermissionCheck(
+  id: number,
+): Promise<{ id: number; userId: number | null; agencyId: number | null } | null> {
+  return this.prisma.product.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      userId: true,
+      agencyId: true,
+    },
+  });
+}
   async searchProducts(filters: SearchFiltersDto, language: SupportedLang):Promise<any[]>{
     const whereConditions: any = this.buildWhereConditions(filters, language);
 

@@ -1,5 +1,5 @@
 // products/search-products.controller.ts
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { SearchProductsService } from './search-product.service';
 import { t, type SupportedLang } from '../../locales';
 import { SearchFiltersDto } from './dto/product-filters.dto';
@@ -15,6 +15,8 @@ import { LanguageCode } from '@prisma/client';
 import { CreateProductService } from './create-product.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductService } from './update-product.service';
+import { Permissions } from '../../common/decorators/permissions.decorator';
+import { ProductOwnershipAndPermissionGuard } from '../../common/guard/product-ownership.guard';
 
 @Controller('products')
 export class SearchProductsController {
@@ -112,8 +114,10 @@ const errors = await validate(dto);
    return this.createproductService.createProduct(dto ,images , language ,userId , agencyId);
   }
 
+@UseGuards(ProductOwnershipAndPermissionGuard)
+@Permissions(["can_edit_others_post"])
 
-@Patch('update/:id')
+  @Patch('update/:id')
 @UseInterceptors(FilesInterceptor('images', 7))
 async updateProduct(
   @Param('id') id: string,

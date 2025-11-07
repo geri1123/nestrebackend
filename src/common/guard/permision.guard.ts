@@ -1,10 +1,12 @@
+
+
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RequestWithUser } from '../../../common/types/request-with-user.interface';
-import { AgentPermisionService } from '../../agent/agent-permision.service';
-import { AgentService } from '../../agent/agent.service';
-import { SupportedLang, t } from '../../../locales';
-import { AgencyService } from '../../agency/agency.service';
+import { RequestWithUser } from '../types/request-with-user.interface';
+import { AgentPermisionService } from '../../modules/agent/agent-permision.service';
+import { AgentService } from '../../modules/agent/agent.service';
+import { SupportedLang, t } from '../../locales';
+import { AgencyService } from '../../modules/agency/agency.service';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {

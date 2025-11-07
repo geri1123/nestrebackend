@@ -9,15 +9,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { FiltersModule } from './modules/filters/filters.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
-import { RolesGuard } from './modules/auth/guards/role-guard';
+import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
+import { RolesGuard } from './common/guard/role-guard';
 import { ProductModule } from './modules/product/product.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { AgencyModule } from './modules/agency/agency.module';
 import { UserModule } from './modules/users/users.module';
 import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
 import { AgentModule } from './modules/agent/agent.module';
-import { PermissionsGuard } from './modules/auth/guards/permision.guard';
+import { PermissionsGuard } from './common/guard/permision.guard';
 @Module({
   imports: [
     AppConfigModule,

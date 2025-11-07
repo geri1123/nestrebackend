@@ -10,8 +10,8 @@ export interface DecodedUser {
 
 export interface RequestWithUser extends Request {
   language: SupportedLang;
-  user?: DecodedUser;
-  userId?: number;
+  user: DecodedUser;
+  userId: number;
   agencyId?: number; 
  agencyAgentId?: number | null; 
 }

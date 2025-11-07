@@ -13,6 +13,7 @@ import { AttributeRepo } from "../../repositories/attributes/attributes.reposito
 import { UpdateProductService } from "./update-product.service";
 import { UserModule } from "../users/users.module";
 import { AgentModule } from "../agent/agent.module";
+import { ProductService } from "./product-service";
 @Module({
   controllers: [SearchProductsController],
   imports:[UserModule , AgentModule],
@@ -27,8 +28,9 @@ import { AgentModule } from "../agent/agent.module";
     ProductImagesRepository,   
     AttributeRepo,
     UpdateProductService,
-           
+    ProductService       
 
   ],
+  exports:[ProductService]
 })
 export class ProductModule {}

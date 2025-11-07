@@ -7,8 +7,7 @@ import { UpdateRequestStatusDto } from "./dto/agency-request.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { throwValidationErrors } from "../../common/helpers/validation.helper";
-import { AgencyAgentRoles } from "../../common/decorators/agency-agent-roles.decorator";
-import { PermissionsGuard } from "../auth/guards/permision.guard";
+import { PermissionsGuard } from "../../common/guard/permision.guard";
 import { Permissions } from "../../common/decorators/permissions.decorator";
 
 
@@ -19,7 +18,7 @@ import { Permissions } from "../../common/decorators/permissions.decorator";
 export class AgencyRequestsController {
     constructor(private readonly agencyRequestsService: AgencyRequestsService) {}
 
-@AgencyAgentRoles("team_lead")
+
     
   @Get('registration-requests')
   @Roles('agent', 'agency_owner')
@@ -62,12 +61,12 @@ async updateRegistrationRequestStatus(
   const errors = await validate(dto);
   if (errors.length > 0) throwValidationErrors(errors, language);
   
-  if (!req.agencyId) {
-    throw new UnauthorizedException(t('userNotAuthenticated', language));
-  }
-  if (!userId) {
-    throw new UnauthorizedException(t('userNotAuthenticated', language));
-  }
+  // if (!req.agencyId) {
+  //   throw new UnauthorizedException(t('userNotAuthenticated', language));
+  // }
+  // if (!userId) {
+  //   throw new UnauthorizedException(t('userNotAuthenticated', language));
+  // }
 
   if (body.action === 'approved' && !body.roleInAgency) {
     throw new BadRequestException(t('roleInAgencyRequired', language));
@@ -76,7 +75,7 @@ async updateRegistrationRequestStatus(
   
   return await this.agencyRequestsService.updateRequestStatus(
     requestId,
-    req.agencyId,
+  req.agencyId!,
     userId,
     dto.action,
     dto.roleInAgency!,

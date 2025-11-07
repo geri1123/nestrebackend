@@ -1,6 +1,6 @@
 // jwt-auth.guard.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../common/guard/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
