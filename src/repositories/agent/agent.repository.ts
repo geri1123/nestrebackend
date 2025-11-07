@@ -1,9 +1,9 @@
 // import { prisma } from "../../config/prisma.js";
 import { Injectable } from "@nestjs/common";
-import { Createagentdata, NewAgent } from "../../agent/types/create-agent";
-import { PrismaService } from "../../prisma/prisma.service";
+import { Createagentdata, NewAgent } from "../../modules/agent/types/create-agent";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { IAgentsRepository } from "./Iagent.repository";
-import { AgentInfo } from "../../agent/types/agent-info";
+import { AgentInfo } from "../../modules/agent/types/agent-info";
 import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status, Prisma } from "@prisma/client";
 
 @Injectable()

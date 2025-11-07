@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiQuery, getSchemaPath } from '@nestjs/swagger';
-import { SearchFiltersDto } from '../../product/dto/product-filters.dto';
+import { SearchFiltersDto } from '../../modules/product/dto/product-filters.dto';
 
 export function ApiSearchFilters() {
   return applyDecorators(

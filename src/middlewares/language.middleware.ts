@@ -12,15 +12,15 @@ export class LanguageMiddleware implements NestMiddleware {
   use(req: RequestWithLang, res: Response, next: NextFunction) {
     const supported = Object.keys(translations) as SupportedLang[];
 
-    // 1️⃣ Cookie
+    // Cookie
     let lang = req.cookies?.NEXT_LOCALE as SupportedLang | undefined;
 
-    // 2️⃣ Query param
+   
     if (!lang || !supported.includes(lang)) {
       lang = req.query.lang as SupportedLang;
     }
 
-    // 3️⃣ Default fallback
+    //  Default fallback
     if (!lang || !supported.includes(lang)) {
       lang = 'al';
     }

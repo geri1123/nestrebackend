@@ -1,29 +1,30 @@
 import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
-import { FirebaseModule } from './firebase/firebase.module';
-import { AppConfigModule } from './config/config.module';
+import { PrismaModule } from './infrastructure/prisma/prisma.module';
+import { FirebaseModule } from './infrastructure/firebase/firebase.module';
+import { AppConfigModule } from './infrastructure/config/config.module';
 import { LanguageMiddleware } from './middlewares/language.middleware';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { FiltersModule } from './filters/filters.module';
+import { FiltersModule } from './modules/filters/filters.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { RolesGuard } from './auth/guards/role-guard';
-import { ProductModule } from './product/product.module';
-import { NotificationModule } from './notification/notification.module';
-import { AgencyModule } from './agency/agency.module';
-import { UserModule } from './users/users.module';
-import { AgencyRequestsModule } from './agency-requests/agency-requests.module';
-import { AgentModule } from './agent/agent.module';
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
+import { RolesGuard } from './modules/auth/guards/role-guard';
+import { ProductModule } from './modules/product/product.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { AgencyModule } from './modules/agency/agency.module';
+import { UserModule } from './modules/users/users.module';
+import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
+import { AgentModule } from './modules/agent/agent.module';
+import { PermissionsGuard } from './modules/auth/guards/permision.guard';
 @Module({
   imports: [
     AppConfigModule,
     PrismaModule,
     UserModule,
     AgencyRequestsModule,
-     AgencyModule,
+     
     FirebaseModule,
     AgencyModule,
 AuthModule,
@@ -49,6 +50,10 @@ ThrottlerModule.forRoot([
     {
       provide: APP_GUARD,
       useClass: RolesGuard, 
+    },
+     {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
     },
   ],
 })

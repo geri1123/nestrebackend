@@ -1,6 +1,6 @@
 // repositories/city/CityRepository.ts
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 
 import { ILocationRepository } from "./Ilocation.repository";
 @Injectable()

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { CreateProductInput } from "../../product/types/create-product-input.type";
-import { UpdateProductDto } from "../../product/dto/update-product.dto";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
+import { CreateProductInput } from "../../modules/product/types/create-product-input.type";
+import { UpdateProductDto } from "../../modules/product/dto/update-product.dto";
 @Injectable()
 export class CreateProductsRepository {
   constructor(private prisma: PrismaService) {}

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { hashPassword } from '../../utils/hash';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { hashPassword } from '../../common/utils/hash';
 import type { IUserRepository } from './Iuser.repository';
 // import type { NewUser, PartialUserByToken } from '../../types/database.js';
-import type { BaseUserInfo, NavbarUser } from '../../users/types/base-user-info';
-import { UserCreationData } from '../../auth/types/create-user-input';
-import type { UpdatableUserFields } from '../../users/types/update-user-info'
-import { PartialUserForLogin ,PartialUserByToken } from '../../types/user';
+import type { BaseUserInfo, NavbarUser } from '../../modules/users/types/base-user-info';
+import { UserCreationData } from '../../modules/auth/types/create-user-input';
+import type { UpdatableUserFields } from '../../modules/users/types/update-user-info'
+import { PartialUserForLogin ,PartialUserByToken } from '../../common/types/user';
 
 import { user_status } from '@prisma/client';
 @Injectable()

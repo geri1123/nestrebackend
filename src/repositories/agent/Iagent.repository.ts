@@ -1,5 +1,5 @@
-import { Createagentdata, NewAgent } from "../../agent/types/create-agent.js";
-import { AgentInfo } from "../../agent/types/agent-info.js";
+import { Createagentdata, NewAgent } from "../../modules/agent/types/create-agent.js";
+import { AgentInfo } from "../../modules/agent/types/agent-info.js";
 import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
 export interface IAgentsRepository {
 

@@ -1,6 +1,6 @@
 import { agency } from '@prisma/client';
-import { AgencyInfo } from '../../agency/types/agency-info.js';
-import { PlainAgencyInput } from '../../agency/types/agency-create-input.js';
+import { AgencyInfo } from '../../modules/agency/types/agency-info.js';
+import { PlainAgencyInput } from '../../modules/agency/types/agency-create-input.js';
 
 export interface IAgencyRepository {
   licenseExists(license: string): Promise<boolean>;

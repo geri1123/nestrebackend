@@ -1,6 +1,6 @@
 // category.repository.spec.ts
 import { CategoryRepository } from '../category/category.repository';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { LanguageCode, product_status } from '@prisma/client';
 
 describe('CategoryRepository', () => {

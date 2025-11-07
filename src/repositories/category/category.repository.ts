@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 
-import { PrismaService } from "../../prisma/prisma.service";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { ICatRepository } from "./Icategory.repository";
 import { LanguageCode } from "@prisma/client";
 import { product_status } from "@prisma/client";
-import { CategoryDto } from "../../filters/dto/filters.dto.js";
+import { CategoryDto } from "../../modules/filters/dto/filters.dto.js";
 @Injectable()
 export class CategoryRepository implements ICatRepository {
   constructor(private readonly prisma: PrismaService) {}

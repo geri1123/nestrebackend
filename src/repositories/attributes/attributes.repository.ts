@@ -1,5 +1,5 @@
 import {  LanguageCode } from "@prisma/client";
-import { PrismaService } from "../../prisma/prisma.service";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { IAttributeRepo } from "./Iattribute.respository";
 import { Injectable } from "@nestjs/common";
 @Injectable()

@@ -2,8 +2,8 @@ import {
   registrationrequest,
   registrationrequest_status,
 } from '@prisma/client';
-import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create.js';
-import { AgentRequestQueryResult } from '../../registration-request/type/agent-request-query-result.js';
+import { RegistrationRequestCreateInput } from '../../modules/registration-request/type/registration-request-create.js';
+import { AgentRequestQueryResult } from '../../modules/registration-request/type/agent-request-query-result.js';
 
 export interface IRegistrationRequestRepository {
   create(data: RegistrationRequestCreateInput): Promise<number>;

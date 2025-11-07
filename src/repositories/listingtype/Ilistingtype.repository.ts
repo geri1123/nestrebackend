@@ -1,5 +1,5 @@
 import { LanguageCode, product_status } from '@prisma/client';
-import { ListingTypeDto } from '../../filters/dto/filters.dto';
+import { ListingTypeDto } from '../../modules/filters/dto/filters.dto';
 export interface IListingTypeRepository {
   getAllListingTypes(
     language?: LanguageCode,

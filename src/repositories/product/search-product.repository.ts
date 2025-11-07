@@ -1,7 +1,7 @@
 // repositories/products/SearchProductRepo.ts
-import { PrismaService } from "../../prisma/prisma.service.js";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service.js";
 import { SupportedLang } from "../../locales/index.js";
-import { SearchFiltersDto } from "../../product/dto/product-filters.dto.js";
+import { SearchFiltersDto } from "../../modules/product/dto/product-filters.dto.js";
 import { Injectable } from "@nestjs/common";
 import { IsearchProductRepository } from "./Isearch-product.repository.js";
 @Injectable()

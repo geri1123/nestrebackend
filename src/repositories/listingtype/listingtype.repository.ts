@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service.js';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service.js';
 import { LanguageCode, product_status } from '@prisma/client';
 import { IListingTypeRepository } from './Ilistingtype.repository.js';
-import { ListingTypeDto } from '../../filters/dto/filters.dto.js';
+import { ListingTypeDto } from '../../modules/filters/dto/filters.dto.js';
 
 
 @Injectable()

@@ -1,7 +1,7 @@
 // import { prisma } from '../../config/prisma.js';
 
 import { IUsernameHistoryRepository } from './Iusername-history.repository.js';
-import { PrismaService } from '../../prisma/prisma.service.js';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service.js';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UsernameHistoryRepository implements IUsernameHistoryRepository {

@@ -1,9 +1,9 @@
 
 import { user_status } from '@prisma/client';
-import type { BaseUserInfo } from '../../users/types/base-user-info.js';
-import type { UserCreationData, UserRegistration } from '../../auth/types/create-user-input.js';
-import { PartialUserForLogin , PartialUserByToken } from '../../types/user.js';
-import { UpdatableUserFields } from '../../users/types/update-user-info.js';
+import type { BaseUserInfo } from '../../modules/users/types/base-user-info.js';
+import type { UserCreationData, UserRegistration } from '../../modules/auth/types/create-user-input.js';
+import { PartialUserForLogin , PartialUserByToken } from '../../common/types/user.js';
+import { UpdatableUserFields } from '../../modules/users/types/update-user-info.js';
 export interface IUserRepository {
   create(userData: UserCreationData): Promise<number>;
 updateProfileImage(userId: number, imageUrl: string): Promise<void> ;

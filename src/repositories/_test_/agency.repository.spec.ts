@@ -1,6 +1,6 @@
 import { AgencyRepository } from '../agency/agency.repository';
-import { PrismaService } from '../../prisma/prisma.service';
-import { generatePublicCode } from '../../utils/hash';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { generatePublicCode } from '../../common/utils/hash';
 
 jest.mock('../../utils/hash');
 

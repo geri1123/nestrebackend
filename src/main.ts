@@ -77,7 +77,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { AppConfigService } from './config/config.service';
+import { AppConfigService } from './infrastructure/config/config.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { SupportedLang, t } from './locales';
 import { ValidationError } from 'class-validator';

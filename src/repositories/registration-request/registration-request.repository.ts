@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AgentRequestQueryResult } from '../../registration-request/type/agent-request-query-result';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { AgentRequestQueryResult } from '../../modules/registration-request/type/agent-request-query-result';
 import { IRegistrationRequestRepository } from './Iregistration-request.respository';
-import { RegistrationRequestCreateInput } from '../../registration-request/type/registration-request-create';
+import { RegistrationRequestCreateInput } from '../../modules/registration-request/type/registration-request-create';
 import { registrationrequest, registrationrequest_status } from '@prisma/client';
 
 @Injectable()
