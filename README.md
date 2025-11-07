@@ -12,7 +12,7 @@ Agency Owners can create and manage properties and agents.
 
 Agents have controlled access to actions based on assigned roles and permissions.
 
-Role-based permissions are cached in Redis for faster authorization checks.
+
 
  Agency Management
 
