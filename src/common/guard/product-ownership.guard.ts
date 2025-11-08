@@ -16,13 +16,13 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
     const productId = Number(req.params.id);
  const language=req.language;
-    // fetch product from DB
+  
     const product = await this.productService.getProductForPermissionCheck(productId , language);
   
 
-    // =========================
+   
     // Agency Owner: full access to own agency
-    // =========================
+
     if (req.user && req.user.role === 'agency_owner') {
       if (product.agencyId !== req.agencyId) {
         throw new ForbiddenException(t("anotherAgency",language));
@@ -31,7 +31,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     }
 
     
-    // Agent: check ownership & permissions
+  
     
     if (req.user && req.user.role === 'agent') {
       // agent must belong to an agency
@@ -40,10 +40,8 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
       const agent = await this.agentService.getAgentWithPermissions(req.agencyAgentId);
       if (!agent) throw new ForbiddenException(t('agentNotFound', language));
 
-      // agent updating own product → allowed
       if (product.userId === req.userId) return true;
 
-      // agent updating other’s product → allowed only if same agency & has permission
       if (
         agent.permission?.can_edit_others_post &&
         product.agencyId === req.agencyId
@@ -53,7 +51,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     }
 
   
-    // Regular users: only own products
+    // Regular users only own products
    
     if (product.userId !== req.userId) {
       throw new ForbiddenException(t("cannotEditProduct", language));
