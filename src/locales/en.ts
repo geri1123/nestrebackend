@@ -3,7 +3,12 @@ export const en = {
      agentInactive: "Agent is inactive",
      agencyInactive:"Agency is not active",
       agencySuspended: "Agency is suspended",
-      
+         anotherAgency: "You cannot edit products from another agency",
+    noAgency: "You are not associated with any agency",
+    agentNotFound: "Agent not found",
+    cannotEditOthersProduct: "You do not have permission to edit this product",
+    cannotEditProduct: "You cannot edit this product",
+      accountSuspended:  'Your account is suspended.',
   somethingWentWrong: 'Something went wrong',
   userNotAssociatedWithAgency:"User is not associated with any agency",
    noTokenProvided: "No token provided",

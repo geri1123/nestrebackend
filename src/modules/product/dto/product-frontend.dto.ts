@@ -48,13 +48,18 @@ export class ProductFrontendDto {
     description: 'City where the product is located'
   })
   city: string;
+  @ApiProperty({ 
+    example: 'Active',
+    description: 'product status'
+  })
+  status: string;
 
   @ApiProperty({ 
     example: '2025-10-09T13:00:49.118Z',
     description: 'Product creation timestamp'
   })
   createdAt: string;
-
+  
   @ApiProperty({ 
     type: [ProductImageDto],
     description: 'Array of product images (max 2)'

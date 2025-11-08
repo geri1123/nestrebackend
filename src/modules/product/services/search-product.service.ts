@@ -1,12 +1,12 @@
 // products/search-products.service.ts
 import { Injectable } from '@nestjs/common';
-import { SearchProductsRepo } from '../../repositories/product/search-product.repository';
-import { SearchFiltersDto } from './dto/product-filters.dto';
-import { SupportedLang } from '../../locales/index';
-import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
-import { ProductFrontendDto } from './dto/product-frontend.dto';
-import { ProductImageDto } from './dto/product-frontend.dto';
-import { ProductImageEntity } from './types/product.type';
+import { SearchProductsRepo } from '../../../repositories/product/search-product.repository';
+import { SearchFiltersDto } from '../dto/product-filters.dto';
+import { SupportedLang } from '../../../locales/index';
+import { FirebaseService } from '../../../infrastructure/firebase/firebase.service';
+import { ProductFrontendDto } from '../dto/product-frontend.dto';
+import { ProductImageDto } from '../dto/product-frontend.dto';
+import { ProductImageEntity } from '../types/product.type';
 @Injectable()
 export class SearchProductsService {
   constructor(
@@ -14,8 +14,8 @@ export class SearchProductsService {
     private readonly firebaseservice:FirebaseService
 ) {}
 
-  async getProducts(filters: SearchFiltersDto, language: SupportedLang):Promise<{ products: ProductFrontendDto[]; totalCount: number; currentPage: number; totalPages: number }> {
-    const products = await this.repo.searchProducts(filters, language);
+  async getProducts(filters: SearchFiltersDto, language: SupportedLang ,   isProtectedRoute: boolean = false):Promise<{ products: ProductFrontendDto[]; totalCount: number; currentPage: number; totalPages: number }> {
+    const products = await this.repo.searchProducts(filters, language ,isProtectedRoute);
     const totalCount = await this.repo.getProductsCount(filters, language);
 
     const productsForFrontend: ProductFrontendDto[] = products.map((product) => {
@@ -31,6 +31,7 @@ export class SearchProductsService {
         city: product.city?.name || 'Unknown',
        createdAt: product.createdAt.toISOString(),
         image: images,
+       status:product.status,
         categoryName:
           product.subcategory?.category?.categorytranslation?.[0]?.name || 'No Category',
         subcategoryName:

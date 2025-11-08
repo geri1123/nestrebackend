@@ -1,8 +1,15 @@
 export const it = {
    agentInactive: "L'agente è inattivo",
    agencyInactive: "L'agenzia non è attiva",
+    accountSuspended:  'Il tuo account è sospeso.',
    agencySuspended: "L'agenzia è sospesa",
    somethingWentWrong: 'Qualcosa è andato storto',
+
+     anotherAgency: "Non puoi modificare i prodotti di un'altra agenzia",
+    noAgency: "Non sei associato a nessuna agenzia",
+    agentNotFound: "Agente non trovato",
+    cannotEditOthersProduct: "Non hai il permesso di modificare questo prodotto",
+    cannotEditProduct: "Non puoi modificare questo prodotto",
    userNotAssociatedWithAgency:"L'utente non è associato a nessuna agenzia",
  validationFailed: "Convalida non riuscita",
      userNotAuthenticated: "Utente non autenticato",

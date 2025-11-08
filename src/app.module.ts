@@ -18,6 +18,7 @@ import { UserModule } from './modules/users/users.module';
 import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
 import { AgentModule } from './modules/agent/agent.module';
 import { PermissionsGuard } from './common/guard/permision.guard';
+// import { UserStatusGuard } from './common/guard/user-status.guard';
 @Module({
   imports: [
     AppConfigModule,
@@ -44,17 +45,21 @@ ThrottlerModule.forRoot([
     AppService,
   
       {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard, 
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard, 
-    },
-     {
-      provide: APP_GUARD,
-      useClass: PermissionsGuard,
-    },
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard, 
+  },
+  // {
+  //   provide: APP_GUARD,
+  //   useClass: UserStatusGuard,
+  // },
+  {
+    provide: APP_GUARD,
+    useClass: RolesGuard, 
+  },
+  {
+    provide: APP_GUARD,
+    useClass: PermissionsGuard,
+  }
   ],
 })
 export class AppModule {

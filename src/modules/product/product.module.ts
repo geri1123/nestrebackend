@@ -1,21 +1,22 @@
 import { Module } from "@nestjs/common";
 import { SearchProductsRepo } from "../../repositories/product/search-product.repository";
-import { SearchProductsService } from "./search-product.service";
-import { SearchProductsController } from "./product.controller";
+import { SearchProductsService } from "./services/search-product.service";
+import { SearchProductsController } from "./controller/product.controller";
 import { CreateProductsRepository } from "../../repositories/product/create-product.repository";
-import { CreateProductService } from "./create-product.service";
-import { ProductAttributeValueService } from "./product-attribute-value.service";
+import { CreateProductService } from "./services/create-product.service";
+import { ProductAttributeValueService } from "./services/product-attribute-value.service";
 import { ProductAttributeValueRepo } from "../../repositories/product-attribute-value/product-attribute-value.repository";
-import { CreateProductImageService } from "./create-product-images.service";
+import { CreateProductImageService } from "./services/create-product-images.service";
 import { ProductImagesRepository } from "../../repositories/productImage/product-image.repository";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
 import { AttributeRepo } from "../../repositories/attributes/attributes.repository";
-import { UpdateProductService } from "./update-product.service";
+import { UpdateProductService } from "./services/update-product.service";
 import { UserModule } from "../users/users.module";
 import { AgentModule } from "../agent/agent.module";
-import { ProductService } from "./product-service";
+import { ProductService } from "./services/product-service";
+import { ManageProductController } from "./controller/manage-products.controller";
 @Module({
-  controllers: [SearchProductsController],
+  controllers: [SearchProductsController , ManageProductController],
   imports:[UserModule , AgentModule],
   providers: [
     SearchProductsRepo,

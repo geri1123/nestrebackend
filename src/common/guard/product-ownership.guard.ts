@@ -1,9 +1,9 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { AgentService } from '../../modules/agent/agent.service';
-import { AgencyService } from '../../modules/agency/agency.service';
 
-import { ProductService } from '../../modules/product/product-service';
+import { t } from '../../locales';
+import { ProductService } from '../../modules/product/services/product-service';
 
 @Injectable()
 export class ProductOwnershipAndPermissionGuard implements CanActivate {
@@ -25,7 +25,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     // =========================
     if (req.user && req.user.role === 'agency_owner') {
       if (product.agencyId !== req.agencyId) {
-        throw new ForbiddenException("You cannot edit products from another agency");
+        throw new ForbiddenException(t("anotherAgency",language));
       }
       return true;
     }
@@ -35,10 +35,10 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     
     if (req.user && req.user.role === 'agent') {
       // agent must belong to an agency
-      if (!req.agencyAgentId) throw new ForbiddenException("You are not associated with any agency");
+      if (!req.agencyAgentId) throw new ForbiddenException(t("noAgency", language));
 
       const agent = await this.agentService.getAgentWithPermissions(req.agencyAgentId);
-      if (!agent) throw new ForbiddenException("Agent not found");
+      if (!agent) throw new ForbiddenException(t('agentNotFound', language));
 
       // agent updating own product → allowed
       if (product.userId === req.userId) return true;
@@ -49,14 +49,14 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
         product.agencyId === req.agencyId
       ) return true;
 
-      throw new ForbiddenException("You do not have permission to edit this product");
+      throw new ForbiddenException(t("cannotEditOthersProduct", language));
     }
 
   
     // Regular users: only own products
    
     if (product.userId !== req.userId) {
-      throw new ForbiddenException("You cannot edit this product");
+      throw new ForbiddenException(t("cannotEditProduct", language));
     }
 
     return true;

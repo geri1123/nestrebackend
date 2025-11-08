@@ -1,9 +1,16 @@
 export const al = {
   agentInactive: "Agjenti është i pavlefshëm",
   agencyInactive:"Agjencia nuk është aktive",
-  
+  accountSuspended:  'Llogaria juaj është pezulluar.',
   agencySuspended:" Agjencia është pezulluar",
       somethingWentWrong: 'Diçka shkoi gabim',
+
+ anotherAgency: "Nuk mund të modifikoni produktet e një agjencie tjetër",
+    noAgency: "Nuk jeni i lidhur me asnjë agjenci",
+    agentNotFound: "Agjenti nuk u gjet",
+    cannotEditOthersProduct: "Nuk keni leje për të modifikuar këtë produkt",
+    cannotEditProduct: "Nuk mund të modifikoni këtë produkt",
+
       userNotAssociatedWithAgency:"Përdoruesi nuk është i lidhur me asnjë agjenci",
   validationFailed: "Validimi dështoi",
      userNotAuthenticated: "Përdoruesi nuk është autentikuar",

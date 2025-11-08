@@ -5,6 +5,7 @@ import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { IAgentsRepository } from "./Iagent.repository";
 import { AgentInfo } from "../../modules/agent/types/agent-info";
 import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status, Prisma } from "@prisma/client";
+import { AgentPermissions } from "../../common/types/permision.type";
 
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {
@@ -19,17 +20,33 @@ export class AgentsRepository implements IAgentsRepository {
    
     return agent ? agent.agency_id : null;
   }
-
-    async findByAgencyAndAgent(agencyId: number, agentId: number): Promise<agencyagent | null> {
-    return this.prisma.agencyagent.findUnique({
-      where: {
-        agency_id_agent_id: {
-          agency_id: agencyId,
-          agent_id: agentId,
-        },
+async findByAgencyAndAgent(
+  agencyId: number,
+  agentId: number
+): Promise<(agencyagent & { permission: any }) | null> {
+  return this.prisma.agencyagent.findUnique({
+    where: {
+      agency_id_agent_id: {
+        agency_id: agencyId,
+        agent_id: agentId,
       },
-    });
-  }
+    },
+    include: {
+      permission: true, 
+    },
+  });
+}
+  //   async findByAgencyAndAgent(agencyId: number, agentId: number): Promise<agencyagent | null> {
+  //   return this.prisma.agencyagent.findUnique({
+  //     where: {
+  //       agency_id_agent_id: {
+  //         agency_id: agencyId,
+  //         agent_id: agentId,
+  //       },
+        
+  //     },
+  //   });
+  // }
    async createAgencyAgent(data: Createagentdata): Promise<NewAgent> {
     // create the agent in the database
     const agent = await this.prisma.agencyagent.create({

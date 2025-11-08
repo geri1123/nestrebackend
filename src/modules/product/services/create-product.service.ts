@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from "@nestjs/common";
 import { CreateProductImageService } from "./create-product-images.service";
 import { ProductAttributeValueService } from "./product-attribute-value.service";
-import { SupportedLang, t } from "../../locales";
-import { CreateProductDto } from "./dto/create-product.dto";
-import { CreateProductsRepository } from "../../repositories/product/create-product.repository";
+import { SupportedLang, t } from "../../../locales";
+import { CreateProductDto } from "../dto/create-product.dto";
+import { CreateProductsRepository } from "../../../repositories/product/create-product.repository";
 
 @Injectable()
 export class CreateProductService {
@@ -20,10 +20,10 @@ export class CreateProductService {
        userId: number,
     agencyId?: number 
   ) {
-    // if (!userId) throw new BadRequestException("UserId is required");
+ 
 
     try {
-      // 1️⃣ Create product
+    
       const product = await this.createProductsRepo.createProduct({
         title: dto.title,
         price: dto.price,

@@ -97,9 +97,11 @@ if (request.agency_id !== agencyId) {
     
   });
     
-  if (permissions && Object.keys(permissions).length > 0) {
-    await this.agentpermisonService.addPermissions(agent.id, agencyId, permissions);
-  }
+ await this.agentpermisonService.addPermissions(
+  agent.id,
+  agencyId,
+  permissions && Object.keys(permissions).length > 0 ? permissions : {}
+);
   
 
 await this.emailService.sendAgentWelcomeEmail(

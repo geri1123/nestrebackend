@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { SearchProductsRepo } from "../../repositories/product/search-product.repository";
-import { SupportedLang, t } from "../../locales";
+import { SearchProductsRepo } from "../../../repositories/product/search-product.repository";
+import { SupportedLang, t } from "../../../locales";
 
 @Injectable()
 export class ProductService {

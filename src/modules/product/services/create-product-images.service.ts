@@ -1,8 +1,7 @@
 import { Injectable, BadRequestException } from "@nestjs/common";
-import { ProductImagesRepository } from "../../repositories/productImage/product-image.repository";
-import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
-import { SupportedLang, t } from "../../locales";
-
+import { ProductImagesRepository } from "../../../repositories/productImage/product-image.repository";
+import { FirebaseService } from "../../../infrastructure/firebase/firebase.service";
+import { SupportedLang,t } from "../../../locales";
 @Injectable()
 export class CreateProductImageService {
   constructor(

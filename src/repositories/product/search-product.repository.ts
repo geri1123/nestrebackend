@@ -19,8 +19,8 @@ async getProductForPermissionCheck(
     },
   });
 }
-  async searchProducts(filters: SearchFiltersDto, language: SupportedLang):Promise<any[]>{
-    const whereConditions: any = this.buildWhereConditions(filters, language);
+  async searchProducts(filters: SearchFiltersDto, language: SupportedLang,   isProtectedRoute: boolean = false):Promise<any[]>{
+    const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
 
     let orderBy: Record<string, "asc" | "desc"> = { createdAt: "desc" }; 
     if (filters.sortBy) {
@@ -52,6 +52,7 @@ async getProductForPermissionCheck(
         id: true,
         title: true,
         price: true,
+        status:true,
         description: true,
         streetAddress: true,
         createdAt: true,
@@ -122,7 +123,7 @@ async getProductForPermissionCheck(
     return this.prisma.product.count({ where: whereConditions });
   }
 
-private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang) {
+private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang ,isProtectedRoute: boolean = false) {
   const whereConditions: any = {};
 
   // Area filter
@@ -132,7 +133,7 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang)
     if (filters.areaHigh !== undefined) whereConditions.area.lte = filters.areaHigh;
   }
 
-  // ✅ Category & Subcategory filter by ID
+  //  Category & Subcategory filter by ID
   if (filters.subcategoryId || filters.categoryId) {
     whereConditions.subcategory = {};
 
@@ -145,12 +146,12 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang)
     }
   }
 
-  // ✅ Listing Type filter
+  //  Listing Type filter
   if (filters.listingTypeId) {
     whereConditions.listingTypeId = filters.listingTypeId;
   }
 
-  // ✅ Attribute filter by IDs
+  // Attribute filter by IDs
   if (filters.attributes && Object.keys(filters.attributes).length > 0) {
     const attributeConditions: any[] = [];
 
@@ -175,14 +176,14 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang)
     }
   }
 
-  // ✅ Price filter
+  //  Price filter
   if (filters.pricelow !== undefined || filters.pricehigh !== undefined) {
     whereConditions.price = {};
     if (filters.pricelow !== undefined) whereConditions.price.gte = filters.pricelow;
     if (filters.pricehigh !== undefined) whereConditions.price.lte = filters.pricehigh;
   }
 
-  // ✅ City / Country filter
+  //  City / Country filter
   if (filters.cities || filters.country) {
     whereConditions.city = {};
     if (filters.cities && filters.cities.length > 0) {
@@ -198,11 +199,23 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang)
     }
   }
 
-  // ✅ Status filter
-  if (filters.status) {
+  // Status filter
+  // if (filters.status) {
+  //   whereConditions.status = filters.status;
+  // }
+    if (filters.status) {
+    // explicit status from filters always takes priority
     whereConditions.status = filters.status;
+  } else if (isProtectedRoute) {
+    whereConditions.status = { in: ['active', 'draft', 'pending', 'sold', 'inactive'] };
+  } else {
+    // Public route: only active products
+    whereConditions.status = 'active';
   }
+  if (filters.userId) whereConditions.userId = filters.userId;
 
+  
+  if (filters.agencyId) whereConditions.agencyId = filters.agencyId;
   console.log('🔍 WHERE (IDs):', JSON.stringify(whereConditions, null, 2));
   return whereConditions;
 }

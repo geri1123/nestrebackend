@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEnum } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsNumber } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SearchFiltersDto {
@@ -72,4 +72,14 @@ export class SearchFiltersDto {
   @ApiPropertyOptional({ description: 'Offset for pagination', example: 0, type: Number })
   @IsOptional()
   offset?: number;
+
+   @ApiPropertyOptional({ description: 'Filter by user ID (for dashboard/agents)', example: 5, type: Number })
+  @IsOptional()
+  @IsNumber()
+  userId?: number;
+
+  @ApiPropertyOptional({ description: 'Filter by agency ID (for dashboard/owners)', example: 3, type: Number })
+  @IsOptional()
+  @IsNumber()
+  agencyId?: number;
 }
