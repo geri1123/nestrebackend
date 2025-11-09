@@ -117,11 +117,19 @@ async getProductForPermissionCheck(
       },
     });
   }
-
-  async getProductsCount(filters: SearchFiltersDto, language: SupportedLang): Promise<number> {
-    const whereConditions: any = this.buildWhereConditions(filters, language);
-    return this.prisma.product.count({ where: whereConditions });
-  }
+  
+async getProductsCount(
+  filters: SearchFiltersDto,
+  language: SupportedLang,
+  isProtectedRoute: boolean = false
+): Promise<number> {
+  const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
+  return this.prisma.product.count({ where: whereConditions });
+}
+  // async getProductsCount(filters: SearchFiltersDto, language: SupportedLang): Promise<number> {
+  //   const whereConditions: any = this.buildWhereConditions(filters, language);
+  //   return this.prisma.product.count({ where: whereConditions });
+  // }
 
 private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang ,isProtectedRoute: boolean = false) {
   const whereConditions: any = {};

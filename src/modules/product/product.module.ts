@@ -15,6 +15,7 @@ import { UserModule } from "../users/users.module";
 import { AgentModule } from "../agent/agent.module";
 import { ProductService } from "./services/product-service";
 import { ManageProductController } from "./controller/manage-products.controller";
+import { SearchFiltersHelper } from "./utils/search-filters.helper";
 @Module({
   controllers: [SearchProductsController , ManageProductController],
   imports:[UserModule , AgentModule],
@@ -29,7 +30,8 @@ import { ManageProductController } from "./controller/manage-products.controller
     ProductImagesRepository,   
     AttributeRepo,
     UpdateProductService,
-    ProductService       
+    ProductService,
+    SearchFiltersHelper       
 
   ],
   exports:[ProductService]

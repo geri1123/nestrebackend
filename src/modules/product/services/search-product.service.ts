@@ -16,7 +16,7 @@ export class SearchProductsService {
 
   async getProducts(filters: SearchFiltersDto, language: SupportedLang ,   isProtectedRoute: boolean = false):Promise<{ products: ProductFrontendDto[]; totalCount: number; currentPage: number; totalPages: number }> {
     const products = await this.repo.searchProducts(filters, language ,isProtectedRoute);
-    const totalCount = await this.repo.getProductsCount(filters, language);
+    const totalCount = await this.repo.getProductsCount(filters, language,isProtectedRoute);
 
     const productsForFrontend: ProductFrontendDto[] = products.map((product) => {
       const images: ProductImageDto[]  = product.productimage.map((img:ProductImageEntity) => ({
