@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { SearchProductsRepo } from "../../repositories/product/search-product.repository";
 import { SearchProductsService } from "./services/search-product.service";
 import { SearchProductsController } from "./controller/product.controller";
-import { CreateProductsRepository } from "../../repositories/product/create-product.repository";
+import { ProductsRepository } from "../../repositories/product/product.repository";
 import { CreateProductService } from "./services/create-product.service";
 import { ProductAttributeValueService } from "./services/product-attribute-value.service";
 import { ProductAttributeValueRepo } from "../../repositories/product-attribute-value/product-attribute-value.repository";
@@ -23,7 +23,7 @@ import { SearchFiltersHelper } from "./utils/search-filters.helper";
     SearchProductsRepo,
     ProductAttributeValueRepo,
     ProductAttributeValueService,
-    CreateProductsRepository,
+    ProductsRepository,
     CreateProductService,
     SearchProductsService,
     CreateProductImageService, 

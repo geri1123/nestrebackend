@@ -2,14 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductAttributeValueService } from './product-attribute-value.service';
 import { SupportedLang, t } from '../../../locales';
 import { UpdateProductDto } from '../dto/update-product.dto';
-import { CreateProductsRepository } from '../../../repositories/product/create-product.repository';
+import { ProductsRepository } from '../../../repositories/product/product.repository';
 import { CreateProductImageService } from './create-product-images.service';
 import { FirebaseService } from '../../../infrastructure/firebase/firebase.service';
 
 @Injectable()
 export class UpdateProductService {
   constructor(
-    private readonly createProductRepo: CreateProductsRepository,
+    private readonly createProductRepo: ProductsRepository,
     private readonly productAttributeValueService: ProductAttributeValueService,
     private readonly productImageService: CreateProductImageService,
     private readonly firebaseService: FirebaseService,

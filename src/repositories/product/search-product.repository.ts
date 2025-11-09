@@ -7,18 +7,7 @@ import { IsearchProductRepository } from "./Isearch-product.repository.js";
 @Injectable()
 export class SearchProductsRepo implements IsearchProductRepository{
   constructor(private prisma: PrismaService) {}
-async getProductForPermissionCheck(
-  id: number,
-): Promise<{ id: number; userId: number | null; agencyId: number | null } | null> {
-  return this.prisma.product.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      userId: true,
-      agencyId: true,
-    },
-  });
-}
+
   async searchProducts(filters: SearchFiltersDto, language: SupportedLang,   isProtectedRoute: boolean = false):Promise<any[]>{
     const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
 
@@ -113,6 +102,7 @@ async getProductForPermissionCheck(
             },
           },
         },
+        user:{select:{username:true}},
         agency: { select: { agency_name: true, logo: true } },
       },
     });
@@ -126,10 +116,7 @@ async getProductsCount(
   const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
   return this.prisma.product.count({ where: whereConditions });
 }
-  // async getProductsCount(filters: SearchFiltersDto, language: SupportedLang): Promise<number> {
-  //   const whereConditions: any = this.buildWhereConditions(filters, language);
-  //   return this.prisma.product.count({ where: whereConditions });
-  // }
+
 
 private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang ,isProtectedRoute: boolean = false) {
   const whereConditions: any = {};

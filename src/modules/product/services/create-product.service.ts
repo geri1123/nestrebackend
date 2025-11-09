@@ -3,14 +3,13 @@ import { CreateProductImageService } from "./create-product-images.service";
 import { ProductAttributeValueService } from "./product-attribute-value.service";
 import { SupportedLang, t } from "../../../locales";
 import { CreateProductDto } from "../dto/create-product.dto";
-import { CreateProductsRepository } from "../../../repositories/product/create-product.repository";
-
+import { ProductsRepository } from "../../../repositories/product/product.repository";
 @Injectable()
 export class CreateProductService {
   constructor(
     private readonly createProductImageService: CreateProductImageService,
     private readonly productAttributeValueService: ProductAttributeValueService,
-    private readonly createProductsRepo: CreateProductsRepository
+    private readonly createProductsRepo: ProductsRepository
   ) {}
 
   async createProduct(

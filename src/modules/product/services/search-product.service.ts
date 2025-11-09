@@ -7,6 +7,7 @@ import { FirebaseService } from '../../../infrastructure/firebase/firebase.servi
 import { ProductFrontendDto } from '../dto/product-frontend.dto';
 import { ProductImageDto } from '../dto/product-frontend.dto';
 import { ProductImageEntity } from '../types/product.type';
+import { userInfo } from 'os';
 @Injectable()
 export class SearchProductsService {
   constructor(
@@ -19,7 +20,7 @@ export class SearchProductsService {
     const totalCount = await this.repo.getProductsCount(filters, language,isProtectedRoute);
 
     const productsForFrontend: ProductFrontendDto[] = products.map((product) => {
-      const images: ProductImageDto[]  = product.productimage.map((img:ProductImageEntity) => ({
+      const images: ProductImageDto[]  = product.productimage.map((img:ProductImageDto) => ({
         imageUrl: img.imageUrl ? this.firebaseservice.getPublicUrl(img.imageUrl) : null,
         
       }));
@@ -38,6 +39,7 @@ export class SearchProductsService {
           product.subcategory?.subcategorytranslation?.[0]?.name || 'No Subcategory',
         listingTypeName:
           product.listing_type?.listing_type_translation?.[0]?.name || 'No Listing Type',
+              user: { username: product.user?.username || 'Unknown' }, 
         agency: product.agency
           ? {
               agency_name: product.agency.agency_name || 'Unknown Agency',

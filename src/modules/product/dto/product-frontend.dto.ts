@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-
+import { user_role } from '@prisma/client';
+//product Images
 export class ProductImageDto {
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/image.png', 
@@ -8,22 +9,64 @@ export class ProductImageDto {
   })
   imageUrl: string | null;
 }
+export class ProductUserDto {
+  @ApiProperty({ nullable: true, description: 'Username of user' })
+  username: string;
 
-export class AgencyDto {
+  @ApiProperty({ nullable: true, description: 'example@yahoo.com' })
+  email?: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Arthur' })
+  first_name?: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Bond' })
+  last_name?: string | null;
+
+  @ApiProperty({ nullable: true, description: '068*******' })
+  phone?: string | null;
+
+  @ApiProperty({ nullable: true, description: 'agent | agency_owner | user' })
+  role?: user_role;
+}
+
+//Product agency dto
+export class ProductAgencyDto {
   @ApiProperty({ 
     example: 'Real Estate Agency',
     description: 'Name of the real estate agency'
   })
-  agency_name: string;
+  agency_name?: string;
 
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/logo.webp', 
     nullable: true,
     description: 'Public URL of the agency logo'
   })
-  logo: string | null;
+  logo?: string | null;
+
+   @ApiProperty({ 
+    example: 'Paris', 
+  
+    description: 'address'
+  })
+  address?: string|null ;
+  @ApiProperty({ 
+    example: '12455455', 
+  
+    description: 'agency phone'
+  })
+  phone?: string|null ;
+   @ApiProperty({ 
+    example: '23/2/2012', 
+  
+    description: 'agency creation'
+  })
+  created_at?: Date ;
+
 }
 
+
+//product for frontend
 export class ProductFrontendDto {
   @ApiProperty({ 
     example: 132,
@@ -31,78 +74,44 @@ export class ProductFrontendDto {
   })
   id: number;
 
-  @ApiProperty({ 
-    example: 'Beautiful apartment in city center',
-    description: 'Product title'
-  })
+  @ApiProperty({  example: 'Beautiful apartment in city center',description: 'Product title'})
   title: string;
 
-  @ApiProperty({ 
-    example: 120000,
-    description: 'Product price'
-  })
+  @ApiProperty({ example: 120000, description: 'Product price'})
   price: number;
 
-  @ApiProperty({ 
-    example: 'Tirana',
-    description: 'City where the product is located'
-  })
+  @ApiProperty({ example: 'Tirana',description: 'City where the product is located'})
   city: string;
-  @ApiProperty({ 
-    example: 'Active',
-    description: 'product status'
-  })
+  @ApiProperty({ example: 'Active', description: 'product status'})
   status: string;
 
-  @ApiProperty({ 
-    example: '2025-10-09T13:00:49.118Z',
-    description: 'Product creation timestamp'
-  })
+  @ApiProperty({ example: '2025-10-09T13:00:49.118Z',description: 'Product creation timestamp'})
   createdAt: string;
   
-  @ApiProperty({ 
-    type: [ProductImageDto],
-    description: 'Array of product images (max 2)'
-  })
+  @ApiProperty({ type: [ProductImageDto], description: 'Array of product images (max 2)'})
   image: ProductImageDto[];
 
-  @ApiProperty({ 
-    example: 'Residential',
-    description: 'Category name in selected language'
-  })
+  @ApiProperty({ example: 'Residential', description: 'Category name in selected language'})
   categoryName: string;
 
-  @ApiProperty({ 
-    example: 'Apartment',
-    description: 'Subcategory name in selected language'
-  })
+  @ApiProperty({  example: 'Apartment',description: 'Subcategory name in selected language' })
   subcategoryName: string;
 
-  @ApiProperty({ 
-    example: 'For Sale',
-    description: 'Listing type name in selected language'
-  })
+  @ApiProperty({ example: 'For Sale',description: 'Listing type name in selected language'})
   listingTypeName: string;
+@ApiProperty({nullable: true,description: 'Username of user'})
+user: ProductUserDto | null;
+ 
+  @ApiProperty({ type: ProductAgencyDto, nullable: true,description: 'Agency information if product belongs to an agency'})
 
-  @ApiProperty({ 
-    type: AgencyDto, 
-    nullable: true,
-    description: 'Agency information if product belongs to an agency'
-  })
-  agency: AgencyDto | null;
+  agency: ProductAgencyDto | null;
 }
 
 export class ProductsSearchResponseDto {
-  @ApiProperty({ 
-    type: [ProductFrontendDto],
-    description: 'Array of products matching the search criteria'
-  })
+  @ApiProperty({ type: [ProductFrontendDto],description: 'Array of products matching the search criteria'})
   products: ProductFrontendDto[];
 
-  @ApiProperty({ 
-    example: 48,
-    description: 'Total number of products matching the filters'
-  })
+  @ApiProperty({ example: 48,description: 'Total number of products matching the filters'})
   totalCount: number;
 
   @ApiProperty({ 
