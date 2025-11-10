@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { AgencyRepository } from "../../repositories/agency/agency.repository";
 import { RegisterAgencyOwnerDto } from "../auth/dto/register-agency-owner.dto";
 import { SupportedLang, t } from "../../locales";
 
 import { AgencyInfo } from "./types/agency-info";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
+import { RequestWithUser } from "../../common/types/request-with-user.interface";
 @Injectable()
 export class AgencyService {
   constructor(
@@ -100,29 +101,46 @@ async getPaginatedAgencies(page = 1, limit = 10) {
     agencies: agencies.map(a => ({
       id: a.id,
       name: a.agency_name,
-      logo: a.logo ? this.firebaseService.getPublicUrl(a.logo) : null, // map each logo
+      logo: a.logo ? this.firebaseService.getPublicUrl(a.logo) : null,
       address: a.address,
       created_at: a.created_at.toLocaleDateString('en-GB'),
     })),
   };
 }
-async getAgencyInfoByOwner( agencyid:number ,language: SupportedLang='al'): Promise<AgencyInfo | null> {
-  const agencyinfo= this.agencyRepo.getAgencyInfoByOwner(agencyid);
-  if(!agencyinfo){
+async getAgencyInfo(
+  agencyId: number,
+  language: SupportedLang = 'al',
+  isProtectedRoute = false,
+  req?: RequestWithUser
+): Promise<AgencyInfo | null> {
+  const agencyInfo = await this.agencyRepo.getAgencyInfoByOwner(agencyId); 
+
+  if (!agencyInfo) {
     throw new BadRequestException({
       success: false,
       message: t('agencyNotFound', language),
     });
   }
-  return agencyinfo;
+
+  // Public page
+ if (!isProtectedRoute && agencyInfo.status !== 'active') {
+  throw new NotFoundException(t('agencyNotFound', language));
+}
+  // check ownership or permissions
+  if (isProtectedRoute) {
+    const isOwner = req?.user?.id === agencyInfo.owner_user_id;
+    const isAgent =
+      req?.user?.role === 'agent' && req?.agencyId === agencyInfo.id;
+
+    if (!isOwner && !isAgent) {
+      throw new ForbiddenException({
+    success: false,
+    message: t('unauthorizedAccess', language),
+  });
+    }
+  }
+
+  return agencyInfo;
 }
 
-
-// async getUnderReviewRequestsForAgencyOwner(
-//   agencyId: number, 
-//   limit = 10, 
-//   offset = 0
-// ) {
-//   return this.registrationRequestService.getunderreviewRequests(agencyId, limit, offset);
-// }
 }

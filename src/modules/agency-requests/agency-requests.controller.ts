@@ -44,11 +44,11 @@ export class AgencyRequestsController {
   }
   
 
-
-
-@Patch('registration-requests/:id/status')
 @Roles('agent', 'agency_owner')
  @Permissions(['can_approve_requests']) 
+
+@Patch('registration-requests/:id/status')
+
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,

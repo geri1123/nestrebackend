@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { user_role } from '@prisma/client';
+import { user_role, user_status } from '@prisma/client';
+import { UserStatus } from '../../auth/types/create-user-input';
 //product Images
 export class ProductImageDto {
   @ApiProperty({ 
@@ -27,6 +28,8 @@ export class ProductUserDto {
 
   @ApiProperty({ nullable: true, description: 'agent | agency_owner | user' })
   role?: user_role;
+  @ApiProperty({nullable:true  , description:"active | suspended| inactive "})
+  status?:user_status
 }
 
 //Product agency dto
@@ -50,6 +53,12 @@ export class ProductAgencyDto {
     description: 'address'
   })
   address?: string|null ;
+   @ApiProperty({ 
+    example: 'suspended', 
+  
+    description: 'agency status'
+  })
+  status?: string|null ;
   @ApiProperty({ 
     example: '12455455', 
   
@@ -99,6 +108,10 @@ export class ProductFrontendDto {
 
   @ApiProperty({ example: 'For Sale',description: 'Listing type name in selected language'})
   listingTypeName: string;
+  @ApiProperty({example:"1", description:"user id in product"})
+  userId:number;
+  @ApiProperty({example:"3", description:"agencyid in product if exist"})
+  agencyId?:number |null;
 @ApiProperty({nullable: true,description: 'Username of user'})
 user: ProductUserDto | null;
  

@@ -32,6 +32,7 @@ export class SearchProductsService {
         city: product.city?.name || 'Unknown',
        createdAt: product.createdAt.toISOString(),
         image: images,
+        userId:product.userId,
        status:product.status,
         categoryName:
           product.subcategory?.category?.categorytranslation?.[0]?.name || 'No Category',

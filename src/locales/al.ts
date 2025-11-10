@@ -4,7 +4,7 @@ export const al = {
   accountSuspended:  'Llogaria juaj është pezulluar.',
   agencySuspended:" Agjencia është pezulluar",
       somethingWentWrong: 'Diçka shkoi gabim',
-
+     unauthorizedAccess: "You are not authorized to access this agency information.",
  anotherAgency: "Nuk mund të modifikoni produktet e një agjencie tjetër",
     noAgency: "Nuk jeni i lidhur me asnjë agjenci",
     agentNotFound: "Agjenti nuk u gjet",

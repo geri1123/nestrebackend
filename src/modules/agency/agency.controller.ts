@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Param, Query, Req, UnauthorizedException } from '@nestjs/common';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { AgencyService } from './agency.service';
@@ -6,10 +6,11 @@ import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../locales';
 import type { RequestWithUser } from '../../common/types/request-with-user.interface';
 import { Roles } from '../../common/decorators/roles.decorator';
+import  { Permissions } from '../../common/decorators/permissions.decorator';
 
 @Controller('agencies')
 export class AgencyController {
-  constructor(private readonly agencyservice: AgencyService) {}
+  constructor(private readonly agencyService: AgencyService) {}
   @Public()
   @Get()
 
@@ -17,23 +18,27 @@ async getAllAgencies(
   @Query('page') page = 1,
   @Query('limit') limit = 10,
 ) {
-  return this.agencyservice.getPaginatedAgencies(Number(page), Number(limit));
+  return this.agencyService.getPaginatedAgencies(Number(page), Number(limit));
 }
 
-@Roles('agency_owner')
-@Get('info')
-async getAgencyInfo(@Req() req: RequestWithUser) {
-  if (!req.userId) {
-   throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-  }
-  if(!req.agencyId){
-    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+@Roles('agency_owner', 'agent')
+@Get('agencyinfo')
+async getAgencyInfoPrivate(@Req() req: RequestWithUser) {
+   if (!req.agencyId) {
+    throw new ForbiddenException(t('noAgency', req.language));
   }
 
-  
-  const language: SupportedLang = req.language || 'al';
- const agencyId = req.agencyId;
-  return this.agencyservice.getAgencyInfoByOwner( agencyId,language);
+  return this.agencyService.getAgencyInfo(req.agencyId, req.language, true, req);
 }
 
+@Public()
+@Get(':id/detail')
+async getAgencyInfoPublic(
+  @Param('id') agencyId: number,
+  @Req() req: RequestWithUser 
+) {
+  const language = req.language;
+  // Public route: anyone can view active agencies
+  return this.agencyService.getAgencyInfo(agencyId, language, false, req);
+}
 }

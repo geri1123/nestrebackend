@@ -193,11 +193,6 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang 
       };
     }
   }
-
-  // Status filter
-  // if (filters.status) {
-  //   whereConditions.status = filters.status;
-  // }
     if (filters.status) {
     // explicit status from filters always takes priority
     whereConditions.status = filters.status;
@@ -209,7 +204,19 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang 
   }
   if (filters.userId) whereConditions.userId = filters.userId;
 
-  
+  whereConditions.user = {
+  status: { not: 'suspended' },
+};
+
+whereConditions.AND = [
+  ...(whereConditions.AND || []),
+  {
+    OR: [
+      { agency: null },
+      { agency: { status: { not: 'suspended' } } },
+    ],
+  },
+];
   if (filters.agencyId) whereConditions.agencyId = filters.agencyId;
   console.log('🔍 WHERE (IDs):', JSON.stringify(whereConditions, null, 2));
   return whereConditions;

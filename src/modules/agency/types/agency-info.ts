@@ -12,4 +12,12 @@ export type AgencyInfo = {
   owner_user_id: number;
   created_at: Date;
   updated_at: Date | null;
+
+  // Nested user info
+  user: {
+    username: string;
+    first_name: string | null;
+    last_name: string | null;
+    role:string | null
+  };
 };

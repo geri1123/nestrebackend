@@ -1,4 +1,4 @@
-import {  Body, Controller, ForbiddenException, Param, Patch, Post, Req, UnauthorizedException, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import {  Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UpdateProductService } from "../services/update-product.service";
 import { CreateProductService } from "../services/create-product.service";
 import { FilesInterceptor } from "@nestjs/platform-express";
@@ -11,12 +11,17 @@ import { CreateProductDto } from "../dto/create-product.dto";
 import type { RequestWithUser } from "../../../common/types/request-with-user.interface";
 import { UpdateProductDto } from "../dto/update-product.dto";
 import {t } from "../../../locales";
+import { ProductsSearchResponseDto } from "../dto/product-frontend.dto";
+import { SearchProductsService } from "../services/search-product.service";
+import { SearchFiltersHelper } from "../utils/search-filters.helper";
 
 @Controller('products') 
 export class ManageProductController{
     constructor(  
          private readonly createproductService: CreateProductService,
-        private readonly updateProductService:UpdateProductService
+        private readonly updateProductService:UpdateProductService,
+        private readonly searchfilter:SearchFiltersHelper,
+        private readonly searchProductsService:SearchProductsService
     ){}
 
        @Post("add")
@@ -42,7 +47,7 @@ const errors = await validate(dto);
   }
 
 @UseGuards(ProductOwnershipAndPermissionGuard)
-@Permissions(["can_edit_others_post"])
+// @Permissions(["can_edit_others_post"])
 
   @Patch('update/:id')
 @UseInterceptors(FilesInterceptor('images', 7))
@@ -72,4 +77,41 @@ const agencyId=req.agencyId;
     images, 
   );
 }
+
+
+@Get("dashboard/products")
+async getDashboardProducts(
+  @Req() req: RequestWithUser, 
+  @Query() rawQuery: Record<string, any>,
+  @Query('page') page = '1',
+  @Query('view') view: 'mine' | 'agency' = 'mine' 
+): Promise<ProductsSearchResponseDto> {
+   const language = req.language;
+  const filters = this.searchfilter.parse(rawQuery, page , );
+
+  if (view === 'mine') {
+   
+    filters.userId = req.userId;
+    // filters.status = undefined; 
+  } else if (view === 'agency') {
+    filters.agencyId = req.agencyId!;
+
+    if (req.user.role === 'agent' && !req.agentPermissions?.can_view_all_posts) {
+      
+      filters.status = 'active';
+    } 
+    else if (rawQuery.status) {
+      filters.status = rawQuery.status; 
+    }
+  }
+
+ 
+  const isProtectedRoute =
+    view === 'mine' || 
+    (view === 'agency' && (req.user.role === 'agency_owner' || req.agentPermissions?.can_view_all_posts));
+
+  return this.searchProductsService.getProducts(filters, language, isProtectedRoute);
+}
+
+
 }

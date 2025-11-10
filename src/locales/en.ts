@@ -3,6 +3,7 @@ export const en = {
      agentInactive: "Agent is inactive",
      agencyInactive:"Agency is not active",
       agencySuspended: "Agency is suspended",
+     unauthorizedAccess: "You are not authorized to access this agency information.",
          anotherAgency: "You cannot edit products from another agency",
     noAgency: "You are not associated with any agency",
     agentNotFound: "Agent not found",

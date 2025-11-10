@@ -8,8 +8,33 @@ import { IAgencyRepository } from './Iagency.repository';
 @Injectable()
 export class AgencyRepository implements IAgencyRepository {
   constructor(private prisma : PrismaService) {}
+//  async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfo | null> {
+//   const agency = await this.prisma.agency.findUnique({
+//     where: { id: agencyId },
+//     select: {
+//       id: true,
+//       agency_name: true,
+//       logo: true,
+//       license_number: true,
+//       phone: true,
+//       website: true,
+//       status: true,
+//       public_code: true,
+//       agency_email: true,
+//       address: true,
+//       owner_user_id: true,
+//       created_at: true,
+//       updated_at: true,
+//     },
+//   });
+
+//   if (!agency) return null;
+
+  
+//   return agency as AgencyInfo;
+// }
  async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfo | null> {
-  const agency = await this.prisma.agency.findFirst({
+  const agency = await this.prisma.agency.findUnique({
     where: { id: agencyId },
     select: {
       id: true,
@@ -25,15 +50,20 @@ export class AgencyRepository implements IAgencyRepository {
       owner_user_id: true,
       created_at: true,
       updated_at: true,
+      user: { 
+        select: {
+          username: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
     },
   });
 
   if (!agency) return null;
 
-  
   return agency as AgencyInfo;
 }
- 
 
   async licenseExists(license: string): Promise<boolean> {
     const agency = await this.prisma.agency.findFirst({
