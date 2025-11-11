@@ -121,58 +121,49 @@ async getAgentsForPublicView(
 
 
 //getagents for logedin agents | agency owner
-async getAgentsForProtectedRoute( agencyId: number,
+async getAgentsForProtectedRoute(
+  agencyId: number,
   page: number = 1,
   limit: number = 10,
-  language: SupportedLang):Promise<AgentPaginationResponseDto> {
- try {
-    const offset = (page - 1) * limit;
+  language: SupportedLang,
+  search?: string,
+  sortBy: 'asc' | 'desc' = 'desc'
+): Promise<AgentPaginationResponseDto> {
+  const offset = (page - 1) * limit;
 
-    const [agentsPage, totalCount] = await Promise.all([
-     this.agentrepo.getAgentsByAgency(agencyId, undefined, limit, offset, true),
-    this.agentrepo.getAgentsCountByAgency(agencyId, true),
+  const [agentsPage, totalCount] = await Promise.all([
+    this.agentrepo.getAgentsByAgency(agencyId, undefined, limit, offset, true, search, sortBy),
+    this.agentrepo.getAgentsCountByAgency(agencyId, true, search),
+  ]);
 
-    ]);
-
-    if (!agentsPage || agentsPage.length === 0) {
-      return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
-    }
-
-    const agentsForFrontend = agentsPage.map(agent => ({
-      id: agent.id,
-    
-     
-     
-      role_in_agency: agent.role_in_agency,
-      
-     
-      status: agent.status,
-      created_at: agent.created_at,
-      
-      agentUser: agent.agentUser
-        ? {
-            id: agent.agentUser.id,
-            username: agent.agentUser.username,
-            email: agent.agentUser.email,
-            
-            first_name: agent.agentUser.first_name ?? null,
-            last_name: agent.agentUser.last_name ?? null,
-            profile_image:agent.agentUser.profile_img? 
-            this.firebaseService.getPublicUrl(agent.agentUser.profile_img) : null,
-           
-          }
-        : null,
-      
-    }));
-
-    return {
-      agents: agentsForFrontend,
-      totalCount,
-      totalPages: Math.ceil(totalCount / limit),
-      currentPage: page,
-    };
-  } catch (error) {
-    throw new InternalServerErrorException(t('somethingWentWrong', language));
+  if (!agentsPage || agentsPage.length === 0) {
+    return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
   }
+
+  const agentsForFrontend = agentsPage.map(agent => ({
+    id: agent.id,
+    role_in_agency: agent.role_in_agency,
+    status: agent.status,
+    created_at: agent.created_at,
+    agentUser: agent.agentUser
+      ? {
+          id: agent.agentUser.id,
+          username: agent.agentUser.username,
+          email: agent.agentUser.email,
+          first_name: agent.agentUser.first_name ?? null,
+          last_name: agent.agentUser.last_name ?? null,
+          profile_image: agent.agentUser.profile_img
+            ? this.firebaseService.getPublicUrl(agent.agentUser.profile_img)
+            : null,
+        }
+      : null,
+  }));
+
+  return {
+    agents: agentsForFrontend,
+    totalCount,
+    totalPages: Math.ceil(totalCount / limit),
+    currentPage: page,
+  };
 }
 }

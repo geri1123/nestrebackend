@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException, InternalServerErrorException } from "@nestjs/common";
 import { AgencyRepository } from "../../repositories/agency/agency.repository";
 import { RegisterAgencyOwnerDto } from "../auth/dto/register-agency-owner.dto";
 import { SupportedLang, t } from "../../locales";
@@ -123,6 +123,7 @@ async getAgencyInfo(
   isProtectedRoute = false,
   req?: RequestWithUser
 ): Promise<AgencyInfo | null> {
+
   const agencyInfo = await this.agencyRepo.getAgencyInfoByOwner(agencyId);
 
   if (!agencyInfo) {
@@ -137,7 +138,6 @@ async getAgencyInfo(
     throw new NotFoundException(t('agencyNotFound', language));
   }
 
-  // If protected route, just return agencyInfo, guard will handle suspension
   return agencyInfo;
 }
 // async getAgencyInfo(

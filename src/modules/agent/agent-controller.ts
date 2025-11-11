@@ -32,31 +32,31 @@ export class AgentController{
   }
 
 @UseGuards(UserStatusGuard)
- @Roles('agency_owner', 'agent')
-    @Get("dashboard")
-  
-  async getPrivateAgents(
-    
- 
-     @Req() req:RequestWithUser,
-    @Query("page") page?: string,
-    @Query("limit") limit?: string,
- 
-  ) {
-    const language = req.language;
-  const agencyId=req.agencyId;
-if(!agencyId){
-    return null;
-}
- 
-    const pageNumber = parseInt(page ?? "1", 10);
-    const limitNumber = parseInt(limit ?? "10", 10);
+@Roles('agency_owner', 'agent')
+@Get("dashboard")
+async getPrivateAgents(
+  @Req() req: RequestWithUser,
+  @Query("page") page?: string,
+  @Query("limit") limit?: string,
+  @Query("search") search?: string,
+  @Query("sort") sort?: 'asc' | 'desc',
+  @Query("status") status?:string,
+) {
+  const language = req.language;
+  const agencyId = req.agencyId;
+  if (!agencyId) return null;
 
-    return this.agentService.getAgentsForProtectedRoute(
-      agencyId,
-      pageNumber,
-      limitNumber,
-      language
-    );
-  }
+  const pageNumber = parseInt(page ?? "1", 10);
+  const limitNumber = parseInt(limit ?? "10", 10);
+  const sortBy = sort ?? 'desc';
+
+  return this.agentService.getAgentsForProtectedRoute(
+    agencyId,
+    pageNumber,
+    limitNumber,
+    language,
+    search,
+    sortBy,
+  );
+}
 }

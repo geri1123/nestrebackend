@@ -93,19 +93,30 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
       },
     });
   }
-async getAgentsByAgency(
+
+  async getAgentsByAgency(
   agencyId: number,
   agentStatus?: agencyagent_status,
   limit?: number,
   offset?: number,
-  showAllStatuses: boolean = false, // 👈 new flag
+  showAllStatuses: boolean = false,
+  search?: string,
+  sortBy: 'asc' | 'desc' = 'desc'
 ) {
   return this.prisma.agencyagent.findMany({
     where: {
       agency_id: agencyId,
-      ...(showAllStatuses
-        ? {} // ✅ show everything (terminated, suspended, active)
-        : { status: 'active' }), // ✅ only active for public
+      ...(showAllStatuses ? {} : { status: 'active' }),
+      ...(agentStatus ? { status: agentStatus } : {}),
+      ...(search
+        ? {
+            OR: [
+              { agentUser: { is: { username: { contains: search} } } },
+              { agentUser: { is: { first_name: { contains: search} } } },
+              { agentUser: { is: { last_name: { contains: search } } } },
+            ],
+          }
+        : {}),
     },
     include: {
       agentUser: {
@@ -121,23 +132,77 @@ async getAgentsByAgency(
       },
       permission: true,
     },
-    orderBy: { created_at: 'desc' },
+    orderBy: { created_at: sortBy },
     take: limit,
     skip: offset,
   });
 }
-
 async getAgentsCountByAgency(
   agencyId: number,
   showAllStatuses: boolean = false,
+  search?: string
 ) {
   return this.prisma.agencyagent.count({
     where: {
       agency_id: agencyId,
       ...(showAllStatuses ? {} : { status: 'active' }),
+      ...(search
+        ? {
+            OR: [
+              { agentUser: { is: { username: { contains: search } } } },
+              { agentUser: { is: { first_name: { contains: search } } } },
+              { agentUser: { is: { last_name: { contains: search } } } },
+            ],
+          }
+        : {}),
     },
   });
 }
+// async getAgentsByAgency(
+//   agencyId: number,
+//   agentStatus?: agencyagent_status,
+//   limit?: number,
+//   offset?: number,
+//   showAllStatuses: boolean = false, 
+// ) {
+//   return this.prisma.agencyagent.findMany({
+//     where: {
+//       agency_id: agencyId,
+//       ...(showAllStatuses
+//         ? {} 
+//         : { status: 'active' }),
+//     },
+//     include: {
+//       agentUser: {
+//         select: {
+//           id: true,
+//           username: true,
+//           email: true,
+//           first_name: true,
+//           last_name: true,
+//           profile_img: true,
+//           status: true,
+//         },
+//       },
+//       permission: true,
+//     },
+//     orderBy: { created_at: 'desc' },
+//     take: limit,
+//     skip: offset,
+//   });
+// }
+
+// async getAgentsCountByAgency(
+//   agencyId: number,
+//   showAllStatuses: boolean = false,
+// ) {
+//   return this.prisma.agencyagent.count({
+//     where: {
+//       agency_id: agencyId,
+//       ...(showAllStatuses ? {} : { status: 'active' }),
+//     },
+//   });
+// }
 //  async getAgentsCountByAgency(
 //   agencyId: number,
 //   agentStatus?: agencyagent_status,

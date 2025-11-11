@@ -17,13 +17,18 @@ findAgencyIdByAgent(userId: number): Promise<number | null>
 getAgentWithPermissions(agencyAgentId: number): Promise<
   (agencyagent & { permission: agencyagent_permission | null }) | null
 >;
- getAgentsCountByAgency(
-  agencyId: number,
-  showAllStatuses: boolean ,
-) :Promise<number>
-   getAgentsByAgency(
-  agencyId: number,
-  agentStatus?: agencyagent_status,
-): Promise<(agencyagent & { permission: agencyagent_permission | null, agentUser: any })[]>
+//  getAgentsCountByAgency(
+//   agencyId: number,
+//   showAllStatuses: boolean ,
+// ) :Promise<number>
+//     getAgentsByAgency(
+//   agencyId: number,
+//   agentStatus?: agencyagent_status,
+//   limit?: number,
+//   offset?: number,
+//   showAllStatuses: boolean,
+//   search?: string,           
+//   sortBy: 'asc' | 'desc' = 'desc' 
+// ): Promise<(agencyagent & { permission: agencyagent_permission | null, agentUser: any })[]>
 
 }
