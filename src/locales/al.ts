@@ -1,10 +1,12 @@
 export const al = {
-  agentInactive: "Agjenti është i pavlefshëm",
+  agentInactive: "Agjenti është jo aktiv ose kontrata ka mbaruar",
   agencyInactive:"Agjencia nuk është aktive",
   accountSuspended:  'Llogaria juaj është pezulluar.',
   agencySuspended:" Agjencia është pezulluar",
+   cannotResendTokenForCurrentStatus: "Nuk mund të dërgohet përsëri token-i i verifikimit për statusin aktual të përdoruesit.",
+
       somethingWentWrong: 'Diçka shkoi gabim',
-     unauthorizedAccess: "You are not authorized to access this agency information.",
+     unauthorizedAccess: "Nuk jeni i autorizuar të aksesoni këto informacione të agjencisë.",
  anotherAgency: "Nuk mund të modifikoni produktet e një agjencie tjetër",
     noAgency: "Nuk jeni i lidhur me asnjë agjenci",
     agentNotFound: "Agjenti nuk u gjet",

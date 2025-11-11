@@ -6,6 +6,7 @@ import { IAgentsRepository } from "./Iagent.repository";
 import { AgentInfo } from "../../modules/agent/types/agent-info";
 import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status, Prisma } from "@prisma/client";
 import { AgentPermissions } from "../../common/types/permision.type";
+import { AgentDto } from "../../modules/agent/dto/agentsinagency.dto";
 
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {
@@ -36,17 +37,7 @@ async findByAgencyAndAgent(
     },
   });
 }
-  //   async findByAgencyAndAgent(agencyId: number, agentId: number): Promise<agencyagent | null> {
-  //   return this.prisma.agencyagent.findUnique({
-  //     where: {
-  //       agency_id_agent_id: {
-  //         agency_id: agencyId,
-  //         agent_id: agentId,
-  //       },
-        
-  //     },
-  //   });
-  // }
+ 
    async createAgencyAgent(data: Createagentdata): Promise<NewAgent> {
     // create the agent in the database
     const agent = await this.prisma.agencyagent.create({
@@ -102,6 +93,65 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
       },
     });
   }
+async getAgentsByAgency(
+  agencyId: number,
+  agentStatus?: agencyagent_status,
+  limit?: number,
+  offset?: number,
+  showAllStatuses: boolean = false, // 👈 new flag
+) {
+  return this.prisma.agencyagent.findMany({
+    where: {
+      agency_id: agencyId,
+      ...(showAllStatuses
+        ? {} // ✅ show everything (terminated, suspended, active)
+        : { status: 'active' }), // ✅ only active for public
+    },
+    include: {
+      agentUser: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          first_name: true,
+          last_name: true,
+          profile_img: true,
+          status: true,
+        },
+      },
+      permission: true,
+    },
+    orderBy: { created_at: 'desc' },
+    take: limit,
+    skip: offset,
+  });
+}
+
+async getAgentsCountByAgency(
+  agencyId: number,
+  showAllStatuses: boolean = false,
+) {
+  return this.prisma.agencyagent.count({
+    where: {
+      agency_id: agencyId,
+      ...(showAllStatuses ? {} : { status: 'active' }),
+    },
+  });
+}
+//  async getAgentsCountByAgency(
+//   agencyId: number,
+//   agentStatus?: agencyagent_status,
+// ){
+//   return this.prisma.agencyagent.count({
+//     where: {
+//       agency_id: agencyId,
+//       ...(agentStatus ? { status: agentStatus } : {}),
+//       agentUser: {
+//         status: 'active',
+//       },
+//     },
+//   });
+// }
 }
 
 

@@ -1,14 +1,20 @@
-import {  BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {  BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { AgentsRepository } from "../../repositories/agent/agent.repository";
 import { SupportedLang, t } from "../../locales";
 import { Createagentdata } from "./types/create-agent";
 import { error } from "console";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
+import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
+import { type AgentPaginationResponseDto } from "./dto/agentsinagency.dto";
 
 
 @Injectable()
 
 export class AgentService{
-    constructor(private readonly agentrepo:AgentsRepository){}
+    constructor(
+      private readonly agentrepo:AgentsRepository,
+      private readonly firebaseService:FirebaseService
+    ){}
     async ensureIdCardIsUnique(id_card_number: string, language: SupportedLang): Promise<void> {
     const existingAgent = await this.agentrepo.findByIdCardNumber(id_card_number);
     if (existingAgent) {
@@ -55,5 +61,118 @@ export class AgentService{
 
   async getAgentWithPermissions(agencyAgentId: number) {
   return this.agentrepo.getAgentWithPermissions(agencyAgentId);
+}
+
+async getAgentsForPublicView(
+  agencyId: number,
+  page: number = 1,
+  limit: number = 10,
+  language: SupportedLang
+):Promise<AgentPaginationResponseDto> {
+  try {
+    const offset = (page - 1) * limit;
+
+    const [agentsPage, totalCount] = await Promise.all([
+         this.agentrepo.getAgentsByAgency(agencyId, 'active', limit, offset, false),
+    this.agentrepo.getAgentsCountByAgency(agencyId, false),
+    ]);
+
+    if (!agentsPage || agentsPage.length === 0) {
+      return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
+    }
+
+    const agentsForFrontend = agentsPage.map(agent => ({
+      id: agent.id,
+    
+     
+     
+      role_in_agency: agent.role_in_agency,
+      
+     
+      status: agent.status,
+      created_at: agent.created_at,
+      
+      agentUser: agent.agentUser
+        ? {
+            id: agent.agentUser.id,
+            username: agent.agentUser.username,
+            email: agent.agentUser.email,
+            
+            first_name: agent.agentUser.first_name ?? null,
+            last_name: agent.agentUser.last_name ?? null,
+            profile_image:agent.agentUser.profile_img? 
+            this.firebaseService.getPublicUrl(agent.agentUser.profile_img) : null,
+           
+          }
+        : null,
+      
+    }));
+
+    return {
+      agents: agentsForFrontend,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+    };
+  } catch (error) {
+    throw new InternalServerErrorException(t('somethingWentWrong', language));
+  }
+}
+
+
+//getagents for logedin agents | agency owner
+async getAgentsForProtectedRoute( agencyId: number,
+  page: number = 1,
+  limit: number = 10,
+  language: SupportedLang):Promise<AgentPaginationResponseDto> {
+ try {
+    const offset = (page - 1) * limit;
+
+    const [agentsPage, totalCount] = await Promise.all([
+     this.agentrepo.getAgentsByAgency(agencyId, undefined, limit, offset, true),
+    this.agentrepo.getAgentsCountByAgency(agencyId, true),
+
+    ]);
+
+    if (!agentsPage || agentsPage.length === 0) {
+      return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
+    }
+
+    const agentsForFrontend = agentsPage.map(agent => ({
+      id: agent.id,
+    
+     
+     
+      role_in_agency: agent.role_in_agency,
+      
+     
+      status: agent.status,
+      created_at: agent.created_at,
+      
+      agentUser: agent.agentUser
+        ? {
+            id: agent.agentUser.id,
+            username: agent.agentUser.username,
+            email: agent.agentUser.email,
+            
+            first_name: agent.agentUser.first_name ?? null,
+            last_name: agent.agentUser.last_name ?? null,
+            profile_image:agent.agentUser.profile_img? 
+            this.firebaseService.getPublicUrl(agent.agentUser.profile_img) : null,
+           
+          }
+        : null,
+      
+    }));
+
+    return {
+      agents: agentsForFrontend,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+    };
+  } catch (error) {
+    throw new InternalServerErrorException(t('somethingWentWrong', language));
+  }
 }
 }

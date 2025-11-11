@@ -120,25 +120,61 @@ await this.notificationservice.sendNotification({
       await this.emailService.sendWelcomeEmail(user.email, safeFirstName);
     }
   }
+async resend(identifier: string, language: SupportedLang): Promise<void> {
+  const errors: Record<string, string[]> = {};
 
-  async resend(identifier: string, language: SupportedLang): Promise<void> {
-    const errors: Record<string, string[]> = {};
-    const user = await this.userservice.findByIdentifierOrFail(identifier, language);
+  const user = await this.userservice.findByIdentifierOrFail(identifier, language);
 
-    if (user.email_verified) {
-      errors.email = [t('emailAlreadyVerified', language)];
-      throw new BadRequestException({
-        success: false,
-        message: t('validationFailed', language),
-        errors,
-      });
-    }
-
-    const token = await this.userservice.regenerateVerificationToken(user.id);
-    await this.emailService.sendVerificationEmail(user.email, user.first_name ?? 'User', token, language);
+  // Already verified?
+  if (user.email_verified) {
+    errors.email = [t('emailAlreadyVerified', language)];
+    throw new BadRequestException({
+      success: false,
+      message: t('validationFailed', language),
+      errors,
+    });
   }
+
+  // Only allow resending if user status is 'pending' or 'inactive'
+  if (!['pending', 'inactive'].includes(user.status)) {
+    errors.status = [t('cannotResendTokenForCurrentStatus', language)];
+    throw new BadRequestException({
+      success: false,
+      message: t('validationFailed', language),
+      errors,
+    });
+  }
+
+  // Generate new token
+  const token = await this.userservice.regenerateVerificationToken(user.id);
+
+  // Send email
+  await this.emailService.sendVerificationEmail(
+    user.email,
+    user.first_name ?? 'User',
+    token,
+    language
+  );
 }
 
+//   async resend(identifier: string, language: SupportedLang): Promise<void> {
+//     const errors: Record<string, string[]> = {};
+//     const user = await this.userservice.findByIdentifierOrFail(identifier, language);
+
+//     if (user.email_verified) {
+//       errors.email = [t('emailAlreadyVerified', language)];
+//       throw new BadRequestException({
+//         success: false,
+//         message: t('validationFailed', language),
+//         errors,
+//       });
+//     }
+
+//     const token = await this.userservice.regenerateVerificationToken(user.id);
+//     await this.emailService.sendVerificationEmail(user.email, user.first_name ?? 'User', token, language);
+//   }
+// }
+}
 
 
  // await this.notificationservice.sendNotification({

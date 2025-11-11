@@ -4,6 +4,7 @@ export const en = {
      agencyInactive:"Agency is not active",
       agencySuspended: "Agency is suspended",
      unauthorizedAccess: "You are not authorized to access this agency information.",
+       cannotResendTokenForCurrentStatus: "Cannot resend verification token for the current user status.",
          anotherAgency: "You cannot edit products from another agency",
     noAgency: "You are not associated with any agency",
     agentNotFound: "Agent not found",

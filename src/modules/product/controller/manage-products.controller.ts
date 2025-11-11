@@ -14,6 +14,7 @@ import {t } from "../../../locales";
 import { ProductsSearchResponseDto } from "../dto/product-frontend.dto";
 import { SearchProductsService } from "../services/search-product.service";
 import { SearchFiltersHelper } from "../utils/search-filters.helper";
+import { UserStatusGuard } from "../../../common/guard/status.guard";
 
 @Controller('products') 
 export class ManageProductController{
@@ -25,6 +26,7 @@ export class ManageProductController{
     ){}
 
        @Post("add")
+       @UseGuards(UserStatusGuard)
   @UseInterceptors(FilesInterceptor('images', 7)) 
   async createProduct(
     @Body()  body: Record<string, any>,
@@ -46,8 +48,8 @@ const errors = await validate(dto);
    return this.createproductService.createProduct(dto ,images , language ,userId , agencyId!);
   }
 
-@UseGuards(ProductOwnershipAndPermissionGuard)
-// @Permissions(["can_edit_others_post"])
+@UseGuards(ProductOwnershipAndPermissionGuard, UserStatusGuard)
+
 
   @Patch('update/:id')
 @UseInterceptors(FilesInterceptor('images', 7))

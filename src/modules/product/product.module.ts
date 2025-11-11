@@ -16,9 +16,10 @@ import { AgentModule } from "../agent/agent.module";
 import { ProductService } from "./services/product-service";
 import { ManageProductController } from "./controller/manage-products.controller";
 import { SearchFiltersHelper } from "./utils/search-filters.helper";
+import { AgencyModule } from "../agency/agency.module";
 @Module({
   controllers: [SearchProductsController , ManageProductController],
-  imports:[UserModule , AgentModule],
+  imports:[UserModule , AgentModule , AgencyModule],
   providers: [
     SearchProductsRepo,
     ProductAttributeValueRepo,

@@ -5,10 +5,12 @@ import { AgentService } from './agent.service';
 import { AgentPermissionRepository } from '../../repositories/agent-permision/agent-permision.repository';
 import { AgentPermisionService } from './agent-permision.service';
 import { AgencyModule } from '../agency/agency.module';
+import { AgentController } from './agent-controller';
 
 
 @Module({
   imports: [AgencyModule],
+    controllers: [AgentController],
   providers: [AgentService,AgentsRepository ,AgentPermisionService, AgentPermissionRepository],
   exports: [AgentsRepository , AgentService , AgentPermisionService],
 })

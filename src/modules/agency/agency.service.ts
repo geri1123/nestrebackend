@@ -23,6 +23,16 @@ export class AgencyService {
     }
     return agency;
   }
+  async getAgencyForGuard(agencyId: number, language: SupportedLang = 'al') {
+  const agency = await this.agencyRepo.getAgencyInfoByOwner(agencyId);
+  if (!agency) {
+    throw new BadRequestException({
+      success: false,
+      message: t('agencyNotFound', language),
+    });
+  }
+  return agency;
+}
   async getAgencyByOwnerOrFail(ownerUserId: number, language: SupportedLang) {
   const agency = await this.agencyRepo.findByOwnerUserId(ownerUserId);
   if (!agency) {
@@ -113,7 +123,7 @@ async getAgencyInfo(
   isProtectedRoute = false,
   req?: RequestWithUser
 ): Promise<AgencyInfo | null> {
-  const agencyInfo = await this.agencyRepo.getAgencyInfoByOwner(agencyId); 
+  const agencyInfo = await this.agencyRepo.getAgencyInfoByOwner(agencyId);
 
   if (!agencyInfo) {
     throw new BadRequestException({
@@ -122,25 +132,48 @@ async getAgencyInfo(
     });
   }
 
-  // Public page
- if (!isProtectedRoute && agencyInfo.status !== 'active') {
-  throw new NotFoundException(t('agencyNotFound', language));
-}
-  // check ownership or permissions
-  if (isProtectedRoute) {
-    const isOwner = req?.user?.id === agencyInfo.owner_user_id;
-    const isAgent =
-      req?.user?.role === 'agent' && req?.agencyId === agencyInfo.id;
-
-    if (!isOwner && !isAgent) {
-      throw new ForbiddenException({
-    success: false,
-    message: t('unauthorizedAccess', language),
-  });
-    }
+  // Only hide suspended agencies for public/non-protected routes
+  if (!isProtectedRoute && agencyInfo.status !== 'active') {
+    throw new NotFoundException(t('agencyNotFound', language));
   }
 
+  // If protected route, just return agencyInfo, guard will handle suspension
   return agencyInfo;
 }
+// async getAgencyInfo(
+//   agencyId: number,
+//   language: SupportedLang = 'al',
+//   isProtectedRoute = false,
+//   req?: RequestWithUser
+// ): Promise<AgencyInfo | null> {
+//   const agencyInfo = await this.agencyRepo.getAgencyInfoByOwner(agencyId); 
+
+//   if (!agencyInfo) {
+//     throw new BadRequestException({
+//       success: false,
+//       message: t('agencyNotFound', language),
+//     });
+//   }
+
+//   // Public page
+//  if (!isProtectedRoute && agencyInfo.status !== 'active') {
+//   throw new NotFoundException(t('agencyNotFound', language));
+// }
+//   // check ownership or permissions
+//   if (isProtectedRoute) {
+//     const isOwner = req?.user?.id === agencyInfo.owner_user_id;
+//     const isAgent =
+//       req?.user?.role === 'agent' && req?.agencyId === agencyInfo.id;
+
+//     if (!isOwner && !isAgent) {
+//       throw new ForbiddenException({
+//     success: false,
+//     message: t('unauthorizedAccess', language),
+//   });
+//     }
+//   }
+
+//   return agencyInfo;
+// }
 
 }

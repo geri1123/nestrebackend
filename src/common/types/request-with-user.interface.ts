@@ -21,6 +21,7 @@ import { Request } from 'express';
 import { SupportedLang } from '../../locales';
 import { BaseUserInfo } from '../../modules/users/types/base-user-info';
 import { AgentPermissions } from './permision.type';
+import { agencyagent_status } from '@prisma/client';
 
 export interface RequestWithUser extends Request {
   language: SupportedLang;
@@ -31,4 +32,5 @@ export interface RequestWithUser extends Request {
   agencyId?: number | null;
   agencyAgentId?: number | null;
   agentPermissions?: AgentPermissions; 
+  agentStatus?:agencyagent_status;
 }

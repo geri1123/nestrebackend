@@ -4,7 +4,7 @@ export const it = {
     accountSuspended:  'Il tuo account è sospeso.',
    agencySuspended: "L'agenzia è sospesa",
    somethingWentWrong: 'Qualcosa è andato storto',
-
+ cannotResendTokenForCurrentStatus: "Impossibile rinviare il token di verifica per lo stato attuale dell'utente.",
      anotherAgency: "Non puoi modificare i prodotti di un'altra agenzia",
     noAgency: "Non sei associato a nessuna agenzia",
     agentNotFound: "Agente non trovato",

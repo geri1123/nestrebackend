@@ -9,6 +9,7 @@ import { validate } from "class-validator";
 import { throwValidationErrors } from "../../common/helpers/validation.helper";
 import { PermissionsGuard } from "../../common/guard/permision.guard";
 import { Permissions } from "../../common/decorators/permissions.decorator";
+import { UserStatusGuard } from "../../common/guard/status.guard";
 
 
 
@@ -21,6 +22,7 @@ export class AgencyRequestsController {
 
     
   @Get('registration-requests')
+  @UseGuards(UserStatusGuard)
   @Roles('agent', 'agency_owner')
   @Permissions(['can_approve_requests']) 
   async getRegistrationRequests(
@@ -44,11 +46,11 @@ export class AgencyRequestsController {
   }
   
 
-@Roles('agent', 'agency_owner')
- @Permissions(['can_approve_requests']) 
 
 @Patch('registration-requests/:id/status')
-
+@UseGuards(UserStatusGuard)
+@Roles('agent', 'agency_owner')
+ @Permissions(['can_approve_requests']) 
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
@@ -60,14 +62,6 @@ async updateRegistrationRequestStatus(
   const dto = plainToInstance(UpdateRequestStatusDto, body);
   const errors = await validate(dto);
   if (errors.length > 0) throwValidationErrors(errors, language);
-  
-  // if (!req.agencyId) {
-  //   throw new UnauthorizedException(t('userNotAuthenticated', language));
-  // }
-  // if (!userId) {
-  //   throw new UnauthorizedException(t('userNotAuthenticated', language));
-  // }
-
   if (body.action === 'approved' && !body.roleInAgency) {
     throw new BadRequestException(t('roleInAgencyRequired', language));
   }
