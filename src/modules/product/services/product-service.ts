@@ -28,14 +28,14 @@ async getSingleProduct(
   if (product.status !== 'active') {
     if (!isProtectedRoute) return null;
 
-    const isOwner = req?.userId === product.userId;
+    const isOwner = req?.userId=== product.userId;
     const isAgencyOwner = req?.user?.role === 'agency_owner' && req?.agencyId === product.agencyId;
     const canAgentSee = req?.user?.role === 'agent' && req?.agentPermissions?.can_view_all_posts;
-
+ 
     if (!isOwner && !isAgencyOwner && !canAgentSee) return null;
   }
-
-  // Suspended user or agency
+ console.log(req?.userId ,req?.agencyId )
+  
   if (product.user?.status === 'suspended' || product.agency?.status === 'suspended') {
     return null;
   }
@@ -63,28 +63,5 @@ async getSingleProduct(
 
   return dto;
 }
-//  async getSingleProduct(
-//   id: number,
-//   language: SupportedLang,
-//   isProtectedRoute: boolean,
-//   req?: RequestWithUser
-// ) {
-//   const product = await this.productRepo.getProductById(id, language);
-//   if (!product) return null;
 
-  
-//   if (product.status !== 'active') {
-//     if (!isProtectedRoute) return null;
-
-//     const isOwner = req?.userId === product.userId;
-//     const isAgencyOwner = req?.user?.role === 'agency_owner' && req?.agencyId === product.agencyId;
-//     const canAgentSee = req?.user?.role === 'agent' && req?.agentPermissions?.can_view_all_posts;
-
-//     if (!isOwner && !isAgencyOwner && !canAgentSee) return null;
-//   }
-//  if (product.user?.status === 'suspended' || product.agency?.status === 'suspended') {
-//     return null;
-//   }
-//   return product;
-// }
 }

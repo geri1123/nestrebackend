@@ -24,9 +24,9 @@ export class ManageProductController{
         private readonly searchfilter:SearchFiltersHelper,
         private readonly searchProductsService:SearchProductsService
     ){}
-
+  @UseGuards(UserStatusGuard)
        @Post("add")
-       @UseGuards(UserStatusGuard)
+     
   @UseInterceptors(FilesInterceptor('images', 7)) 
   async createProduct(
     @Body()  body: Record<string, any>,
@@ -39,7 +39,7 @@ export class ManageProductController{
    if (!userId) {
   throw new UnauthorizedException(t('userNotAuthenticated', req.language));
 }
- if (!agencyId) {
+if (req.user.role !== 'user' && !req.agencyId) {
   throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
 }
  const dto = plainToInstance(CreateProductDto, body);
@@ -90,28 +90,32 @@ async getDashboardProducts(
 ): Promise<ProductsSearchResponseDto> {
    const language = req.language;
   const filters = this.searchfilter.parse(rawQuery, page , );
-
-  if (view === 'mine') {
-   
+ if (view === 'mine') {
+    // Show only your own products
     filters.userId = req.userId;
-    // filters.status = undefined; 
   } else if (view === 'agency') {
-    filters.agencyId = req.agencyId!;
+   
+    if (!req.agencyId || (req.user.role !== 'agent' && req.user.role !== 'agency_owner')) {
+      throw new ForbiddenException(t("userNotAssociatedWithAgency", language))
+    }
+
+    filters.agencyId = req.agencyId;
 
     if (req.user.role === 'agent' && !req.agentPermissions?.can_view_all_posts) {
-      
+      // Agent without permission only active products
       filters.status = 'active';
-    } 
-    else if (rawQuery.status) {
-      filters.status = rawQuery.status; 
+    } else if (rawQuery.status) {
+     
+      filters.status = rawQuery.status;
     }
   }
 
- 
+  // Determine if route is "protected"
   const isProtectedRoute =
-    view === 'mine' || 
+    view === 'mine' ||
     (view === 'agency' && (req.user.role === 'agency_owner' || req.agentPermissions?.can_view_all_posts));
 
+ 
   return this.searchProductsService.getProducts(filters, language, isProtectedRoute);
 }
 

@@ -183,7 +183,7 @@ async registerAgent(dto: RegisterAgentDto, lang: SupportedLang) {
   );
   Object.assign(extraErrors, agentErrors);
 
-  // 3️⃣ Throw all validation errors together
+  //  Throw all validation errors together
   if (errors.length > 0 || Object.keys(extraErrors).length > 0) {
     throwValidationErrors(errors, lang, extraErrors);
   }

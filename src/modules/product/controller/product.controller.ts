@@ -10,6 +10,7 @@ import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 
 import { ProductService } from '../services/product-service';
+import { OptionalJwtAuthGuard } from '../../../common/guard/optional-jwt.guard';
 @Controller('products')
 export class SearchProductsController {
   constructor(
@@ -30,31 +31,43 @@ export class SearchProductsController {
   ): Promise<ProductsSearchResponseDto> {
     const language=req.language;
     const filters = this.searchfilter.parse(rawQuery, page);
-    console.log('Controller parsed filters:', JSON.stringify(filters, null, 2));
+   
 
     return this.searchProductsService.getProducts(filters, language, false );
   }
 
-  
-@Public()
-@Get(':id')
-async getProduct(
-  @Param('id') id: number,
-  @Req() req: RequestWithUser
-) {
-  const language = req.language;
-
-
-  const isProtectedRoute = !!('user' in req && req.user);
-
-  const product = await this.productService.getSingleProduct(id, language, isProtectedRoute, req);
-
-  if (!product) {
-    throw new NotFoundException(t('productNotFound', language));
-  }
-
+  @Public()
+@Get('public/:id')
+async getPublicProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
+  const product = await this.productService.getSingleProduct(id, req.language, false);
+  if (!product) throw new NotFoundException(t('productNotFound', req.language));
   return product;
 }
+  @Get('protected/:id')
+async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
+  const product = await this.productService.getSingleProduct(id, req.language, true, req);
+  if (!product) throw new NotFoundException(t('productNotFound', req.language));
+  return product;
+}
+
+// @Get(':id')
+// async getProduct(
+//   @Param('id') id: number,
+//   @Req() req: RequestWithUser
+// ) {
+//   const language = req.language;
+
+
+//   const isProtectedRoute = !!(req.user);
+
+//   const product = await this.productService.getSingleProduct(id, language, isProtectedRoute, req);
+
+//   if (!product) {
+//     throw new NotFoundException(t('productNotFound', language));
+//   }
+
+//   return product;
+// }
 
 }
 

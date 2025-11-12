@@ -140,12 +140,14 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
 async getAgentsCountByAgency(
   agencyId: number,
   showAllStatuses: boolean = false,
-  search?: string
+  search?: string,
+  agentStatus?:agencyagent_status
 ) {
   return this.prisma.agencyagent.count({
     where: {
       agency_id: agencyId,
-      ...(showAllStatuses ? {} : { status: 'active' }),
+       ...(showAllStatuses ? {} : { status: 'active' }),
+      ...(agentStatus ? { status: agentStatus } : {}),
       ...(search
         ? {
             OR: [

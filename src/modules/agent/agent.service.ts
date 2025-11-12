@@ -6,6 +6,7 @@ import { error } from "console";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
 import { type AgentPaginationResponseDto } from "./dto/agentsinagency.dto";
+import { agencyagent_status } from "@prisma/client";
 
 
 @Injectable()
@@ -67,14 +68,16 @@ async getAgentsForPublicView(
   agencyId: number,
   page: number = 1,
   limit: number = 10,
-  language: SupportedLang
+  language: SupportedLang,
+   search?: string,
+  sortBy: 'asc' | 'desc' = 'desc'
 ):Promise<AgentPaginationResponseDto> {
   try {
     const offset = (page - 1) * limit;
 
     const [agentsPage, totalCount] = await Promise.all([
-         this.agentrepo.getAgentsByAgency(agencyId, 'active', limit, offset, false),
-    this.agentrepo.getAgentsCountByAgency(agencyId, false),
+         this.agentrepo.getAgentsByAgency(agencyId, 'active', limit, offset, false,search, sortBy),
+    this.agentrepo.getAgentsCountByAgency(agencyId, false,sortBy),
     ]);
 
     if (!agentsPage || agentsPage.length === 0) {
@@ -127,13 +130,14 @@ async getAgentsForProtectedRoute(
   limit: number = 10,
   language: SupportedLang,
   search?: string,
-  sortBy: 'asc' | 'desc' = 'desc'
+  sortBy: 'asc' | 'desc' = 'desc',
+  status?:agencyagent_status,
 ): Promise<AgentPaginationResponseDto> {
   const offset = (page - 1) * limit;
 
   const [agentsPage, totalCount] = await Promise.all([
-    this.agentrepo.getAgentsByAgency(agencyId, undefined, limit, offset, true, search, sortBy),
-    this.agentrepo.getAgentsCountByAgency(agencyId, true, search),
+    this.agentrepo.getAgentsByAgency(agencyId, status, limit, offset, true, search, sortBy ),
+    this.agentrepo.getAgentsCountByAgency(agencyId, true, search , status),
   ]);
 
   if (!agentsPage || agentsPage.length === 0) {

@@ -4,6 +4,7 @@ import { type RequestWithLang } from "../../middlewares/language.middleware";
 import { UserStatusGuard } from "../../common/guard/status.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { type RequestWithUser } from "../../common/types/request-with-user.interface";
+import { agencyagent_status } from "@prisma/client";
 
 @Controller("agents")
 export class AgentController{
@@ -15,6 +16,8 @@ export class AgentController{
      @Req() req:RequestWithLang,
     @Query("page") page?: string,
     @Query("limit") limit?: string,
+      @Query("search") search?: string,
+  @Query("sort") sort?: 'asc' | 'desc',
  
   ) {
     const language = req.language;
@@ -22,12 +25,14 @@ export class AgentController{
  
     const pageNumber = parseInt(page ?? "1", 10);
     const limitNumber = parseInt(limit ?? "10", 10);
-
+  const sortBy = sort ?? 'desc';  
     return this.agentService.getAgentsForPublicView(
       agencyId,
       pageNumber,
       limitNumber,
-      language
+      language,
+       search,
+    sortBy,
     );
   }
 
@@ -37,17 +42,17 @@ export class AgentController{
 async getPrivateAgents(
   @Req() req: RequestWithUser,
   @Query("page") page?: string,
-  @Query("limit") limit?: string,
+  // @Query("limit") limit?: string,
   @Query("search") search?: string,
   @Query("sort") sort?: 'asc' | 'desc',
-  @Query("status") status?:string,
+  @Query("status") status?:agencyagent_status,
 ) {
   const language = req.language;
   const agencyId = req.agencyId;
   if (!agencyId) return null;
 
   const pageNumber = parseInt(page ?? "1", 10);
-  const limitNumber = parseInt(limit ?? "10", 10);
+  const limitNumber = 12; 
   const sortBy = sort ?? 'desc';
 
   return this.agentService.getAgentsForProtectedRoute(
@@ -57,6 +62,7 @@ async getPrivateAgents(
     language,
     search,
     sortBy,
+    status
   );
 }
 }
