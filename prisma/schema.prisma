@@ -242,6 +242,7 @@ model user {
   passwordresettoken           passwordresettoken[]
   product                      product[]
   productimage                 productimage[]
+    savedProducts          SavedProduct[]
   registrationRequestsReviewed registrationrequest[] @relation("RegistrationRequestReviewedBy")
   registrationRequests         registrationrequest[] @relation("RegistrationRequestUser")
   usernamehistory              usernamehistory[]
@@ -309,7 +310,7 @@ model product {
   user                  user                    @relation(fields: [userId], references: [id], map: "Product_userId_fkey")
   productattributevalue productattributevalue[]
   productimage          productimage[]
-
+  savedProducts         SavedProduct[]
   @@index([agencyId], map: "Product_agencyId_fkey")
   @@index([cityId], map: "Product_cityId_fkey")
   @@index([listingTypeId], map: "Product_listingTypeId_fkey")
@@ -357,6 +358,17 @@ model agencyagent_permission {
 
   agencyagent agencyagent @relation(fields: [agency_agent_id], references: [id], onDelete: Cascade)
   agency      agency      @relation(fields: [agency_id], references: [id])
+}
+
+model SavedProduct {
+  id         Int      @id @default(autoincrement())
+  user       user     @relation(fields: [user_id], references: [id]) 
+  user_id    Int
+  product    product  @relation(fields: [product_id], references: [id]) 
+  product_id Int
+  saved_at   DateTime @default(now())
+
+  @@unique([user_id, product_id]) 
 }
 enum LanguageCode {
   en

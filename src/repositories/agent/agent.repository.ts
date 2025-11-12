@@ -101,8 +101,21 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
   offset?: number,
   showAllStatuses: boolean = false,
   search?: string,
-  sortBy: 'asc' | 'desc' = 'desc'
+  sort: 'name_asc' | 'name_desc' | 'created_at_desc' | 'created_at_asc' = 'created_at_desc',
 ) {
+  // figure out Prisma orderBy based on sort option
+  let orderBy: any = {};
+
+  if (sort === 'name_asc') {
+    orderBy = { agentUser: { first_name: 'asc' } };
+  } else if (sort === 'name_desc') {
+    orderBy = { agentUser: { first_name: 'desc' } };
+  } else if (sort === 'created_at_asc') {
+    orderBy = { created_at: 'asc' };
+  } else if (sort === 'created_at_desc') {
+    orderBy = { created_at: 'desc' };
+  }
+
   return this.prisma.agencyagent.findMany({
     where: {
       agency_id: agencyId,
@@ -111,9 +124,9 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
       ...(search
         ? {
             OR: [
-              { agentUser: { is: { username: { contains: search} } } },
-              { agentUser: { is: { first_name: { contains: search} } } },
-              { agentUser: { is: { last_name: { contains: search } } } },
+              { agentUser: { username: { contains: search} } },
+              { agentUser: { first_name: { contains: search } } },
+              { agentUser: { last_name: { contains: search } } },
             ],
           }
         : {}),
@@ -132,28 +145,28 @@ async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
       },
       permission: true,
     },
-    orderBy: { created_at: sortBy },
+    orderBy,
     take: limit,
     skip: offset,
   });
 }
 async getAgentsCountByAgency(
   agencyId: number,
-  showAllStatuses: boolean = false,
+  showAllStatuses = false,
   search?: string,
-  agentStatus?:agencyagent_status
+  agentStatus?: agencyagent_status
 ) {
   return this.prisma.agencyagent.count({
     where: {
       agency_id: agencyId,
-       ...(showAllStatuses ? {} : { status: 'active' }),
+      ...(showAllStatuses ? {} : { status: 'active' }),
       ...(agentStatus ? { status: agentStatus } : {}),
       ...(search
         ? {
             OR: [
               { agentUser: { is: { username: { contains: search } } } },
               { agentUser: { is: { first_name: { contains: search } } } },
-              { agentUser: { is: { last_name: { contains: search } } } },
+              { agentUser: { is: { last_name: { contains: search} } } },
             ],
           }
         : {}),

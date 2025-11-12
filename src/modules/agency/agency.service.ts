@@ -95,7 +95,7 @@ export class AgencyService {
   async getAgencyWithOwnerById(agencyId: number) {
     return this.agencyRepo.findWithOwnerById(agencyId);
   }
-async getPaginatedAgencies(page = 1, limit = 10) {
+async getPaginatedAgencies(page:number=1, limit:number =12) {
   const skip = (page - 1) * limit;
 
   // Fetch agencies and total count in parallel
@@ -140,40 +140,6 @@ async getAgencyInfo(
 
   return agencyInfo;
 }
-// async getAgencyInfo(
-//   agencyId: number,
-//   language: SupportedLang = 'al',
-//   isProtectedRoute = false,
-//   req?: RequestWithUser
-// ): Promise<AgencyInfo | null> {
-//   const agencyInfo = await this.agencyRepo.getAgencyInfoByOwner(agencyId); 
 
-//   if (!agencyInfo) {
-//     throw new BadRequestException({
-//       success: false,
-//       message: t('agencyNotFound', language),
-//     });
-//   }
-
-//   // Public page
-//  if (!isProtectedRoute && agencyInfo.status !== 'active') {
-//   throw new NotFoundException(t('agencyNotFound', language));
-// }
-//   // check ownership or permissions
-//   if (isProtectedRoute) {
-//     const isOwner = req?.user?.id === agencyInfo.owner_user_id;
-//     const isAgent =
-//       req?.user?.role === 'agent' && req?.agencyId === agencyInfo.id;
-
-//     if (!isOwner && !isAgent) {
-//       throw new ForbiddenException({
-//     success: false,
-//     message: t('unauthorizedAccess', language),
-//   });
-//     }
-//   }
-
-//   return agencyInfo;
-// }
 
 }

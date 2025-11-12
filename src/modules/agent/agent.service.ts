@@ -7,6 +7,8 @@ import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
 import { type AgentPaginationResponseDto } from "./dto/agentsinagency.dto";
 import { agencyagent_status } from "@prisma/client";
+import { FilterAgentsDto, sort } from "./dto/filter-agents.dto";
+import { formatDate } from "../../common/utils/date";
 
 
 @Injectable()
@@ -24,7 +26,9 @@ export class AgentService{
       });
     }
   }
- 
+ //-----
+ //crete agent
+ //-----
   async createAgencyAgent(data: Createagentdata  ,language: SupportedLang="al"){
     return this.agentrepo.createAgencyAgent(data);
   }
@@ -39,6 +43,10 @@ export class AgentService{
   }
   return agent;
 }
+
+//======
+//find if agent exist
+//========
  async findExistingAgent(agentId: number, language: SupportedLang) {
   const existingAgent = await this.agentrepo.findExistingAgent(agentId);
 
@@ -63,52 +71,67 @@ export class AgentService{
   async getAgentWithPermissions(agencyAgentId: number) {
   return this.agentrepo.getAgentWithPermissions(agencyAgentId);
 }
+//-------
 
-async getAgentsForPublicView(
+//get protected and public agents
+
+//-------
+async getAgents(
   agencyId: number,
-  page: number = 1,
-  limit: number = 10,
+  page = 1,
+  limit = 12,
   language: SupportedLang,
-   search?: string,
-  sortBy: 'asc' | 'desc' = 'desc'
-):Promise<AgentPaginationResponseDto> {
+  filters: FilterAgentsDto,
+  showAllStatuses = false, 
+  defaultStatus?: agencyagent_status, 
+): Promise<AgentPaginationResponseDto> {
   try {
     const offset = (page - 1) * limit;
+    const { search, sort = "created_at_desc", status } = filters;
+
+    const finalStatus = defaultStatus ?? status;
+
 
     const [agentsPage, totalCount] = await Promise.all([
-         this.agentrepo.getAgentsByAgency(agencyId, 'active', limit, offset, false,search, sortBy),
-    this.agentrepo.getAgentsCountByAgency(agencyId, false,sortBy),
+      this.agentrepo.getAgentsByAgency(
+        agencyId,
+        finalStatus,
+        limit,
+        offset,
+        showAllStatuses,
+        search,
+        sort as sort,
+      ),
+      this.agentrepo.getAgentsCountByAgency(
+        agencyId,
+        showAllStatuses,
+        search,
+        finalStatus,
+      ),
     ]);
 
     if (!agentsPage || agentsPage.length === 0) {
       return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
     }
 
+    
     const agentsForFrontend = agentsPage.map(agent => ({
       id: agent.id,
-    
-     
-     
       role_in_agency: agent.role_in_agency,
-      
-     
       status: agent.status,
-      created_at: agent.created_at,
-      
+   created_at: formatDate(agent.created_at),
       agentUser: agent.agentUser
         ? {
             id: agent.agentUser.id,
             username: agent.agentUser.username,
             email: agent.agentUser.email,
-            
             first_name: agent.agentUser.first_name ?? null,
             last_name: agent.agentUser.last_name ?? null,
-            profile_image:agent.agentUser.profile_img? 
-            this.firebaseService.getPublicUrl(agent.agentUser.profile_img) : null,
-           
+            profile_image: agent.agentUser.profile_img
+              ? this.firebaseService.getPublicUrl(agent.agentUser.profile_img)
+              : null,
           }
         : null,
-      
     }));
 
     return {
@@ -118,56 +141,7 @@ async getAgentsForPublicView(
       currentPage: page,
     };
   } catch (error) {
-    throw new InternalServerErrorException(t('somethingWentWrong', language));
+    throw new InternalServerErrorException(t("somethingWentWrong", language));
   }
-}
-
-
-//getagents for logedin agents | agency owner
-async getAgentsForProtectedRoute(
-  agencyId: number,
-  page: number = 1,
-  limit: number = 10,
-  language: SupportedLang,
-  search?: string,
-  sortBy: 'asc' | 'desc' = 'desc',
-  status?:agencyagent_status,
-): Promise<AgentPaginationResponseDto> {
-  const offset = (page - 1) * limit;
-
-  const [agentsPage, totalCount] = await Promise.all([
-    this.agentrepo.getAgentsByAgency(agencyId, status, limit, offset, true, search, sortBy ),
-    this.agentrepo.getAgentsCountByAgency(agencyId, true, search , status),
-  ]);
-
-  if (!agentsPage || agentsPage.length === 0) {
-    return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
-  }
-
-  const agentsForFrontend = agentsPage.map(agent => ({
-    id: agent.id,
-    role_in_agency: agent.role_in_agency,
-    status: agent.status,
-    created_at: agent.created_at,
-    agentUser: agent.agentUser
-      ? {
-          id: agent.agentUser.id,
-          username: agent.agentUser.username,
-          email: agent.agentUser.email,
-          first_name: agent.agentUser.first_name ?? null,
-          last_name: agent.agentUser.last_name ?? null,
-          profile_image: agent.agentUser.profile_img
-            ? this.firebaseService.getPublicUrl(agent.agentUser.profile_img)
-            : null,
-        }
-      : null,
-  }));
-
-  return {
-    agents: agentsForFrontend,
-    totalCount,
-    totalPages: Math.ceil(totalCount / limit),
-    currentPage: page,
-  };
 }
 }

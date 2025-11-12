@@ -15,7 +15,7 @@ export class SearchProductsService {
     private readonly firebaseservice:FirebaseService
 ) {}
 
-  async getProducts(filters: SearchFiltersDto, language: SupportedLang ,   isProtectedRoute: boolean = false):Promise<{ products: ProductFrontendDto[]; totalCount: number; currentPage: number; totalPages: number }> {
+  async getProducts(filters: SearchFiltersDto, language: SupportedLang ,   isProtectedRoute: boolean = false ):Promise<{ products: ProductFrontendDto[]; totalCount: number; currentPage: number; totalPages: number }> {
   const [products, totalCount] = await Promise.all([
   this.repo.searchProducts(filters, language, isProtectedRoute),
   this.repo.getProductsCount(filters, language, isProtectedRoute),

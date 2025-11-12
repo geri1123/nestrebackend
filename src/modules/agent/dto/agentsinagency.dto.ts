@@ -58,7 +58,7 @@ export class AgentForFrontEndDto {
   id: number;
   role_in_agency: agencyagent_role_in_agency;
   status: agencyagent_status;
-  created_at: Date;
+  created_at: string;
   agentUser: AgentUserForFrontEndDto | null;
 }
 

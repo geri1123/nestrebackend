@@ -194,12 +194,12 @@ private buildWhereConditions(filters: SearchFiltersDto, language: SupportedLang 
     }
   }
     if (filters.status) {
-    // explicit status from filters always takes priority
+  
     whereConditions.status = filters.status;
   } else if (isProtectedRoute) {
     whereConditions.status = { in: ['active', 'draft', 'pending', 'sold', 'inactive'] };
   } else {
-    // Public route: only active products
+
     whereConditions.status = 'active';
   }
   if (filters.userId) whereConditions.userId = filters.userId;
@@ -218,7 +218,7 @@ whereConditions.AND = [
   },
 ];
   if (filters.agencyId) whereConditions.agencyId = filters.agencyId;
-  console.log('🔍 WHERE (IDs):', JSON.stringify(whereConditions, null, 2));
+  // console.log('🔍 WHERE (IDs):', JSON.stringify(whereConditions, null, 2));
   return whereConditions;
 }
 }

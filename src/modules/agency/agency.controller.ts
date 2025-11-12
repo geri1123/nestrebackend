@@ -16,9 +16,10 @@ export class AgencyController {
 
 async getAllAgencies(
   @Query('page') page = 1,
-  @Query('limit') limit = 10,
+ 
 ) {
-  return this.agencyService.getPaginatedAgencies(Number(page), Number(limit));
+   const fixedLimit = 12; 
+  return this.agencyService.getPaginatedAgencies(Number(page), fixedLimit);
 }
 
 @Roles('agency_owner', 'agent')
@@ -38,7 +39,7 @@ async getAgencyInfoPublic(
   @Req() req: RequestWithUser 
 ) {
   const language = req.language;
-  // Public route: anyone can view active agencies
+  
   return this.agencyService.getAgencyInfo(agencyId, language, false, req);
 }
 }

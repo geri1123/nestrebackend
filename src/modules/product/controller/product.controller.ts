@@ -35,6 +35,43 @@ export class SearchProductsController {
 
     return this.searchProductsService.getProducts(filters, language, false );
   }
+@Public()
+@Get('agency/:agencyId')
+async getAgencyProducts(
+  @Param('agencyId') agencyId: number,
+  @Req() req: RequestWithLang,
+  @Query('page') page = '1'
+) {
+  const language = req.language;
+  const filters = this.searchfilter.parse(req.query, page);
+
+
+  filters.agencyId = agencyId;
+
+ 
+  filters.status = 'active';
+
+  return this.searchProductsService.getProducts(filters, language, false);
+}
+
+@Public()
+@Get('agent/:agentId')
+async getAgentProducts(
+  @Param('agentId') agentId: number,
+  @Req() req: RequestWithLang,
+  @Query('page') page = '1'
+) {
+  const language = req.language;
+  const filters = this.searchfilter.parse(req.query, page);
+
+  
+  filters.userId = agentId;
+
+
+  filters.status = 'active';
+
+  return this.searchProductsService.getProducts(filters, language, false);
+}
 
   @Public()
 @Get('public/:id')
@@ -50,24 +87,7 @@ async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) 
   return product;
 }
 
-// @Get(':id')
-// async getProduct(
-//   @Param('id') id: number,
-//   @Req() req: RequestWithUser
-// ) {
-//   const language = req.language;
 
-
-//   const isProtectedRoute = !!(req.user);
-
-//   const product = await this.productService.getSingleProduct(id, language, isProtectedRoute, req);
-
-//   if (!product) {
-//     throw new NotFoundException(t('productNotFound', language));
-//   }
-
-//   return product;
-// }
 
 }
 
