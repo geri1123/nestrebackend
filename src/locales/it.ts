@@ -2,7 +2,12 @@ export const it = {
    agentInactive: "L'agente è inattivo",
    agencyInactive: "L'agenzia non è attiva",
     accountSuspended:  'Il tuo account è sospeso.',
-   agencySuspended: "L'agenzia è sospesa",
+      productSavedSuccessfully: "Prodotto salvato con successo!",
+  saveFailed: "Impossibile salvare il prodotto. Riprova.",
+  productAlreadySaved: "Questo prodotto è già nella tua lista dei salvati.",
+    productUnsavedSuccessfully: "Prodotto rimosso con successo",
+
+  agencySuspended: "L'agenzia è sospesa",
    somethingWentWrong: 'Qualcosa è andato storto',
  cannotResendTokenForCurrentStatus: "Impossibile rinviare il token di verifica per lo stato attuale dell'utente.",
      anotherAgency: "Non puoi modificare i prodotti di un'altra agenzia",

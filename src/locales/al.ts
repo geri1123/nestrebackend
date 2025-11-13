@@ -4,7 +4,10 @@ export const al = {
   accountSuspended:  'Llogaria juaj është pezulluar.',
   agencySuspended:" Agjencia është pezulluar",
    cannotResendTokenForCurrentStatus: "Nuk mund të dërgohet përsëri token-i i verifikimit për statusin aktual të përdoruesit.",
-
+ productUnsavedSuccessfully: "Produkti u hoq me sukses",
+  productSavedSuccessfully: "Produkti u ruajt me sukses!",
+  saveFailed: "Produkti nuk mund të ruhej. Ju lutemi provoni përsëri.",
+  productAlreadySaved: "Ky produkt është tashmë në listën tuaj të ruajtur.",
       somethingWentWrong: 'Diçka shkoi gabim',
      unauthorizedAccess: "Nuk jeni i autorizuar të aksesoni këto informacione të agjencisë.",
  anotherAgency: "Nuk mund të modifikoni produktet e një agjencie tjetër",

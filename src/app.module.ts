@@ -18,6 +18,7 @@ import { UserModule } from './modules/users/users.module';
 import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
 import { AgentModule } from './modules/agent/agent.module';
 import { PermissionsGuard } from './common/guard/permision.guard';
+import { SaveProductModule } from './modules/saved-product/save-product.module';
 // import { UserStatusGuard } from './common/guard/user-status.guard';
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { PermissionsGuard } from './common/guard/permision.guard';
     PrismaModule,
     UserModule,
     AgencyRequestsModule,
-     
+     SaveProductModule,
     FirebaseModule,
     AgencyModule,
 AuthModule,
@@ -48,10 +49,7 @@ ThrottlerModule.forRoot([
     provide: APP_GUARD,
     useClass: JwtAuthGuard, 
   },
-  // {
-  //   provide: APP_GUARD,
-  //   useClass: UserStatusGuard,
-  // },
+
   {
     provide: APP_GUARD,
     useClass: RolesGuard, 
