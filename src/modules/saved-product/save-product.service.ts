@@ -43,8 +43,12 @@ export class SaveProductService{
   this.saveProductRepo.countSaved(userId),
   this.saveProductRepo.getSavedProducts(userId, language, skip, limit),
 ]);
- const products:SavedProductDto[] = savedProducts.map((saved:SavedProductWithRelations) => {
-  const images = saved.product.productimage.map((img:SavedProductImage) =>img.imageUrl? this.firebaseService.getPublicUrl(img.imageUrl):null); 
+ const products: SavedProductDto[] = savedProducts.map((saved: SavedProductWithRelations) => {
+
+  const images: SavedProductImage[] = saved.product.productimage.map((img: SavedProductImage) => ({
+    imageUrl: img.imageUrl ? this.firebaseService.getPublicUrl(img.imageUrl) : null,
+  }));
+
   return {
     id: saved.product.id,
     title: saved.product.title,
@@ -56,7 +60,7 @@ export class SaveProductService{
       country: saved.product.city?.country?.name || 'No Country',
       user: { username: saved.product.user?.username || 'Unknown' },
 
-     images, 
+    images,
     savedAt: formatDate( saved.saved_at),
   };
 

@@ -1,5 +1,5 @@
 export class SavedProductImage{
-    imageUrl:string
+     imageUrl: string | null; 
 }
 
 export class SavedProductDto {
