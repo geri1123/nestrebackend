@@ -6,11 +6,12 @@ import { UpdateAgentsDto } from "./dto/update-agents.dto";
 import { validate } from "class-validator";
 import { throwValidationErrors } from "../../common/helpers/validation.helper";
 import { agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
+import { AgentPermisionService } from "./agent-permision.service";
 @Injectable()
 export class ManageAgentsService{
     constructor(
         private readonly agentRepo:AgentsRepository , 
-        private readonly agentPermisionRepo:AgentPermissionRepository
+        private readonly agentPermisionService:AgentPermisionService
     ){}
 
    async updateAgencyAgents(
@@ -25,7 +26,7 @@ export class ManageAgentsService{
       throwValidationErrors(errors, language);
     }
 
-    // Map DTO to Prisma update data
+   
     const dataToUpdate: Partial<{
       role_in_agency: agencyagent_role_in_agency;
       commission_rate: number;
@@ -38,7 +39,21 @@ export class ManageAgentsService{
       ...(dto.status !== undefined && { status: dto.status }),
     };
 
-    // Update agent
-    return this.agentRepo.updateAgencyAgent(agentId, dataToUpdate);
+    const updatedAgent = await this.agentRepo.updateAgencyAgent(agentId, dataToUpdate);
+
+ 
+ if (dto.permissions) {
+    const existingPermissions = await this.agentPermisionService.getPermissions(agentId);
+
+    if (existingPermissions) {
+    
+      await this.agentPermisionService.updatePermissions(agentId, dto.permissions);
+    } else {
+      
+      await this.agentPermisionService.addPermissions(agentId, agencyId, dto.permissions);
+    }
+  }
+
+  return updatedAgent;
   }
 }
