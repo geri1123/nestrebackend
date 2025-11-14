@@ -98,6 +98,8 @@ case "price": return t("price" , lang);
 case "pricePositive": return t("pricePositive" , lang);
 case "title": return t("title" , lang);
 case "productstatus": return t("productstatus", lang);
-default: return code; // fallback
+
+case 'endDateInvalid':return t("endDateInvalid", lang)
+default: return code;
   }
 }

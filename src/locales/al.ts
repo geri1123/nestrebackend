@@ -13,9 +13,10 @@ export const al = {
  anotherAgency: "Nuk mund të modifikoni produktet e një agjencie tjetër",
     noAgency: "Nuk jeni i lidhur me asnjë agjenci",
     agentNotFound: "Agjenti nuk u gjet",
+    cannotEditOtherAgencyAgent: "Nuk mund të modifikoni agjentët e një agjencie tjetër",
     cannotEditOthersProduct: "Nuk keni leje për të modifikuar këtë produkt",
     cannotEditProduct: "Nuk mund të modifikoni këtë produkt",
-
+ endDateInvalid: "Data e mbarimit duhet të jetë një datë e vlefshme",
       userNotAssociatedWithAgency:"Përdoruesi nuk është i lidhur me asnjë agjenci",
   validationFailed: "Validimi dështoi",
      userNotAuthenticated: "Përdoruesi nuk është autentikuar",

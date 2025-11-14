@@ -6,7 +6,7 @@ import { error } from "console";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
 import { type AgentPaginationResponseDto } from "./dto/agentsinagency.dto";
-import { agencyagent_status } from "@prisma/client";
+import { agencyagent, agencyagent_status } from "@prisma/client";
 import { FilterAgentsDto, sort } from "./dto/filter-agents.dto";
 import { formatDate } from "../../common/utils/date";
 
@@ -18,6 +18,11 @@ export class AgentService{
       private readonly agentrepo:AgentsRepository,
       private readonly firebaseService:FirebaseService
     ){}
+
+
+   async findById(agentId: number): Promise<agencyagent | null> {
+  return await this.agentrepo.findById(agentId);
+}
     async ensureIdCardIsUnique(id_card_number: string, language: SupportedLang): Promise<void> {
     const existingAgent = await this.agentrepo.findByIdCardNumber(id_card_number);
     if (existingAgent) {

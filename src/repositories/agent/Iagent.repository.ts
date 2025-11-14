@@ -3,7 +3,7 @@ import { AgentInfo } from "../../modules/agent/types/agent-info.js";
 import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
 import { AgentDto } from "../../modules/agent/dto/agentsinagency.dto.js";
 export interface IAgentsRepository {
-
+findById(agentId: number): Promise<agencyagent | null>
 findByIdCardNumber(
   idCardNumber: string
 ): Promise<{ id_card_number: string | null } | null> 
@@ -17,6 +17,17 @@ findAgencyIdByAgent(userId: number): Promise<number | null>
 getAgentWithPermissions(agencyAgentId: number): Promise<
   (agencyagent & { permission: agencyagent_permission | null }) | null
 >;
+
+updateAgencyAgent(
+  agencyAgentId: number,
+  data: Partial<{
+    id_card_number: string;
+    role_in_agency: agencyagent_role_in_agency;
+    commission_rate: number;
+    end_date: Date;
+    status: agencyagent_status;
+  }>
+): Promise<agencyagent>
 //  getAgentsCountByAgency(
 //   agencyId: number,
 //   showAllStatuses: boolean ,

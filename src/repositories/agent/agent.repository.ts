@@ -11,7 +11,9 @@ import { AgentDto } from "../../modules/agent/dto/agentsinagency.dto";
 @Injectable()
 export class AgentsRepository implements IAgentsRepository {
  constructor(private readonly prisma: PrismaService) {}
-
+async findById(agentId: number): Promise<agencyagent | null> {
+  return this.prisma.agencyagent.findUnique({ where: { id: agentId } });
+}
    async findAgencyIdByAgent(userId: number): Promise<number | null> {
     const agent = await this.prisma.agencyagent.findFirst({
       where: { agent_id: userId },
@@ -172,73 +174,21 @@ async getAgentsCountByAgency(
         : {}),
     },
   });
+  
 }
-// async getAgentsByAgency(
-//   agencyId: number,
-//   agentStatus?: agencyagent_status,
-//   limit?: number,
-//   offset?: number,
-//   showAllStatuses: boolean = false, 
-// ) {
-//   return this.prisma.agencyagent.findMany({
-//     where: {
-//       agency_id: agencyId,
-//       ...(showAllStatuses
-//         ? {} 
-//         : { status: 'active' }),
-//     },
-//     include: {
-//       agentUser: {
-//         select: {
-//           id: true,
-//           username: true,
-//           email: true,
-//           first_name: true,
-//           last_name: true,
-//           profile_img: true,
-//           status: true,
-//         },
-//       },
-//       permission: true,
-//     },
-//     orderBy: { created_at: 'desc' },
-//     take: limit,
-//     skip: offset,
-//   });
-// }
-
-// async getAgentsCountByAgency(
-//   agencyId: number,
-//   showAllStatuses: boolean = false,
-// ) {
-//   return this.prisma.agencyagent.count({
-//     where: {
-//       agency_id: agencyId,
-//       ...(showAllStatuses ? {} : { status: 'active' }),
-//     },
-//   });
-// }
-//  async getAgentsCountByAgency(
-//   agencyId: number,
-//   agentStatus?: agencyagent_status,
-// ){
-//   return this.prisma.agencyagent.count({
-//     where: {
-//       agency_id: agencyId,
-//       ...(agentStatus ? { status: agentStatus } : {}),
-//       agentUser: {
-//         status: 'active',
-//       },
-//     },
-//   });
-// }
+async updateAgencyAgent(
+  agencyAgentId: number,
+  data: Partial<{
+    id_card_number: string;
+    role_in_agency: agencyagent_role_in_agency;
+    commission_rate: number;
+    end_date: Date;
+    status: agencyagent_status;
+  }>
+): Promise<agencyagent> {
+  return this.prisma.agencyagent.update({
+    where: { id: agencyAgentId },
+    data,
+  });
 }
-
-
-
-  // async findByIdCardNumber(idCardNumber: string) {
-  //   return await this.prisma.agencyagent.findUnique({
-  //     where: { id_card_number: idCardNumber },
-  //   });
-  // }
-
+}

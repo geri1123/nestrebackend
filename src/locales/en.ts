@@ -12,6 +12,7 @@ export const en = {
          anotherAgency: "You cannot edit products from another agency",
     noAgency: "You are not associated with any agency",
     agentNotFound: "Agent not found",
+      cannotEditOtherAgencyAgent: "You cannot modify agents of another agency",
     cannotEditOthersProduct: "You do not have permission to edit this product",
     cannotEditProduct: "You cannot edit this product",
       accountSuspended:  'Your account is suspended.',
@@ -37,6 +38,7 @@ export const en = {
     phoneLength: "Phone number must be between 5 and 20 characters",
      aboutMeLength: "About me must be at most 500 characters",
      ////
+      endDateInvalid: "End date must be a valid date string",
        agencyActivationFailed: "Failed to activate the agency.",
      agentNotificationFailed: "Agent notification process failed.",
   agencyOrOwnerNotFound: "Agency or agency owner not found.",

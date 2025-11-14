@@ -10,7 +10,6 @@ import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 
 import { ProductService } from '../services/product-service';
-import { OptionalJwtAuthGuard } from '../../../common/guard/optional-jwt.guard';
 @Controller('products')
 export class SearchProductsController {
   constructor(
@@ -27,7 +26,7 @@ export class SearchProductsController {
     @Req() req:RequestWithLang,
     @Query() rawQuery: Record<string, any>,
     @Query('page') page = '1',
-    // @Query('lang') lang: SupportedLang = 'al'
+  
   ): Promise<ProductsSearchResponseDto> {
     const language=req.language;
     const filters = this.searchfilter.parse(rawQuery, page);
