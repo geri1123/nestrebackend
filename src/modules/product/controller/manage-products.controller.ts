@@ -102,7 +102,7 @@ async getDashboardProducts(
     filters.agencyId = req.agencyId;
 
     if (req.user.role === 'agent' && !req.agentPermissions?.can_view_all_posts) {
-      // Agent without permission only active products
+      
       filters.status = 'active';
     } else if (rawQuery.status) {
      

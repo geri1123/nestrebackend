@@ -13,7 +13,7 @@ export type AgencyInfo = {
   created_at: Date;
   updated_at: Date | null;
 
-  // Nested user info
+  
   user: {
     username: string;
     first_name: string | null;

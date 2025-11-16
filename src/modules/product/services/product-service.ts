@@ -34,8 +34,7 @@ async getSingleProduct(
  
     if (!isOwner && !isAgencyOwner && !canAgentSee) return null;
   }
- console.log(req?.userId ,req?.agencyId )
-  
+
   if (product.user?.status === 'suspended' || product.agency?.status === 'suspended') {
     return null;
   }

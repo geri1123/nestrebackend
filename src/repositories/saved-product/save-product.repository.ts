@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { SupportedLang } from "../../locales";
-import { SavedProduct } from "@prisma/client";
+import { product_status, SavedProduct } from "@prisma/client";
 
 @Injectable()
 export class SaveProductRepository {
@@ -23,7 +23,9 @@ export class SaveProductRepository {
   }
 async countSaved(userId: number): Promise<number> {
   return this.prisma.savedProduct.count({
-    where: { user_id: userId },
+    where: { user_id: userId , product: {
+        status:product_status.active,  
+      },},
   });
 }
 async getSavedProducts(
@@ -33,7 +35,12 @@ async getSavedProducts(
   take?: number
 ) :Promise<any>{
   return this.prisma.savedProduct.findMany({
-    where: { user_id: userId },
+    where: {
+      user_id: userId,
+      product: {
+        status:product_status.active,  
+      },
+    },
     include: {
       product: {
         include: {

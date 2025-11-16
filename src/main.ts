@@ -90,7 +90,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  // ✅ ValidationPipe (only handles real DTO validation errors)
+ 
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -109,7 +109,7 @@ async function bootstrap() {
         }
 
         const formatted: Record<string, string[]> = {};
-        const lang: SupportedLang = 'al'; // you can later detect this dynamically from request
+        const lang: SupportedLang = 'al'; 
 
         for (const err of errors) {
           if (err.constraints) {
@@ -128,17 +128,17 @@ async function bootstrap() {
     }),
   );
 
-  // ✅ Global error filter (handles logic errors like ForbiddenException, NotFound, etc.)
+  
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  // ✅ Enable CORS
+  
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });
 
-  // ✅ Swagger setup
+  
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Real Estate App API')
     .setDescription('API documentation for the Real Estate backend')

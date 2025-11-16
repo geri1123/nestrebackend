@@ -15,10 +15,17 @@ export class SaveProductService{
         private readonly saveProductRepo:SaveProductRepository,
         private readonly firebaseService:FirebaseService
     ){}
-    async saveProduct(userId: number, productId: number, language: SupportedLang) {
-    
-    const save = await this.saveProductRepo.createSave(userId, productId);
 
+
+   
+    async saveProduct(userId: number, productId: number, language: SupportedLang) {
+      const alreadySaved = await this.saveProductRepo.isSaved(userId, productId);
+
+  if (alreadySaved) {
+    throw new ForbiddenException(t("productAlreadySaved", language));
+  }
+    const save = await this.saveProductRepo.createSave(userId, productId);
+  
     if (!save) {
       throw new ForbiddenException(t("saveFailed", language));
     }

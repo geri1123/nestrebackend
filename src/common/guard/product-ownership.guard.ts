@@ -43,7 +43,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
       throw new ForbiddenException(t('cannotEditOthersProduct', lang));
     }
 
-    // 👤 Regular users: can only edit their own products
+    // Regular users: can only edit their own products
     if (product.userId !== req.userId) {
       throw new ForbiddenException(t('cannotEditProduct', lang));
     }
