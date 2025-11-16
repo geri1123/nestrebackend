@@ -23,12 +23,20 @@ export class NotificationTemplateService {
     },
     agency_confirm_agent: {
       [LanguageCode.al]: () =>
-        `Agjensioni juaj ka aprovuar kërkesën tuaj për t'u bashkuar. Mirë se erdhët në ekip!`,
+        `Agjensia juaj ka aprovuar kërkesën tuaj për t'u bashkuar. Mirë se erdhët në ekip!`,
       [LanguageCode.en]: () =>
         `Your request to join the agency has been approved. Welcome to the team!`,
       [LanguageCode.it]: () =>
         `La tua richiesta di unirti all'agenzia è stata approvata. Benvenuto nel team!`,
     },
+    agent_updated_by_agent: {
+  [LanguageCode.al]: (data) =>
+    `${data.updatedByName} ka përditësuar informacionet tua: ${data.reason}.`,
+  [LanguageCode.en]: (data) =>
+    `${data.updatedByName} has updated your information: ${data.reason}.`,
+  [LanguageCode.it]: (data) =>
+    `${data.updatedByName} ha aggiornato le tue informazioni: ${data.reason}.`,
+},
   };
 
 

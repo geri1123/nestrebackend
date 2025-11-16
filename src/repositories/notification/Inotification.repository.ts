@@ -9,6 +9,7 @@ export interface NotificationData {
   userId: number;
   type: string;
   translations: NotificationTranslationInput[];
+    messageData?: Record<string, any>;
 }
 
 export interface INotificationRepository {

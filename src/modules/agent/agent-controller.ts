@@ -65,11 +65,15 @@ async getPrivateAgents(
 @UseGuards(UserStatusGuard ,AgentBelongsToAgencyGuard)
 async updateAgencyAgents(@Param('id') id:number ,@Req() req:RequestWithUser , @Body() data: Record<string, any>,  ){
    const agencyId = req.agencyId;
+   const user=req.user;
  const language=req.language;
+ if(!user){
+  return null;
+ }
  if (!agencyId) {
   throw new ForbiddenException(t("agencyNotFound" , language));
 }
   const dto = plainToInstance(UpdateAgentsDto, data)
- return this.manageAgentService.updateAgencyAgents(id, agencyId, dto, language)
+ return this.manageAgentService.updateAgencyAgents(id, agencyId, dto, language , user)
 }
 }
