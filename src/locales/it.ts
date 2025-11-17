@@ -1,4 +1,7 @@
 export const it = {
+   agentUpdatedSuccessfully: "Agente aggiornato con successo.",
+  websiteInvalid: "L'URL del sito web non è valido",
+    phoneMustBeDigits: "Il numero di telefono deve contenere solo cifre",
    agentInactive: "L'agente è inattivo",
    agencyInactive: "L'agenzia non è attiva",
     accountSuspended:  'Il tuo account è sospeso.',

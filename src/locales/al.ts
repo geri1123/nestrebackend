@@ -1,4 +1,7 @@
 export const al = {
+  agentUpdatedSuccessfully: "Agjenti u përditësua me sukses.",
+  websiteInvalid: "Adresa e faqes së internetit nuk është e vlefshme",
+   phoneMustBeDigits: "Numri i telefonit duhet të përmbajë vetëm shifra",
   agentInactive: "Agjenti është jo aktiv ose kontrata ka mbaruar",
   agencyInactive:"Agjencia nuk është aktive",
   accountSuspended:  'Llogaria juaj është pezulluar.',

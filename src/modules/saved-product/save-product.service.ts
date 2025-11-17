@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable } from "@nestjs/common";
 import { SaveProductRepository } from "../../repositories/saved-product/save-product.repository";
 import { SupportedLang, t } from "../../locales";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
-import { ProductImageDto } from "../product/dto/product-frontend.dto";
 import { formatDate } from "../../common/utils/date";
 import { PaginatedSavedProductsDto, SavedProductDto, SavedProductImage } from "./dto/save-product.dto";
 import { SavedProductWithRelations } from "./type/SavedProductWithRelations.type";

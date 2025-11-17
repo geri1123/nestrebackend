@@ -99,7 +99,10 @@ case "pricePositive": return t("pricePositive" , lang);
 case "title": return t("title" , lang);
 case "productstatus": return t("productstatus", lang);
 
-case 'endDateInvalid':return t("endDateInvalid", lang)
+case 'endDateInvalid':return t("endDateInvalid", lang);
+case "agencyNameRequired":return t("agencyNameRequired",lang)
+case "phoneMustBeDigits":return t("phoneMustBeDigits", lang)
+case "websiteInvalid":return t("websiteInvalid" , lang);
 default: return code;
   }
 }

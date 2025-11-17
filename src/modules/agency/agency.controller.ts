@@ -1,4 +1,4 @@
-import { Controller, ForbiddenException, Get, Param, Patch, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Patch, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { AgencyService } from './agency.service';
@@ -8,10 +8,17 @@ import type { RequestWithUser } from '../../common/types/request-with-user.inter
 import { Roles } from '../../common/decorators/roles.decorator';
 import  { Permissions } from '../../common/decorators/permissions.decorator';
 import { RolesGuard } from '../../common/guard/role-guard';
+import { plainToInstance } from 'class-transformer';
+import { UpdateAgencyDto } from './dto/update-agency.dto';
+import { ManageAgencyService } from './manage-agency.service';
 
 @Controller('agencies')
 export class AgencyController {
-  constructor(private readonly agencyService: AgencyService) {}
+  constructor(
+    private readonly agencyService: AgencyService,
+    private readonly manageAgencyService:ManageAgencyService
+
+  ) {}
   @Public()
   @Get()
 
@@ -48,13 +55,16 @@ async getAgencyInfoPublic(
 async changeagencyfields(
   @Req() req:RequestWithUser,
   // @Query() 
+   @Body() data: Record<string, any>, 
 ){
  const {language , agencyId}=req;
   if (!agencyId) {
     throw new ForbiddenException(t('noAgency', req.language));
   }
 
+const dto=plainToInstance(UpdateAgencyDto , data)
 
+return this.manageAgencyService.updateAgencyFields(dto , language , agencyId)
 }
 
 }

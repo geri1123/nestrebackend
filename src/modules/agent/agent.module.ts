@@ -14,6 +14,6 @@ import { NotificationModule } from '../notification/notification.module';
   imports: [AgencyModule,NotificationModule],
     controllers: [AgentController],
   providers: [AgentService,AgentsRepository  ,AgentPermisionService, AgentPermissionRepository , ManageAgentsService],
-  exports: [AgentsRepository , AgentService , AgentPermisionService],
+  exports: [AgentsRepository,AgentPermissionRepository , AgentService , AgentPermisionService],
 })
 export class AgentModule {}

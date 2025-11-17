@@ -1,5 +1,7 @@
 export const en = {
-
+ phoneMustBeDigits: "Phone must contain only numbers",
+agentUpdatedSuccessfully: "Agent updated successfully.",
+ websiteInvalid: "The website URL is not valid",
      agentInactive: "Agent is inactive",
      agencyInactive:"Agency is not active",
       agencySuspended: "Agency is suspended",
