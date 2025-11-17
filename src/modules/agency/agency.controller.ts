@@ -1,4 +1,4 @@
-import { Controller, ForbiddenException, Get, Param, Query, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Param, Patch, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { AgencyService } from './agency.service';
@@ -7,6 +7,7 @@ import { SupportedLang, t } from '../../locales';
 import type { RequestWithUser } from '../../common/types/request-with-user.interface';
 import { Roles } from '../../common/decorators/roles.decorator';
 import  { Permissions } from '../../common/decorators/permissions.decorator';
+import { RolesGuard } from '../../common/guard/role-guard';
 
 @Controller('agencies')
 export class AgencyController {
@@ -42,4 +43,18 @@ async getAgencyInfoPublic(
   
   return this.agencyService.getAgencyInfo(agencyId, language, false, req);
 }
+@Roles('agency_owner')
+@Patch('update-fields')
+async changeagencyfields(
+  @Req() req:RequestWithUser,
+  // @Query() 
+){
+ const {language , agencyId}=req;
+  if (!agencyId) {
+    throw new ForbiddenException(t('noAgency', req.language));
+  }
+
+
+}
+
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LanguageCode } from '@prisma/client';
 import { SupportedLang } from '../../locales';
+import { translateAgentChanges } from '../agent/helpers/agent-change-translator';
 
 type TemplateFn = (user: any) => string;
 
@@ -29,14 +30,14 @@ export class NotificationTemplateService {
       [LanguageCode.it]: () =>
         `La tua richiesta di unirti all'agenzia è stata approvata. Benvenuto nel team!`,
     },
-    agent_updated_by_agent: {
-  [LanguageCode.al]: (data) =>
-    `${data.updatedByName} ka përditësuar informacionet tua: ${data.reason}.`,
-  [LanguageCode.en]: (data) =>
-    `${data.updatedByName} has updated your information: ${data.reason}.`,
-  [LanguageCode.it]: (data) =>
-    `${data.updatedByName} ha aggiornato le tue informazioni: ${data.reason}.`,
-},
+      agent_updated_by_agent: {
+      [LanguageCode.al]: (data) =>
+        `${data.updatedByName} ka përditësuar informacionet tua: ${translateAgentChanges(data.dto, 'al')}.`,
+      [LanguageCode.en]: (data) =>
+        `${data.updatedByName} has updated your information: ${translateAgentChanges(data.dto, 'en')}.`,
+      [LanguageCode.it]: (data) =>
+        `${data.updatedByName} ha aggiornato le tue informazioni: ${translateAgentChanges(data.dto, 'it')}.`,
+    },
   };
 
 
