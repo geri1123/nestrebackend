@@ -2,16 +2,14 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserService } from "./users.service";
 import { FirebaseService } from "../../../infrastructure/firebase/firebase.service";
 import { SupportedLang, t } from "../../../locales";
+import { ImageUtilsService } from "../../../common/utils/image-utils.service";
 
 @Injectable()
 export class ProfilePictureService {
-  private readonly ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-  private readonly DEFAULT_IMAGE_PREFIXES = ['defaults/', 'system/'];
-
   constructor(
     private readonly userService: UserService,
-    private readonly firebaseService: FirebaseService
+    private readonly firebaseService: FirebaseService,
+    private readonly imageUtilsService: ImageUtilsService 
   ) {}
 
   async updateProfileImage(
@@ -20,19 +18,19 @@ export class ProfilePictureService {
     language: SupportedLang
   ): Promise<string> {
  
-    this.validateFile(file, language);
+     this.imageUtilsService.validateFile(file, language);
 
   
     const user = await this.userService.findByIdOrFail(userId, language);
     const oldImagePath = user.profile_img;
 
 
-    if (oldImagePath && !this.isDefaultImage(oldImagePath)) {
+    if (oldImagePath && !this.imageUtilsService.isDefaultImage(oldImagePath)) {
       try {
         await this.firebaseService.deleteFile(oldImagePath);
-        console.log(`✅ Deleted old profile image: ${oldImagePath}`);
+        console.log(` Deleted old profile image: ${oldImagePath}`);
       } catch (error) {
-        console.warn(`⚠️ Failed to delete old profile image:`, error);
+        console.warn(` Failed to delete old profile image:`, error);
       }
     }
 
@@ -57,7 +55,7 @@ export class ProfilePictureService {
       await this.firebaseService.deleteFile(uploadedPath);
       throw new BadRequestException({
         success: false,
-        message: "Failed to update profile image in database",
+        message:t('failedToUpdateProfileImage',language),
       });
     }
 
@@ -72,16 +70,16 @@ export class ProfilePictureService {
     if (!oldImagePath) {
       throw new BadRequestException({
         success: false,
-        message: "No profile image to delete",
+        message: t('noimagetodelete' , language),
       });
     }
 
-    if (this.isDefaultImage(oldImagePath)) {
-      throw new BadRequestException({
-        success: false,
-        message: "Cannot delete default profile image",
-      });
-    }
+    // if (!this.imageUtilsService.isDefaultImage(oldImagePath)) {
+    //   throw new BadRequestException({
+    //     success: false,
+    //     message: "Cannot delete default profile image",
+    //   });
+    // }
 
  
     try {
@@ -91,33 +89,33 @@ export class ProfilePictureService {
     }
 
     
-    await this.userService.updateProfileImage(userId, '');
+    await this.userService.deleteProfileImage(userId);
   }
 
-  private validateFile(file: Express.Multer.File, language: SupportedLang): void {
-    if (!file) {
-      throw new BadRequestException({
-        success: false,
-        message:t('noImageUploaded', language),
-      });
-    }
+  // private validateFile(file: Express.Multer.File, language: SupportedLang): void {
+  //   if (!file) {
+  //     throw new BadRequestException({
+  //       success: false,
+  //       message:t('noImageUploaded', language),
+  //     });
+  //   }
 
-    if (!this.ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-      throw new BadRequestException({
-        success: false,
-        message:t('invalidImageType', language),
-      });
-    }
+  //   if (!this.ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+  //     throw new BadRequestException({
+  //       success: false,
+  //       message:t('invalidImageType', language),
+  //     });
+  //   }
 
-    if (file.size > this.MAX_FILE_SIZE) {
-      throw new BadRequestException({
-        success: false,
-        message:t('imageTooLarge', language),
-      });
-    }
-  }
+  //   if (file.size > this.MAX_FILE_SIZE) {
+  //     throw new BadRequestException({
+  //       success: false,
+  //       message:t('imageTooLarge', language),
+  //     });
+  //   }
+  // }
 
-  private isDefaultImage(path: string): boolean {
-    return this.DEFAULT_IMAGE_PREFIXES.some(prefix => path.startsWith(prefix));
-  }
+  // private isDefaultImage(path: string): boolean {
+  //   return this.DEFAULT_IMAGE_PREFIXES.some(prefix => path.startsWith(prefix));
+  // }
 }

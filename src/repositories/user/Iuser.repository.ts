@@ -21,4 +21,5 @@ updateProfileImage(userId: number, imageUrl: string): Promise<void> ;
   updateFieldsById(userId: number, fields: Partial<UpdatableUserFields>): Promise<void>;
   verifyEmail(userId: number, emailVerified: boolean, statusToUpdate: user_status): Promise<void>;
   regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<void>;
+   deleteImage(userId:number):Promise<void>;
 }

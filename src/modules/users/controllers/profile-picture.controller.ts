@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilePictureService } from '../services/profile-picture.service';
-import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../../locales';
 import { ApiProfilePictureUpload ,ApiProfilePictureDelete} from '../swager/upload-image.swager';
 import { ProfileSwagger } from '../swager/profile.swagger';
@@ -59,7 +58,7 @@ export class ProfilePictureController {
       throw new BadRequestException(t('userNotAuthenticated', req.language));
     }
     const userId = req.userId;
-    const language: SupportedLang = req.language || 'en';
+    const language: SupportedLang = req.language || 'al';
 
     await this.profilePictureService.deleteProfileImage(userId, language);
 

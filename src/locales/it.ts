@@ -1,4 +1,7 @@
 export const it = {
+    failedToUpdateProfileImage:"Impossibile aggiornare l'immagine del profilo nel database.",
+failedToUpdateAgencyLogo: "Aggiornamento del logo dell'agenzia non riuscito.",
+noimagetodelete:"Nessuna immagine da eliminare.",
    agentUpdatedSuccessfully: "Agente aggiornato con successo.",
   websiteInvalid: "L'URL del sito web non è valido",
     phoneMustBeDigits: "Il numero di telefono deve contenere solo cifre",

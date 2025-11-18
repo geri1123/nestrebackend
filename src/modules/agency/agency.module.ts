@@ -5,10 +5,11 @@ import { AgencyRepository } from '../../repositories/agency/agency.repository';
 import { AgencyService } from './agency.service';
 import { AgencyController } from './agency.controller';
 import { ManageAgencyService } from './manage-agency.service';
+import { ImageUtilsService } from '../../common/utils/image-utils.service';
 @Module({
   controllers: [AgencyController],
   
-  providers: [AgencyRepository, AgencyService , ManageAgencyService ],
+  providers: [AgencyRepository, AgencyService ,ImageUtilsService, ManageAgencyService ],
   exports: [ AgencyService ,AgencyRepository],
 })
 export class AgencyModule {}

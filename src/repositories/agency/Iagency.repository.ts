@@ -31,4 +31,5 @@ countAgencies(): Promise<number>;
       Omit<PlainAgencyInput, 'id' | 'created_at' | 'public_code' | 'updated_at'>
     >
   ): Promise<void>;
+   deleteLogo(agencyId: number): Promise<void>;
 }

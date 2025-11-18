@@ -135,4 +135,11 @@ async updateProfileImage(userId: number, imageUrl: string): Promise<void> {
       data: { verification_token: token, verification_token_expires: expires, updated_at: new Date() },
     });
   }
+  async deleteImage(userId:number){
+    await this.prisma.user.update({
+  where: { id: userId },
+  data: { profile_img: null },
+});
+
+  }
 }

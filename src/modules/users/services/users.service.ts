@@ -145,4 +145,7 @@ async getNavbarUser(
     profile_img: publicUrl,
   };
 }
+async deleteProfileImage(userId:number){
+  await this.userRepo.deleteImage(userId)
+}
 }

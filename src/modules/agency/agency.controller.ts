@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Query, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { AgencyService } from './agency.service';
@@ -11,6 +11,7 @@ import { RolesGuard } from '../../common/guard/role-guard';
 import { plainToInstance } from 'class-transformer';
 import { UpdateAgencyDto } from './dto/update-agency.dto';
 import { ManageAgencyService } from './manage-agency.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('agencies')
 export class AgencyController {
@@ -67,4 +68,40 @@ const dto=plainToInstance(UpdateAgencyDto , data)
 return this.manageAgencyService.updateAgencyFields(dto , language , agencyId)
 }
 
+@Roles('agency_owner')
+@Patch('upload-logo')
+@UseInterceptors(FileInterceptor('file'))
+async uploadAgencyLogo(
+  @Req() req: RequestWithUser,
+  @UploadedFile() file: Express.Multer.File,
+) {
+  const { language, agencyId } = req;
+
+  if (!agencyId) {
+    throw new ForbiddenException(t('noAgency', language));
+  }
+
+ const agencyLogo= await this.manageAgencyService.uploadLogo(agencyId, file, language);
+   return {
+      success: true,
+      message:t('imagesuccessfullyUploaded', language),
+      imageUrl: agencyLogo,
+    };
+}
+@Roles('agency_owner')
+@Delete("logo")
+async deleteAgencyLogo(
+@Req() req:RequestWithUser
+){
+  const {agencyId,language}=req;
+    if(!agencyId){
+      throw new ForbiddenException(t('noAgency', language));
+    }
+
+    await this.manageAgencyService.deletelogo(agencyId , language)
+      return {
+      success: true,
+      message:t('imagesuccessfullydeleted', language),
+    };
+}
 }

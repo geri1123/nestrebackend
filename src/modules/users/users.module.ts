@@ -9,10 +9,11 @@ import { UsernameService } from './services/username.service';
 import { UsernameHistoryRepository } from '../../repositories/usernamehistory/usernamehistory.repository';
 import { ProfilePictureService } from './services/profile-picture.service';
 import { ProfilePictureController } from './controllers/profile-picture.controller';
+import { ImageUtilsService } from '../../common/utils/image-utils.service';
 @Module({
   controllers:[UserController , ProfilePictureController],
   imports: [EmailModule ],
-  providers: [ProfilePictureService,UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
+  providers: [ProfilePictureService,ImageUtilsService,UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
   exports: [UserRepository , UserService, RegistrationService , RegistrationService],
 })
 export class UserModule {}

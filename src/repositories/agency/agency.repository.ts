@@ -78,14 +78,18 @@ async findLogoById(agencyId: number): Promise<{ logo: string | null } | null> {
     select: { logo: true },
   });
 }
-async findWithOwnerById(agencyId: number): Promise<{ id: number; agency_name: string; owner_user_id: number } | null> {
+async findWithOwnerById(
+  agencyId: number
+): Promise<{ id: number; agency_name: string; owner_user_id: number; status: string; } | null> {
+  
   return this.prisma.agency.findUnique({
     where: { id: agencyId },
     select: {
       id: true,
       agency_name: true,
       owner_user_id: true,
-      status:true,
+      status: true,
+      
     },
   });
 }
@@ -182,5 +186,12 @@ async getAllAgencies(skip: number, take: number): Promise<agency[]> {
       data: { ...filteredData },
     });
   }
-  
+ async deleteLogo(agencyId: number): Promise<void> {
+  await this.prisma.agency.update({
+    where: { id: agencyId },
+    data: {
+      logo: null,
+    },
+  });
+}
 }
