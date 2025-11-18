@@ -6,6 +6,7 @@ import { SupportedLang, t } from "../../locales";
 import { AgencyInfo } from "./types/agency-info";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
 import { RequestWithUser } from "../../common/types/request-with-user.interface";
+import { CreateAgencyDto } from "./dto/create-agency.dto";
 @Injectable()
 export class AgencyService {
   constructor(
@@ -63,7 +64,7 @@ export class AgencyService {
 
  
   async createAgency(
-    dto: RegisterAgencyOwnerDto,
+    dto: CreateAgencyDto,
     userId: number,
     language: SupportedLang = "al"
   ): Promise<number> {

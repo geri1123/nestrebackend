@@ -89,5 +89,14 @@ get passwordResetTokenExpiration(): number {
   get redisTTL(): number {
     return Number(this.configService.get<number>('REDIS_TTL', 3600));
   }
-
+//google auth 2.0
+get googleClientId(): string {
+  return this.configService.get<string>('GOOGLE_CLIENT_ID' ,'') ;
 }
+
+get googleClientSecret(): string {
+  return this.configService.get<string>('GOOGLE_CLIENT_SECRET','');
+}
+}
+
+

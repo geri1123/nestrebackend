@@ -229,6 +229,8 @@ model user {
   role                         user_role
   status                       user_status           @default(active)
   email_verified               Boolean               @default(false)
+  google_user      Boolean  @default(false)
+google_id        String?  @unique
   last_login                   DateTime?
   last_active                  DateTime?
   created_at                   DateTime              @default(now())

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Query, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 
 import { Public } from '../../common/decorators/public.decorator';
 import { AgencyService } from './agency.service';
@@ -12,13 +12,15 @@ import { plainToInstance } from 'class-transformer';
 import { UpdateAgencyDto } from './dto/update-agency.dto';
 import { ManageAgencyService } from './manage-agency.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateAgencyDto } from './dto/create-agency.dto';
+import { AgencyCreationService } from './AgencyCreation.Service';
 
 @Controller('agencies')
 export class AgencyController {
   constructor(
     private readonly agencyService: AgencyService,
-    private readonly manageAgencyService:ManageAgencyService
-
+    private readonly manageAgencyService:ManageAgencyService,
+    private readonly createAgencyService:AgencyCreationService
   ) {}
   @Public()
   @Get()
@@ -103,5 +105,26 @@ async deleteAgencyLogo(
       success: true,
       message:t('imagesuccessfullydeleted', language),
     };
+}
+
+@Roles('user')
+@Post('create-agency')
+
+async createAgency(
+  @Req() req:RequestWithUser,
+  @Body() data: Record<string, any>, 
+){
+ const {userId , language}=req;
+if (!userId) {
+  throw new UnauthorizedException(t("userNotAuthenticated" , language));
+
+}
+const dto=plainToInstance(CreateAgencyDto , data)
+const agency=await this.createAgencyService.registerAgencyFromUser(dto ,userId , language)
+
+return {
+  message: t("agencyCreatedSuccessfully", language),
+  agency, 
+}
 }
 }

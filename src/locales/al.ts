@@ -1,6 +1,8 @@
 export const al = {
   failedToUpdateProfileImage:"Dështoi përditësimi i fotos së profilit në bazën e të dhënave.",
  failedToUpdateAgencyLogo: "Dështoi përditësimi i logos së agjencisë.",
+       agencyCreatedSuccessfully:"Agjencia u krijua me sukses",
+
   noimagetodelete:"Nuk ka asnjë imazh për të fshirë.",
   agentUpdatedSuccessfully: "Agjenti u përditësua me sukses.",
   websiteInvalid: "Adresa e faqes së internetit nuk është e vlefshme",
