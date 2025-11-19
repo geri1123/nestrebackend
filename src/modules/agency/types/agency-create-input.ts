@@ -1,3 +1,4 @@
+import { agency_status } from "@prisma/client";
 
 
 export type PlainAgencyInput = {
@@ -9,4 +10,5 @@ export type PlainAgencyInput = {
   phone?: string | null;
   website?: string | null;
   owner_user_id: number;
+   status?: agency_status;
 };

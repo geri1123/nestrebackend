@@ -15,6 +15,7 @@ import { RegistrationService } from '../users/services/RegistrationService';
 import { throwValidationErrors } from '../../common/helpers/validation.helper';
 import { validate } from 'class-validator';
 import { AgentService } from '../agent/agent.service';
+import { agency_status } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -144,7 +145,7 @@ async registerAgencyOwner(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
     lang
   );
 
-  await this.agencyService.createAgency(dto, userId, lang);
+  await this.agencyService.createAgency(dto, userId, lang , agency_status.inactive);
 
   await this.emailService.sendVerificationEmail(
     dto.email,

@@ -125,7 +125,8 @@ async findWithOwnerById(
     data: {
       ...agencyData,
       public_code: publicCode,
-      status: 'inactive',
+      // status: 'inactive',
+      status: agencyData.status ?? 'inactive',
     },
     select: { id: true },
   });

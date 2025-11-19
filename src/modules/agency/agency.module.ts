@@ -6,7 +6,7 @@ import { AgencyService } from './agency.service';
 import { AgencyController } from './agency.controller';
 import { ManageAgencyService } from './manage-agency.service';
 import { ImageUtilsService } from '../../common/utils/image-utils.service';
-import { AgencyCreationService } from './AgencyCreation.Service';
+import { AgencyCreationService } from './agency-creation.service';
 import { UserModule } from '../users/users.module';
 @Module({
   imports:[UserModule],

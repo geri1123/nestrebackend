@@ -9,7 +9,7 @@ import { throwValidationErrors } from "../../common/helpers/validation.helper";
 import { CreateAgencyDto } from "./dto/create-agency.dto";
 import { SupportedLang } from "../../locales";
 import { validate } from "class-validator";
-import { user_role } from "@prisma/client";
+import { agency_status, user_role } from "@prisma/client";
 
 @Injectable()
 export class AgencyCreationService {
@@ -23,7 +23,7 @@ export class AgencyCreationService {
     userId: number,
     language: SupportedLang
   ) {
-    // 1️⃣ Run validation and agency existence check in parallel
+    
     const [errors, agencyErrors] = await Promise.all([
       validate(dto),
       this.agencyService.checkAgencyExists(dto.agency_name, dto.license_number, language),
@@ -41,7 +41,7 @@ export class AgencyCreationService {
     await this.userService.updateFields(userId, { role: user_role.agency_owner});
 
   
-    const agencyId = await this.agencyService.createAgency(dto, userId, language);
+    const agencyId = await this.agencyService.createAgency(dto, userId, language , agency_status.active);
 
     return { agencyId };
   }

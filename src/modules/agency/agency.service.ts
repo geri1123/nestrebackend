@@ -7,6 +7,7 @@ import { AgencyInfo } from "./types/agency-info";
 import { FirebaseService } from "../../infrastructure/firebase/firebase.service";
 import { RequestWithUser } from "../../common/types/request-with-user.interface";
 import { CreateAgencyDto } from "./dto/create-agency.dto";
+import { agency_status } from "@prisma/client";
 @Injectable()
 export class AgencyService {
   constructor(
@@ -66,7 +67,8 @@ export class AgencyService {
   async createAgency(
     dto: CreateAgencyDto,
     userId: number,
-    language: SupportedLang = "al"
+    language: SupportedLang = "al",
+    status:agency_status,
   ): Promise<number> {
     console.log('🏢 [AgencyService] Creating agency');
 
@@ -75,6 +77,7 @@ export class AgencyService {
       license_number: dto.license_number,
       address: dto.address,
       owner_user_id: userId,
+      status,
     });
   }
 

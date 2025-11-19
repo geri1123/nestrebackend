@@ -13,7 +13,7 @@ import { UpdateAgencyDto } from './dto/update-agency.dto';
 import { ManageAgencyService } from './manage-agency.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateAgencyDto } from './dto/create-agency.dto';
-import { AgencyCreationService } from './AgencyCreation.Service';
+import { AgencyCreationService } from './agency-creation.service';
 
 @Controller('agencies')
 export class AgencyController {
