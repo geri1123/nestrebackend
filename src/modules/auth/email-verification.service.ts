@@ -4,7 +4,7 @@ import { EmailService } from '../../infrastructure/email/email.service';
 import { SupportedLang, t } from '../../locales';
 import { AgencyService } from '../agency/agency.service';
 import { UserService } from '../users/services/users.service';
-import { RegistrationRequestService } from '../registration-request/registration.request.service';
+import { RegistrationRequestService } from '../registration-request/registration_request.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationTemplateService } from '../notification/notifications-template.service';
 

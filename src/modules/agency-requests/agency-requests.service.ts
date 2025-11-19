@@ -1,12 +1,13 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { RegistrationRequestService } from "../registration-request/registration.request.service";
+import { RegistrationRequestService } from "../registration-request/registration_request.service";
 import { SupportedLang, t } from "../../locales";
-import { agencyagent_role_in_agency, registrationrequest_status } from "@prisma/client";
+import { agencyagent_role_in_agency, registrationrequest_status, user_role, user_status } from "@prisma/client";
 import { AgentService } from "../agent/agent.service";
 import { UserService } from "../users/services/users.service";
 import { EmailService } from "../../infrastructure/email/email.service";
 import { AgentPermisionService } from "../agent/agent-permision.service";
 import { UpdateRequestStatusDto } from "./dto/agency-request.dto";
+import { UserStatus } from "../auth/types/create-user-input";
 
 @Injectable()
 
@@ -82,11 +83,24 @@ if (request.agency_id !== agencyId) {
     commissionRate:dto.commissionRate,
     status: "active",
   }, language);
+const updates: any = {};
 
-  await this.userservice.updateFields(request.user_id, {
-    status: "active",
+if (request.user.role !== user_role.agent) {
+  updates.role = user_role.agent;
+}
+
+if (request.user.status !== user_status.active) {
+  updates.status = user_status.active;
+}
+
+if (Object.keys(updates).length > 0) {
+  await this.userservice.updateFields(request.user_id, updates);
+}
+  // await this.userservice.updateFields(request.user_id, {
+  //   status: user_status.active,
+  //   role:user_role.agent
     
-  });
+  // });
     
  await this.agentpermisonService.addPermissions(
   agent.id,

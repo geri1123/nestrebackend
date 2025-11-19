@@ -2,7 +2,7 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { UserService } from '../users/services/users.service';
 import { AgencyService } from '../agency/agency.service';
-import { RegistrationRequestService } from '../registration-request/registration.request.service';
+import { RegistrationRequestService } from '../registration-request/registration_request.service';
 import { EmailService } from '../../infrastructure/email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';

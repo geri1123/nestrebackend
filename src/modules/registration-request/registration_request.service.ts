@@ -7,7 +7,7 @@ import { UpdateRequestStatusType } from "./type/updatestatus-type";
 import { AgencyService } from "../agency/agency.service";
 
 import { AgentService } from "../agent/agent.service";
-import { registrationrequest_status } from "@prisma/client";
+import { registrationrequest_request_type, registrationrequest_requested_role, registrationrequest_status, user_role, user_status } from "@prisma/client";
 
 @Injectable()
 export class RegistrationRequestService {
@@ -134,11 +134,13 @@ async findRequestById(
   id: number;
   user_id: number;
   agency_id: number | null;
-  id_card_number: string | null; // <- match Prisma
+  id_card_number: string | null; 
   user: {
     email: string;
     first_name: string | null;
     last_name: string | null;
+    role:user_role;
+    status:user_status;
   };
 }> {
   const request = await this.requestRepo.findRequestById(id);
@@ -152,5 +154,31 @@ async findRequestById(
 
   return request; 
 }
+//send reuest by loged in users
+async sendRequestToAgencyById(
+  userId: number,
+  agencyId: number,
 
+  language: SupportedLang = 'al'
+) {
+  // Find agency by ID
+  const agency = await this.agencyservice.getAgencyWithOwnerById(agencyId);
+  if (!agency) {
+    throw new BadRequestException({
+      success: false,
+      message: t("invalidAgencyId", language),
+    });
+  }
+
+  // Create request without idCardNumber
+await this.requestRepo.create({
+  userId,
+  idCardNumber: null,
+  status: registrationrequest_status.pending,
+  agencyName: agency.agency_name,
+  agencyId: agency.id,
+  requestedRole: registrationrequest_requested_role.agent,
+  requestType:registrationrequest_request_type.agent_license_verification,
+});
+}
 }

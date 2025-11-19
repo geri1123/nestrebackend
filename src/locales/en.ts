@@ -2,6 +2,7 @@ export const en = {
       failedToUpdateProfileImage:"Failed to update profile image in database.",
       noimagetodelete:"No image to delete.",
      agencyCreatedSuccessfully:"Agency created successfully",
+     requestSentSuccessfully:"Request sent successfully.",
 failedToUpdateAgencyLogo: "Failed to update agency logo.",
  phoneMustBeDigits: "Phone must contain only numbers",
 agentUpdatedSuccessfully: "Agent updated successfully.",

@@ -3,7 +3,7 @@ import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { AgentRequestQueryResult } from '../../modules/registration-request/type/agent-request-query-result';
 import { IRegistrationRequestRepository } from './Iregistration-request.respository';
 import { RegistrationRequestCreateInput } from '../../modules/registration-request/type/registration-request-create';
-import { registrationrequest, registrationrequest_status } from '@prisma/client';
+import { registrationrequest, registrationrequest_status, user_role, user_status } from '@prisma/client';
 
 @Injectable()
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
@@ -152,6 +152,8 @@ async findRequestById(id: number): Promise<{
     email: string;
     first_name: string | null;
     last_name: string | null;
+    role:user_role;
+    status:user_status;
   };
 } | null> {
   return this.prisma.registrationrequest.findUnique({
@@ -166,6 +168,8 @@ async findRequestById(id: number): Promise<{
           email: true,
           first_name: true,
           last_name: true,
+          role:true,
+          status:true,
         },
       },
     },
