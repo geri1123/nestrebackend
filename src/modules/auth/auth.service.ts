@@ -86,8 +86,8 @@ async login(dto: LoginDto, language: SupportedLang = 'al') {
       userId: user.id,
       username: user.username,
       email: user.email,
-      role: user.role,
-      agencyId, 
+      // role: user.role,
+      // agencyId, 
     },
     { expiresIn: tokenExpiry },
   );

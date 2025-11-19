@@ -6,6 +6,7 @@ import { AgentService } from "../agent/agent.service";
 import { UserService } from "../users/services/users.service";
 import { EmailService } from "../../infrastructure/email/email.service";
 import { AgentPermisionService } from "../agent/agent-permision.service";
+import { UpdateRequestStatusDto } from "./dto/agency-request.dto";
 
 @Injectable()
 
@@ -45,19 +46,9 @@ async getRequestsForAgencyOwner(
 async updateRequestStatus(
   requestId: number,
   agencyId: number,
+  
   approvedBy: number,
-  action: 'approved' | 'rejected',
-  roleInAgency: agencyagent_role_in_agency,
-  commissionRate?: number,
-  reviewNotes?: string,
-    permissions?: {
-    can_edit_own_post?: boolean;
-    can_edit_others_post?: boolean;
-    can_approve_requests?: boolean;
-    can_view_all_posts?: boolean;
-    can_delete_posts?: boolean;
-    can_manage_agents?: boolean;
-  },
+  dto:UpdateRequestStatusDto,
   language: SupportedLang = "al"
 ) {
   const request = await this.registrationrequestService.findRequestById(requestId, language);
@@ -72,8 +63,8 @@ if (request.agency_id !== agencyId) {
 }
 
   // If approved, create the agent first
-  if (action === 'approved') {
-    if (!roleInAgency) {
+  if (dto.action === 'approved') {
+    if (!dto.roleInAgency) {
       throw new Error('roleInAgency is required when approving');
     }
     
@@ -87,8 +78,8 @@ if (request.agency_id !== agencyId) {
     agentId: request.user_id,
     addedBy: approvedBy,
     idCardNumber:request.id_card_number ||"",
-    roleInAgency,
-    commissionRate,
+    roleInAgency:dto.roleInAgency,
+    commissionRate:dto.commissionRate,
     status: "active",
   }, language);
 
@@ -100,7 +91,7 @@ if (request.agency_id !== agencyId) {
  await this.agentpermisonService.addPermissions(
   agent.id,
   agencyId,
-  permissions && Object.keys(permissions).length > 0 ? permissions : {}
+  dto.permissions && Object.keys(dto.permissions).length > 0 ? dto.permissions : {}
 );
   
 
@@ -108,7 +99,7 @@ await this.emailService.sendAgentWelcomeEmail(
   request.user.email,
   `${request.user.first_name || ''} ${request.user.last_name || ''}`.trim()
 );
-  } else if(action==="rejected"){
+  } else if(dto.action==="rejected"){
      await this.userservice.updateFields(request.user_id, {
     status: "active",
     role: "user"
@@ -122,15 +113,15 @@ await this.emailService.sendAgentWelcomeEmail(
    this.registrationrequestService.updateRequests(
     {
       requestId,
-      action,
-      commissionRate,
-      reviewNotes,
+      action:dto.action,
+      commissionRate:dto.commissionRate,
+      reviewNotes:dto.reviewNotes,
       reviewedBy: approvedBy,
     },
     language
   );
    const message =
-    action === 'approved'
+    dto.action === 'approved'
       ? t('registrationApprovedSuccessfully', language)
       : t('registrationRejectedSuccessfully', language);
 
@@ -140,3 +131,4 @@ await this.emailService.sendAgentWelcomeEmail(
   };
 }
 }
+
