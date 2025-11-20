@@ -19,9 +19,14 @@ import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.
 import { AgentModule } from './modules/agent/agent.module';
 import { PermissionsGuard } from './common/guard/permision.guard';
 import { SaveProductModule } from './modules/saved-product/save-product.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { DatabaseModule } from './infrastructure/database/database.module';
+import { ProductClicksModule } from './modules/product-clicks/product_clicks.module';
 // import { UserStatusGuard } from './common/guard/user-status.guard';
 @Module({
   imports: [
+    ProductClicksModule,
+DatabaseModule,
     AppConfigModule,
     PrismaModule,
     UserModule,

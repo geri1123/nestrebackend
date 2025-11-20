@@ -5,11 +5,15 @@ import { ProductsRepository } from "../../../repositories/product/product.reposi
 import { ProductFrontendDto } from "../dto/product-frontend.dto";
 import { RequestWithUser } from "../../../common/types/request-with-user.interface";
 import { FirebaseService } from "../../../infrastructure/firebase/firebase.service";
+import { ProductClicksService } from "../../product-clicks/product_clicks.service";
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepo:ProductsRepository , private readonly firebaseService:FirebaseService) {}
-
+  constructor(private readonly productRepo:ProductsRepository ,
+     private readonly firebaseService:FirebaseService,
+    private readonly productClicksService: ProductClicksService,
+    ) {}
+ 
   async getProductForPermissionCheck(id: number , language:SupportedLang) {
     const product = await this.productRepo.getProductForPermissionCheck(id);
     if (!product) throw new NotFoundException(t("productNotFound" , language));
@@ -23,7 +27,8 @@ async getSingleProduct(
 ): Promise<ProductFrontendDto | null> {
   const product = await this.productRepo.getProductById(id, language);
   if (!product) return null;
-
+const productclicks=await this.productClicksService.getClicksByProduct(`${id}`);
+const totalClicks = productclicks.reduce((sum, c) => sum + c.count, 0);
   // Status checks
   if (product.status !== 'active') {
     if (!isProtectedRoute) return null;
@@ -49,8 +54,10 @@ async getSingleProduct(
     agencyId: product.agencyId,
     userId: product.userId,
     createdAt: product.createdAt.toISOString(),
+    totalClicks,
     image: product.productimage.map(img => ({
       agencyId: product.agencyId,
+      
       imageUrl: this.firebaseService.getPublicUrl(img.imageUrl),
     })),
     categoryName: product.subcategory?.category?.categorytranslation?.[0]?.name || 'No Category',

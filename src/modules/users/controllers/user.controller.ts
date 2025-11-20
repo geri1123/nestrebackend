@@ -38,7 +38,6 @@ export class UserController{
     const profile = await this.Userservice.getNavbarUser(userId , language);
     return {
       success: true,
-      message:"SUCCESS",
       profile,
     };
   }

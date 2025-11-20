@@ -23,9 +23,10 @@ async sendQuickRequest(
     throw new UnauthorizedException(t('userNotAuthenticated', req.language));
   }
 
-  await this.registrationReqService.sendRequestToAgencyById(
+  await this.registrationReqService.sendQuickRequestToAgency(
     req.userId,
     agencyId,
+    req.user.username,
     req.language,
   );
 return{

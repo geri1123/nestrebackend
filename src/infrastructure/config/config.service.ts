@@ -97,6 +97,11 @@ get googleClientId(): string {
 get googleClientSecret(): string {
   return this.configService.get<string>('GOOGLE_CLIENT_SECRET','');
 }
+
+//mongo
+get mongoUri(): string {
+  return this.configService.get<string>('MONGO_URI','');
+}
 }
 
 

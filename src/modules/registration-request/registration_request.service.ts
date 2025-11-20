@@ -8,12 +8,14 @@ import { AgencyService } from "../agency/agency.service";
 
 import { AgentService } from "../agent/agent.service";
 import { registrationrequest_request_type, registrationrequest_requested_role, registrationrequest_status, user_role, user_status } from "@prisma/client";
+import { NotificationTemplateService } from "../notification/notifications-template.service";
 
 @Injectable()
 export class RegistrationRequestService {
   constructor(
     private readonly requestRepo: RegistrationRequestRepository,
     private readonly notificationService: NotificationService,
+    private readonly templateService:NotificationTemplateService,
     private readonly agencyservice:AgencyService,
     private readonly agentservice:AgentService
   ) {}
@@ -155,10 +157,10 @@ async findRequestById(
   return request; 
 }
 //send reuest by loged in users
-async sendRequestToAgencyById(
+async sendQuickRequestToAgency(
   userId: number,
   agencyId: number,
-
+  username:string,
   language: SupportedLang = 'al'
 ) {
   // Find agency by ID
@@ -174,11 +176,22 @@ async sendRequestToAgencyById(
 await this.requestRepo.create({
   userId,
   idCardNumber: null,
-  status: registrationrequest_status.pending,
+  status: registrationrequest_status.under_review,
   agencyName: agency.agency_name,
   agencyId: agency.id,
   requestedRole: registrationrequest_requested_role.agent,
   requestType:registrationrequest_request_type.agent_license_verification,
+});
+
+const translations = this.templateService.getAllTranslations(
+  "user_send_request",
+  { username }
+);
+await this.notificationService.sendNotification({
+  userId: agency.owner_user_id,
+  type: "user_send_request",
+  translations,
+  messageData: { username }
 });
 }
 }

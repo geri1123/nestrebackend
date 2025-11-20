@@ -105,7 +105,8 @@ export class ProductFrontendDto {
 
   @ApiProperty({  example: 'Apartment',description: 'Subcategory name in selected language' })
   subcategoryName: string;
-
+@ApiProperty({example:"1", description:"Product clicks"})
+totalClicks?:number;
   @ApiProperty({ example: 'For Sale',description: 'Listing type name in selected language'})
   listingTypeName: string;
   @ApiProperty({example:"1", description:"user id in product"})

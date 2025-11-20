@@ -17,9 +17,10 @@ import { ProductService } from "./services/product-service";
 import { ManageProductController } from "./controller/manage-products.controller";
 import { SearchFiltersHelper } from "./utils/search-filters.helper";
 import { AgencyModule } from "../agency/agency.module";
+import { ProductClicksModule } from "../product-clicks/product_clicks.module";
 @Module({
-  controllers: [SearchProductsController , ManageProductController],
-  imports:[UserModule , AgentModule , AgencyModule],
+  controllers: [SearchProductsController      , ManageProductController],
+  imports:[UserModule , AgentModule , AgencyModule ,ProductClicksModule],
   providers: [
     SearchProductsRepo,
     ProductAttributeValueRepo,
@@ -32,7 +33,8 @@ import { AgencyModule } from "../agency/agency.module";
     AttributeRepo,
     UpdateProductService,
     ProductService,
-    SearchFiltersHelper       
+    SearchFiltersHelper  ,
+    
 
   ],
   exports:[ProductService]

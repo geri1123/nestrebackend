@@ -112,7 +112,7 @@ export class AgencyRequestsController {
   async getRegistrationRequests(
     @Req() req: RequestWithUser,
     @Query('page') page = 1,        
-    @Query('limit') limit = 10,
+
     @Query('status') status?: string,
   ) {
     if (!req.agencyId) {
@@ -124,7 +124,7 @@ export class AgencyRequestsController {
     return this.agencyRequestsService.getRequestsForAgencyOwner(
       req.agencyId,
       Number(page),           
-      Number(limit),
+      
       status as any,           
     );
   }

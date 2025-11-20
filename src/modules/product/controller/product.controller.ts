@@ -10,12 +10,14 @@ import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 
 import { ProductService } from '../services/product-service';
+import { ProductClicksService } from '../../product-clicks/product_clicks.service';
 @Controller('products')
 export class SearchProductsController {
   constructor(
     private readonly searchProductsService: SearchProductsService,
     private readonly searchfilter:SearchFiltersHelper,
-    private readonly productService:ProductService
+    private readonly productService:ProductService,
+    private readonly productClicksService:ProductClicksService
   ) {}
  
 
@@ -77,12 +79,23 @@ async getAgentProducts(
 async getPublicProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
   const product = await this.productService.getSingleProduct(id, req.language, false);
   if (!product) throw new NotFoundException(t('productNotFound', req.language));
+  const ip =
+    req.headers['x-forwarded-for']?.toString().split(',')[0] ||
+    req.ip ||
+    'unknown';
+
+  await this.productClicksService.incrementClick(
+    `${id}`,
+    `${req.userId || 'guest'}`,
+    ip
+  );
   return product;
 }
   @Get('protected/:id')
 async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
   const product = await this.productService.getSingleProduct(id, req.language, true, req);
   if (!product) throw new NotFoundException(t('productNotFound', req.language));
+   
   return product;
 }
 

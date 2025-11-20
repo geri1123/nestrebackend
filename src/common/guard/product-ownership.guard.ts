@@ -23,16 +23,16 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
       return true;
     }
 
-    //  Agent: limited permissions
+    //  Agent
     if (req.user?.role === 'agent') {
       if (!req.agencyAgentId) {
         throw new ForbiddenException(t('noAgency', lang));
       }
 
-      // Can edit their own product
+      
       if (product.userId === req.userId) return true;
 
-      // Can edit others’ products only if permission allows
+     
       if (
         req.agentPermissions?.can_edit_others_post &&
         product.agencyId === req.agencyId
@@ -43,7 +43,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
       throw new ForbiddenException(t('cannotEditOthersProduct', lang));
     }
 
-    // Regular users: can only edit their own products
+
     if (product.userId !== req.userId) {
       throw new ForbiddenException(t('cannotEditProduct', lang));
     }

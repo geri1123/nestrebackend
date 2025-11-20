@@ -23,9 +23,10 @@ export class AgencyRequestsService {
 async getRequestsForAgencyOwner(
   agencyId: number,
   page = 1,           
-  limit = 10,
+  
   status?: registrationrequest_status
 ) {
+  const limit=12;
   const skip = (page - 1) * limit;
 
   const [total, requests] = await Promise.all([

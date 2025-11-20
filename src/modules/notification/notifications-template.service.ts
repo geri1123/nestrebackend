@@ -30,6 +30,14 @@ export class NotificationTemplateService {
       [LanguageCode.it]: () =>
         `La tua richiesta di unirti all'agenzia è stata approvata. Benvenuto nel team!`,
     },
+  user_send_request: {
+  [LanguageCode.al]: (data) =>
+    `${data.username} kërkon të bashkohet me agjencinë tuaj.`,
+  [LanguageCode.en]: (data) =>
+    `${data.username} wants to join your agency.`,
+  [LanguageCode.it]: (data) =>
+    `${data.username} vuole unirsi alla vostra agenzia.`,
+},
       agent_updated_by_agent: {
       [LanguageCode.al]: (data) =>
         `${data.updatedByName} ka përditësuar informacionet tua: ${translateAgentChanges(data.dto, 'al')}.`,
