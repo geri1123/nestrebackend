@@ -3,11 +3,12 @@
 import { IUsernameHistoryRepository } from './Iusername-history.repository.js';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service.js';
 import { Injectable } from '@nestjs/common';
+import { usernamehistory } from '@prisma/client';
 @Injectable()
 export class UsernameHistoryRepository implements IUsernameHistoryRepository {
   constructor(private prisma: PrismaService) {}
-  async getLastUsernameChange(userId: number): Promise<any | null> {
-    const record = await this.prisma.usernamehistory.findFirst({
+   getLastUsernameChange(userId: number): Promise<usernamehistory | null> {
+    const record =  this.prisma.usernamehistory.findFirst({
       where: { user_id: userId },
       orderBy: { next_username_update: 'desc' },
     });

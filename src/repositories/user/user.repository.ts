@@ -27,7 +27,7 @@ export class UserRepository implements IUserRepository {
   }
 
   // READ
-  async findByIdWithPassword(userId: number): Promise<{ id: number; password: string } | null> {
+   findByIdWithPassword(userId: number): Promise<{ id: number; password: string } | null> {
     return this.prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, password: true },
@@ -45,7 +45,7 @@ export class UserRepository implements IUserRepository {
     });
     return user ? (user as BaseUserInfo) : null;
   }
-async getNavbarUser(userId: number):Promise<NavbarUser | null> {
+ getNavbarUser(userId: number):Promise<NavbarUser | null> {
   return this.prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -71,8 +71,8 @@ async getNavbarUser(userId: number):Promise<NavbarUser | null> {
     });
   }
 
-  async findByIdForProfileImage(userId: number): Promise<{ id: number; profile_img: string | null } | null> {
-    return this.prisma.user.findUnique({
+   async findByIdForProfileImage(userId: number): Promise<{ id: number; profile_img: string | null } | null> {
+    return  this.prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, profile_img: true },
     });

@@ -246,6 +246,7 @@ google_id        String?  @unique
   product                      product[]
   productimage                 productimage[]
     savedProducts          SavedProduct[]
+    productAdvertisements        ProductAdvertisement[]
   registrationRequestsReviewed registrationrequest[] @relation("RegistrationRequestReviewedBy")
   registrationRequests         registrationrequest[] @relation("RegistrationRequestUser")
   usernamehistory              usernamehistory[]
@@ -314,6 +315,7 @@ model product {
   productattributevalue productattributevalue[]
   productimage          productimage[]
   savedProducts         SavedProduct[]
+  advertisements        ProductAdvertisement[] 
   @@index([agencyId], map: "Product_agencyId_fkey")
   @@index([cityId], map: "Product_cityId_fkey")
   @@index([listingTypeId], map: "Product_listingTypeId_fkey")
@@ -388,13 +390,44 @@ model Wallet {
 
 model WalletTransaction {
   id            String   @id @default(uuid())
-  wallet        Wallet   @relation(fields: [walletId], references: [id])
+   wallet        Wallet   @relation(fields: [walletId], references: [id])
   walletId      String
   type          wallet_transaction_type   
   amount        Float
   balanceAfter  Float
   description   String?  
+   productAdvertisement ProductAdvertisement?
   createdAt     DateTime @default(now())
+
+}
+
+model ProductAdvertisement {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  userId      Int
+  walletTxId  String?   @unique   // <-- must be unique for one-to-one
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  status      advertisement_status @default(active)
+  adType      advertisement_type   @default(normal)
+
+  product     product   @relation(fields: [productId], references: [id])
+  user        user      @relation(fields: [userId], references: [id])
+  walletTx    WalletTransaction? @relation(fields: [walletTxId], references: [id])
+
+  @@index([productId])
+  @@index([userId])
+}
+enum advertisement_type {
+  cheap
+  normal
+  premium
+}
+enum advertisement_status {
+  active
+  inactive
+  expired
+  pending
 }
 enum LanguageCode {
   en

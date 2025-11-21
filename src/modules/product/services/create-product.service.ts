@@ -64,7 +64,7 @@ export class CreateProductService {
 
       const [uploadedImages] = await Promise.all(tasks);
 
-      // 3️⃣ Return result
+      //  Return result
       return {
         success: true,
         message: t("successadded", language),
@@ -74,7 +74,7 @@ export class CreateProductService {
         },
       };
     } catch (error) {
-      console.error("❌ Error creating product:", error);
+      console.error("Error creating product:", error);
       throw new BadRequestException({
         success: false,
         message: t("failedCreatingProduct", language),
