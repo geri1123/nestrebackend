@@ -16,7 +16,7 @@ export const EmailProvider: Provider = {
     });
 
     await transporter.verify();
-    console.log('✅ Email transporter ready');
+    console.log(' Email transporter ready');
 
     return transporter;
   },

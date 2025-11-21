@@ -40,6 +40,7 @@ import { UserModule } from '../users/users.module';
     }),
   ],
   providers: [
+   
    AuthService,
   EmailVerificationService,
   PasswordRecoveryService,

@@ -68,7 +68,7 @@ export class EmailService {
   }
 async sendAgentRejectedEmail(to: string, name: string) {
   const subject = 'Agent Request Rejected';
-  const html = AgentRejectedEmailTemplate(name); // You can modify this template to include your custom message
+  const html = AgentRejectedEmailTemplate(name); 
   return this.sendEmail(to, subject, html);
 }
   async sendPasswordRecoveryEmail(

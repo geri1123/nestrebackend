@@ -21,7 +21,12 @@ export class SaveProductController{
           if (!userId) {
       throw new UnauthorizedException(t('userNotAuthenticated' , language));
     }
-     return this.saveProductService.saveProduct(userId,  prductId, language)
+     await this.saveProductService.saveProduct(userId,  prductId, language)
+      return {
+      success: true,
+      message: t("productSavedSuccessfully", language),
+      
+    };
     }
   
     @Get("get-saved")

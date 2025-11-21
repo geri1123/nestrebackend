@@ -29,12 +29,8 @@ export class SaveProductService{
       throw new ForbiddenException(t("saveFailed", language));
     }
 
+    return save;
     
-    return {
-      success: true,
-      message: t("productSavedSuccessfully", language),
-      data: save,
-    };
   }
 
 

@@ -22,9 +22,12 @@ import { SaveProductModule } from './modules/saved-product/save-product.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { ProductClicksModule } from './modules/product-clicks/product_clicks.module';
+import { waitForDebugger } from 'inspector';
+import { WalletModule } from './modules/wallet/wallet.module';
 // import { UserStatusGuard } from './common/guard/user-status.guard';
 @Module({
   imports: [
+    WalletModule,
     ProductClicksModule,
 DatabaseModule,
     AppConfigModule,

@@ -11,13 +11,15 @@ import type { RequestWithUser } from '../../../common/types/request-with-user.in
 
 import { ProductService } from '../services/product-service';
 import { ProductClicksService } from '../../product-clicks/product_clicks.service';
+import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
 @Controller('products')
 export class SearchProductsController {
   constructor(
     private readonly searchProductsService: SearchProductsService,
     private readonly searchfilter:SearchFiltersHelper,
     private readonly productService:ProductService,
-    private readonly productClicksService:ProductClicksService
+    private readonly productClicksService:ProductClicksService,
+    private readonly softAuth: SoftAuthService,
   ) {}
  
 
@@ -77,6 +79,7 @@ async getAgentProducts(
   @Public()
 @Get('public/:id')
 async getPublicProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
+  await this.softAuth.attachUserIfExists(req);
   const product = await this.productService.getSingleProduct(id, req.language, false);
   if (!product) throw new NotFoundException(t('productNotFound', req.language));
   const ip =

@@ -73,14 +73,6 @@ export class ProfilePictureService {
         message: t('noimagetodelete' , language),
       });
     }
-
-    // if (!this.imageUtilsService.isDefaultImage(oldImagePath)) {
-    //   throw new BadRequestException({
-    //     success: false,
-    //     message: "Cannot delete default profile image",
-    //   });
-    // }
-
  
     try {
       await this.firebaseService.deleteFile(oldImagePath);

@@ -18,10 +18,13 @@ import { ManageProductController } from "./controller/manage-products.controller
 import { SearchFiltersHelper } from "./utils/search-filters.helper";
 import { AgencyModule } from "../agency/agency.module";
 import { ProductClicksModule } from "../product-clicks/product_clicks.module";
+import { SoftAuthService } from "../../common/soft-auth/soft-auth.service";
+import { JwtModule } from "@nestjs/jwt";
 @Module({
   controllers: [SearchProductsController      , ManageProductController],
-  imports:[UserModule , AgentModule , AgencyModule ,ProductClicksModule],
+  imports:[UserModule ,    JwtModule.register({}), AgentModule , AgencyModule ,ProductClicksModule],
   providers: [
+   SoftAuthService,
     SearchProductsRepo,
     ProductAttributeValueRepo,
     ProductAttributeValueService,

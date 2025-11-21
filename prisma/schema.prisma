@@ -238,6 +238,7 @@ google_id        String?  @unique
   verification_token           String?
   verification_token_expires   DateTime?
   agency                       agency?
+   wallet                       Wallet?
   agencyAgentAddedBy           agencyagent[]         @relation("AgencyAgentAddedBy")
   agencyAgentAgent             agencyagent[]         @relation("AgencyAgentAgent")
   notification                 notification[]
@@ -372,12 +373,39 @@ model SavedProduct {
 
   @@unique([user_id, product_id]) 
 }
+
+model Wallet {
+  id        String              @id @default(uuid())
+  user      user   @relation(fields: [userId], references: [id])
+  userId    Int                 @unique
+  balance   Float               @default(0)
+  currency  String              @default("EUR")
+  transactions WalletTransaction[]
+
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model WalletTransaction {
+  id            String   @id @default(uuid())
+  wallet        Wallet   @relation(fields: [walletId], references: [id])
+  walletId      String
+  type          wallet_transaction_type   
+  amount        Float
+  balanceAfter  Float
+  description   String?  
+  createdAt     DateTime @default(now())
+}
 enum LanguageCode {
   en
   al
   it
 }
-
+enum wallet_transaction_type{
+  topup
+  withdraw
+  purchase
+}
 enum registrationrequest_request_type {
   agent_license_verification
   agency_registration
