@@ -174,7 +174,13 @@ async findRequestById(id: number): Promise<{
       },
     },
   });
-}
+} 
+  async deleteByUserId(userId: number): Promise<number> {
+    const result = await this.prisma.registrationrequest.deleteMany({
+      where: { user_id: userId },
+    });
+    return result.count;
+  }
 }
 //findById
   //   async findById(id: number) {

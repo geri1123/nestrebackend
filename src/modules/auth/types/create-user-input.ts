@@ -62,6 +62,6 @@ export type RegistrationInput =
 // Type used for DB creation — generalized for all roles
 export type UserCreationData = Omit<BaseRegistration & { role: 'user' | 'agency_owner' | 'agent' }, 'repeatPassword' | 'terms_accepted'> & {
   status: UserStatus;
-  verification_token: string;
-  verification_token_expires: Date;
+  // verification_token: string;
+  // verification_token_expires: Date;
 };

@@ -32,4 +32,5 @@ countAgencies(): Promise<number>;
     >
   ): Promise<void>;
    deleteLogo(agencyId: number): Promise<void>;
+   deleteByOwnerUserId(userId: number): Promise<number>;
 }

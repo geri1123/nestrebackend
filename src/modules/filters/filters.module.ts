@@ -6,10 +6,10 @@ import { ListingTypeRepo } from '../../repositories/listingtype/listingtype.repo
 import { AttributeRepo } from '../../repositories/attributes/attributes.repository';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { LoationRepository } from '../../repositories/location/location.repository';
-import { AuthModule } from '../auth/auth.module';
+
 
 @Module({
-  imports: [AppCacheModule , AuthModule],
+  imports: [AppCacheModule ],
   controllers: [FiltersController],
   providers: [
     FiltersService,
@@ -18,7 +18,7 @@ import { AuthModule } from '../auth/auth.module';
     AttributeRepo,
     LoationRepository,
   
-    // PrismaService,
+    
   ],
 })
 export class FiltersModule {}

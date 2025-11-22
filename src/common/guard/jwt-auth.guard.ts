@@ -95,7 +95,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
+
 import { JwtService } from '@nestjs/jwt';
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
@@ -103,6 +103,7 @@ import { UserRepository } from '../../repositories/user/user.repository';
 import { AgentService } from '../../modules/agent/agent.service';
 import { AgencyService } from '../../modules/agency/agency.service';
 import { t, SupportedLang } from '../../locales';
+import { AppConfigService } from '../../infrastructure/config/config.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -111,7 +112,7 @@ export class JwtAuthGuard implements CanActivate {
     private readonly userRepo: UserRepository,
     private readonly agentService: AgentService,
     private readonly agencyService: AgencyService,
-    private readonly config: ConfigService,
+    private readonly config: AppConfigService, 
     private readonly reflector: Reflector,
   ) {}
 
@@ -136,10 +137,10 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
      
-      const decoded = this.jwtService.verify(token, {
-        secret: this.config.get<string>('JWT_SECRET'),
+      
+   const decoded = this.jwtService.verify(token, {
+        secret: this.config.jwtSecret, 
       });
-
       
       const user = await this.userRepo.findById(decoded.userId);
       if (!user) throw new UnauthorizedException(t('userNotFound', lang));
@@ -187,3 +188,6 @@ export class JwtAuthGuard implements CanActivate {
     }
   }
 }
+// const decoded = this.jwtService.verify(token, {
+      //   secret: this.config.get<string>('JWT_SECRET'),
+      // });

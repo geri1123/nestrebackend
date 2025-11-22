@@ -3,13 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '../../repositories/user/user.repository';
 import { RequestWithUser } from '../types/request-with-user.interface';
+import { AppConfigService } from '../../infrastructure/config/config.service';
 
 @Injectable()
 export class SoftAuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepo: UserRepository,
-    private readonly config: ConfigService,
+    private readonly config: AppConfigService,
   ) {}
 
   async attachUserIfExists(req: RequestWithUser) {
@@ -22,13 +23,12 @@ export class SoftAuthService {
 
     try {
       const decoded = this.jwtService.verify(token, {
-        secret: this.config.get<string>('JWT_SECRET'),
+        secret: this.config.jwtSecret,
       });
 
       const user = await this.userRepo.findById(decoded.userId);
       if (!user) return;
 
-      req.user = user;
       req.userId = user.id;
     } catch (e) {
      

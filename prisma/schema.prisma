@@ -235,8 +235,6 @@ google_id        String?  @unique
   last_active                  DateTime?
   created_at                   DateTime              @default(now())
   updated_at                   DateTime?             @updatedAt
-  verification_token           String?
-  verification_token_expires   DateTime?
   agency                       agency?
    wallet                       Wallet?
   agencyAgentAddedBy           agencyagent[]         @relation("AgencyAgentAddedBy")
@@ -405,7 +403,7 @@ model ProductAdvertisement {
   id          Int       @id @default(autoincrement())
   productId   Int
   userId      Int
-  walletTxId  String?   @unique   // <-- must be unique for one-to-one
+  walletTxId  String?   @unique   
   startDate   DateTime  @default(now())
   endDate     DateTime?
   status      advertisement_status @default(active)

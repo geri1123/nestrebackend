@@ -22,16 +22,7 @@ export class UserService {
     }
     return user;
   }
-    async regenerateVerificationToken(userId: number): Promise<string> {
-    const token = generateToken();
-    const expires = new Date();
-    expires.setHours(expires.getHours() + 24);
-
-    await this.userRepo.regenerateVerificationToken(userId, token, expires);
-
-    return token;
-  }
-  //
+  
   async findByIdOrFail(userId: number, lang: SupportedLang) {
   const user = await this.userRepo.findById(userId);
   if (!user) {
@@ -104,16 +95,7 @@ async verifyEmail(
   async findByIdentifier(identifier: string) {
     return this.userRepo.findByIdentifier(identifier);
   }
- async findByVerificationTokenOrFail(token: string) {
-    const user = await this.userRepo.findByVerificationToken(token);
-    if (!user) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Invalid or expired token',
-      });
-    }
-    return user;
-  }
+
   async updateLastLogin(userId: number) {
     return this.userRepo.updateFieldsById(userId, { last_login: new Date() });
   }
@@ -148,4 +130,5 @@ async getNavbarUser(
 async deleteProfileImage(userId:number){
   await this.userRepo.deleteImage(userId)
 }
+
 }

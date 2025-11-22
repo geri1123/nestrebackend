@@ -19,6 +19,8 @@ import { AgencyModule } from '../agency/agency.module';
 import { AppConfigModule } from '../../infrastructure/config/config.module';
 import { AgentModule } from '../agent/agent.module';
 import { UserModule } from '../users/users.module';
+import { AppConfigService } from '../../infrastructure/config/config.service';
+import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 
 
 @Module({
@@ -26,18 +28,19 @@ import { UserModule } from '../users/users.module';
     NotificationModule,
     EmailModule,
     UserModule,
-    AppConfigModule,
+    // AppConfigModule,
     AgencyModule,
     AgentModule,
     RegistrationRequestModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'secret',
-        signOptions: { expiresIn: '1d' },
-      }),
-      inject: [ConfigService],
-    }),
+    AppCacheModule,
+   JwtModule.registerAsync({
+  imports: [AppConfigModule],
+  useFactory: async (configService: AppConfigService) => ({
+    secret: configService.jwtSecret, 
+    signOptions: { expiresIn: '1d' },
+  }),
+  inject: [AppConfigService],
+}),
   ],
   providers: [
    

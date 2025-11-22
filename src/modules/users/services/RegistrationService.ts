@@ -5,53 +5,66 @@ import { BaseRegistrationDto } from '../../auth/dto/base-registration.dto';
 import { UserStatus, UserCreationData } from '../../auth/types/create-user-input';
 import { generateToken } from '../../../common/utils/hash';
 import { t, SupportedLang } from '../../../locales';
+import { CacheService } from '../../../infrastructure/cache/cache.service';
 
 @Injectable()
 export class RegistrationService {
   constructor(
     private readonly userRepo: UserRepository,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
+    private readonly cacheService:CacheService,
   ) {}
 
-  private mapDtoToUserCreation(dto: BaseRegistrationDto, role: 'user' | 'agency_owner' | 'agent'): UserCreationData {
-    const verification_token = generateToken();
-    const verification_token_expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    return {
-      username: dto.username,
-      email: dto.email,
-      password: dto.password,
-      first_name: dto.first_name,
-      last_name: dto.last_name,
-      role,
-      status: UserStatus.INACTIVE,
-      verification_token,
-      verification_token_expires,
-    };
-  }
+private mapDtoToUserCreation(dto: BaseRegistrationDto, role: 'user' | 'agency_owner' | 'agent'): UserCreationData {
+  return {
+    username: dto.username,
+    email: dto.email,
+    password: dto.password,
+    first_name: dto.first_name,
+    last_name: dto.last_name,
+    role,
+    status: UserStatus.INACTIVE,  
+  };
+}
+  
+async registerUser(dto: BaseRegistrationDto, language: SupportedLang) {
+  const errors = await this.checkUserExists(dto.username, dto.email, language);
+  if (Object.keys(errors).length) throw new BadRequestException(errors);
 
-  async registerUser(dto: BaseRegistrationDto, language: SupportedLang) {
-    // Validate existence
-    const errors = await this.checkUserExists(dto.username, dto.email, language);
-    if (Object.keys(errors).length) throw new BadRequestException(errors);
+  // Reuse createUserWithRole for all user types
+  const { userId, verificationToken } = await this.createUserWithRole(dto, 'user', language);
 
-    const userData = this.mapDtoToUserCreation(dto, 'user');
-    const userId = await this.userRepo.create(userData);
+  // Send verification email
+  await this.emailService.sendVerificationEmail(
+    dto.email,
+    dto.first_name || dto.username,
+    verificationToken,
+    language
+  );
 
-    await this.emailService.sendVerificationEmail(
-      dto.email,
-      dto.first_name || dto.username,
-      userData.verification_token,
-      language,
-    );
-
-    return { userId, message: t('registrationSuccess', language) };
-  }
-
-  async createUserWithRole(dto: BaseRegistrationDto, role: 'user' | 'agency_owner' | 'agent', language:SupportedLang="al") {
+  return { userId, message: t('registrationSuccess', language) };
+}
+  
+  
+ async createUserWithRole(
+    dto: BaseRegistrationDto,
+    role: 'user' | 'agency_owner' | 'agent',
+    language: SupportedLang = 'al',
+  ) {
     const userData = this.mapDtoToUserCreation(dto, role);
     const userId = await this.userRepo.create(userData);
-    return { userId, verificationToken: userData.verification_token };
+
+    // Generate verification token
+    const verificationToken = generateToken();
+  const cacheKey = `email_verification:${verificationToken}`;
+
+  // const result = await this.cacheService.set(cacheKey,  { userId, role }, 24 * 60 * 60 * 1000);
+  const result = await this.cacheService.set(cacheKey, { userId, role },30 * 60 * 1000);
+    console.log(`[CACHE SET] ${cacheKey}`);
+  console.log(`[CACHE SET] Data: userId=${userId}, role=${role}, success=${result}`);
+
+    return { userId, verificationToken };
   }
 
   async checkUserExists(username: string, email: string, language: SupportedLang) {

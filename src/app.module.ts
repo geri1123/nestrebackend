@@ -19,14 +19,18 @@ import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.
 import { AgentModule } from './modules/agent/agent.module';
 import { PermissionsGuard } from './common/guard/permision.guard';
 import { SaveProductModule } from './modules/saved-product/save-product.module';
-import { MongooseModule } from '@nestjs/mongoose';
+
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { ProductClicksModule } from './modules/product-clicks/product_clicks.module';
-import { waitForDebugger } from 'inspector';
+
 import { WalletModule } from './modules/wallet/wallet.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronJobsModule } from './cron/cron.module';
 // import { UserStatusGuard } from './common/guard/user-status.guard';
 @Module({
   imports: [
+ ScheduleModule.forRoot(),  
+ CronJobsModule,
     WalletModule,
     ProductClicksModule,
 DatabaseModule,

@@ -71,16 +71,16 @@ export class FirebaseService implements OnModuleInit {
           if (compressedSize < originalSize || originalSize > 1024 * 1024) {
             buffer = compressedBuffer;
             contentType = 'image/jpeg';
-            console.log(`📦 Compressed: ${originalSize} → ${compressedSize} bytes (${Math.round((1 - compressedSize/originalSize) * 100)}% reduction)`);
+            console.log(` Compressed: ${originalSize} → ${compressedSize} bytes (${Math.round((1 - compressedSize/originalSize) * 100)}% reduction)`);
           } else {
-            console.log(`ℹ️ Using original (compressed was larger)`);
+            console.log(` Using original (compressed was larger)`);
           }
         } else {
-          console.warn(`⚠️ Compression produced invalid output, using original`);
+          console.warn(`Compression produced invalid output, using original`);
         }
       } catch (error) {
-        console.error('❌ Image compression failed:', error);
-        console.log('ℹ️ Falling back to original image');
+        console.error(' Image compression failed:', error);
+        console.log(' Falling back to original image');
       }
     }
 
@@ -109,7 +109,7 @@ export class FirebaseService implements OnModuleInit {
         throw new Error('Invalid image: no dimensions');
       }
 
-      console.log(`🖼️ Processing image: ${metadata.width}x${metadata.height} ${metadata.format}`);
+      console.log(` Processing image: ${metadata.width}x${metadata.height} ${metadata.format}`);
 
       const compressedBuffer = await sharp(buffer)
         .resize(this.IMAGE_MAX_WIDTH, this.IMAGE_MAX_HEIGHT, {
@@ -145,16 +145,16 @@ export class FirebaseService implements OnModuleInit {
 
       if (exists) {
         await file.delete();
-        console.log(`✅ Deleted file: ${filePath}`);
+        console.log(`Deleted file: ${filePath}`);
       } else {
-        console.log(`ℹ️ File not found (already deleted?): ${filePath}`);
+        console.log(` File not found (already deleted?): ${filePath}`);
       }
     } catch (error: any) {
       if (error.code === 404) {
-        console.log(`ℹ️ File not found: ${filePath}`);
+        console.log(`File not found: ${filePath}`);
         return;
       }
-      console.error(`❌ Failed to delete file ${filePath}:`, error.message);
+      console.error(` Failed to delete file ${filePath}:`, error.message);
     }
   }
 
@@ -162,12 +162,12 @@ export class FirebaseService implements OnModuleInit {
   async deleteUserFolder(userId: number, folderPrefix: string = 'profile-images'): Promise<void> {
     try {
       const prefix = `${folderPrefix}/${userId}/`;
-      console.log(`🗑️ Deleting folder: ${prefix}`);
+      console.log(` Deleting folder: ${prefix}`);
       
       await this.bucket.deleteFiles({ prefix });
-      console.log(`✅ Deleted all files in: ${prefix}`);
+      console.log(` Deleted all files in: ${prefix}`);
     } catch (error) {
-      console.error(`❌ Failed to delete folder:`, error);
+      console.error(` Failed to delete folder:`, error);
     }
   }
 

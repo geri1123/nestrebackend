@@ -194,5 +194,12 @@ async getAllAgencies(skip: number, take: number): Promise<agency[]> {
       logo: null,
     },
   });
-}
+};
+async deleteByOwnerUserId(ownerUserId: number): Promise<number> {
+    const result = await this.prisma.agency.deleteMany({
+      where: { owner_user_id: ownerUserId },
+    });
+    return result.count;
+  }
+
 }

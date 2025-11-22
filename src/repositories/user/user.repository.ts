@@ -64,12 +64,12 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  async findByVerificationToken(token: string): Promise<PartialUserByToken | null> {
-    return this.prisma.user.findFirst({
-      where: { verification_token: token, verification_token_expires: { gt: new Date() } },
-      select: { id: true, role: true, email: true, username: true, first_name: true, last_name: true },
-    });
-  }
+  // async findByVerificationToken(token: string): Promise<PartialUserByToken | null> {
+  //   return this.prisma.user.findFirst({
+  //     where: { verification_token: token, verification_token_expires: { gt: new Date() } },
+  //     select: { id: true, role: true, email: true, username: true, first_name: true, last_name: true },
+  //   });
+  // }
 
    async findByIdForProfileImage(userId: number): Promise<{ id: number; profile_img: string | null } | null> {
     return  this.prisma.user.findUnique({
@@ -125,21 +125,31 @@ async updateProfileImage(userId: number, imageUrl: string): Promise<void> {
   async verifyEmail(userId: number, emailVerified: boolean, statusToUpdate: user_status): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { email_verified: emailVerified, status: statusToUpdate, verification_token: null, verification_token_expires: null, updated_at: new Date() },
+      data: { email_verified: emailVerified, status: statusToUpdate,  updated_at: new Date() },
     });
   }
 
-  async regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { verification_token: token, verification_token_expires: expires, updated_at: new Date() },
-    });
-  }
+  // async regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<void> {
+  //   await this.prisma.user.update({
+  //     where: { id: userId },
+  //     data: { verification_token: token, verification_token_expires: expires, updated_at: new Date() },
+  //   });
+  // }
   async deleteImage(userId:number){
     await this.prisma.user.update({
   where: { id: userId },
   data: { profile_img: null },
 });
 
+  }
+  async findUnverifiedBefore(date: Date) {
+    return this.prisma.user.findMany({
+      where: { email_verified: false, created_at: { lt: date } },
+      select: { id: true },
+    });
+  }
+
+  async deleteById(userId: number) {
+    return this.prisma.user.delete({ where: { id: userId } });
   }
 }

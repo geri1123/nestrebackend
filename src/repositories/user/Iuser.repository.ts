@@ -10,7 +10,7 @@ updateProfileImage(userId: number, imageUrl: string): Promise<void> ;
   findByIdWithPassword(userId: number): Promise<{ id: number; password: string } | null>;
   findById(userId: number): Promise<BaseUserInfo | null>;
   findByIdentifier(identifier: string): Promise<PartialUserForLogin | null>;
-  findByVerificationToken(token: string): Promise<PartialUserByToken | null>;
+  // findByVerificationToken(token: string): Promise<PartialUserByToken | null>;
   findByIdForProfileImage(userId: number): Promise<{ id: number; profile_img: string | null } | null>;
   getUsernameById(userId: number): Promise<string | null>;
   getUserPasswordById(userId: number): Promise<string | null>;
@@ -20,6 +20,8 @@ updateProfileImage(userId: number, imageUrl: string): Promise<void> ;
  getNavbarUser(userId: number): Promise<{ username: string; email: string; profile_img: string | null; last_login: Date | null } | null>;
   updateFieldsById(userId: number, fields: Partial<UpdatableUserFields>): Promise<void>;
   verifyEmail(userId: number, emailVerified: boolean, statusToUpdate: user_status): Promise<void>;
-  regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<void>;
+  // regenerateVerificationToken(userId: number, token: string, expires: Date): Promise<void>;
    deleteImage(userId:number):Promise<void>;
+  deleteById(userId: number) ;
+  findUnverifiedBefore(date: Date);
 }

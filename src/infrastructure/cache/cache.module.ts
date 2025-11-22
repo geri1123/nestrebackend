@@ -1,35 +1,34 @@
-// src/cache/cache.module.ts
 import { Module, Global } from '@nestjs/common';
 import { AppConfigModule } from '../config/config.module';
 import { AppConfigService } from '../config/config.service';
 import Keyv from 'keyv';
 import KeyvRedis from '@keyv/redis';
+import { CacheService } from './cache.service';
 
-export const CACHE_KEYV = 'CACHE_KEYV';
+import { CACHE_KEYV } from './cache.constants';
 
-@Global()
 @Module({
-  imports: [AppConfigModule],
   providers: [
     {
       provide: CACHE_KEYV,
       inject: [AppConfigService],
       useFactory: async (config: AppConfigService) => {
         const keyv = new Keyv({
-          store: new KeyvRedis({ url: config.redisUrl }) as any, 
+          store: new KeyvRedis({ url: config.redisUrl }) as any,
           ttl: config.redisTTL,
         });
 
         keyv.on('error', err => console.error('Keyv Redis Error', err));
 
-        await keyv.set('ping', 'pong'); 
+        await keyv.set('ping', 'pong');
         const pong = await keyv.get('ping');
-        console.log('Redis test:', pong); 
+        console.log('Redis test:', pong);
 
         return keyv;
       },
     },
+    CacheService,
   ],
-  exports: [CACHE_KEYV],
+  exports: [CacheService],
 })
 export class AppCacheModule {}

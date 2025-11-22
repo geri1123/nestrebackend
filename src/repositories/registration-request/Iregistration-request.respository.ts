@@ -37,5 +37,5 @@ setUnderReview(userId: number): Promise<registrationrequest | null>;
 
   findByUserId(userId: number):any;
 findRequestById(id: number): Promise<{ id: number; user_id: number } | null>  ;
-  // findById(id: number):any;
+deleteByUserId(userId: number): Promise<number>
 }

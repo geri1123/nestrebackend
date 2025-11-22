@@ -10,9 +10,10 @@ import { UsernameHistoryRepository } from '../../repositories/usernamehistory/us
 import { ProfilePictureService } from './services/profile-picture.service';
 import { ProfilePictureController } from './controllers/profile-picture.controller';
 import { ImageUtilsService } from '../../common/utils/image-utils.service';
+import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 @Module({
   controllers:[UserController , ProfilePictureController],
-  imports: [EmailModule ],
+  imports: [EmailModule ,AppCacheModule],
   providers: [ProfilePictureService,ImageUtilsService,UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
   exports: [UserRepository , UserService, RegistrationService , RegistrationService],
 })

@@ -17,7 +17,7 @@ export class SaveProductRepository {
   }
 
   async removeSave(userId: number, productId: number):Promise<any> {
-    return this.prisma.savedProduct.deleteMany({
+    return await this.prisma.savedProduct.deleteMany({
       where: { user_id: userId, product_id: productId },
     });
   }
@@ -34,7 +34,7 @@ async getSavedProducts(
   skip?: number,
   take?: number
 ) :Promise<any>{
-  return this.prisma.savedProduct.findMany({
+  return await this.prisma.savedProduct.findMany({
     where: {
       user_id: userId,
       product: {

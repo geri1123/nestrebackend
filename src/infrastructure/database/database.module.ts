@@ -11,7 +11,7 @@ import { MongoCheckService } from './mongo-check.service';
       inject: [AppConfigService],
       useFactory: (config: AppConfigService) => ({
         uri: config.mongoUri,       
-        dbName: 'productclicksdb',   
+        dbName: 'analyticsdb',   
        
       }),
     }),
