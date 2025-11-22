@@ -18,7 +18,7 @@ import type { Response } from 'express'
 import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { LoginDto} from './dto/login.dto';
 import { t } from '../../locales';
-import { CustomThrottlerGuard } from './guards/custom-throttler.guard';
+
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator';
 import { AuthSwagger } from './swagger/auth.swagger';
@@ -30,9 +30,10 @@ import { AuthSwagger } from './swagger/auth.swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @AuthSwagger.Login()
+   
   @Post('login')
-@Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
-@UseGuards(CustomThrottlerGuard)
+@Throttle({ default: { limit: 5, ttl: 240000 } }) 
+
 @HttpCode(HttpStatus.OK)
 async login(
   @Body() body: Record<string, any>,

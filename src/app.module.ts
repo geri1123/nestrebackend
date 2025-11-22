@@ -6,7 +6,7 @@ import { FirebaseModule } from './infrastructure/firebase/firebase.module';
 import { AppConfigModule } from './infrastructure/config/config.module';
 import { LanguageMiddleware } from './middlewares/language.middleware';
 import { AuthModule } from './modules/auth/auth.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
 import { FiltersModule } from './modules/filters/filters.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
@@ -26,9 +26,17 @@ import { ProductClicksModule } from './modules/product-clicks/product_clicks.mod
 import { WalletModule } from './modules/wallet/wallet.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobsModule } from './cron/cron.module';
+import { CustomThrottlerGuard } from './common/guard/Throttler.guard';
 // import { UserStatusGuard } from './common/guard/user-status.guard';
 @Module({
   imports: [
+  ThrottlerModule.forRoot({
+  throttlers: [
+    {
+         limit: 10, ttl: 1 
+    },
+  ],
+}),
  ScheduleModule.forRoot(),  
  CronJobsModule,
     WalletModule,
@@ -45,18 +53,18 @@ AuthModule,
 FiltersModule,
 ProductModule,
 NotificationModule,
-ThrottlerModule.forRoot([
-      {
-        ttl: 15 * 60, 
-        limit: 5,     
-      },
-    ]),
+
     AgentModule, 
   ],
   controllers: [AppController],
   providers: [
     AppService,
+  {
+    provide:APP_GUARD,
+    useClass:CustomThrottlerGuard
+  }
   
+    ,
       {
     provide: APP_GUARD,
     useClass: JwtAuthGuard, 
@@ -69,7 +77,8 @@ ThrottlerModule.forRoot([
   {
     provide: APP_GUARD,
     useClass: PermissionsGuard,
-  }
+  },
+
   ],
 })
 export class AppModule {
