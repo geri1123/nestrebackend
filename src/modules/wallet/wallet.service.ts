@@ -51,44 +51,7 @@ async changeWalletBalance(
 
   return { balance: newBalance };
 }
-//  async changeWalletBalance(
-//   userId: number,
-//   type: wallet_transaction_type,
-//   amount: number,
-//   language:SupportedLang,
-// ) {
-//   const wallet = await this.walletRepo.getWalletByUser(userId);
-//   if (!wallet) throw new NotFoundException("Wallet not found");
 
-//   if (amount <= 0) throw new BadRequestException("Amount must be positive");
-
-//   let newBalance = wallet.balance;
-
-//   if (type ===wallet_transaction_type.topup) {
-//     newBalance += amount;
-//   } else if (type === wallet_transaction_type.withdraw || type === wallet_transaction_type.purchase) {
-//     if (wallet.balance < amount) {
-//       throw new BadRequestException(t("insufficientBalance", language));
-//     }
-//     newBalance -= amount;
-//   } else {
-//     throw new BadRequestException(t("invalidTransactionType", language));
-//   }
-
-  
-//   await this.walletRepo.updateWalletBalance(wallet.id, newBalance);
-// const sign = type === wallet_transaction_type.topup ? '+' : '-';
-//   // Create transaction
-//   await this.walletTransactionRepo.createTransaction(
-//     wallet.id,
-//     type,
-//     amount,
-//     newBalance,
-//     `${type} ${sign}${amount} EUR`
-//   );
-
-//   return { balance: newBalance };
-// }
 async getWallet(
   userId: number,
   language: SupportedLang,
@@ -99,16 +62,20 @@ async getWallet(
   if (!wallet) {
     throw new NotFoundException(t('walletNotFound', language));
   }
+const [transactions, count] = await Promise.all([
+  this.walletTransactionRepo.getTransactions(wallet.id, page, limit),
+  this.walletTransactionRepo.countTransaction(wallet.id),
+]);
 
-  const transactions = await this.walletTransactionRepo.getTransactions(
-    wallet.id,
-    page,
-    limit
-  );
-
+ const totalPages = Math.ceil(count / limit);
+ const itemsOnCurrentPage = Math.min(limit, count - (page - 1) * limit);
   return {
     wallet,
     transactions,
+    totalCount:count,
+   page,
+   totalPages,
+  itemsOnCurrentPage
   };
 }
 ///create wallet
@@ -128,5 +95,19 @@ async getWallet(
       throw new Error(t("faildCreateWallet", language));
     }
   }
+async transferMoney(senderId: number, receiverId: number, amount: number , language:SupportedLang) {
+  const senderWallet = await this.walletRepo.getWalletByUser(senderId);
+  const receiverWallet = await this.walletRepo.getWalletByUser(receiverId);
 
+  if (!senderWallet || !receiverWallet) throw new Error(t("walletNotFound"  , language));
+  if (senderWallet.balance < amount) throw new Error(t("insufficientBalance",language));
+
+  await this.prisma.$transaction(async (tx) => {
+    await this.walletRepo.updateWalletBalanceTx(tx, senderWallet.id, senderWallet.balance - amount);
+    await this.walletRepo.updateWalletBalanceTx(tx, receiverWallet.id, receiverWallet.balance + amount);
+
+    await this.walletTransactionRepo.createTransactionTx(tx, senderWallet.id, "withdraw", amount, senderWallet.balance - amount, `Transfer to user ${receiverId}`);
+    await this.walletTransactionRepo.createTransactionTx(tx, receiverWallet.id, "topup", amount, receiverWallet.balance + amount, `Transfer from user ${senderId}`);
+  });
+}
 }

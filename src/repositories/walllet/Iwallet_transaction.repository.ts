@@ -12,5 +12,6 @@ export interface IwalletTransaction{
   walletId: string,
   page:number ,      
   limit:number       
-): Promise<WalletTransaction[]> 
+): Promise<WalletTransaction[]> ;
+countTransaction(walletId: string):Promise<number>
 }

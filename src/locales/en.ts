@@ -5,6 +5,8 @@ export const en = {
    faildCreateWallet:"Failed to create wallet. Please try again.",
    walletSuccessfullyCreated:"Wallet successfully created.",
    walletNotFound:'Wallet not found.',
+    successfullyAdvertised: "Product successfully advertised",
+   tooManyRequests: 'Too many requests. Please try again later.',
    amountAddedSuccessfully:"Amount added successfully",
     invalidTransactionType: "Invalid transaction type",
     insufficientBalance: "Insufficient balance",

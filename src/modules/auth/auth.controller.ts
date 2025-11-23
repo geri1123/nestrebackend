@@ -74,6 +74,7 @@ async login(
 }
   @AuthSwagger.RegisterUser()
   @Post('register/user')
+  @Throttle({ default: { limit: 6, ttl: 240000 } }) 
   @HttpCode(HttpStatus.CREATED)
  
 
@@ -85,6 +86,7 @@ async registerUser(@Body() body: Record<string, any>, @Req() req: RequestWithLan
 
 @AuthSwagger.RegisterAgencyOwner()
   @Post('register/agency_owner')
+  @Throttle({ default: { limit: 6, ttl: 240000 } }) 
   @HttpCode(HttpStatus.CREATED)
  
 async registerAgencyOwner(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
@@ -94,6 +96,7 @@ async registerAgencyOwner(@Body() body: Record<string, any>, @Req() req: Request
 }
 @AuthSwagger.RegisterAgent()
   @Post('register/agent')
+  @Throttle({ default: { limit: 6, ttl: 240000 } }) 
   @HttpCode(HttpStatus.CREATED)
   
   async registerAgent(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {

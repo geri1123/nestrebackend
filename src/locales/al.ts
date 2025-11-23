@@ -5,6 +5,8 @@ export const al = {
    faildCreateWallet:"Krijimi i portofolit dështoi. Ju lutemi provoni përsëri.",
 walletSuccessfullyCreated:"Portofoli u krijua me sukses.",
 walletNotFound:"Portofoli nuk u gjet.",
+successfullyAdvertised: "Produkti është reklamuar me sukses",
+ tooManyRequests: 'Shumë kërkesa. Ju lutemi provoni përsëri më vonë.',
 amountAddedSuccessfully:"Shuma u shtua me sukses",
 invalidTransactionType: "Lloji i transaksionit është i pavlefshëm",
     insufficientBalance: "Balançë e pamjaftueshme",

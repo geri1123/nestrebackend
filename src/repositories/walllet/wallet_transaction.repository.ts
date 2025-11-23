@@ -35,4 +35,9 @@ export class WalletTransactionRepository implements IwalletTransaction{
     take: limit,
   });
 }
+countTransaction(walletId: string):Promise<number> {
+  return this.prisma.walletTransaction.count({
+    where: { walletId }
+  });
+}
 }

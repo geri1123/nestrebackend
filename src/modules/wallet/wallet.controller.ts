@@ -29,13 +29,10 @@ export class WalletController{
 async getWalletWithUserId(
   @Req() req: RequestWithUser,
   @Query("page") page = 1,
-  
 ) {
   const { userId, language } = req;
-const limit=10;
-  if (!userId) {
-    throw new UnauthorizedException(t("userNotAuthenticated", language));
-  }
+  const limit = 10;
+  if (!userId) throw new UnauthorizedException(t("userNotAuthenticated", language));
 
   const wallet = await this.walletService.getWallet(userId, language, Number(page), Number(limit));
 
