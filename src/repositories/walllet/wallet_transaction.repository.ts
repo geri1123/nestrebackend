@@ -1,25 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { Prisma, PrismaClient, wallet_transaction_type, WalletTransaction } from "@prisma/client";
-import { IwalletTransaction } from "./Iwallet_transaction.repository";
+import { IWalletTransaction } from "./Iwallet_transaction.repository";
 
 @Injectable()
-export class WalletTransactionRepository implements IwalletTransaction{
+export class WalletTransactionRepository implements IWalletTransaction{
   constructor(private prisma: PrismaService) {}
 
-  // Create a wallet transaction
-  createTransactionTx(
-  tx: Prisma.TransactionClient,
-  walletId: string,
-  type: wallet_transaction_type,
-  amount: number,
-  balanceAfter: number,
-  description?: string
-) {
-  return tx.walletTransaction.create({
-    data: { walletId, type, amount, balanceAfter, description },
-  });
+  async createTransactionTx(tx: Prisma.TransactionClient, walletId: string, type: wallet_transaction_type, amount: number, balanceAfter: number, description: string) {
+  return tx.walletTransaction.create({ data: { walletId, type, amount, balanceAfter, description } });
 }
+
 
    getTransactions(
   walletId: string,

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { WalletRepository } from "../../repositories/walllet/wallet.repository";
 import { SupportedLang, t } from "../../locales";
 import { WalletTransactionRepository } from "../../repositories/walllet/wallet_transaction.repository";
-import { wallet_transaction_type } from "@prisma/client";
+import { Prisma, wallet_transaction_type } from "@prisma/client";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 @Injectable()
 export class WalletService{
@@ -11,22 +11,24 @@ export class WalletService{
     private readonly walletTransactionRepo:WalletTransactionRepository,
     private readonly prisma: PrismaService
 ){}
-
 async changeWalletBalance(
   userId: number,
   type: wallet_transaction_type,
   amount: number,
   language: SupportedLang,
-) {
-  const wallet = await this.walletRepo.getWalletByUser(userId);
-  if (!wallet) throw new NotFoundException("Wallet not found");
+  tx?: Prisma.TransactionClient
+): Promise<{ balance: number; transactionId: string }> {  
+  const wallet = tx 
+    ? await this.walletRepo.getWalletForTx(tx, userId) 
+    : await this.walletRepo.getWalletByUser(userId);
+
+  if (!wallet) throw new NotFoundException(t("walletNotFound", language));
   if (amount <= 0) throw new BadRequestException("Amount must be positive");
 
   let newBalance = wallet.balance;
 
-  if (type === wallet_transaction_type.topup) {
-    newBalance += amount;
-  } else if (type === wallet_transaction_type.withdraw || type === wallet_transaction_type.purchase) {
+  if (type === wallet_transaction_type.topup) newBalance += amount;
+  else if (type === wallet_transaction_type.withdraw || type === wallet_transaction_type.purchase) {
     if (wallet.balance < amount) throw new BadRequestException(t("insufficientBalance", language));
     newBalance -= amount;
   } else {
@@ -35,22 +37,72 @@ async changeWalletBalance(
 
   const sign = type === wallet_transaction_type.topup ? "+" : "-";
 
-  // Prisma transaction
-  await this.prisma.$transaction(async (tx) => {
-  await this.walletRepo.updateWalletBalanceTx(tx, wallet.id, newBalance);
-  await this.walletTransactionRepo.createTransactionTx(
-    tx,
-    wallet.id,
-    type,
-    amount,
-    newBalance,
-    `${type} ${sign}${amount} EUR`
-  );
-});
+  let transaction;
+  if (tx) {
+    transaction = await this.walletTransactionRepo.createTransactionTx(
+      tx,
+      wallet.id,
+      type,
+      amount,
+      newBalance,
+      `${type} ${sign}${amount} EUR`
+    );
+    await this.walletRepo.updateWalletBalanceTx(tx, wallet.id, newBalance);
+  } else {
+    await this.prisma.$transaction(async t => {
+      transaction = await this.walletTransactionRepo.createTransactionTx(
+        t,
+        wallet.id,
+        type,
+        amount,
+        newBalance,
+        `${type} ${sign}${amount} EUR`
+      );
+      await this.walletRepo.updateWalletBalanceTx(t, wallet.id, newBalance);
+    });
+  }
 
-
-  return { balance: newBalance };
+  return { balance: newBalance, transactionId: transaction.id }; 
 }
+// async changeWalletBalance(
+//   userId: number,
+//   type: wallet_transaction_type,
+//   amount: number,
+//   language: SupportedLang,
+// ) {
+//   const wallet = await this.walletRepo.getWalletByUser(userId);
+//   if (!wallet) throw new NotFoundException("Wallet not found");
+//   if (amount <= 0) throw new BadRequestException("Amount must be positive");
+
+//   let newBalance = wallet.balance;
+
+//   if (type === wallet_transaction_type.topup) {
+//     newBalance += amount;
+//   } else if (type === wallet_transaction_type.withdraw || type === wallet_transaction_type.purchase) {
+//     if (wallet.balance < amount) throw new BadRequestException(t("insufficientBalance", language));
+//     newBalance -= amount;
+//   } else {
+//     throw new BadRequestException(t("invalidTransactionType", language));
+//   }
+
+//   const sign = type === wallet_transaction_type.topup ? "+" : "-";
+
+//   // Prisma transaction
+//   await this.prisma.$transaction(async (tx) => {
+//   await this.walletRepo.updateWalletBalanceTx(tx, wallet.id, newBalance);
+//   await this.walletTransactionRepo.createTransactionTx(
+//     tx,
+//     wallet.id,
+//     type,
+//     amount,
+//     newBalance,
+//     `${type} ${sign}${amount} EUR`
+//   );
+// });
+
+
+//   return { balance: newBalance };
+// }
 
 async getWallet(
   userId: number,

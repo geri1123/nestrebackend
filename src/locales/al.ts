@@ -5,6 +5,9 @@ export const al = {
    faildCreateWallet:"Krijimi i portofolit dështoi. Ju lutemi provoni përsëri.",
 walletSuccessfullyCreated:"Portofoli u krijua me sukses.",
 walletNotFound:"Portofoli nuk u gjet.",
+     noPermissionToAdvertise:"Nuk keni leje ta reklamoni këtë produkt.",
+productNotActive:"Ky produkt nuk është aktiv.",
+productAlreadyAdvertised:"Ky produkt është tashmë i reklamuar.",
 successfullyAdvertised: "Produkti është reklamuar me sukses",
  tooManyRequests: 'Shumë kërkesa. Ju lutemi provoni përsëri më vonë.',
 amountAddedSuccessfully:"Shuma u shtua me sukses",
@@ -136,11 +139,7 @@ agencyActivationFailed: "Dështoi aktivizimi i agjencisë.",
     phoneUpdated: "Telefoni u përditësua me sukses",
   TooManyUsernameRequestsError: "Mund të ndryshoni emrin e përdoruesit vetëm një herë çdo 10 ditë.",
 successfullyUpdatedUsername:"Emri i përdoruesit u përditësua me sukses",
-//agency
-  // agentRequest: {
-  //   approved: "Kërkesa u miratua me sukses",
-  //   rejected: "Kërkesa u refuzua me sukses",
-  // },
+
   approved: "Kërkesa u miratua me sukses",
     rejected: "Kërkesa u refuzua me sukses",
 agencyNotFound: "Agjencia nuk u gjet.",

@@ -24,7 +24,7 @@ export class UserStatusGuard implements CanActivate {
       throw new ForbiddenException(t('accountSuspended', lang));
     }
 
-    //  Agent-specific
+    
   if (role === 'agent' && req.agencyId) {
   // use existing data, no DB call
   if (req.agentStatus !== 'active') {

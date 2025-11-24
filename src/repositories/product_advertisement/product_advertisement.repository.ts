@@ -1,19 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
-import { ProductAdvertisement, advertisement_type } from "@prisma/client";
+import { Prisma, ProductAdvertisement, advertisement_type } from "@prisma/client";
+import { IProductAdvertisementRepository } from "./Iporiduct_advertisement.repository";
 
 @Injectable()
-export class ProductAdvertisementRepository {
+export class ProductAdvertisementRepository implements IProductAdvertisementRepository {
   constructor(private readonly prisma: PrismaService) {}
-
-  async createAdvertisement(
+  async createAdvertisementTx(
+    tx: Prisma.TransactionClient, 
     productId: number,
     userId: number,
     adType: advertisement_type = "normal",
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+      walletTxId?: string
   ): Promise<ProductAdvertisement> {
-    return this.prisma.productAdvertisement.create({
+    return tx.productAdvertisement.create({
       data: {
         productId,
         userId,
@@ -21,29 +23,27 @@ export class ProductAdvertisementRepository {
         startDate: startDate || new Date(),
         endDate,
         status: "active",
+         walletTxId,
       },
     });
+  
   }
-
   async updateStatus(adId: number, status: "active" | "inactive" | "expired" | "pending") {
     return this.prisma.productAdvertisement.update({
       where: { id: adId },
       data: { status },
     });
   }
-  async hasActiveAdvertisement(productId: number): Promise<boolean> {
-    const activeAd = await this.prisma.productAdvertisement.findFirst({
-      where: {
-        productId,
-        status: "active",
-        OR: [
-          { endDate: null }, // No end date means indefinite
-          { endDate: { gte: new Date() } }, // End date is in the future
-        ],
+async getActiveAd(productId: number) {
+  return this.prisma.productAdvertisement.findFirst({
+    where: {
+      productId,
+      status: "active",
+      endDate: {
+        gt: new Date(),
       },
-    });
-
-    return !!activeAd;
-  }
-
+    },
+  });
+}
+ 
 }

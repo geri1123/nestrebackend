@@ -6,6 +6,7 @@ import { ProductFrontendDto } from "../dto/product-frontend.dto";
 import { RequestWithUser } from "../../../common/types/request-with-user.interface";
 import { FirebaseService } from "../../../infrastructure/firebase/firebase.service";
 import { ProductClicksService } from "../../product-clicks/product_clicks.service";
+import { product } from "@prisma/client";
 
 @Injectable()
 export class ProductService {
@@ -18,6 +19,13 @@ export class ProductService {
     const product = await this.productRepo.getProductForPermissionCheck(id);
     if (!product) throw new NotFoundException(t("productNotFound" , language));
     return product;
+  }
+  async findProductById(productId:number , language:SupportedLang){
+    const prod=this.productRepo.findProductById(productId);
+    if(!prod){
+      throw  new NotFoundException(t("productNotFound", language))
+    }
+    return prod; 
   }
 async getSingleProduct(
   id: number,

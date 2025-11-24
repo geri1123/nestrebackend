@@ -5,6 +5,10 @@ export const it = {
    faildCreateWallet:"Creazione del portafoglio fallita. Per favore riprova.",
     walletSuccessfullyCreated:"Portafoglio creato con successo.",
     tooManyRequests: 'Troppe richieste. Riprova più tardi.',
+     noPermissionToAdvertise:"Non hai il permesso di pubblicizzare questo prodotto.",
+
+         productNotActive:"Questo prodotto non è attivo.",
+productAlreadyAdvertised:"Questo prodotto è già pubblicizzato.",
     walletAlreadyExists:"Il portafoglio esiste già.",
 failedToUpdateAgencyLogo: "Aggiornamento del logo dell'agenzia non riuscito.",
 noimagetodelete:"Nessuna immagine da eliminare.",

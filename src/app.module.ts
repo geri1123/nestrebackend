@@ -27,7 +27,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobsModule } from './cron/cron.module';
 import { CustomThrottlerGuard } from './common/guard/Throttler.guard';
-// import { UserStatusGuard } from './common/guard/user-status.guard';
+import { AdvertiseProductModule } from './modules/advertise_product/advertise_product.module';
 @Module({
   imports: [
   ThrottlerModule.forRoot({
@@ -52,6 +52,7 @@ DatabaseModule,
 AuthModule,
 FiltersModule,
 ProductModule,
+AdvertiseProductModule,
 NotificationModule,
 
     AgentModule, 

@@ -3,11 +3,12 @@ import { Body, Controller, Post, Query, Req, UnauthorizedException } from "@nest
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { AdvertiseDto } from "./dto/advertise.dto";
 import { t } from "../../locales";
+import { ProductAdvertisementService } from "./advertise_product.service";
 
 @Controller("advertise")
 
 export class AdvertiseProductController{
-    // constructor(private readonly advertiseService:AdvertiseProductService){}
+    constructor(private readonly advertiseService:ProductAdvertisementService){}
 
     @Post()
     async advertise(
@@ -19,7 +20,7 @@ export class AdvertiseProductController{
             throw new UnauthorizedException(t('userNotAuthenticated' , language))
 
         }
-        // const addvertise=this.advertiseService.advertise(userId , data , language )
+      await this.advertiseService.advertise( data ,userId  , language )
         return{
             success:true,
             message:t("successfullyAdvertised", language)
