@@ -45,5 +45,14 @@ async getActiveAd(productId: number) {
     },
   });
 }
- 
+ async expireAds(now: Date): Promise<number> {
+  const result = await this.prisma.productAdvertisement.updateMany({
+    where: {
+      status: 'active',
+      endDate: { lte: now }, 
+    },
+    data: { status: 'expired' },
+  });
+  return result.count;
+}
 }

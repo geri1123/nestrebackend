@@ -5,11 +5,12 @@ import { ProductAdvertisementRepository } from "../../repositories/product_adver
 import { ProductModule } from "../product/product.module";
 import { ProductAdvertisementService } from "./advertise_product.service";
 import { WalletModule } from "../wallet/wallet.module";
+import { ProductAdvertisementCleanupService } from "./product-advertisement-cleanup.service";
 
 @Module({
     imports:[ProductModule , WalletModule],
-    providers:[ProductAdvertisementRepository , ProductAdvertisementService ],
+    providers:[ProductAdvertisementRepository , ProductAdvertisementService ,ProductAdvertisementCleanupService],
     controllers:[AdvertiseProductController],
-    exports:[]
+    exports:[ProductAdvertisementCleanupService]
 })
 export class AdvertiseProductModule{}

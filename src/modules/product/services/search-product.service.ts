@@ -6,8 +6,7 @@ import { SupportedLang } from '../../../locales/index';
 import { FirebaseService } from '../../../infrastructure/firebase/firebase.service';
 import { ProductFrontendDto } from '../dto/product-frontend.dto';
 import { ProductImageDto } from '../dto/product-frontend.dto';
-import { ProductImageEntity } from '../types/product.type';
-import { userInfo } from 'os';
+
 @Injectable()
 export class SearchProductsService {
   constructor(
@@ -25,7 +24,16 @@ export class SearchProductsService {
         imageUrl: img.imageUrl ? this.firebaseservice.getPublicUrl(img.imageUrl) : null,
         
       }));
-
+  const hasActiveAd = product.advertisements && product.advertisements.length > 0;
+      
+      const advertisement = hasActiveAd
+        ? {
+            id: product.advertisements[0].id,
+          
+            status: product.advertisements[0].status,
+          
+          }
+        : null;
       return {
         id: product.id,
         title: product.title,
@@ -49,6 +57,8 @@ export class SearchProductsService {
           
             }
           : null,
+        isAdvertised: hasActiveAd,
+        advertisement,
       };
     });
 
