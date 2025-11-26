@@ -8,8 +8,9 @@ import { ManageAgencyService } from './manage-agency.service';
 import { ImageUtilsService } from '../../common/utils/image-utils.service';
 import { AgencyCreationService } from './agency-creation.service';
 import { UserModule } from '../users/users.module';
+
 @Module({
-  imports:[UserModule],
+  imports:[UserModule ],
   controllers: [AgencyController],
   
   providers: [AgencyRepository, AgencyService ,ImageUtilsService, ManageAgencyService , AgencyCreationService ],

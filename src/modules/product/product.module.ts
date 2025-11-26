@@ -22,7 +22,7 @@ import { SoftAuthService } from "../../common/soft-auth/soft-auth.service";
 import { JwtModule } from "@nestjs/jwt";
 @Module({
   controllers: [SearchProductsController      , ManageProductController],
-  imports:[UserModule ,    JwtModule.register({}), AgentModule , AgencyModule ,ProductClicksModule],
+  imports:[UserModule ,ProductClicksModule,    JwtModule.register({}), AgentModule , AgencyModule ,ProductClicksModule],
   providers: [
    SoftAuthService,
     SearchProductsRepo,

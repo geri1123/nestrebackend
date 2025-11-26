@@ -1,6 +1,13 @@
 
-// TODO: Continue here tomorrow
-// FIXME: Pick up here
+//To do tommorow 
+//1-refresh token when change role from normal user to agency owner and creating token service 
+//2- Create TokenService (Better, Recommended) 
+// This breaks the circular dependency entirely:
+
+// Create a new TokenService in your auth module
+// Export TokenService from AuthModule (instead of full AuthService)
+// Import only JwtModule in AgencyModule (not AuthModule)
+// Use TokenService in AgencyCreationService
 
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserService } from "../users/services/users.service";
@@ -10,12 +17,14 @@ import { CreateAgencyDto } from "./dto/create-agency.dto";
 import { SupportedLang } from "../../locales";
 import { validate } from "class-validator";
 import { agency_status, user_role } from "@prisma/client";
+import { AuthService } from "../auth/auth.service";
 
 @Injectable()
 export class AgencyCreationService {
   constructor(
     private readonly agencyService: AgencyService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+   
   ) {}
 
   async registerAgencyFromUser(
@@ -42,6 +51,10 @@ export class AgencyCreationService {
 
   
     const agencyId = await this.agencyService.createAgency(dto, userId, language , agency_status.active);
+//  const { user, token } = await this.authservice.refreshTokenAfterRoleChange(
+//       userId,
+//       language
+//     );
 
     return { agencyId };
   }

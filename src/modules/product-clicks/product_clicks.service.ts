@@ -36,5 +36,21 @@ export class ProductClicksService {
     { upsert: true, new: true }
   );
 }
+async getClicksForProducts(productIds: (string | number)[]) {
+  if (!productIds || productIds.length === 0) return new Map<string, number>();
 
+  // Ensure strings because productId in Mongo schema is string
+  const ids = productIds.map(String);
+
+  const clicks = await this.productClickModel.aggregate([
+    { $match: { productId: { $in: ids } } },
+    { $group: { _id: "$productId", totalClicks: { $sum: "$count" } } }
+  ]).exec();
+
+  const map = new Map<string, number>();
+  for (const c of clicks) {
+    map.set(String(c._id), c.totalClicks || 0);
+  }
+  return map;
+}
 }

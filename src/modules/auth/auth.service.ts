@@ -16,6 +16,13 @@ import { throwValidationErrors } from '../../common/helpers/validation.helper';
 import { validate } from 'class-validator';
 import { AgentService } from '../agent/agent.service';
 import { agency_status } from '@prisma/client';
+import { RequestWithUser } from '../../common/types/request-with-user.interface';
+export interface CustomJwtPayload {
+  userId: number;
+  username: string;
+  email: string;
+  role: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -28,7 +35,20 @@ export class AuthService {
     private readonly registrationrequestservice: RegistrationRequestService,
     private readonly registerservice:RegistrationService,
   ) {}
+   
+    private generateJwt(user: any, expiresIn: string | number = '1d'): string {
+    const payload = {
+      userId: Number(user.id),
+      username: String(user.username),
+      email: String(user.email),
+      role: String(user.role),
+    };
 
+ 
+    return this.jwtService.sign(payload as any, { 
+      expiresIn: expiresIn as any 
+    });
+  }
 
 async login(dto: LoginDto, language: SupportedLang = 'al') {
   const { identifier, password, rememberMe } = dto;
@@ -44,18 +64,24 @@ async login(dto: LoginDto, language: SupportedLang = 'al') {
 
   await this.userService.updateLastLogin(user.id);
 
-  const tokenExpiry = rememberMe ? '30d' : '1d';
-
-  const token = this.jwtService.sign({
-    userId: user.id,
-    username: user.username,
-    email: user.email,
-  }, { expiresIn: tokenExpiry });
+ const tokenExpiry = rememberMe ? '30d' : '1d';
+    const token = this.generateJwt(user, tokenExpiry);
+  // const token = this.jwtService.sign({
+  //   userId: user.id,
+  //   username: user.username,
+  //   email: user.email,
+  //     role: user.role,
+  // }, { expiresIn: tokenExpiry });
 
   return { user, token };
 }
 
 
+  async refreshTokenAfterRoleChange(userId: number, language: SupportedLang) {
+    const user = await this.userService.findByIdOrFail(userId, language);
+    const token = this.generateJwt(user, '1d'); // default 1 day
+    return { user, token };
+  }
 //======Regiser user=====////
  async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
   const errors = await validate(dto);

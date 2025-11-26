@@ -63,7 +63,7 @@ export class SearchFiltersDto {
   })
   @IsOptional()
   @IsEnum(['price_asc', 'price_desc', 'date_asc', 'date_desc'])
-  sortBy?: 'price_asc' | 'price_desc' | 'date_asc' | 'date_desc';
+  sortBy?: 'price_asc' | 'price_desc' | 'date_asc' | 'date_desc' | 'most_clicks';
 
   @ApiPropertyOptional({ description: 'Number of items per page', example: 12, type: Number })
   @IsOptional()

@@ -4,136 +4,147 @@ import { SupportedLang } from "../../locales/index.js";
 import { SearchFiltersDto } from "../../modules/product/dto/product-filters.dto.js";
 import { Injectable } from "@nestjs/common";
 import { IsearchProductRepository } from "./Isearch-product.repository.js";
+import { ProductClicksService } from "../../modules/product-clicks/product_clicks.service.js";
 @Injectable()
 export class SearchProductsRepo implements IsearchProductRepository{
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,private productClicksService: ProductClicksService) {}
 
 
-    async searchProducts(
-    filters: SearchFiltersDto,
-    language: SupportedLang,
-    isProtectedRoute: boolean = false
-  ): Promise<any[]> {
-    const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
-    
-    // Build the secondary sort order (user preference or default)
-    const secondaryOrderBy: any[] = [];
-    if (filters.sortBy) {
-      switch (filters.sortBy) {
-        case "price_asc":
-          secondaryOrderBy.push({ price: "asc" });
-          break;
-        case "price_desc":
-          secondaryOrderBy.push({ price: "desc" });
-          break;
-        case "date_asc":
-          secondaryOrderBy.push({ createdAt: "asc" });
-          break;
-        case "date_desc":
-          secondaryOrderBy.push({ createdAt: "desc" });
-          break;
+  async searchProducts(
+  filters: SearchFiltersDto,
+  language: SupportedLang,
+  isProtectedRoute: boolean = false
+): Promise<any[]> {
+  const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
+
+  // Build the secondary sort order (user preference or default)
+  const secondaryOrderBy: any[] = [];
+  if (filters.sortBy && filters.sortBy !== 'most_clicks') {
+    switch (filters.sortBy) {
+      case "price_asc":
+        secondaryOrderBy.push({ price: "asc" });
+        break;
+      case "price_desc":
+        secondaryOrderBy.push({ price: "desc" });
+        break;
+      case "date_asc":
+        secondaryOrderBy.push({ createdAt: "asc" });
+        break;
+      case "date_desc":
+        secondaryOrderBy.push({ createdAt: "desc" });
+        break;
+    }
+  } else {
+    // Default sort by createdAt if no sort is provided or if sort is most_clicks
+    secondaryOrderBy.push({ createdAt: "desc" });
+  }
+
+  // Fetch all products that match the criteria
+  const allProducts = await this.prisma.product.findMany({
+    where: whereConditions,
+    orderBy: secondaryOrderBy,
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      status: true,
+      description: true,
+      streetAddress: true,
+      createdAt: true,
+      updatedAt: true,
+      userId: true,
+      productimage: { take: 2, select: { imageUrl: true } },
+      city: { select: { name: true } },
+      subcategory: {
+        select: {
+          slug: true,
+          subcategorytranslation: { where: { language }, select: { name: true }, take: 1 },
+          category: {
+            select: {
+              slug: true,
+              categorytranslation: { where: { language }, select: { name: true }, take: 1 },
+            },
+          },
+        },
+      },
+      listing_type: {
+        select: {
+          slug: true,
+          listing_type_translation: { where: { language }, select: { name: true }, take: 1 },
+        },
+      },
+      productattributevalue: {
+        select: {
+          attributes: {
+            select: {
+              code: true,
+              attributeTranslation: { where: { language }, select: { name: true }, take: 1 },
+            },
+          },
+          attribute_values: {
+            select: {
+              value_code: true,
+              attributeValueTranslations: { where: { language }, select: { name: true }, take: 1 },
+            },
+          },
+        },
+      },
+      user: { select: { username: true } },
+      agency: { select: { agency_name: true, logo: true } },
+      advertisements: {
+        where: {
+          status: 'active',
+          startDate: { lte: new Date() },
+          endDate: { gte: new Date() }
+        },
+        select: {
+          id: true,
+          startDate: true,
+          endDate: true,
+          status: true,
+          adType: true
+        },
+        orderBy: { endDate: 'desc' },
+        take: 1
       }
-    } else {
-      secondaryOrderBy.push({ createdAt: "desc" });
+    },
+  });
+
+  // Fetch clicks for all products
+  const productIds = allProducts.map(p => p.id);
+  const clicksMap = await this.productClicksService.getClicksForProducts(productIds);
+
+  // Merge clicks into products
+  const productsWithClicks = allProducts.map(p => ({
+    ...p,
+    clickCount: clicksMap.get(String(p.id)) || 0
+  }));
+
+  // Sort products: ads first, then clicks if requested
+  const sortedProducts = productsWithClicks.sort((a, b) => {
+    const aHasAd = a.advertisements && a.advertisements.length > 0;
+    const bHasAd = b.advertisements && b.advertisements.length > 0;
+
+    // Products with active ads come first
+    if (aHasAd && !bHasAd) return -1;
+    if (!aHasAd && bHasAd) return 1;
+
+    // If user selected "most_clicks", sort by clickCount descending
+    if (filters.sortBy === 'most_clicks') {
+      return b.clickCount - a.clickCount;
     }
 
-    console.log("Repository whereConditions:", JSON.stringify(whereConditions, null, 2));
-    console.log("Repository language:", language);
+    return 0;
+  });
 
-    // Fetch all products that match the criteria (without pagination first)
-    const allProducts = await this.prisma.product.findMany({
-      where: whereConditions,
-      orderBy: secondaryOrderBy,
-      select: {
-        id: true,
-        title: true,
-        price: true,
-        status: true,
-        description: true,
-        streetAddress: true,
-        createdAt: true,
-        updatedAt: true,
-        userId: true,
-        productimage: { take: 2, select: { imageUrl: true } },
-        city: { select: { name: true } },
-        subcategory: {
-          select: {
-            slug: true,
-            subcategorytranslation: { where: { language }, select: { name: true }, take: 1 },
-            category: {
-              select: {
-                slug: true,
-                categorytranslation: { where: { language }, select: { name: true }, take: 1 },
-              },
-            },
-          },
-        },
-        listing_type: {
-          select: {
-            slug: true,
-            listing_type_translation: { where: { language }, select: { name: true }, take: 1 },
-          },
-        },
-        productattributevalue: {
-          select: {
-            attributes: {
-              select: {
-                code: true,
-                attributeTranslation: { where: { language }, select: { name: true }, take: 1 },
-              },
-            },
-            attribute_values: {
-              select: {
-                value_code: true,
-                attributeValueTranslations: { where: { language }, select: { name: true }, take: 1 },
-              },
-            },
-          },
-        },
-        user: { select: { username: true } },
-        agency: { select: { agency_name: true, logo: true } },
-        advertisements: {
-          where: {
-            status: 'active',
-            startDate: { lte: new Date() },
-            endDate: { gte: new Date() }
-          },
-          select: {
-            id: true,
-            startDate: true,
-            endDate: true,
-            status: true,
-            adType: true
-          },
-          orderBy: {
-            endDate: 'desc'
-          },
-          take: 1
-        }
-      },
-    });
+  // Apply pagination
+  const paginatedProducts = sortedProducts.slice(
+    filters.offset,
+    filters.offset! + filters.limit!
+  );
 
-    
-    const sortedProducts = allProducts.sort((a, b) => {
-      const aHasAd = a.advertisements && a.advertisements.length > 0;
-      const bHasAd = b.advertisements && b.advertisements.length > 0;
-      
-      // Products with active ads come first
-      if (aHasAd && !bHasAd) return -1;
-      if (!aHasAd && bHasAd) return 1;
-      
-    
-      return 0;
-    });
-
-    // Apply pagination after sorting
-    const paginatedProducts = sortedProducts.slice(
-      filters.offset,
-      filters.offset! + filters.limit!
-    );
-
-    return paginatedProducts;
-  }
+  return paginatedProducts;
+}
 async getProductsCount(
   filters: SearchFiltersDto,
   language: SupportedLang,

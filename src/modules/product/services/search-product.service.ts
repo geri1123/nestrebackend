@@ -59,6 +59,7 @@ export class SearchProductsService {
           : null,
         isAdvertised: hasActiveAd,
         advertisement,
+         totalClicks: product.clickCount
       };
     });
 
