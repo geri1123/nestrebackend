@@ -9,121 +9,131 @@ export class SearchProductsRepo implements IsearchProductRepository{
   constructor(private prisma: PrismaService) {}
 
 
-  async searchProducts(
-  filters: SearchFiltersDto,
-  language: SupportedLang,
-  isProtectedRoute: boolean = false
-): Promise<any[]> {
-  const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
- const orderBy: any[] = [];
-
- 
-  // This will sort products with active ads first, then non-advertised products
-  orderBy.push({
-    advertisements: {
-      _count: 'desc'
-    }
-  });
-
-  
-  if (filters.sortBy) {
-    switch (filters.sortBy) {
-      case "price_asc":
-        orderBy.push({ price: "asc" });
-        break;
-      case "price_desc":
-        orderBy.push({ price: "desc" });
-        break;
-      case "date_asc":
-        orderBy.push({ createdAt: "asc" });
-        break;
-      case "date_desc":
-        orderBy.push({ createdAt: "desc" });
-        break;
-    }
-  } else {
-    orderBy.push({ createdAt: "desc" });
-  }
-
-
-  console.log("Repository whereConditions:", JSON.stringify(whereConditions, null, 2));
-  console.log("Repository language:", language);
-
-  return this.prisma.product.findMany({
-    where: whereConditions,
-    take: filters.limit,
-    skip: filters.offset,
-    orderBy,
-    select: {
-      id: true,
-      title: true,
-      price: true,
-      status: true,
-      description: true,
-      streetAddress: true,
-      createdAt: true,
-      updatedAt: true,
-      productimage: { take: 2, select: { imageUrl: true } },
-      city: { select: { name: true } },
-      subcategory: {
-        select: {
-          slug: true,
-          subcategorytranslation: { where: { language }, select: { name: true }, take: 1 },
-          category: {
-            select: {
-              slug: true,
-              categorytranslation: { where: { language }, select: { name: true }, take: 1 },
-            },
-          },
-        },
-      },
-      listing_type: {
-        select: {
-          slug: true,
-          listing_type_translation: { where: { language }, select: { name: true }, take: 1 },
-        },
-      },
-      productattributevalue: {
-        select: {
-          attributes: {
-            select: {
-              code: true,
-              attributeTranslation: { where: { language }, select: { name: true }, take: 1 },
-            },
-          },
-          attribute_values: {
-            select: {
-              value_code: true,
-              attributeValueTranslations: { where: { language }, select: { name: true }, take: 1 },
-            },
-          },
-        },
-      },
-      user: { select: { username: true } },
-      agency: { select: { agency_name: true, logo: true } },
-      advertisements: {
-        where: {
-          status: 'active',
-          startDate: { lte: new Date() },
-          endDate: { gte: new Date() }
-        },
-        select: {
-          id: true,
-          startDate: true,
-          endDate: true,
-          status: true,
-          adType: true
-        },
-        orderBy: {
-          endDate: 'desc' 
-        },
-        take: 1 
+    async searchProducts(
+    filters: SearchFiltersDto,
+    language: SupportedLang,
+    isProtectedRoute: boolean = false
+  ): Promise<any[]> {
+    const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
+    
+    // Build the secondary sort order (user preference or default)
+    const secondaryOrderBy: any[] = [];
+    if (filters.sortBy) {
+      switch (filters.sortBy) {
+        case "price_asc":
+          secondaryOrderBy.push({ price: "asc" });
+          break;
+        case "price_desc":
+          secondaryOrderBy.push({ price: "desc" });
+          break;
+        case "date_asc":
+          secondaryOrderBy.push({ createdAt: "asc" });
+          break;
+        case "date_desc":
+          secondaryOrderBy.push({ createdAt: "desc" });
+          break;
       }
+    } else {
+      secondaryOrderBy.push({ createdAt: "desc" });
+    }
+
+    console.log("Repository whereConditions:", JSON.stringify(whereConditions, null, 2));
+    console.log("Repository language:", language);
+
+    // Fetch all products that match the criteria (without pagination first)
+    const allProducts = await this.prisma.product.findMany({
+      where: whereConditions,
+      orderBy: secondaryOrderBy,
+      select: {
+        id: true,
+        title: true,
+        price: true,
+        status: true,
+        description: true,
+        streetAddress: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: true,
+        productimage: { take: 2, select: { imageUrl: true } },
+        city: { select: { name: true } },
+        subcategory: {
+          select: {
+            slug: true,
+            subcategorytranslation: { where: { language }, select: { name: true }, take: 1 },
+            category: {
+              select: {
+                slug: true,
+                categorytranslation: { where: { language }, select: { name: true }, take: 1 },
+              },
+            },
+          },
+        },
+        listing_type: {
+          select: {
+            slug: true,
+            listing_type_translation: { where: { language }, select: { name: true }, take: 1 },
+          },
+        },
+        productattributevalue: {
+          select: {
+            attributes: {
+              select: {
+                code: true,
+                attributeTranslation: { where: { language }, select: { name: true }, take: 1 },
+              },
+            },
+            attribute_values: {
+              select: {
+                value_code: true,
+                attributeValueTranslations: { where: { language }, select: { name: true }, take: 1 },
+              },
+            },
+          },
+        },
+        user: { select: { username: true } },
+        agency: { select: { agency_name: true, logo: true } },
+        advertisements: {
+          where: {
+            status: 'active',
+            startDate: { lte: new Date() },
+            endDate: { gte: new Date() }
+          },
+          select: {
+            id: true,
+            startDate: true,
+            endDate: true,
+            status: true,
+            adType: true
+          },
+          orderBy: {
+            endDate: 'desc'
+          },
+          take: 1
+        }
+      },
+    });
+
     
+    const sortedProducts = allProducts.sort((a, b) => {
+      const aHasAd = a.advertisements && a.advertisements.length > 0;
+      const bHasAd = b.advertisements && b.advertisements.length > 0;
+      
+      // Products with active ads come first
+      if (aHasAd && !bHasAd) return -1;
+      if (!aHasAd && bHasAd) return 1;
+      
     
-    },
-  });
-}
+      return 0;
+    });
+
+    // Apply pagination after sorting
+    const paginatedProducts = sortedProducts.slice(
+      filters.offset,
+      filters.offset! + filters.limit!
+    );
+
+    return paginatedProducts;
+  }
 async getProductsCount(
   filters: SearchFiltersDto,
   language: SupportedLang,
@@ -239,136 +249,3 @@ whereConditions.AND = [
 }
 
 
-
-// // let orderBy: Record<string, "asc" | "desc"> = { createdAt: "desc" }; 
-    // if (filters.sortBy) {
-    //   switch (filters.sortBy) {
-    //     case "price_asc":
-    //       orderBy = { price: "asc" };
-    //       break;
-    //     case "price_desc":
-    //       orderBy = { price: "desc" };
-    //       break;
-    //     case "date_asc":
-    //       orderBy = { createdAt: "asc" };
-    //       break;
-    //     case "date_desc":
-    //       orderBy = { createdAt: "desc" };
-    //       break;
-    //   }
-    // }
-
-
-    //   async searchProducts(filters: SearchFiltersDto, language: SupportedLang,   isProtectedRoute: boolean = false):Promise<any[]>{
-//     const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
-// let orderBy: any[] = [];
-
-//   orderBy.push({
-//     productAdvertisement: {
-//       some: {
-//         status: 'active',
-//         startDate: { lte: new Date() },
-//         endDate: { gte: new Date() }
-//       }
-//     },
-//     createdAt: 'desc' // fallback within this group
-//   });
-
-//   // 2pply user's selected sort
-//   if (filters.sortBy) {
-//     switch (filters.sortBy) {
-//       case "price_asc":
-//         orderBy.push({ price: "asc" });
-//         break;
-//       case "price_desc":
-//         orderBy.push({ price: "desc" });
-//         break;
-//       case "date_asc":
-//         orderBy.push({ createdAt: "asc" });
-//         break;
-//       case "date_desc":
-//         orderBy.push({ createdAt: "desc" });
-//         break;
-//     }
-//   } else {
-//     orderBy.push({ createdAt: "desc" });
-//   }
-
-//     console.log("Repository whereConditions:", JSON.stringify(whereConditions, null, 2));
-//     console.log("Repository language:", language);
-
-//     return this.prisma.product.findMany({
-//       where: whereConditions,
-//       take: filters.limit,
-//       skip: filters.offset,
-//       orderBy,
-//       select: {
-//         id: true,
-//         title: true,
-//         price: true,
-//         status:true,
-//         description: true,
-//         streetAddress: true,
-//         createdAt: true,
-//         updatedAt: true,
-//         productimage: { take: 2, select: { imageUrl: true } },
-//         city: { select: { name: true } },
-//         subcategory: {
-//           select: {
-//             slug: true, 
-//             subcategorytranslation: {
-//               where: { language },
-//               select: { name: true },
-//               take: 1,
-//             },
-//             category: {
-//               select: {
-//                 slug: true, 
-//                 categorytranslation: {
-//                   where: { language },
-//                   select: { name: true },
-//                   take: 1,
-//                 },
-//               },
-//             },
-//           },
-//         },
-//         listing_type: {
-//           select: {
-//             slug: true, 
-//             listing_type_translation: {
-//               where: { language },
-//               select: { name: true },
-//               take: 1,
-//             },
-//           },
-//         },
-//         productattributevalue: {
-//           select: {
-//             attributes: {
-//               select: {
-//                 code: true,
-//                 attributeTranslation: {
-//                   where: { language },
-//                   select: { name: true },
-//                   take: 1, 
-//                 },
-//               },
-//             },
-//             attribute_values: {
-//               select: {
-//                 value_code: true, 
-//                 attributeValueTranslations: {
-//                   where: { language },
-//                   select: { name: true },
-//                   take: 1,
-//                 },
-//               },
-//             },
-//           },
-//         },
-//         user:{select:{username:true}},
-//         agency: { select: { agency_name: true, logo: true } },
-//       },
-//     });
-//   }

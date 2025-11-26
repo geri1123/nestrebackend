@@ -240,7 +240,7 @@ google_id        String?  @unique
   agencyAgentAddedBy           agencyagent[]         @relation("AgencyAgentAddedBy")
   agencyAgentAgent             agencyagent[]         @relation("AgencyAgentAgent")
   notification                 notification[]
-  passwordresettoken           passwordresettoken[]
+  
   product                      product[]
   productimage                 productimage[]
     savedProducts          SavedProduct[]
@@ -278,16 +278,6 @@ model country {
   city city[]
 }
 
-model passwordresettoken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique(map: "PasswordResetToken_token_key")
-  userId    Int
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      user     @relation(fields: [userId], references: [id], map: "PasswordResetToken_userId_fkey")
-
-  @@index([userId], map: "PasswordResetToken_userId_fkey")
-}
 
 model product {
   id                    Int                     @id @default(autoincrement())

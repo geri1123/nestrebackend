@@ -18,13 +18,14 @@ import {  plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../common/helpers/validation.helper';
 import { PasswordSwagger } from './swagger/password.swagger';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('password')
 export class PasswordController {
   constructor(
     private readonly passwordRecoveryService: PasswordRecoveryService,
   ) {}
-
+@Public()
  @Post('reset-password')
 @HttpCode(HttpStatus.OK)
 @PasswordSwagger.ResetPassword()
@@ -49,6 +50,8 @@ async resetPassword(@Body() body: Record<string, any>, @Req() req: RequestWithLa
     message: t('passwordResetSuccess', lang),
   };
 }
+
+@Public()
   @Post('forgot-password')
 @HttpCode(HttpStatus.OK)
 @PasswordSwagger.ForgotPassword()

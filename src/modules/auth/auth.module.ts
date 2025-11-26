@@ -10,7 +10,6 @@ import { PasswordRecoveryService } from './password.service';
 
 import { RegistrationRequestModule } from '../registration-request/registration_request.module';
 
-import { PasswordResetTokenRepository } from '../../repositories/passwordReset/password-reset.repository';
 import { EmailVerificationController } from './email-verification.controller';
 import { EmailVerificationService } from './email-verification.service';
 import { NotificationModule } from '../notification/notification.module';
@@ -47,7 +46,7 @@ import { AppCacheModule } from '../../infrastructure/cache/cache.module';
    AuthService,
   EmailVerificationService,
   PasswordRecoveryService,
-  PasswordResetTokenRepository,
+ 
   ],
   controllers: [
     AuthController,

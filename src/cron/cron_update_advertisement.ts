@@ -11,7 +11,7 @@ export class UpdateExpiredAdvertisementCron {
   
 //   @Cron('0 * * * *') //every hour
   
-  @Cron('*/3 * * * * *')  
+ @Cron('0 */10 * * * *')
   async handleCron() {
     const expiredCount = await this.cleanUpService.expireAds();
     this.logger.log(`Expired ${expiredCount} product advertisements.`);

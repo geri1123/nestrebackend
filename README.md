@@ -48,9 +48,90 @@ Property filters (categories, subcategories, cities, states).
 
 
 
+Notification System
 
+The API includes a full notification module:
+
+- Stores localized user notifications in the database.
+- Supports multiple languages through `notificationTranslation`.
+- Automatic creation of notifications for:
+  - Registration approval/rejection
+  - New agent added to an agency
+  - Advertisement purchases
+  - Wallet top-ups
+
+Notifications are linked to users and can be fetched paginated.
 Significantly reduces repeated database calls and improves response times.
+ Password Reset (Redis Token)
 
+Password reset tokens are no longer stored in the database.
+
+Instead, the system uses Redis:
+
+- A secure token is generated.
+- Token is stored temporarily in Redis:password_reset:<token>
+
+
+ User clicks the link → the API verifies the token in Redis.
+ User’s `email_verified` field becomes `true`.
+
+The token is temporary and automatically expires.
+
+---
+
+ Wallet System
+
+Each user has one wallet:
+
+- Balance stored in the `Wallet` table
+- Transaction history stored in `WalletTransaction`
+- Supported types:
+- `topup`
+- `withdraw`
+- `purchase`
+
+ Wallet Features
+
+- Users can top up their balance.
+- Every balance change creates a transaction record.
+- Purchases (advertisements) deduct automatically from the balance.
+- Always ensures **atomic balance changes** using Prisma transactions.
+
+---
+
+ Product Advertisement System
+
+Users can pay to promote their products:
+
+ Advertisement Types
+- `cheap`
+- `normal`
+- `premium`
+
+Workflow
+1. User selects ad type.
+2. Price is deducted from the wallet.
+3. A `ProductAdvertisement` record is created.
+4. A `WalletTransaction` record is created and linked.
+5. Cron jobs automatically:
+- Activate ads
+- Expire ads when `endDate` passes
+
+Advertisement data is attached to each product via Prisma relations.
+
+---
+
+ Cron Jobs for Advertisement Cleanup
+
+The app includes scheduled tasks to manage advertisements:
+
+- Expire ads when `endDate < NOW()`
+- Update product visibility based on active/inactive ads
+
+Example:
+
+```ts
+@Cron('*/10 * * * *') 
 -- Localization
 
 Full multilingual support, default language: Albanian (al).
