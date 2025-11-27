@@ -1,4 +1,5 @@
 import { Prisma, ProductAdvertisement, advertisement_type } from "@prisma/client";
+import { Advertisement } from "../../modules/advertise_product/domain/advertisement.entity";
 
 export interface IProductAdvertisementRepository {
   
@@ -10,7 +11,7 @@ export interface IProductAdvertisementRepository {
     startDate?: Date,
     endDate?: Date,
     walletTxId?: string
-  ): Promise<ProductAdvertisement>;
+  ): Promise<Advertisement>;
 
  
   updateStatus(

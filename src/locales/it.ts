@@ -6,7 +6,7 @@ export const it = {
     walletSuccessfullyCreated:"Portafoglio creato con successo.",
     tooManyRequests: 'Troppe richieste. Riprova più tardi.',
      noPermissionToAdvertise:"Non hai il permesso di pubblicizzare questo prodotto.",
-
+   amountMustBePositive: "L'importo deve essere positivo",
          productNotActive:"Questo prodotto non è attivo.",
 productAlreadyAdvertised:"Questo prodotto è già pubblicizzato.",
     walletAlreadyExists:"Il portafoglio esiste già.",

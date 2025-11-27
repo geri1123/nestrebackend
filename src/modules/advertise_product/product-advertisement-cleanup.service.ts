@@ -1,12 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ProductAdvertisementRepository } from "../../repositories/product_advertisement/product_advertisement.repository";
-
+import { ExpireProductAdsUseCase } from "./use-cases/expired-addvertisement.use-cace";
 @Injectable()
 export class ProductAdvertisementCleanupService {
-  constructor(private readonly adRepo: ProductAdvertisementRepository) {}
+  constructor(private readonly expireAdsUseCase: ExpireProductAdsUseCase) {}
 
   async expireAds(): Promise<number> {
-    const now = new Date(); 
-    return this.adRepo.expireAds(now);
+    return this.expireAdsUseCase.execute();
   }
 }

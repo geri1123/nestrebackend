@@ -1,6 +1,6 @@
 import { wallet_transaction_type, WalletTransaction, Prisma } from "@prisma/client";
 
-export interface IWalletTransaction {
+export interface IWalletTransactionRepository {
  
   createTransactionTx(
     tx: Prisma.TransactionClient, 

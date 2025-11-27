@@ -1,17 +1,22 @@
 import { Module } from '@nestjs/common';
-import { SaveProductService } from './save-product.service';
 import { SaveProductController } from './saved-product.controller';
-import { SaveProductRepository } from '../../repositories/saved-product/save-product.repository';
-
+import { SaveProductUseCase } from './use-cases/save-product.usecase';
+import { UnsaveProductUseCase } from './use-cases/unsave-product.usecase';
+import { GetSavedProductsUseCase } from './use-cases/get-saved-products.usecase';
+import { SavedProductRepository } from '../../repositories/saved-product/save-product.repository';
+import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 
 @Module({
-  controllers:[SaveProductController], 
+  imports:[FirebaseModule],
+  controllers: [SaveProductController],
   providers: [
-    SaveProductService,
-    SaveProductRepository
-  ],
-  exports: [
-  
+    SaveProductUseCase,
+    UnsaveProductUseCase,
+    GetSavedProductsUseCase,
+    {
+      provide: 'ISavedProductRepository',
+      useClass: SavedProductRepository,
+    },
   ],
 })
 export class SaveProductModule {}

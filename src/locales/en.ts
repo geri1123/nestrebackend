@@ -7,6 +7,8 @@ export const en = {
    walletNotFound:'Wallet not found.',
     successfullyAdvertised: "Product successfully advertised",
     productNotActive:"This product is not active.",
+amountMustBePositive: "Amount must be positive",
+
     noPermissionToAdvertise:"You do not have permission to advertise this product.",
     productAlreadyAdvertised:"This product is already advertised.",
    tooManyRequests: 'Too many requests. Please try again later.',

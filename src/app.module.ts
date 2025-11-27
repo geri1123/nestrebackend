@@ -27,7 +27,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobsModule } from './cron/cron.module';
 import { CustomThrottlerGuard } from './common/guard/Throttler.guard';
-import { AdvertiseProductModule } from './modules/advertise_product/advertise_product.module';
+import { AdvertiseProductModule } from './modules/advertise_product/advertise-product.module';
 
 
 @Module({

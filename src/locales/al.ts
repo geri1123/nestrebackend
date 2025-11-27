@@ -6,6 +6,7 @@ export const al = {
 walletSuccessfullyCreated:"Portofoli u krijua me sukses.",
 walletNotFound:"Portofoli nuk u gjet.",
      noPermissionToAdvertise:"Nuk keni leje ta reklamoni këtë produkt.",
+      amountMustBePositive: "Shuma duhet të jetë pozitive",
 productNotActive:"Ky produkt nuk është aktiv.",
 productAlreadyAdvertised:"Ky produkt është tashmë i reklamuar.",
 successfullyAdvertised: "Produkti është reklamuar me sukses",
