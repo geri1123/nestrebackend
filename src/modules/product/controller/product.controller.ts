@@ -10,7 +10,7 @@ import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 
 import { ProductService } from '../services/product-service';
-import { ProductClicksService } from '../../product-clicks/product_clicks.service';
+import { ProductClicksService } from '../../product-clicks/product-clicks.service';
 import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
 @Controller('products')
 export class SearchProductsController {

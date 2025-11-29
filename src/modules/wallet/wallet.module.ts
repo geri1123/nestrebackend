@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { WalletRepository } from "../../repositories/walllet/wallet.repository";
-import { WalletService } from "./wallet.service";
+import { WalletService } from "./application/services/wallet.service";
 import { WalletController } from "./wallet.controller";
-import { WalletTransactionRepository } from "../../repositories/walllet/wallet_transaction.repository";
-import { ChangeWalletBalanceUseCase } from "./use-cases/change-wallet-balance.use-case";
-import { TransferMoneyUseCase } from "./use-cases/transfer-money.use-case";
+import { WalletTransactionRepository } from "../../repositories/walllet/wallet-transaction.repository";
+import { ChangeWalletBalanceUseCase } from "./application/use-cases/change-wallet-balance.use-case";
+import { TransferMoneyUseCase } from "./application/use-cases/transfer-money.use-case";
 
 @Module({
   controllers:[WalletController],

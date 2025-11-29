@@ -4,7 +4,7 @@ import { SupportedLang } from "../../locales/index.js";
 import { SearchFiltersDto } from "../../modules/product/dto/product-filters.dto.js";
 import { Injectable } from "@nestjs/common";
 import { IsearchProductRepository } from "./Isearch-product.repository.js";
-import { ProductClicksService } from "../../modules/product-clicks/product_clicks.service.js";
+import { ProductClicksService } from "../../modules/product-clicks/product-clicks.service.js";
 @Injectable()
 export class SearchProductsRepo implements IsearchProductRepository{
   constructor(private prisma: PrismaService,private productClicksService: ProductClicksService) {}

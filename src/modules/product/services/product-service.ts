@@ -5,7 +5,7 @@ import { ProductsRepository } from "../../../repositories/product/product.reposi
 import { ProductFrontendDto } from "../dto/product-frontend.dto";
 import { RequestWithUser } from "../../../common/types/request-with-user.interface";
 import { FirebaseService } from "../../../infrastructure/firebase/firebase.service";
-import { ProductClicksService } from "../../product-clicks/product_clicks.service";
+import { ProductClicksService } from "../../product-clicks/product-clicks.service";
 import { product } from "@prisma/client";
 
 @Injectable()

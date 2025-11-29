@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
-import { ISavedProductRepository } from './Isave-product.repository';
-import { SavedProductEntity } from '../../modules/saved-product/domain/save-product.entity';
+import { ISavedProductRepository } from '../../modules/saved-product/domain/repositories/Isave-product.repository';
+import { SavedProductEntity } from '../../modules/saved-product/domain/entities/save-product.entity';
 import { LanguageCode, product_status } from '@prisma/client';
 import { SupportedLang } from '../../locales';
 
@@ -93,92 +93,3 @@ export class SavedProductRepository implements ISavedProductRepository {
     });
   }
 }
-// import { Injectable } from "@nestjs/common";
-// import { PrismaService } from "../../infrastructure/prisma/prisma.service";
-// import { SupportedLang } from "../../locales";
-// import { product_status, SavedProduct } from "@prisma/client";
-
-// @Injectable()
-// export class SaveProductRepository {
-//   constructor(private prisma: PrismaService) {}
-
-//   async createSave(userId: number, productId: number) :Promise<SavedProduct>{
-//     return this.prisma.savedProduct.create({
-//       data: {
-//         user_id: userId,
-//         product_id: productId,
-//       },
-//     });
-//   }
-
-//   async removeSave(userId: number, productId: number):Promise<any> {
-//     return await this.prisma.savedProduct.deleteMany({
-//       where: { user_id: userId, product_id: productId },
-//     });
-//   }
-// async countSaved(userId: number): Promise<number> {
-//   return this.prisma.savedProduct.count({
-//     where: { user_id: userId , product: {
-//         status:product_status.active,  
-//       },},
-//   });
-// }
-// async getSavedProducts(
-//   userId: number,
-//   language: SupportedLang = 'al',
-//   skip?: number,
-//   take?: number
-// ) :Promise<any>{
-//   return await this.prisma.savedProduct.findMany({
-//     where: {
-//       user_id: userId,
-//       product: {
-//         status:product_status.active,  
-//       },
-//     },
-//     include: {
-//       product: {
-//         include: {
-//           productimage: { select: { imageUrl: true }, take: 2, orderBy: { id: 'asc' } },
-//           subcategory: {
-//             select: {
-//               id: true,
-//               subcategorytranslation: { where: { language }, select: { name: true } },
-//               category: {
-//                 select: {
-//                   id: true,
-//                   categorytranslation: { where: { language }, select: { name: true } },
-//                 },
-//               },
-//             },
-//           },
-//           user: {
-//             select: {
-//               username: true,
-//               agency: { select: { agency_name: true, logo: true } },
-//             },
-//           },
-//           city: {
-//             select: { id: true, name: true, country: { select: { id: true, name: true, code: true } } },
-//           },
-//           listing_type: {
-//             select: {
-//               id: true,
-//               listing_type_translation: { where: { language }, select: { name: true } },
-//             },
-//           },
-//         },
-//       },
-//     },
-//     orderBy: { saved_at: 'desc' },
-//     skip, 
-//     take, 
-//   });
-// }
-//   async isSaved(userId: number, productId: number) {
-//     const existing = await this.prisma.savedProduct.findUnique({
-//       where: { user_id_product_id: { user_id: userId, product_id: productId } },
-//     });
-//     return !!existing;
-//   }
-// }

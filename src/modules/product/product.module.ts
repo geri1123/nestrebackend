@@ -17,7 +17,7 @@ import { ProductService } from "./services/product-service";
 import { ManageProductController } from "./controller/manage-products.controller";
 import { SearchFiltersHelper } from "./utils/search-filters.helper";
 import { AgencyModule } from "../agency/agency.module";
-import { ProductClicksModule } from "../product-clicks/product_clicks.module";
+import { ProductClicksModule } from "../product-clicks/product-clicks.module";
 import { SoftAuthService } from "../../common/soft-auth/soft-auth.service";
 import { JwtModule } from "@nestjs/jwt";
 @Module({

@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { RegistrationRequestService } from "../registration-request/registration_request.service";
+import { RegistrationRequestService } from "../registration-request/registration-request.service";
 import { SupportedLang, t } from "../../locales";
 import { agencyagent_role_in_agency, registrationrequest_status, user_role, user_status } from "@prisma/client";
 import { AgentService } from "../agent/agent.service";

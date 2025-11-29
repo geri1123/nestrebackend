@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { RegistrationRequestModule } from "../registration-request/registration_request.module";
+import { RegistrationRequestModule } from "../registration-request/registration-request.module";
 
 import { AgencyRequestsService } from "./agency-requests.service";
 import { AgencyRequestsController } from "./agency-requests.controller";

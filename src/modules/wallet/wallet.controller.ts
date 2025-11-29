@@ -67,11 +67,12 @@
 // }
 
 import { Body, Controller, Get, Post, Query, Req, UnauthorizedException } from "@nestjs/common";
-import { WalletService } from "./wallet.service";
+
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
 import { wallet_transaction_type } from "@prisma/client";
-import { TopUpDto } from "./dto/topup.dto";
+import { TopUpDto } from "./application/dto/topup.dto";
+import { WalletService } from "./application/services/wallet.service";
 
 @Controller('wallet')
 export class WalletController {

@@ -8,7 +8,7 @@ import { PasswordController } from './password.controller';
 import { EmailModule } from '../../infrastructure/email/email.module';
 import { PasswordRecoveryService } from './password.service';
 
-import { RegistrationRequestModule } from '../registration-request/registration_request.module';
+import { RegistrationRequestModule } from '../registration-request/registration-request.module';
 
 import { EmailVerificationController } from './email-verification.controller';
 import { EmailVerificationService } from './email-verification.service';

@@ -3,7 +3,7 @@ import { CacheService } from '../../infrastructure/cache/cache.service';
 import { UserService } from '../users/services/users.service';
 import { AgencyService } from '../agency/agency.service';
 import { EmailService } from '../../infrastructure/email/email.service';
-import { RegistrationRequestService } from '../registration-request/registration_request.service';
+import { RegistrationRequestService } from '../registration-request/registration-request.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationTemplateService } from '../notification/notifications-template.service';
 import { SupportedLang, t } from '../../locales';

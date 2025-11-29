@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { SaveProductController } from './saved-product.controller';
-import { SaveProductUseCase } from './use-cases/save-product.usecase';
-import { UnsaveProductUseCase } from './use-cases/unsave-product.usecase';
-import { GetSavedProductsUseCase } from './use-cases/get-saved-products.usecase';
+import { SaveProductController } from './controller/saved-product.controller';
+import { SaveProductUseCase } from './application/use-cases/save-product.usecase';
+import { UnsaveProductUseCase } from './application/use-cases/unsave-product.usecase';
+import { GetSavedProductsUseCase } from './application/use-cases/get-saved-products.usecase';
 import { SavedProductRepository } from '../../repositories/saved-product/save-product.repository';
 import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 

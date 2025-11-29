@@ -21,14 +21,13 @@ import { PermissionsGuard } from './common/guard/permision.guard';
 import { SaveProductModule } from './modules/saved-product/save-product.module';
 
 import { DatabaseModule } from './infrastructure/database/database.module';
-import { ProductClicksModule } from './modules/product-clicks/product_clicks.module';
+import { ProductClicksModule } from './modules/product-clicks/product-clicks.module';
 
 import { WalletModule } from './modules/wallet/wallet.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobsModule } from './cron/cron.module';
 import { CustomThrottlerGuard } from './common/guard/Throttler.guard';
-import { AdvertiseProductModule } from './modules/advertise_product/advertise-product.module';
-
+import { AdvertiseProductModule } from './modules/advertise-product/advertise-product.module';
 
 @Module({
   imports: [
