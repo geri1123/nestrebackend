@@ -4,14 +4,18 @@ import { WalletRepository } from "../../../../repositories/walllet/wallet.reposi
 import { WalletTransactionRepository } from "../../../../repositories/walllet/wallet-transaction.repository";
 import { WalletDomainEntity } from "../../domain/entities/wallet.entity";
 import { SupportedLang, t } from "../../../../locales";
-import {type IWalletRepository } from "../../domain/repositories/Iwallet.repository";
-import {type IWalletTransactionRepository } from "../../../../repositories/walllet/Iwallet-transaction.repository";
+import {type IWalletRepository } from "../../domain/repositories/wallet.interface.repository";
+import {type IWalletTransactionRepository } from "../../domain/repositories/wallet-transaction.interface.repository";
+import { WALLET_REPOSITORY_TOKENS } from "../../domain/repositories/wallet.repository.token";
 @Injectable()
 export class TransferMoneyUseCase {
   constructor(
-   @Inject("IWalletRepository") private readonly walletRepo: IWalletRepository,
-     @Inject("IWalletTransactionRepository") private readonly walletTransactionRepo: IWalletTransactionRepository
-     ,
+   @Inject(WALLET_REPOSITORY_TOKENS.WALLET_REPOSITORY)
+    private readonly walletRepo: IWalletRepository,
+    
+    @Inject(WALLET_REPOSITORY_TOKENS.WALLET_TRANSACTION_REPOSITORY)
+    private readonly walletTransactionRepo: IWalletTransactionRepository,
+     
     private readonly prisma: PrismaService
   ) {}
 

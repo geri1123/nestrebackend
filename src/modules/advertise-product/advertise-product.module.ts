@@ -3,9 +3,7 @@ import { AdvertiseProductController } from "./controller/advertise-product.contr
 import { ProductAdvertisementRepository } from "../../repositories/product-advertisement/product-advertisement.repository";
 // import { AdvertiseProductService } from "./advertise_product.service";
 import { ProductModule } from "../product/product.module";
-import { ProductAdvertisementService } from "./application/services/advertise-product.service";
 import { WalletModule } from "../wallet/wallet.module";
-import { ProductAdvertisementCleanupService } from "./application/services/product-advertisement-cleanup.service";
 import { AdvertiseProductUseCase } from "./application/use-cases/advertise-product.use-case";
 import { ExpireProductAdsUseCase } from "./application/use-cases/expired-addvertisement.use-cace";
 
@@ -19,8 +17,8 @@ import { ExpireProductAdsUseCase } from "./application/use-cases/expired-addvert
   },
         
         ExpireProductAdsUseCase,AdvertiseProductUseCase, 
-        ProductAdvertisementService ,ProductAdvertisementCleanupService],
+         ],
     controllers:[AdvertiseProductController],
-    exports:[ProductAdvertisementCleanupService]
+    exports:[ExpireProductAdsUseCase]
 })
 export class AdvertiseProductModule{}

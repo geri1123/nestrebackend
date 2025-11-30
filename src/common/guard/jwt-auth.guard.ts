@@ -4,23 +4,28 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { JwtService } from '@nestjs/jwt';
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { UserRepository } from '../../repositories/user/user.repository';
 import { AgentService } from '../../modules/agent/agent.service';
 import { AgencyService } from '../../modules/agency/agency.service';
 import { t, SupportedLang } from '../../locales';
 import { AppConfigService } from '../../infrastructure/config/config.service';
-
+import { GetUserProfileUseCase } from '../../modules/users/application/use-cases/get-user-profile.use-case';
+import { USERS_REPOSITORY_TOKENS } from '../../modules/users/domain/repositories/user.repository.tokens';
+import { type IUserDomainRepository } from '../../modules/users/domain/repositories/user.repository.interface';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepo: UserRepository,
+      private readonly getUserProfile: GetUserProfileUseCase,
+      @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    private readonly userRepository: IUserDomainRepository,
+     
     private readonly agentService: AgentService,
     private readonly agencyService: AgencyService,
     private readonly config: AppConfigService, 
@@ -53,7 +58,7 @@ export class JwtAuthGuard implements CanActivate {
         secret: this.config.jwtSecret, 
       });
       
-      const user = await this.userRepo.findById(decoded.userId);
+      const user = await this.getUserProfile.execute(decoded.userId);
       if (!user) throw new UnauthorizedException(t('userNotFound', lang));
 
       
@@ -90,9 +95,10 @@ export class JwtAuthGuard implements CanActivate {
         req.agencyAgentId = undefined; 
       }
 
-      // Update last_active
-      await this.userRepo.updateFieldsById(user.id, { last_active: new Date() });
-
+     
+ await this.userRepository.updateFields(user.id, {
+        last_active: new Date(),
+      });
       return true;
     } catch (error) {
       throw new UnauthorizedException(t('invalidOrExpiredToken', lang));

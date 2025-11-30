@@ -71,12 +71,21 @@ import { Body, Controller, Get, Post, Query, Req, UnauthorizedException } from "
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
 import { wallet_transaction_type } from "@prisma/client";
-import { TopUpDto } from "./application/dto/topup.dto";
-import { WalletService } from "./application/services/wallet.service";
+import { TopUpDto } from "./dto/topup.dto";
+
+import { CreateWalletUseCase } from "./application/use-cases/crreate-wallet.use-case";
+import { GetWalletUseCase } from "./application/use-cases/get-wallet.use-case";
+import { ChangeWalletBalanceUseCase } from "./application/use-cases/change-wallet-balance.use-case";
 
 @Controller('wallet')
 export class WalletController {
-  constructor(private readonly walletService: WalletService) {}
+  constructor(
+    
+        private readonly createWalletUseCase: CreateWalletUseCase,
+    private readonly getWalletUseCase: GetWalletUseCase,
+    private readonly changeBalanceUseCase: ChangeWalletBalanceUseCase,
+
+  ) {}
 
   // Create wallet for user
   @Post('create')
@@ -84,7 +93,7 @@ export class WalletController {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-    await this.walletService.createWallet(userId, language);
+      await this.createWalletUseCase.execute(userId, language);
 
     return {
       success: true,
@@ -98,8 +107,14 @@ export class WalletController {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-    const limit = 10; // you can make this dynamic if you want
-    const walletData = await this.walletService.getWallet(userId, language, Number(page), limit);
+    const limit = 10; 
+   const walletData = await this.getWalletUseCase.execute(
+      userId,
+      Number(page),
+      limit,
+      language
+    );
+
 
     return {
       success: true,
@@ -116,18 +131,18 @@ export class WalletController {
     const amount = body.amount;
     const type = wallet_transaction_type.topup;
 
-    const { balance, transactionId } = await this.walletService.changeWalletBalance(
+    const result = await this.changeBalanceUseCase.execute({
       userId,
-      type,
+      type: wallet_transaction_type.topup,
       amount,
-      language
-    );
+      language,
+    });
 
     return {
       success: true,
       message: t('amountAddedSuccessfully', language),
-      balance,
-      transactionId,
+      balance: result.balance,
+      transactionId: result.transactionId,
     };
   }
 

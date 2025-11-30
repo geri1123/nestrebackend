@@ -5,8 +5,8 @@ import { PrismaService } from "../../../../infrastructure/prisma/prisma.service"
 import { WalletDomainEntity } from "../../domain/entities/wallet.entity";
 import { wallet_transaction_type, WalletTransaction } from "@prisma/client";
 import { SupportedLang, t } from "../../../../locales";
-import {type IWalletRepository } from "../../domain/repositories/Iwallet.repository";
-import { type IWalletTransactionRepository } from "../../../../repositories/walllet/Iwallet-transaction.repository";
+import {type IWalletRepository } from "../../domain/repositories/wallet.interface.repository";
+import { type IWalletTransactionRepository } from "../../domain/repositories/wallet-transaction.interface.repository";
 
 interface ChangeBalanceInput {
   userId: number;

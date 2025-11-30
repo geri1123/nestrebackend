@@ -11,7 +11,7 @@ export class DeleteInactiveUsersCron {
 
   
 
-@Cron('*/10 * * * *') //10min
+@Cron('*/10 * * * *')
   async handleCron() {
    
 

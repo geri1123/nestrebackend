@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { Prisma, PrismaClient, wallet_transaction_type, WalletTransaction } from "@prisma/client";
-import { IWalletTransactionRepository } from "./Iwallet-transaction.repository";
+import { IWalletTransactionRepository } from "../../modules/wallet/domain/repositories/wallet-transaction.interface.repository";
 
 @Injectable()
 export class WalletTransactionRepository implements IWalletTransactionRepository{

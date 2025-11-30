@@ -7,8 +7,10 @@ export const en = {
    walletNotFound:'Wallet not found.',
     successfullyAdvertised: "Product successfully advertised",
     productNotActive:"This product is not active.",
+    usernameCooldown: "You can change your username again on {date}.",
 amountMustBePositive: "Amount must be positive",
-
+sameUsername: "The new username cannot be the same as the current username.",
+    usernameChangedSuccessfully: "Username changed successfully.",
     noPermissionToAdvertise:"You do not have permission to advertise this product.",
     productAlreadyAdvertised:"This product is already advertised.",
    tooManyRequests: 'Too many requests. Please try again later.',

@@ -42,7 +42,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { Prisma, Wallet, wallet_transaction_type } from "@prisma/client";
-import { IWalletRepository } from "../../modules/wallet/domain/repositories/Iwallet.repository";
+import { IWalletRepository } from "../../modules/wallet/domain/repositories/wallet.interface.repository";
 import { WalletDomainEntity } from "../../modules/wallet/domain/entities/wallet.entity";
 
 @Injectable()

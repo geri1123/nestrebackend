@@ -1,10 +1,11 @@
 import { Injectable, BadRequestException, ForbiddenException, Inject } from "@nestjs/common";
-import { WalletService } from "../../../wallet/application/services/wallet.service";
 import { ProductService } from "../../../product/services/product-service";
 import { SupportedLang , t } from "../../../../locales";
 import { advertisement_type, wallet_transaction_type } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import {type IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
+import { ChangeWalletBalanceUseCase } from "../../../wallet/application/use-cases/change-wallet-balance.use-case";
+
 const AD_PRICING = { cheap: 5, normal: 10, premium: 20 };
 const AD_DURATION = { cheap: 7, normal: 14, premium: 30 };
 
@@ -13,7 +14,7 @@ export class AdvertiseProductUseCase {
   constructor(
   @Inject("IProductAdvertisementRepository")
   private readonly adRepo: IProductAdvertisementRepository,
-    private readonly walletService: WalletService,
+    private readonly changeWalletBalanceUseCase: ChangeWalletBalanceUseCase,
     private readonly productService: ProductService,
     private readonly prisma: PrismaService
   ) {}
@@ -37,12 +38,15 @@ async execute(productId: number, adType: advertisement_type, userId: number, lan
 
   try {
     return await this.prisma.$transaction(async (tx) => {
-      const { transactionId } = await this.walletService.purchaseWithTransaction(
-        userId,
-        price,
-        language,
-        tx
-      );
+     const { transactionId } = await this.changeWalletBalanceUseCase.execute(
+  {
+    userId,
+    type: wallet_transaction_type.purchase,
+    amount: price,
+    language,
+  },
+  tx
+);
 
       return this.adRepo.createAdvertisementTx(
         tx,
