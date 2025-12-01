@@ -1,0 +1,1 @@
+export type AgencyStatus = "active" | "inactive" | "suspended";

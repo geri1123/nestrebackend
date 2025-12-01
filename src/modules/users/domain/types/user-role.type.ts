@@ -1,0 +1,1 @@
+export type userRole = 'user' | 'agency_owner' | 'agent';

@@ -2,8 +2,9 @@
 
 import { Request } from 'express';
 import { SupportedLang } from '../../locales';
-import { BaseUserInfo } from '../../modules/users/types/base-user-info';
-import { AgentPermissions } from './permision.type';
+
+import { AgentPermissionEntity } from '../../modules/agent/domain/entities/agent-permission.entity';
+
 import { agencyagent_status } from '@prisma/client';
 import { User } from '../../modules/users/domain/entities/user.entity';
 
@@ -15,6 +16,6 @@ user?:User;
 
   agencyId?: number | null;
   agencyAgentId?: number | null;
-  agentPermissions?: AgentPermissions; 
+agentPermissions?: AgentPermissionEntity | null
   agentStatus?:agencyagent_status;
 }

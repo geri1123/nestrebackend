@@ -34,7 +34,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
 
      
       if (
-        req.agentPermissions?.can_edit_others_post &&
+        req.agentPermissions?.canEditOthersPost &&
         product.agencyId === req.agencyId
       ) {
         return true;

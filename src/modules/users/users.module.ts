@@ -44,7 +44,7 @@ import { ProfileController } from './controllers/profile.controller';
     RegisterUserUseCase,
   ],
   exports: [
-
+USERS_REPOSITORY_TOKENS.USER_REPOSITORY, 
     GetUserProfileUseCase,
     RegisterUserUseCase,
   

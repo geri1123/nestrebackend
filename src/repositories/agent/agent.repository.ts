@@ -1,194 +1,208 @@
-// import { prisma } from "../../config/prisma.js";
-import { Injectable } from "@nestjs/common";
-import { Createagentdata, NewAgent } from "../../modules/agent/types/create-agent";
-import { PrismaService } from "../../infrastructure/prisma/prisma.service";
-import { IAgentsRepository } from "./Iagent.repository";
-import { AgentInfo } from "../../modules/agent/types/agent-info";
-import { agencyagent, agencyagent_permission, agencyagent_role_in_agency, agencyagent_status, Prisma } from "@prisma/client";
-import { AgentPermissions } from "../../common/types/permision.type";
-import { AgentDto } from "../../modules/agent/dto/agentsinagency.dto";
+import { Injectable } from '@nestjs/common';
+import {
+  agencyagent,
+  agencyagent_status,
+  Prisma,
+} from '@prisma/client';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+
+import { AgentMapper } from '../../modules/agent/infrastructure/mappers/agent.mapper';
+import { AgentWithUserAndPermission , AgentSort , CreateAgentDomainData , IAgentDomainRepository } from '../../modules/agent/domain/repositories/agents.repository.interface';
+import { AgentEntity } from '../../modules/agent/domain/entities/agent.entity';
+import { AgentStatus } from '../../modules/agent/domain/types/agent-status.type';
+import { AgentRole } from '../../modules/agent/domain/types/agent-role.type';
+import { AgentPermissionEntity } from '../../modules/agent/domain/entities/agent-permission.entity';
 
 @Injectable()
-export class AgentsRepository implements IAgentsRepository {
- constructor(private readonly prisma: PrismaService) {}
-async findById(agentId: number): Promise<agencyagent | null> {
-  return this.prisma.agencyagent.findUnique({ where: { id: agentId } });
-}
-   async findAgencyIdByAgent(userId: number): Promise<number | null> {
+export class AgentRepository implements IAgentDomainRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findById(agentId: number): Promise<AgentEntity | null> {
+    const agent = await this.prisma.agencyagent.findUnique({
+      where: { id: agentId },
+    });
+    return agent ? AgentMapper.toDomain(agent) : null;
+  }
+
+  async findAgencyIdByAgent(userId: number): Promise<number | null> {
     const agent = await this.prisma.agencyagent.findFirst({
       where: { agent_id: userId },
-      select: { agency_id: true }, 
+      select: { agency_id: true },
     });
-
-   
     return agent ? agent.agency_id : null;
   }
-async findByAgencyAndAgent(
+
+ async findByAgencyAndAgent(
   agencyId: number,
-  agentId: number
-): Promise<(agencyagent & { permission: any }) | null> {
-  return this.prisma.agencyagent.findUnique({
+  agentUserId: number,
+): Promise<{ agent: AgentEntity; permission: AgentPermissionEntity | null } | null> {
+  const result = await this.prisma.agencyagent.findUnique({
     where: {
       agency_id_agent_id: {
         agency_id: agencyId,
-        agent_id: agentId,
+        agent_id: agentUserId,
       },
     },
     include: {
-      permission: true, 
+      permission: true,
     },
   });
+
+  if (!result) return null;
+
+  return {
+    agent: AgentMapper.toDomain(result),
+    permission: result.permission ? AgentMapper.toPermissionDomain(result.permission) : null,
+  };
 }
- 
-   async createAgencyAgent(data: Createagentdata): Promise<NewAgent> {
-    // create the agent in the database
-    const agent = await this.prisma.agencyagent.create({
+
+  async findByIdCardNumber(idCardNumber: string): Promise<string | null> {
+    const result = await this.prisma.agencyagent.findUnique({
+      where: { id_card_number: idCardNumber },
+      select: { id_card_number: true },
+    });
+    return result?.id_card_number ?? null;
+  }
+
+  async findExistingAgent(agent_id: number): Promise<AgentEntity | null> {
+    const result = await this.prisma.agencyagent.findFirst({
+      where: { agent_id },
+    });
+    return result ? AgentMapper.toDomain(result) : null;
+  }
+
+  async createAgencyAgent(data: CreateAgentDomainData): Promise<AgentEntity> {
+    const created = await this.prisma.agencyagent.create({
       data: {
         agency_id: data.agencyId,
         agent_id: data.agentId,
-        added_by: data.addedBy,
-        id_card_number: data.idCardNumber,
-        role_in_agency: data.roleInAgency,
-        commission_rate: data.commissionRate,
+        added_by: data.addedBy ?? null,
+        id_card_number: data.idCardNumber ?? null,
+        role_in_agency: data.roleInAgency as any,
+        commission_rate: data.commissionRate ?? null,
         start_date: new Date(),
-        
-        status: data.status,
-      },
-      select: {
-        id:true,
-        agent_id: true,
-        agency_id: true,
-        added_by: true,
-        id_card_number: true,
-        role_in_agency: true,
-        status: true,
-        commission_rate: true,
-        start_date: true,
+        status: data.status as any,
       },
     });
 
-   
-    return agent;
+    return AgentMapper.toDomain(created);
   }
-async findByIdCardNumber(
-  idCardNumber: string
-): Promise<{ id_card_number: string | null } | null> {
-  return this.prisma.agencyagent.findUnique({
-    where: { id_card_number: idCardNumber },
-    select: { id_card_number: true },
-  });
-}
-async findExistingAgent(agent_id: number): Promise<agencyagent | null> {
-  return await this.prisma.agencyagent.findFirst({
-    where: { agent_id },  
-  });
-}
 
   async getAgentWithPermissions(
     agencyAgentId: number,
-  ): Promise<Prisma.agencyagentGetPayload<{ include: { permission: true , agency: true } }> | null> {
-    return this.prisma.agencyagent.findUnique({
+  ): Promise<{ agent: AgentEntity; hasPermission: boolean } | null> {
+    const result = await this.prisma.agencyagent.findUnique({
       where: { id: agencyAgentId },
-      include: { 
-        permission: true ,
-          agency: true,
+      include: { permission: true, agency: true },
+    });
+
+    if (!result) return null;
+
+    return {
+      agent: AgentMapper.toDomain(result),
+      hasPermission: !!result.permission,
+    };
+  }
+
+  async getAgentsByAgency(
+    agencyId: number,
+    agentStatus: AgentStatus | undefined,
+    limit: number,
+    offset: number,
+    showAllStatuses: boolean,
+    search: string | undefined,
+    sort: AgentSort,
+  ): Promise<AgentWithUserAndPermission[]> {
+    let orderBy: Prisma.agencyagentOrderByWithRelationInput = {};
+
+    if (sort === 'name_asc' || sort === 'name_desc') {
+      orderBy = {
+        agentUser: {
+          first_name: sort === 'name_asc' ? 'asc' : 'desc',
+        },
+      };
+    } else if (sort === 'created_at_asc') {
+      orderBy = { created_at: 'asc' };
+    } else if (sort === 'created_at_desc') {
+      orderBy = { created_at: 'desc' };
+    }
+
+    const results = await this.prisma.agencyagent.findMany({
+      where: {
+        agency_id: agencyId,
+        ...(showAllStatuses ? {} : { status: agencyagent_status.active }),
+        ...(agentStatus ? { status: agentStatus as any } : {}),
+        ...(search
+          ? {
+              OR: [
+                { agentUser: { username: { contains: search } } },
+                { agentUser: { first_name: { contains: search } } },
+                { agentUser: { last_name: { contains: search } } },
+              ],
+            }
+          : {}),
+      },
+      include: {
+        agentUser: true,
+        permission: true,
+      },
+      orderBy,
+      take: limit,
+      skip: offset,
+    });
+
+    return results.map((r) =>
+      AgentMapper.toAgentWithUserAndPermission({
+        agencyagent: r,
+        agentUser: r.agentUser,
+        permission: r.permission!,
+      }),
+    );
+  }
+
+  async getAgentsCountByAgency(
+    agencyId: number,
+    showAllStatuses: boolean,
+    search?: string,
+    agentStatus?: AgentStatus,
+  ): Promise<number> {
+    return this.prisma.agencyagent.count({
+      where: {
+        agency_id: agencyId,
+        ...(showAllStatuses ? {} : { status: agencyagent_status.active }),
+        ...(agentStatus ? { status: agentStatus as any } : {}),
+        ...(search
+          ? {
+              OR: [
+                { agentUser: { is: { username: { contains: search } } } },
+                { agentUser: { is: { first_name: { contains: search } } } },
+                { agentUser: { is: { last_name: { contains: search } } } },
+              ],
+            }
+          : {}),
       },
     });
   }
 
-  async getAgentsByAgency(
-  agencyId: number,
-  agentStatus?: agencyagent_status,
-  limit?: number,
-  offset?: number,
-  showAllStatuses: boolean = false,
-  search?: string,
-  sort: 'name_asc' | 'name_desc' | 'created_at_desc' | 'created_at_asc' = 'created_at_desc',
-) {
-  // figure out Prisma orderBy based on sort option
-  let orderBy: any = {};
-
-  if (sort === 'name_asc') {
-    orderBy = { agentUser: { first_name: 'asc' } };
-  } else if (sort === 'name_desc') {
-    orderBy = { agentUser: { first_name: 'desc' } };
-  } else if (sort === 'created_at_asc') {
-    orderBy = { created_at: 'asc' };
-  } else if (sort === 'created_at_desc') {
-    orderBy = { created_at: 'desc' };
-  }
-
-  return this.prisma.agencyagent.findMany({
-    where: {
-      agency_id: agencyId,
-      ...(showAllStatuses ? {} : { status: 'active' }),
-      ...(agentStatus ? { status: agentStatus } : {}),
-      ...(search
-        ? {
-            OR: [
-              { agentUser: { username: { contains: search} } },
-              { agentUser: { first_name: { contains: search } } },
-              { agentUser: { last_name: { contains: search } } },
-            ],
-          }
-        : {}),
-    },
-    include: {
-      agentUser: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          first_name: true,
-          last_name: true,
-          profile_img: true,
-          status: true,
-        },
+  async updateAgencyAgent(
+    agencyAgentId: number,
+    data: Partial<{
+      id_card_number: string;
+      role_in_agency: AgentRole;
+      commission_rate: number;
+      end_date: Date;
+      status: AgentStatus;
+    }>,
+  ): Promise<AgentEntity> {
+    const updated = await this.prisma.agencyagent.update({
+      where: { id: agencyAgentId },
+      data: {
+        ...data,
+        role_in_agency: data.role_in_agency as any,
+        status: data.status as any,
       },
-      permission: true,
-    },
-    orderBy,
-    take: limit,
-    skip: offset,
-  });
-}
-async getAgentsCountByAgency(
-  agencyId: number,
-  showAllStatuses = false,
-  search?: string,
-  agentStatus?: agencyagent_status
-) {
-  return this.prisma.agencyagent.count({
-    where: {
-      agency_id: agencyId,
-      ...(showAllStatuses ? {} : { status: 'active' }),
-      ...(agentStatus ? { status: agentStatus } : {}),
-      ...(search
-        ? {
-            OR: [
-              { agentUser: { is: { username: { contains: search } } } },
-              { agentUser: { is: { first_name: { contains: search } } } },
-              { agentUser: { is: { last_name: { contains: search} } } },
-            ],
-          }
-        : {}),
-    },
-  });
-  
-}
-async updateAgencyAgent(
-  agencyAgentId: number,
-  data: Partial<{
-    id_card_number: string;
-    role_in_agency: agencyagent_role_in_agency;
-    commission_rate: number;
-    end_date: Date;
-    status: agencyagent_status;
-  }>
-): Promise<agencyagent> {
-  return this.prisma.agencyagent.update({
-    where: { id: agencyAgentId },
-    data,
-  });
-}
+    });
+
+    return AgentMapper.toDomain(updated);
+  }
 }

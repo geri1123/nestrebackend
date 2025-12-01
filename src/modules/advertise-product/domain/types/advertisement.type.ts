@@ -1,0 +1,1 @@
+export type advertisementType = "premium" | "cheap" | "normal";

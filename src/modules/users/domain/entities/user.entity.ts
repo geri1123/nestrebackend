@@ -1,3 +1,6 @@
+import { userRole } from "../types/user-role.type";
+import { userStatus } from "../types/user-status.type";
+
 export class User {
   constructor(
     public readonly id: number,
@@ -8,8 +11,8 @@ export class User {
     public aboutMe: string | null,
     public profileImg: string | null,
     public phone: string | null,
-    public readonly role: 'user' | 'agency_owner' | 'agent',
-    public readonly status: 'active' | 'inactive' | 'pending' | 'suspended',
+    public readonly role: userRole,
+    public readonly status: userStatus,
     public readonly emailVerified: boolean,
     public readonly createdAt: Date,
     public readonly updatedAt: Date | null,

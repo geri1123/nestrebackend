@@ -11,13 +11,15 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { AgentService } from '../../modules/agent/agent.service';
-import { AgencyService } from '../../modules/agency/agency.service';
+
 import { t, SupportedLang } from '../../locales';
 import { AppConfigService } from '../../infrastructure/config/config.service';
 import { GetUserProfileUseCase } from '../../modules/users/application/use-cases/get-user-profile.use-case';
 import { USERS_REPOSITORY_TOKENS } from '../../modules/users/domain/repositories/user.repository.tokens';
 import { type IUserDomainRepository } from '../../modules/users/domain/repositories/user.repository.interface';
+import { GetAgencyByOwnerUseCase } from '../../modules/agency/application/use-cases/get-agency-by-owner.use-case';
+import { FindAgentInAgencyUseCase } from '../../modules/agent/application/use-cases/find-agent-in-agency.use-case';
+import { GetAgencyIdForAgentUseCase } from '../../modules/agent/application/use-cases/get-agency-id-for-agent.use-case';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
@@ -25,9 +27,9 @@ export class JwtAuthGuard implements CanActivate {
       private readonly getUserProfile: GetUserProfileUseCase,
       @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
     private readonly userRepository: IUserDomainRepository,
-     
-    private readonly agentService: AgentService,
-    private readonly agencyService: AgencyService,
+     private readonly FindAgentInAgency:FindAgentInAgencyUseCase,
+     private readonly getagencyIdForagent: GetAgencyIdForAgentUseCase,
+  private readonly findbyOwner: GetAgencyByOwnerUseCase,
     private readonly config: AppConfigService, 
     private readonly reflector: Reflector,
   ) {}
@@ -73,8 +75,8 @@ export class JwtAuthGuard implements CanActivate {
 
       if (user.role === 'agent') {
         // Fetch agent record
-        const agentRecord = await this.agentService.findByAgencyAndAgent(
-          await this.agentService.getAgencyIdForAgent(user.id) as number,
+        const agentRecord = await this.FindAgentInAgency.execute(
+          await this.getagencyIdForagent.execute(user.id) as number,
           user.id,
           lang,
         );
@@ -82,15 +84,15 @@ export class JwtAuthGuard implements CanActivate {
           throw new UnauthorizedException(t('userNotAssociatedWithAgency', lang));
         }
 
-        req.agencyId = agentRecord.agency_id;
-        req.agencyAgentId = agentRecord.id;
-        req.agentPermissions = agentRecord.permission;
-        req.agentStatus = agentRecord.status;
+       req.agencyId = agentRecord.agent.agencyId;
+req.agencyAgentId = agentRecord.agent.id;
+req.agentPermissions = agentRecord.permission;
+req.agentStatus = agentRecord.agent.status;
       }
 
       if (user.role === 'agency_owner') {
        
-        const agency = await this.agencyService.getAgencyByOwnerOrFail(user.id, lang);
+        const agency = await this.findbyOwner.execute(user.id, lang);
         req.agencyId = agency.id;
         req.agencyAgentId = undefined; 
       }

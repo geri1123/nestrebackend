@@ -1,19 +1,65 @@
+// src/modules/agency/agency.module.ts
 import { Module } from '@nestjs/common';
 
+// Infrastructure
+import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
+import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 
+// Repository token & interface
+import { AGENCY_REPOSITORY_TOKENS } from './domain/repositories/agency.repository.tokens';
 import { AgencyRepository } from '../../repositories/agency/agency.repository';
-import { AgencyService } from './agency.service';
-import { AgencyController } from './agency.controller';
-import { ManageAgencyService } from './manage-agency.service';
+
+// Use-cases
+import { CreateAgencyUseCase } from './application/use-cases/create-agency.use-case';
+import { DeleteAgencyLogoUseCase } from './application/use-cases/delete-agency-logo.use-case';
+import { UpdateAgencyFieldsUseCase } from './application/use-cases/update-agency-fields.use-case';
+import { UploadAgencyLogoUseCase } from './application/use-cases/upload-logo.use-case';
+import { GetPaginatedAgenciesUseCase } from './application/use-cases/get-paginated-agencies.use-case';
+import { GetAgencyByIdUseCase } from './application/use-cases/get-agency-by-id.use-case';
+import { GetAgencyInfoUseCase } from './application/use-cases/get-agency-info.use-case';
+import { RegisterAgencyFromUserUseCase } from './application/use-cases/register-agency-from-user.use-case';
+
+// Controller
+import { AgencyController } from './controllers/agency.controller';
+
+// Extra utils
 import { ImageUtilsService } from '../../common/utils/image-utils.service';
-import { AgencyCreationService } from './agency-creation.service';
-import { UserModule } from '../users/users.module';
+import { UsersModule } from '../users/users.module';
+import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-owner.use-case';
 
 @Module({
-  imports:[UserModule ],
+  imports: [PrismaModule, UsersModule,  FirebaseModule],
+
   controllers: [AgencyController],
-  
-  providers: [AgencyRepository, AgencyService ,ImageUtilsService, ManageAgencyService , AgencyCreationService ],
-  exports: [ AgencyService ,AgencyRepository],
+
+  providers: [
+    // REPOSITORY
+    {
+      provide: AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY,
+      useClass: AgencyRepository,
+    },
+
+    // USE-CASES
+    GetAgencyByOwnerUseCase,
+    CreateAgencyUseCase,
+    DeleteAgencyLogoUseCase,
+    UpdateAgencyFieldsUseCase,
+    UploadAgencyLogoUseCase,
+    GetPaginatedAgenciesUseCase,
+    GetAgencyByIdUseCase,
+    GetAgencyInfoUseCase,
+    RegisterAgencyFromUserUseCase,
+
+    // UTILS
+    ImageUtilsService,
+  ],
+
+  exports: [
+    
+    CreateAgencyUseCase,
+    GetAgencyByIdUseCase,
+    GetAgencyInfoUseCase,
+    RegisterAgencyFromUserUseCase,
+  ],
 })
 export class AgencyModule {}

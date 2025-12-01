@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LanguageCode } from '@prisma/client';
 import { SupportedLang } from '../../locales';
-import { translateAgentChanges } from '../agent/helpers/agent-change-translator';
+import { translateAgentChanges } from '../agent/application/helpers/agent-change-translator';
 
 type TemplateFn = (user: any) => string;
 

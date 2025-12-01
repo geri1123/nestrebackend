@@ -1,21 +1,25 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
-import { AgentsRepository } from "../../repositories/agent/agent.repository";
+
 import { RequestWithUser } from "../types/request-with-user.interface";
 import { t } from "../../locales";
-import { AgentService } from "../../modules/agent/agent.service";
+import { GetAgentByIdUseCase } from "../../modules/agent/application/use-cases/get-agent-by-id.use-case";
+
 
 @Injectable()
 export class AgentBelongsToAgencyGuard implements CanActivate {
-  constructor(private readonly agentService:AgentService) {}
+  constructor(
+   private readonly getagentByid: GetAgentByIdUseCase,
+    ) {}
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
     const agentId = parseInt(req.params.id);
     const userAgencyId = req.agencyId;
-    const language=req.language;
-    const agent = await this.agentService.findById(agentId);
 
-    if (!agent || agent.agency_id !== userAgencyId) {
+    const language=req.language;
+    const agent = await this.getagentByid.execute(agentId , language);
+
+    if (!agent || agent.agencyId !== userAgencyId) {
       throw new ForbiddenException(t("cannotEditOtherAgencyAgent", language));
     }
 

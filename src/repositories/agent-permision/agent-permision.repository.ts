@@ -1,41 +1,50 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../infrastructure/prisma/prisma.service";
-import { agencyagent_permission } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { AgentPermissionUpdateInput , IAgentPermissionDomainRepository } from '../../modules/agent/domain/repositories/agent-permission.repository.interface';
+import { AgentMapper } from '../../modules/agent/infrastructure/mappers/agent.mapper';
+import { AgentPermissionEntity } from '../../modules/agent/domain/entities/agent-permission.entity';
 
 @Injectable()
-export class AgentPermissionRepository {
-  constructor(private prisma: PrismaService) {}
+export class AgentPermissionRepository
+  implements IAgentPermissionDomainRepository
+{
+  constructor(private readonly prisma: PrismaService) {}
 
-  // Get permissions of an agent by agency_agent_id
-  async getPermissionsByAgentId(agencyAgentId: number): Promise<agencyagent_permission | null> {
-    return this.prisma.agencyagent_permission.findUnique({
+  async getPermissionsByAgentId(
+    agencyAgentId: number,
+  ): Promise<AgentPermissionEntity | null> {
+    const result = await this.prisma.agencyagent_permission.findUnique({
       where: { agency_agent_id: agencyAgentId },
     });
+
+    return result ? AgentMapper.toPermissionDomain(result) : null;
   }
 
-  // Create permissions for an agent
   async createPermissions(
     agencyAgentId: number,
     agencyId: number,
-    permissions: Partial<Omit<agencyagent_permission, "id" | "agency_agent_id" | "agency_id" | "created_at" | "updated_at">> // only pass boolean permissions
-  ): Promise<agencyagent_permission> {
-    return this.prisma.agencyagent_permission.create({
+    permissions: AgentPermissionUpdateInput,
+  ): Promise<AgentPermissionEntity> {
+    const created = await this.prisma.agencyagent_permission.create({
       data: {
         agency_agent_id: agencyAgentId,
         agency_id: agencyId,
         ...permissions,
       },
     });
+
+    return AgentMapper.toPermissionDomain(created);
   }
 
-  // Update permissions for an existing agent
   async updatePermissions(
     agencyAgentId: number,
-    permissions: Partial<Omit<agencyagent_permission, "id" | "agency_agent_id" | "agency_id" | "created_at" | "updated_at">>
-  ): Promise<agencyagent_permission> {
-    return this.prisma.agencyagent_permission.update({
+    permissions: AgentPermissionUpdateInput,
+  ): Promise<AgentPermissionEntity> {
+    const updated = await this.prisma.agencyagent_permission.update({
       where: { agency_agent_id: agencyAgentId },
       data: { ...permissions },
     });
+
+    return AgentMapper.toPermissionDomain(updated);
   }
 }

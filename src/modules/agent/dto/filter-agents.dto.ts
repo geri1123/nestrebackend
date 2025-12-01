@@ -1,8 +1,15 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { agencyagent_status } from "@prisma/client";
-import { IsOptional, IsString, IsEnum } from "class-validator";
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { agencyagent_status } from '@prisma/client';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
-export type sort = 'name_asc'|'name_desc'|"created_at_desc"|"created_at_asc";
+export const AgentSortValues = [
+  'name_asc',
+  'name_desc',
+  'created_at_desc',
+  'created_at_asc',
+] as const;
+
+export type AgentSort = (typeof AgentSortValues)[number];
 
 export class FilterAgentsDto {
   @ApiPropertyOptional({
@@ -17,11 +24,11 @@ export class FilterAgentsDto {
   @ApiPropertyOptional({
     description: 'Sort order for the agents list',
     example: 'name_asc',
-    enum: ['name_asc', 'name_desc', 'created_at_desc', 'created_at_asc'],
+    enum: AgentSortValues,
   })
   @IsOptional()
-  @IsEnum(['name_asc', 'name_desc', 'created_at_desc', 'created_at_asc'])
-  sort?: sort;
+  @IsEnum(AgentSortValues, { message: 'invalidSortOption' })
+  sort?: AgentSort;
 
   @ApiPropertyOptional({
     description: 'Filter agents by their current status',
@@ -29,6 +36,6 @@ export class FilterAgentsDto {
     enum: agencyagent_status,
   })
   @IsOptional()
-  @IsEnum(agencyagent_status)
+  @IsEnum(agencyagent_status, { message: 'statusInvalid' })
   status?: agencyagent_status;
 }

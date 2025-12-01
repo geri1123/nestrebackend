@@ -1,3 +1,4 @@
+import { user_role } from "@prisma/client";
 import { User } from "../entities/user.entity";
 import { NavbarUser } from "../value-objects/navbar-user.vo";
 
@@ -32,6 +33,7 @@ export interface UpdateUserFields {
   phone?: string;
   password?: string;
   last_login?: Date;
+  role:user_role;
    last_active?: Date;
   profile_img?: string | null;
 }
