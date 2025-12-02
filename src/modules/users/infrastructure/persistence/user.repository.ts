@@ -1,0 +1,184 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
+
+import { IUserDomainRepository , CreateUserData  , UpdateUserFields } from '../../domain/repositories/user.repository.interface';
+import { User } from '../../domain/entities/user.entity';
+import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
+import { hashPassword } from '../../../../common/utils/hash';
+
+@Injectable()
+export class UserRepository implements IUserDomainRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findById(userId: number): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        first_name: true,
+        last_name: true,
+        about_me: true,
+        profile_img: true,
+        phone: true,
+        status: true,
+        email_verified: true,
+        last_login: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    return user ? User.create(user as any) : null;
+  }
+
+  async findByIdentifier(identifier: string): Promise<User | null> {
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ username: identifier }, { email: identifier }] },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        password: true,
+        status: true,
+        role: true,
+        email_verified: true,
+        first_name: true,
+        last_name: true,
+        about_me: true,
+        profile_img: true,
+        phone: true,
+        last_login: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    return user ? User.create(user as any) : null;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        first_name: true,
+        last_name: true,
+        email_verified: true,
+        status: true,
+        role: true,
+        about_me: true,
+        profile_img: true,
+        phone: true,
+        last_login: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    return user ? User.create(user as any) : null;
+  }
+
+  async usernameExists(username: string): Promise<boolean> {
+    const user = await this.prisma.user.findFirst({
+      where: { username },
+      select: { username: true },
+    });
+    return !!user;
+  }
+
+  async emailExists(email: string): Promise<boolean> {
+    const user = await this.prisma.user.findFirst({
+      where: { email },
+      select: { id: true },
+    });
+    return !!user;
+  }
+
+  async create(data: CreateUserData): Promise<number> {
+    const hashedPassword = await hashPassword(data.password);
+    const result = await this.prisma.user.create({
+      data: {
+        username: data.username,
+        email: data.email,
+        password: hashedPassword,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        role: data.role,
+        status: data.status as any,
+        email_verified: false,
+      },
+    });
+    return result.id;
+  }
+
+  async updateFields(userId: number, fields: Partial<UpdateUserFields>): Promise<void> {
+    const filtered = Object.fromEntries(
+      Object.entries(fields).filter(([_, val]) => val !== undefined),
+    ) as Partial<UpdateUserFields>;
+
+    if (Object.keys(filtered).length === 0) return;
+
+    (filtered as any).updated_at = new Date();
+    await this.prisma.user.update({ where: { id: userId }, data: filtered });
+  }
+
+  async updateUsername(userId: number, newUsername: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { username: newUsername, updated_at: new Date() },
+    });
+  }
+
+  async updateProfileImage(userId: number, imageUrl: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { profile_img: imageUrl, updated_at: new Date() },
+    });
+  }
+
+  async deleteProfileImage(userId: number): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { profile_img: null, updated_at: new Date() },
+    });
+  }
+
+  async verifyEmail(userId: number, emailVerified: boolean, status: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { email_verified: emailVerified, status: status as any, updated_at: new Date() },
+    });
+  }
+
+  async getNavbarUser(userId: number): Promise<NavbarUser | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        username: true,
+        email: true,
+        profile_img: true,
+        last_login: true,
+        role: true,
+      },
+    });
+
+    return user
+      ? new NavbarUser(user.username, user.email, user.profile_img, user.last_login, user.role)
+      : null;
+  }
+
+    async findUnverifiedBefore(date: Date) {
+    return this.prisma.user.findMany({
+      where: { email_verified: false, created_at: { lt: date } },
+      select: { id: true },
+    });
+  }
+async deleteById(userId: number): Promise<void> {
+  await this.prisma.user.delete({ where: { id: userId } });
+}
+}

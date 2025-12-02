@@ -1,6 +1,6 @@
 
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { UserRepository } from '../../repositories/user/user.repository';
+import { UserRepository } from '../users/infrastructure/persistence/user.repository';
 import { EmailService } from '../../infrastructure/email/email.service';
 import { CacheService } from '../../infrastructure/cache/cache.service';
 import { comparePassword } from '../../common/utils/hash';

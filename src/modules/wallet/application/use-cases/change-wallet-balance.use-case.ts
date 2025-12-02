@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, Inject } from "@nestjs/common";
-import {  WalletRepository } from "../../../../repositories/walllet/wallet.repository";
-import { WalletTransactionRepository } from "../../../../repositories/walllet/wallet-transaction.repository";
+import {  WalletRepository } from "../../infrastructure/persistence/wallet.repository";
+import { WalletTransactionRepository } from "../../infrastructure/persistence/wallet-transaction.repository";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { WalletDomainEntity } from "../../domain/entities/wallet.entity";
 import { wallet_transaction_type, WalletTransaction } from "@prisma/client";

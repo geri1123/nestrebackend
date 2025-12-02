@@ -1,41 +1,33 @@
-import { RegistrationRequestEntity } from "../entities/registration-request.entity";
 import { registrationrequest_status } from "@prisma/client";
+import { RegistrationRequestEntity } from "../entities/registration-request.entity";
 
-export interface IRegistrationRequestDomainRepository {
-  getRequests(
-    agencyId: number,
-    limit: number,
-    offset: number,
-    status?: registrationrequest_status
-  ): Promise<RegistrationRequestEntity[]>;
+export const REG_REQ_REPO = "REG_REQ_REPO";
 
-  countRequests(
-    agencyId: number,
-    status?: registrationrequest_status
-  ): Promise<number>;
+export interface IRegistrationRequestRepository {
+  create(request: RegistrationRequestEntity): Promise<number>;
+
+  findByUserId(userId: number): Promise<RegistrationRequestEntity[]>;
 
   findById(id: number): Promise<RegistrationRequestEntity | null>;
 
-  create(data: {
-    userId: number;
-    idCardNumber: string | null;
-    status: string;
-    agencyId: number;
-    agencyName: string;
-    requestedRole: string;
-    requestType: string;
-  }): Promise<number>;
+  findByAgencyIdAndStatus(
+    agencyId: number,
+    status?: registrationrequest_status,
+    skip?: number,
+    take?: number
+  ): Promise<RegistrationRequestEntity[]>;
+
+  setLatestUnderReview(userId: number): Promise<RegistrationRequestEntity | null>;
+
+  idCardExists(idCard: string): Promise<boolean>;
 
   updateStatus(
     id: number,
     status: registrationrequest_status,
     reviewedBy?: number,
     reviewNotes?: string
-  ): Promise<void>;
+  ): Promise<RegistrationRequestEntity>;
 
-  findByUserId(userId: number): Promise<RegistrationRequestEntity[]>;
-
-  idCardExists(idCard: string): Promise<boolean>;
-
-  deleteByUserId(userId: number): Promise<number>;
+  countRequests(agencyId: number, status?: registrationrequest_status): Promise<number>;
+   deleteByUserId(userId: number): Promise<number>;
 }

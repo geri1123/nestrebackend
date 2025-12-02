@@ -1,6 +1,7 @@
 import { user_role } from "@prisma/client";
 import { User } from "../entities/user.entity";
 import { NavbarUser } from "../value-objects/navbar-user.vo";
+import { userStatus } from "../types/user-status.type";
 
 export interface IUserDomainRepository {
   findById(userId: number): Promise<User | null>;
@@ -15,6 +16,8 @@ export interface IUserDomainRepository {
   deleteProfileImage(userId: number): Promise<void>;
   verifyEmail(userId: number, emailVerified: boolean, status: string): Promise<void>;
   getNavbarUser(userId: number): Promise<NavbarUser | null>;
+  findUnverifiedBefore(date: Date): Promise<{ id: number }[]>;
+deleteById(userId: number): Promise<void>;
 }
 export interface CreateUserData {
   username: string;
@@ -34,6 +37,7 @@ export interface UpdateUserFields {
   password?: string;
   last_login?: Date;
   role:user_role;
+  status?:userStatus;
    last_active?: Date;
   profile_img?: string | null;
 }

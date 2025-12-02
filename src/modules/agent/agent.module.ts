@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AgentController } from './controllers/agent-controller';
-import { AgentRepository } from '../../repositories/agent/agent.repository';
-import { AgentPermissionRepository } from '../../repositories/agent-permision/agent-permision.repository';
+import { AgentRepository } from './infrastructure/persistence/agent.repository';
+import { AgentPermissionRepository } from './infrastructure/persistence/agent-permision.repository';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { GetAgentsUseCase } from './application/use-cases/get-agents.use-case';
@@ -14,6 +14,7 @@ import { GetAgencyIdForAgentUseCase } from './application/use-cases/get-agency-i
 import { GetAgentByIdUseCase } from './application/use-cases/get-agent-by-id.use-case';
 import { FindExistingAgentUseCase } from './application/use-cases/find-existing-agent.use-case';
 import { AddAgentPermissionsUseCase } from './application/use-cases/add-agenct-permissons.use-case';
+import { EnsureIdCardUniqueUseCase } from './application/use-cases/ensure-idcard-unique.use-case';
 @Module({
   imports: [AgencyModule, NotificationModule],
   controllers: [AgentController],
@@ -45,6 +46,7 @@ import { AddAgentPermissionsUseCase } from './application/use-cases/add-agenct-p
     UpdateAgentUseCase,
     GetAgencyIdForAgentUseCase,
     GetAgentByIdUseCase,
+    EnsureIdCardUniqueUseCase,
     FindExistingAgentUseCase,
     AddAgentPermissionsUseCase
   ],

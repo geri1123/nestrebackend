@@ -1,7 +1,7 @@
-export type UpdateRequestStatusType = {
-  requestId: number;
-  action: 'approved' | 'rejected';
-commissionRate?: number;
-  reviewNotes?: string;
-  reviewedBy?: number;
-}
+// export type UpdateRequestStatusType = {
+//   requestId: number;
+//   action: 'approved' | 'rejected';
+// commissionRate?: number;
+//   reviewNotes?: string;
+//   reviewedBy?: number;
+// }

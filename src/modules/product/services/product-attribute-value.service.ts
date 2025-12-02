@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from "@nestjs/common";
 import { ProductAttributeValueRepo } from "../../../repositories/product-attribute-value/product-attribute-value.repository";
 import { SupportedLang, t } from "../../../locales";
-import { AttributeRepo } from "../../../repositories/attributes/attributes.repository";
+import { AttributeRepo } from "../../filters/repositories/attributes/attributes.repository";
 
 @Injectable()
 export class ProductAttributeValueService {

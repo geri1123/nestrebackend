@@ -39,7 +39,7 @@ export class ManageProductController{
    if (!userId) {
   throw new UnauthorizedException(t('userNotAuthenticated', req.language));
 }
-if (req.user.role !== 'user' && !req.agencyId) {
+if (req.user?.role !== 'user' && !req.agencyId) {
   throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
 }
  const dto = plainToInstance(CreateProductDto, body);
@@ -95,13 +95,13 @@ async getDashboardProducts(
     filters.userId = req.userId;
   } else if (view === 'agency') {
    
-    if (!req.agencyId || (req.user.role !== 'agent' && req.user.role !== 'agency_owner')) {
+    if (!req.agencyId || (req.user?.role !== 'agent' && req.user?.role !== 'agency_owner')) {
       throw new ForbiddenException(t("userNotAssociatedWithAgency", language))
     }
 
     filters.agencyId = req.agencyId;
 
-    if (req.user.role === 'agent' && !req.agentPermissions?.can_view_all_posts) {
+    if (req.user.role === 'agent' && !req.agentPermissions?.canViewAllPosts) {
       
       filters.status = 'active';
     } else if (rawQuery.status) {
@@ -113,7 +113,7 @@ async getDashboardProducts(
   // Determine if route is "protected"
   const isProtectedRoute =
     view === 'mine' ||
-    (view === 'agency' && (req.user.role === 'agency_owner' || req.agentPermissions?.can_view_all_posts));
+    (view === 'agency' && (req.user?.role === 'agency_owner' || req.agentPermissions?.canViewAllPosts));
 
  
   return this.searchProductsService.getProducts(filters, language, isProtectedRoute);

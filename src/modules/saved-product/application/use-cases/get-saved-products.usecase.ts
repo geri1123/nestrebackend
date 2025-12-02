@@ -4,7 +4,7 @@ import {type ISavedProductRepository } from '../../domain/repositories/Isave-pro
 import { SupportedLang } from '../../../../locales';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { formatDate } from '../../../../common/utils/date';
-import { PaginatedSavedProductsDto, SavedProductDto } from '../dto/save-product.dto';
+import { PaginatedSavedProductsDto, SavedProductDto } from '../../dto/save-product.dto';
 
 @Injectable()
 export class GetSavedProductsUseCase {

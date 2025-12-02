@@ -1,0 +1,1 @@
+export type RegistrationRequestRequestRole =  "agent" | "senior_agent" | "team_lead";

@@ -1,14 +1,14 @@
 // src/filters/filters.service.ts
 
 import { Injectable } from '@nestjs/common';
-import { CategoryRepository } from '../../repositories/category/category.repository';
-import { ListingTypeRepo } from '../../repositories/listingtype/listingtype.repository';
+import { CategoryRepository } from './repositories/category/category.repository';
+import { ListingTypeRepo } from './repositories/listingtype/listingtype.repository';
 import { SupportedLang } from '../../locales';
 import { product_status } from '@prisma/client';
-import { AttributeRepo } from '../../repositories/attributes/attributes.repository';
+import { AttributeRepo } from './repositories/attributes/attributes.repository';
 import { AttributeDto } from './dto/attribute.dto';
-import { LoationRepository } from '../../repositories/location/location.repository';
-import { cityDto, CountryDto } from './dto/location.dto';
+import { LoationRepository } from './repositories/location/location.repository';
+import { CityDto, CountryDto } from './dto/location.dto';
 import { CacheService } from '../../infrastructure/cache/cache.service';
 import { CategoryDto } from './dto/filters.dto';
 @Injectable()
@@ -136,11 +136,11 @@ async getListingTypes(
 
   return countries;
 }
- async getCities(countryCode: string): Promise<cityDto[]> {
+ async getCities(countryCode: string): Promise<CityDto[]> {
   const cacheKey = `cities:${countryCode}`;
 
   
-  let cities = await this.cacheService.get<cityDto[]>(cacheKey);
+  let cities = await this.cacheService.get<CityDto[]>(cacheKey);
 
   if (!cities) {
     cities = await this.locationRepo.getCitiesByCountry(countryCode);

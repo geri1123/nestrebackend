@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { UserCleanupService } from './user-cleanUp.service';
+import { UserCleanupService } from '../modules/cleanup/service/user-clean-up.service';
 
 @Injectable()
 export class DeleteInactiveUsersCron {

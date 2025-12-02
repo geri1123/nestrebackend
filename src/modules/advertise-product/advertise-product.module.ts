@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AdvertiseProductController } from "./controller/advertise-product.controller";
-import { ProductAdvertisementRepository } from "../../repositories/product-advertisement/product-advertisement.repository";
+import { ProductAdvertisementRepository } from "./infrastructure/persistence/product-advertisement.repository";
 // import { AdvertiseProductService } from "./advertise_product.service";
 import { ProductModule } from "../product/product.module";
 import { WalletModule } from "../wallet/wallet.module";

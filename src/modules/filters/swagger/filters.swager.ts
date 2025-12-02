@@ -1,67 +1,39 @@
-// src/filters/swagger/filters.swagger.ts
 import { applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { ApiSuccessResponse, ApiBadRequestResponse } from '../../../common/swagger/response.helper.ts.js';
-import { FiltersResponseSwaggerDto } from '../dto/filters.dto.js';
-import { AttributesResponseDto } from '../dto/attribute.dto.js';
-// import { CityDtoResponse, countryResponseDto } from '../dto/location.dto';
+import { ApiOperation, ApiParam, ApiOkResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { FiltersResponseDto } from '../dto/filters.dto';
+import { AttributesResponseDto } from '../dto/attribute.dto';
+import { CitiesResponseDto, CountriesResponseDto } from '../dto/location.dto';
 
 export class FiltersSwagger {
   static ApiGetFilters() {
     return applyDecorators(
       ApiOperation({
         summary: 'Get filters',
-        description: 'Fetches available filters based on language and active product status.',
+        description: 'Fetches available categories and listing types based on language and active product status.',
       }),
-    ApiSuccessResponse('Filters fetched successfully', {
-        success: true,
-        categories: [
-          {
-            id: 1,
-            name: 'Residenciale',
-            slug: 'residenciale',
-            productCount: 0,
-            subcategories: [
-              {
-                id: 1,
-                name: 'Shtepi private',
-                slug: 'shtepi-private',
-                categoryId: 1,
-                productCount: 0,
-              },
-              {
-                id: 2,
-                name: 'Vile',
-                slug: 'vile',
-                categoryId: 1,
-                productCount: 0,
-              },
-            ],
-          },
-          {
-            id: 2,
-            name: 'Komerciale',
-            slug: 'komerciale',
-            productCount: 0,
-            subcategories: [
-              {
-                id: 3,
-                name: 'Hotel',
-                slug: 'hotel',
-                categoryId: 2,
-                productCount: 0,
-              },
-            ],
-          },
-        ],
-        listingTypes: [
-          { id: 1, name: 'Ne shitje', slug: 'ne-shitje', productCount: 0 },
-          { id: 2, name: 'Per Qera', slug: 'per-qera', productCount: 0 },
-          { id: 3, name: 'Qera afat-shkurtër', slug: 'qera-afat-shkurtër', productCount: 0 },
-        ],
+      ApiOkResponse({
+        description: 'Filters fetched successfully',
+        type: FiltersResponseDto,
       }),
-      ApiBadRequestResponse('validationFailed', {
-        lang: ['Invalid or unsupported language code'],
+      ApiBadRequestResponse({
+        description: 'Invalid language code',
+        schema: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: false },
+            message: { type: 'string', example: 'Validation failed' },
+            errors: {
+              type: 'object',
+              properties: {
+                lang: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['Invalid or unsupported language code'],
+                },
+              },
+            },
+          },
+        },
       }),
     );
   }
@@ -70,46 +42,37 @@ export class FiltersSwagger {
     return applyDecorators(
       ApiOperation({
         summary: 'Get attributes by subcategory',
-        description: 'Returns the attributes for a given subcategory ID.',
+        description: 'Returns the attributes and their values for a given subcategory ID.',
       }),
       ApiParam({
         name: 'subcategoryId',
         type: Number,
-        description: 'ID of the subcategory (e.g., 10)',
+        description: 'ID of the subcategory',
+        example: 1,
       }),
-      ApiQuery({
-        name: 'lang',
-        required: false,
-        description: 'Language code (optional)',
-        example: 'al',
+      ApiOkResponse({
+        description: 'Attributes fetched successfully',
+        type: AttributesResponseDto,
       }),
-        ApiSuccessResponse('Attributes fetched successfully', {
-        success: true,
-        attributes: [
-          {
-            id: 1,
-            inputType: 'number',
-            name: 'Dhoma',
-            slug: 'dhoma',
-            values: [
-              { id: 4, name: '1 Dhome', slug: '1-dhome' },
-              { id: 5, name: '2 Dhoma', slug: '2-dhoma' },
-            ],
+      ApiBadRequestResponse({
+        description: 'Invalid subcategory ID',
+        schema: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: false },
+            message: { type: 'string', example: 'Validation failed' },
+            errors: {
+              type: 'object',
+              properties: {
+                subcategoryId: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['Invalid subcategory ID'],
+                },
+              },
+            },
           },
-          {
-            id: 2,
-            inputType: 'select',
-            name: 'Tualete',
-            slug: 'tualete',
-            values: [
-              { id: 6, name: '1 Tualet', slug: '1-tualet' },
-              { id: 7, name: '2 Tualete', slug: '2-tualete' },
-            ],
-          },
-        ],
-      }),
-      ApiBadRequestResponse('validationFailed', {
-        subcategoryId: ['Invalid subcategory ID'],
+        },
       }),
     );
   }
@@ -117,11 +80,12 @@ export class FiltersSwagger {
   static ApiGetCountries() {
     return applyDecorators(
       ApiOperation({
-        summary: 'Get countries',
-        description: 'Fetches all available countries.',
+        summary: 'Get all countries',
+        description: 'Fetches all available countries from the database.',
       }),
-      ApiSuccessResponse('Countries fetched successfully', {
-        countries: [{id:'1', code: 'AL', name: 'Albania' }],
+      ApiOkResponse({
+        description: 'Countries fetched successfully',
+        type: CountriesResponseDto,
       }),
     );
   }
@@ -130,18 +94,37 @@ export class FiltersSwagger {
     return applyDecorators(
       ApiOperation({
         summary: 'Get cities by country code',
-        description: 'Fetches all cities for the given country code.',
+        description: 'Fetches all cities for the given country code (e.g., AL, IT, US).',
       }),
       ApiParam({
         name: 'countryCode',
         type: String,
-        description: 'Country code, e.g., "al", "it"',
+        description: 'ISO country code (2 letters, uppercase)',
+        example: 'AL',
       }),
-      ApiSuccessResponse('Cities fetched successfully', {
-        cities: [{id:1, name: 'Tirana' , countryId: 1 }, {id:2, name: 'Durres' , countryId: 1  }],
+      ApiOkResponse({
+        description: 'Cities fetched successfully',
+        type: CitiesResponseDto,
       }),
-      ApiBadRequestResponse('validationFailed', {
-        countryCode: ['Invalid or unsupported country code'],
+      ApiBadRequestResponse({
+        description: 'Invalid country code',
+        schema: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean', example: false },
+            message: { type: 'string', example: 'Validation failed' },
+            errors: {
+              type: 'object',
+              properties: {
+                countryCode: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['Invalid or unsupported country code'],
+                },
+              },
+            },
+          },
+        },
       }),
     );
   }

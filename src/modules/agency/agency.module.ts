@@ -7,7 +7,7 @@ import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 
 // Repository token & interface
 import { AGENCY_REPOSITORY_TOKENS } from './domain/repositories/agency.repository.tokens';
-import { AgencyRepository } from '../../repositories/agency/agency.repository';
+import { AgencyRepository } from './infrastructure/persistence/agency.repository';
 
 // Use-cases
 import { CreateAgencyUseCase } from './application/use-cases/create-agency.use-case';
@@ -18,7 +18,7 @@ import { GetPaginatedAgenciesUseCase } from './application/use-cases/get-paginat
 import { GetAgencyByIdUseCase } from './application/use-cases/get-agency-by-id.use-case';
 import { GetAgencyInfoUseCase } from './application/use-cases/get-agency-info.use-case';
 import { RegisterAgencyFromUserUseCase } from './application/use-cases/register-agency-from-user.use-case';
-
+import { GetAgencyWithOwnerByIdUseCase } from './application/use-cases/get-agency-with-owner-byid.use-case';
 // Controller
 import { AgencyController } from './controllers/agency.controller';
 
@@ -26,6 +26,8 @@ import { AgencyController } from './controllers/agency.controller';
 import { ImageUtilsService } from '../../common/utils/image-utils.service';
 import { UsersModule } from '../users/users.module';
 import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-owner.use-case';
+import { GetAgencyByPublicCodeUseCase } from './application/use-cases/check-public-code.use-case';
+import { DeleteAgencyByOwnerUseCase } from './application/use-cases/delete-agency-by-owner.use-case';
 
 @Module({
   imports: [PrismaModule, UsersModule,  FirebaseModule],
@@ -40,6 +42,7 @@ import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-o
     },
 
     // USE-CASES
+    DeleteAgencyByOwnerUseCase,
     GetAgencyByOwnerUseCase,
     CreateAgencyUseCase,
     DeleteAgencyLogoUseCase,
@@ -49,17 +52,20 @@ import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-o
     GetAgencyByIdUseCase,
     GetAgencyInfoUseCase,
     RegisterAgencyFromUserUseCase,
-
+GetAgencyByPublicCodeUseCase,
+GetAgencyWithOwnerByIdUseCase,
     // UTILS
     ImageUtilsService,
   ],
 
   exports: [
-    
+    DeleteAgencyByOwnerUseCase,
     CreateAgencyUseCase,
     GetAgencyByIdUseCase,
     GetAgencyInfoUseCase,
     RegisterAgencyFromUserUseCase,
+    GetAgencyByPublicCodeUseCase,
+    GetAgencyWithOwnerByIdUseCase
   ],
 })
 export class AgencyModule {}

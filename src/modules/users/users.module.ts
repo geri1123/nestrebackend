@@ -7,10 +7,8 @@ import { EmailModule } from '../../infrastructure/email/email.module';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 
 // Repositories
-import { UserRepository } from '../../repositories/user/user.repository';
-import { UsernameHistoryRepository } from '../../repositories/usernamehistory/usernamehistory.repository';
-import {type  IUserDomainRepository } from './domain/repositories/user.repository.interface';
-import {type IUsernameHistoryDomainRepository } from './domain/repositories/username-history.repository.interface';
+import { UserRepository } from './infrastructure/persistence/user.repository';
+import { UsernameHistoryRepository } from './infrastructure/persistence/usernamehistory.repository';
 import { USERS_REPOSITORY_TOKENS } from './domain/repositories/user.repository.tokens';
 // Use Cases
 import { GetUserProfileUseCase } from './application/use-cases/get-user-profile.use-case';
@@ -18,10 +16,10 @@ import { GetNavbarUserUseCase } from './application/use-cases/get-navbar-user.us
 import { UpdateUserProfileUseCase } from './application/use-cases/update-user-profile.use-case';
 import { ChangeUsernameUseCase } from './application/use-cases/change-username.use-case';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
-
+import { FindUnverifiedUsersUseCase } from './application/use-cases/find-unverified-users.use-case';
 // Controllers
 import { ProfileController } from './controllers/profile.controller';
-
+import { UpdateUserFieldsUseCase } from './application/use-cases/update-user-fields.use-case';
 @Module({
   imports: [PrismaModule, FirebaseModule, EmailModule, AppCacheModule],
   controllers: [ProfileController],
@@ -37,6 +35,8 @@ import { ProfileController } from './controllers/profile.controller';
     },
     
     // Use Case providers
+    FindUnverifiedUsersUseCase,
+    UpdateUserFieldsUseCase,
     GetUserProfileUseCase,
     GetNavbarUserUseCase,
     UpdateUserProfileUseCase,
@@ -47,27 +47,8 @@ import { ProfileController } from './controllers/profile.controller';
 USERS_REPOSITORY_TOKENS.USER_REPOSITORY, 
     GetUserProfileUseCase,
     RegisterUserUseCase,
-  
+  UpdateUserFieldsUseCase,
+  FindUnverifiedUsersUseCase,
   ],
 })
 export class UsersModule {}
-// import { Module } from '@nestjs/common';
-// import { UserRepository } from '../../repositories/user/user.repository';
-// import { EmailModule } from '../../infrastructure/email/email.module';
-// import { UserService } from './services/users.service';
-// import { RegistrationService } from './services/RegistrationService';
-// import { ProfileInfoService } from './services/profile-info.service';
-// import { UserController } from './controllers/profile.controller';
-// import { UsernameService } from './services/username.service';
-// import { UsernameHistoryRepository } from '../../repositories/usernamehistory/usernamehistory.repository';
-// import { ProfilePictureService } from './services/profile-picture.service';
-// import { ProfilePictureController } from './controllers/profile-picture.controller';
-// import { ImageUtilsService } from '../../common/utils/image-utils.service';
-// import { AppCacheModule } from '../../infrastructure/cache/cache.module';
-// @Module({
-//   controllers:[UserController , ProfilePictureController],
-//   imports: [EmailModule ,AppCacheModule],
-//   providers: [ProfilePictureService,ImageUtilsService,UserService,UsernameService,UserRepository ,UsernameHistoryRepository, RegistrationService , ProfileInfoService],
-//   exports: [UserRepository , UserService, RegistrationService , RegistrationService],
-// })
-// export class UserModule {}

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UserRepository } from '../../repositories/user/user.repository';
+import { UserRepository } from '../../modules/users/infrastructure/persistence/user.repository';
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { AppConfigService } from '../../infrastructure/config/config.service';
 

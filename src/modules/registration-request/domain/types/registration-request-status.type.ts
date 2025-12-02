@@ -1,0 +1,1 @@
+export type registrationrequest_status = "pending" | "approved" | "rejected" | "under_review";

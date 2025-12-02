@@ -1,14 +1,15 @@
 import { Controller, Param, ParseIntPipe, Post, Req, UnauthorizedException } from "@nestjs/common";
-import { RegistrationRequestService } from "./registration-request.service";
+
 import { Roles } from "../../common/decorators/roles.decorator";
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
+import { SendQuickRequestUseCase } from "./application/use-cases/send-quick-request.use-case";
 
 @Controller('registration-request')
 
 export class RegistrationRequestController{
     constructor(
-    private  registrationReqService:RegistrationRequestService
+    private  sendquickRequest:SendQuickRequestUseCase
     ){
 
     }
@@ -23,10 +24,10 @@ async sendQuickRequest(
     throw new UnauthorizedException(t('userNotAuthenticated', req.language));
   }
 
-  await this.registrationReqService.sendQuickRequestToAgency(
+  await this.sendquickRequest.execute(
     req.userId,
     agencyId,
-    req.user.username,
+    req.user?.username || 'Guest',
     req.language,
   );
 return{

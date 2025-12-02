@@ -11,7 +11,11 @@ export interface IAgencyDomainRepository {
   findLogoById(agencyId: number): Promise<{ logo: string | null } | null>
   getAllAgencies(skip: number, limit: number): Promise<any[]>;
   countAgencies(): Promise<number>;
-
+ getAgencyWithOwnerById(id: number): Promise<{
+  id: number;
+  agency_name: string;
+  owner_user_id: number;
+} | null> 
   // Validation methods
   agencyNameExists(agencyName: string): Promise<boolean>;
   licenseExists(licenseNumber: string): Promise<boolean>;
@@ -28,4 +32,6 @@ export interface IAgencyDomainRepository {
   updateFields(agencyId: number, data: any): Promise<Agency>;
   activateAgency(agencyId: number): Promise<void>;
   deleteLogo(agencyId: number): Promise<void>;
+
+  deleteByOwnerUserId(ownerUserId: number): Promise<number>;
 }
