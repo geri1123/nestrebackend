@@ -81,7 +81,13 @@ async login(
 async registerUser(@Body() body: Record<string, any>, @Req() req: RequestWithLang) {
   const lang = req.language || 'al';
   const dto = plainToInstance(BaseRegistrationDto, body);
-  return this.authService.registerUser(dto, lang);
+ await this.authService.registerUser(dto, lang);
+
+  return {
+    success: true,
+    message: t('registrationSuccess', lang),
+    
+  };
 }
 
 @AuthSwagger.RegisterAgencyOwner()

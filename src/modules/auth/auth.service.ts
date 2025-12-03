@@ -82,11 +82,18 @@ async refreshTokenAfterRoleChange(userId: number, lang: SupportedLang) {
   const token = this.generateJwt(user, '1d');
   return { user, token };
 }
-  
 async registerUser(dto: BaseRegistrationDto, lang: SupportedLang) {
   const errors = await validate(dto);
-  if (dto.password !== dto.repeatPassword)
-    throwValidationErrors(errors, lang, { repeatPassword: [t('passwordsMismatch', lang)] });
+
+  if (dto.password !== dto.repeatPassword) {
+    throwValidationErrors(errors, lang, {
+      repeatPassword: [t('passwordsMismatch', lang)],
+    });
+  }
+
+  if (errors.length > 0) {
+    throwValidationErrors(errors, lang);
+  }
 
   return this.registerUserUseCase.execute(dto, lang, 'user');
 }

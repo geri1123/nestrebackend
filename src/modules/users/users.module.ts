@@ -28,8 +28,9 @@ import { VerifyPasswordResetTokenUseCase } from './application/use-cases/passwor
 import { PasswordController } from './controllers/password-recovery.controller';
 import { FindUserForVerificationUseCase } from './application/use-cases/find-user-for-verification.use-case';
 import { VerifyUserEmailUseCase } from './application/use-cases/verify-user-email.use-case';
+import { FindUserForAuthUseCase } from './application/use-cases/find-user-for-auth.use-case';
 @Module({
-  imports: [PrismaModule, FirebaseModule, EmailModule, AppCacheModule],
+  imports: [ FirebaseModule, EmailModule, AppCacheModule],
   controllers: [ProfileController , PasswordController],
   providers: [
     // Repository providers
@@ -58,6 +59,8 @@ import { VerifyUserEmailUseCase } from './application/use-cases/verify-user-emai
   VerifyPasswordResetTokenUseCase,
   FindUserForVerificationUseCase,
   VerifyUserEmailUseCase,
+  UserRepository,
+  FindUserForAuthUseCase,
   ],
   exports: [
 USERS_REPOSITORY_TOKENS.USER_REPOSITORY, 
@@ -69,8 +72,9 @@ USERS_REPOSITORY_TOKENS.USER_REPOSITORY,
   FindUserByIdUseCase,
   UpdateLastLoginUseCase,
   FindUserForVerificationUseCase,
-  VerifyUserEmailUseCase
-  
+  VerifyUserEmailUseCase,
+  UserRepository,
+  FindUserForAuthUseCase, 
   ],
 })
 export class UsersModule {}

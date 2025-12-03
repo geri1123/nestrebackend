@@ -68,6 +68,7 @@ CheckLicenseExistsUseCase,
     DeleteAgencyByOwnerUseCase,
     CreateAgencyUseCase,
     GetAgencyByIdUseCase,
+    
     GetAgencyInfoUseCase,
     RegisterAgencyFromUserUseCase,
     GetAgencyByPublicCodeUseCase,
@@ -75,6 +76,9 @@ CheckLicenseExistsUseCase,
     ActivateAgencyByOwnerUseCase,
     CheckAgencyNameExistsUseCase,
 CheckLicenseExistsUseCase,
+GetAgencyByOwnerUseCase,
+
+AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY
   ],
 })
 export class AgencyModule {}

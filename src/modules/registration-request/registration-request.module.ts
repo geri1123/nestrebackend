@@ -16,6 +16,7 @@ import { DeleteRegistrationRequestsByUserUseCase } from "./application/use-cases
 import { FindRequestsByUserIdUseCase } from "./application/use-cases/find-requests-by-user-id.use-case";
 import { PrismaModule } from "../../infrastructure/prisma/prisma.module";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
+import { GetRequestCountUseCase } from "./application/use-cases/get-request-count.use-case";
 
 @Module({
   imports: [NotificationModule, AgencyModule, AgentModule ],
@@ -30,6 +31,7 @@ DeleteRegistrationRequestsByUserUseCase,
     CreateAgentRequestUseCase,
     CheckAgentDataUseCase,
     GetRequestsUseCase,
+    GetRequestCountUseCase,
     SetUnderReviewUseCase,
     UpdateRequestStatusUseCase,
     SendQuickRequestUseCase,
@@ -43,7 +45,10 @@ DeleteRegistrationRequestsByUserUseCase,
     FindRequestByIdUseCase,
     DeleteRegistrationRequestsByUserUseCase,
     FindRequestsByUserIdUseCase,
+    GetRequestCountUseCase,
     SetUnderReviewUseCase,
+     GetRequestsUseCase,  
+     UpdateRequestStatusUseCase,
       REG_REQ_TOKEN.REG_REQ_REPOSITORY,
   ]
 })

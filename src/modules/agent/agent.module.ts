@@ -15,8 +15,11 @@ import { GetAgentByIdUseCase } from './application/use-cases/get-agent-by-id.use
 import { FindExistingAgentUseCase } from './application/use-cases/find-existing-agent.use-case';
 import { AddAgentPermissionsUseCase } from './application/use-cases/add-agenct-permissons.use-case';
 import { EnsureIdCardUniqueUseCase } from './application/use-cases/ensure-idcard-unique.use-case';
+import { CreateAgencyUseCase } from '../agency/application/use-cases/create-agency.use-case';
+import { CreateAgentUseCase } from './application/use-cases/create-agent.use-case';
+
 @Module({
-  imports: [AgencyModule, NotificationModule],
+  imports: [ NotificationModule , AgencyModule],
   controllers: [AgentController],
   providers: [
     PrismaService,
@@ -29,6 +32,7 @@ import { EnsureIdCardUniqueUseCase } from './application/use-cases/ensure-idcard
     FindExistingAgentUseCase,
     AddAgentPermissionsUseCase,
     EnsureIdCardUniqueUseCase,
+    CreateAgentUseCase,
    {
       provide: AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,
       useClass: AgentRepository,
@@ -49,7 +53,8 @@ import { EnsureIdCardUniqueUseCase } from './application/use-cases/ensure-idcard
     GetAgentByIdUseCase,
     EnsureIdCardUniqueUseCase,
     FindExistingAgentUseCase,
-    AddAgentPermissionsUseCase
+    AddAgentPermissionsUseCase,
+    CreateAgentUseCase,
   ],
 })
 export class AgentModule {}
