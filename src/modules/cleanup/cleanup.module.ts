@@ -11,6 +11,6 @@ import { UserCleanupService } from "./service/user-clean-up.service";
     RegistrationRequestModule,
   ],
   providers: [DeleteUserUseCase , UserCleanupService],
-  exports: [DeleteUserUseCase],
+  exports: [DeleteUserUseCase , UserCleanupService],
 })
 export class CleanupModule {}

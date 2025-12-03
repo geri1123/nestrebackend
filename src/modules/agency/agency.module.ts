@@ -28,6 +28,9 @@ import { UsersModule } from '../users/users.module';
 import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-owner.use-case';
 import { GetAgencyByPublicCodeUseCase } from './application/use-cases/check-public-code.use-case';
 import { DeleteAgencyByOwnerUseCase } from './application/use-cases/delete-agency-by-owner.use-case';
+import { ActivateAgencyByOwnerUseCase } from './application/use-cases/activate-agency-by-owner.use-case';
+import { CheckAgencyNameExistsUseCase } from './application/use-cases/check-agency-name-exists.use-case';
+import { CheckLicenseExistsUseCase } from './application/use-cases/check-license-exists.use-case';
 
 @Module({
   imports: [PrismaModule, UsersModule,  FirebaseModule],
@@ -54,6 +57,9 @@ import { DeleteAgencyByOwnerUseCase } from './application/use-cases/delete-agenc
     RegisterAgencyFromUserUseCase,
 GetAgencyByPublicCodeUseCase,
 GetAgencyWithOwnerByIdUseCase,
+ActivateAgencyByOwnerUseCase,
+CheckAgencyNameExistsUseCase,
+CheckLicenseExistsUseCase,
     // UTILS
     ImageUtilsService,
   ],
@@ -65,7 +71,10 @@ GetAgencyWithOwnerByIdUseCase,
     GetAgencyInfoUseCase,
     RegisterAgencyFromUserUseCase,
     GetAgencyByPublicCodeUseCase,
-    GetAgencyWithOwnerByIdUseCase
+    GetAgencyWithOwnerByIdUseCase,
+    ActivateAgencyByOwnerUseCase,
+    CheckAgencyNameExistsUseCase,
+CheckLicenseExistsUseCase,
   ],
 })
 export class AgencyModule {}

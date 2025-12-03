@@ -18,7 +18,29 @@ export interface IUserDomainRepository {
   getNavbarUser(userId: number): Promise<NavbarUser | null>;
   findUnverifiedBefore(date: Date): Promise<{ id: number }[]>;
 deleteById(userId: number): Promise<void>;
+ findByIdWithPassword(userId: number): Promise<{
+    id: number;
+    password: string;} | null>;
+    
+ findByIdentifierForAuth(identifier: string): Promise<{
+    id: number;
+    password: string;
+    status: string;
+    role: string;
+    username: string;
+    email: string;
+  } | null>;
+  updatePassword(userId: number, newPassword: string): Promise<void>;
+  findByIdentifierForVerification(identifier: string): Promise<{
+  id: number;
+  email: string;
+  first_name: string | null;
+  role: string;
+  status: string;
+  email_verified: boolean;
+} | null>;
 }
+
 export interface CreateUserData {
   username: string;
   email: string;

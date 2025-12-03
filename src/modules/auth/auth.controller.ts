@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { BaseRegistrationDto } from './dto/base-registration.dto';
-import { RegisterAgencyOwnerDto } from './dto/register-agency-owner.dto';
+import { BaseRegistrationDto } from '../registration/dto/base-registration.dto';
+import { RegisterAgencyOwnerDto } from '../registration/dto/register-agency-owner.dto';
 import { RegisterAgentDto } from './dto/register-agent.dto';
 import type { SupportedLang } from '../../locales';
 import {  plainToInstance } from 'class-transformer';

@@ -28,6 +28,7 @@ import { EnsureIdCardUniqueUseCase } from './application/use-cases/ensure-idcard
     GetAgentByIdUseCase,
     FindExistingAgentUseCase,
     AddAgentPermissionsUseCase,
+    EnsureIdCardUniqueUseCase,
    {
       provide: AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,
       useClass: AgentRepository,

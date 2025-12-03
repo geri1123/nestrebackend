@@ -1,7 +1,7 @@
 // src/auth/swagger/password.swagger.ts
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiBody, ApiTags } from '@nestjs/swagger';
-import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { ResetPasswordDto } from '../../users/dto/reset-password.dto';
 import { ApiSuccessResponse, ApiBadRequestResponse } from '../../../common/swagger/response.helper.ts';
 
 @ApiTags('Password')

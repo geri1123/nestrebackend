@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEnum } from 'class-validator';
-import { BaseRegistrationDto } from './base-registration.dto';
+import { BaseRegistrationDto } from '../../registration/dto/base-registration.dto';
 
 export class RegisterAgentDto extends BaseRegistrationDto {
   @ApiProperty({

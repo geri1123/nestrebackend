@@ -3,10 +3,10 @@ import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiSuccessResponse , ApiBadRequestResponse } from '../../../common/swagger/response.helper.ts.js';
 // import { ApiSuccessResponse, ApiBadRequestResponse, ApiUnauthorizedResponse } from '../../responses.swagger';
 import { RegisterAgentDto } from '../dto/register-agent.dto.js';
-import { RegisterAgencyOwnerDto } from '../dto/register-agency-owner.dto.js';
-import { BaseRegistrationDto } from '../dto/base-registration.dto.js';
+import { RegisterAgencyOwnerDto } from '../../registration/dto/register-agency-owner.dto.js';
+import { BaseRegistrationDto } from '../../registration/dto/base-registration.dto.js';
 import { LoginDto } from '../dto/login.dto.js';
-import { ResendVerificationEmailDto } from '../dto/resend-verification.dto.js';
+import { ResendVerificationEmailDto } from '../../email-verification/dto/resend-verification.dto.js';
 @ApiTags('Auth')
 export class AuthSwagger {
   // 🧩 User Registration

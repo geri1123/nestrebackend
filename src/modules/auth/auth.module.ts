@@ -4,34 +4,37 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { PasswordController } from './password.controller';
+
 import { EmailModule } from '../../infrastructure/email/email.module';
-import { PasswordRecoveryService } from './password.service';
+
 
 import { RegistrationRequestModule } from '../registration-request/registration-request.module';
 
-import { EmailVerificationController } from './email-verification.controller';
-import { EmailVerificationService } from './email-verification.service';
+
+
 import { NotificationModule } from '../notification/notification.module';
 import { AgencyModule } from '../agency/agency.module';
 
 import { AppConfigModule } from '../../infrastructure/config/config.module';
 import { AgentModule } from '../agent/agent.module';
-import { UserModule } from '../users/users.module';
+import { UsersModule } from '../users/users.module';
 import { AppConfigService } from '../../infrastructure/config/config.service';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
+import { RegistrationModule } from '../registration/registration.module';
 
 
 @Module({
   imports: [
     NotificationModule,
     EmailModule,
-    UserModule,
+    UsersModule,
+    RegistrationModule,
     // AppConfigModule,
     AgencyModule,
     AgentModule,
     RegistrationRequestModule,
     AppCacheModule,
+  
    JwtModule.registerAsync({
   imports: [AppConfigModule],
   useFactory: async (configService: AppConfigService) => ({
@@ -44,14 +47,14 @@ import { AppCacheModule } from '../../infrastructure/cache/cache.module';
   providers: [
    
    AuthService,
-  EmailVerificationService,
-  PasswordRecoveryService,
+  
+  
  
   ],
   controllers: [
     AuthController,
-    PasswordController,
-    EmailVerificationController,
+  
+   
   ],
   exports: [AuthService, JwtModule], 
 })

@@ -13,12 +13,19 @@ import { REG_REQ_TOKEN } from "./domain/repositories/reg-req.repository.token";
 import { RegistrationRequestController } from "./registration-request.controller";
 import { FindRequestByIdUseCase } from "./application/use-cases/find-req-by-id.use-case";
 import { DeleteRegistrationRequestsByUserUseCase } from "./application/use-cases/delete-requests-by-user.use-case";
+import { FindRequestsByUserIdUseCase } from "./application/use-cases/find-requests-by-user-id.use-case";
+import { PrismaModule } from "../../infrastructure/prisma/prisma.module";
+import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 
 @Module({
-  imports: [NotificationModule, AgencyModule, AgentModule],
+  imports: [NotificationModule, AgencyModule, AgentModule ],
   controllers: [RegistrationRequestController],
   providers: [
-    { provide: REG_REQ_TOKEN.REG_REQ_REPOSITORY, useClass: RegistrationRequestRepository },
+    {
+      provide: REG_REQ_TOKEN.REG_REQ_REPOSITORY,
+      useClass: RegistrationRequestRepository,
+    },
+PrismaService,
 DeleteRegistrationRequestsByUserUseCase,
     CreateAgentRequestUseCase,
     CheckAgentDataUseCase,
@@ -27,13 +34,17 @@ DeleteRegistrationRequestsByUserUseCase,
     UpdateRequestStatusUseCase,
     SendQuickRequestUseCase,
     FindRequestByIdUseCase,
+    FindRequestsByUserIdUseCase
   ],
   exports: [
     CreateAgentRequestUseCase,
     CheckAgentDataUseCase,
     SendQuickRequestUseCase,
     FindRequestByIdUseCase,
-    DeleteRegistrationRequestsByUserUseCase
+    DeleteRegistrationRequestsByUserUseCase,
+    FindRequestsByUserIdUseCase,
+    SetUnderReviewUseCase,
+      REG_REQ_TOKEN.REG_REQ_REPOSITORY,
   ]
 })
 export class RegistrationRequestModule {}

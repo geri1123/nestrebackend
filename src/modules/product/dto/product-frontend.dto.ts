@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { user_role, user_status } from '@prisma/client';
-import { UserStatus } from '../../auth/types/create-user-input';
+
 //product Images
 export class ProductImageDto {
   @ApiProperty({ 

@@ -43,7 +43,7 @@ const totalClicks = productclicks.reduce((sum, c) => sum + c.count, 0);
 
     const isOwner = req?.userId=== product.userId;
     const isAgencyOwner = req?.user?.role === 'agency_owner' && req?.agencyId === product.agencyId;
-    const canAgentSee = req?.user?.role === 'agent' && req?.agentPermissions?.can_view_all_posts;
+    const canAgentSee = req?.user?.role === 'agent' && req?.agentPermissions?.canViewAllPosts;
  
     if (!isOwner && !isAgencyOwner && !canAgentSee) return null;
   }

@@ -14,7 +14,7 @@ import { RolesGuard } from './common/guard/role-guard';
 import { ProductModule } from './modules/product/product.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { AgencyModule } from './modules/agency/agency.module';
-import { UserModule } from './modules/users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
 import { AgentModule } from './modules/agent/agent.module';
 import { PermissionsGuard } from './common/guard/permision.guard';
@@ -28,6 +28,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobsModule } from './cron/cron.module';
 import { CustomThrottlerGuard } from './common/guard/Throttler.guard';
 import { AdvertiseProductModule } from './modules/advertise-product/advertise-product.module';
+import { CleanupModule } from './modules/cleanup/cleanup.module';
+import { RegistrationModule } from './modules/registration/registration.module';
+import { EmailVerificationModule } from './modules/email-verification/email-verification.module';
 
 @Module({
   imports: [
@@ -41,11 +44,13 @@ import { AdvertiseProductModule } from './modules/advertise-product/advertise-pr
  ScheduleModule.forRoot(),  
  CronJobsModule,
     WalletModule,
+    RegistrationModule,
     ProductClicksModule,
 DatabaseModule,
     AppConfigModule,
     PrismaModule,
-    UserModule,
+    UsersModule,
+    CleanupModule,
     AgencyRequestsModule,
      SaveProductModule,
     FirebaseModule,
@@ -55,6 +60,7 @@ FiltersModule,
 ProductModule,
 AdvertiseProductModule,
 NotificationModule,
+EmailVerificationModule,
 
     AgentModule, 
   ],

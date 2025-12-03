@@ -5,6 +5,7 @@ import { agency_status } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
+import { CheckAgencyNameExistsUseCase } from './check-agency-name-exists.use-case';
 
 export interface CreateAgencyData {
   agency_name: string;
@@ -17,6 +18,7 @@ export class CreateAgencyUseCase {
   constructor(
     @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
     private readonly agencyRepository: IAgencyDomainRepository,
+  
   ) {}
 
   async execute(

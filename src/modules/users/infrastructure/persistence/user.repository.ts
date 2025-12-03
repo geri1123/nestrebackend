@@ -181,4 +181,54 @@ export class UserRepository implements IUserDomainRepository {
 async deleteById(userId: number): Promise<void> {
   await this.prisma.user.delete({ where: { id: userId } });
 }
+async findByIdentifierForAuth(identifier: string) {
+  return this.prisma.user.findFirst({
+    where: {
+      OR: [{ email: identifier }, { username: identifier }]
+    },
+    select: {
+      id: true,
+      password: true,
+      status: true,
+      role: true,
+      username: true,
+      email: true,
+    }
+  });
+};
+async findByIdWithPassword(userId: number) {
+  return this.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      password: true,
+    },
+  });
+};
+async updatePassword(userId: number, newPassword: string): Promise<void> {
+  const hashed = await hashPassword(newPassword);
+
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      password: hashed,
+      updated_at: new Date(),
+    },
+  });
+};
+async findByIdentifierForVerification(identifier: string) {
+  return this.prisma.user.findFirst({
+    where: {
+      OR: [{ email: identifier }, { username: identifier }],
+    },
+    select: {
+      id: true,
+      email: true,
+      first_name: true,
+      role: true,
+      status: true,
+      email_verified: true,
+    },
+  });
+}
 }
