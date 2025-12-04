@@ -5,7 +5,7 @@ import { EmailService } from '../../infrastructure/email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterAgencyOwnerDto } from '../registration/dto/register-agency-owner.dto';
-import { RegisterAgentDto } from './dto/register-agent.dto';
+import { RegisterAgentDto } from '../registration/dto/register-agent.dto';
 import { SupportedLang, t } from '../../locales';
 import { comparePassword } from '../../common/utils/hash';
 import { BaseRegistrationDto } from '../registration/dto/base-registration.dto';
@@ -102,7 +102,9 @@ async registerAgencyOwner(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
   const errors = await validate(dto);
   if (dto.password !== dto.repeatPassword)
     throwValidationErrors(errors, lang, { repeatPassword: [t('passwordsMismatch', lang)] });
-
+  if (errors.length > 0) {
+    throwValidationErrors(errors, lang);
+  }
   return this.registerAgencyOwnerUseCase.execute(dto, lang);
 }
 
@@ -110,7 +112,9 @@ async registerAgent(dto: RegisterAgentDto, lang: SupportedLang) {
   const errors = await validate(dto);
   if (dto.password !== dto.repeatPassword)
     throwValidationErrors(errors, lang, { repeatPassword: [t('passwordsMismatch', lang)] });
-
+  if (errors.length > 0) {
+    throwValidationErrors(errors, lang);
+  }
   return this.registerAgentUseCase.execute(dto, lang);
 }
 

@@ -40,13 +40,14 @@ export class EmailService {
   }
 
   // EMAIL FUNCTIONS
+
   async sendVerificationEmail(to: string, name: string, token: string, language = 'al') {
     if (!token?.trim()) throw new Error('Verification token cannot be empty');
     const langSegment = language === 'al' ? '' : `/${language}`;
+    // const link = `${this.configService.port}${langSegment}/verify-email?token=${token}`;
     const link = `${this.configService.port}${langSegment}/verify-email?token=${token}`;
     return this.sendEmail(to, 'Verify Your Account', verificationEmailTemplate(name, link));
   }
-
   async sendWelcomeEmail(to: string, name: string) {
     return this.sendEmail(to, 'Welcome to Real Estate Platform', welcomeEmailTemplate(name));
   }

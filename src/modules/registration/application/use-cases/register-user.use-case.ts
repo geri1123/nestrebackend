@@ -52,7 +52,7 @@ export class RegisterUserUseCase {
       { userId, role },
       30 * 60 * 1000
     );
-
+   
     await this.emailService.sendVerificationEmail(
       data.email,
       data.first_name || data.username,

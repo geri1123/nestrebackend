@@ -7,6 +7,8 @@ import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { RegisterAgencyOwnerUseCase } from './application/use-cases/register-agency-owner.use-case';
 import { RegisterAgentUseCase } from './application/use-cases/register-agent.use-case';
+import { AgentModule } from '../agent/agent.module';
+import { ValidateAgentRegistrationDataUseCase } from './application/use-cases/validate-agent-registration-data.use-case';
 
 @Module({
   imports: [
@@ -15,11 +17,13 @@ import { RegisterAgentUseCase } from './application/use-cases/register-agent.use
     RegistrationRequestModule,
     EmailModule,
     AppCacheModule,
+    AgentModule
   ],
   providers: [
     RegisterUserUseCase,
     RegisterAgencyOwnerUseCase,
     RegisterAgentUseCase,
+    ValidateAgentRegistrationDataUseCase,
   ],
   exports: [
     RegisterUserUseCase,

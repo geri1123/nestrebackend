@@ -21,6 +21,8 @@ import { UsersModule } from '../users/users.module';
 import { AppConfigService } from '../../infrastructure/config/config.service';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { RegistrationModule } from '../registration/registration.module';
+import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
+import { LoginUseCase } from './application/use-cases/login.use-case';
 
 
 @Module({
@@ -47,7 +49,8 @@ import { RegistrationModule } from '../registration/registration.module';
   providers: [
    
    AuthService,
-  
+  RefreshTokenUseCase,
+  LoginUseCase,
   
  
   ],

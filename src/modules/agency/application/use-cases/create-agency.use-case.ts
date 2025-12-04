@@ -25,32 +25,31 @@ export class CreateAgencyUseCase {
     data: CreateAgencyData,
     ownerUserId: number,
     status: agency_status,
-    language: SupportedLang = 'al',
+    lang: SupportedLang = 'al',
   ): Promise<number> {
-    // Check if agency name or license already exists
+
     const errors: Record<string, string[]> = {};
 
+    // DOMAIN VALIDATION
     if (await this.agencyRepository.agencyNameExists(data.agency_name)) {
-      errors.agency_name = [t('agencyExists', language)];
+      errors.agency_name = [t('agencyExists', lang)];
     }
 
     if (await this.agencyRepository.licenseExists(data.license_number)) {
-      errors.license_number = [t('licenseExists', language)];
+      errors.license_number = [t('licenseExists', lang)];
     }
 
     if (Object.keys(errors).length > 0) {
-      throwValidationErrors([], language, errors);
+      throwValidationErrors([], lang, errors);
     }
 
-    // Create agency
-    const agencyId = await this.agencyRepository.create({
+    // CREATE AGENCY
+    return await this.agencyRepository.create({
       agency_name: data.agency_name,
       license_number: data.license_number,
       address: data.address,
       owner_user_id: ownerUserId,
       status,
     });
-
-    return agencyId;
   }
 }

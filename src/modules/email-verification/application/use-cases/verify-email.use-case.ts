@@ -32,7 +32,6 @@ export class VerifyEmailUseCase {
     private readonly notifications: NotificationService,
     private readonly templates: NotificationTemplateService,
   ) {}
-
   async execute(token: string, lang: SupportedLang) {
     if (!token) {
       throw new BadRequestException({ errors: { token: [t('tokenRequired', lang)] } });
@@ -92,3 +91,5 @@ export class VerifyEmailUseCase {
     });
   }
 }
+
+

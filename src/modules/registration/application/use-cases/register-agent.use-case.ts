@@ -1,25 +1,24 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { RegisterAgentDto } from '../../../auth/dto/register-agent.dto';
-import { USERS_REPOSITORY_TOKENS } from '../../../users/domain/repositories/user.repository.tokens';
-import {type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
+import { Injectable } from '@nestjs/common';
+import { RegisterAgentDto } from '../../dto/register-agent.dto';
 import { CreateAgentRequestUseCase } from '../../../registration-request/application/use-cases/create-agent-request.use-case';
 import { SupportedLang, t } from '../../../../locales';
-import { CacheService } from '../../../../infrastructure/cache/cache.service';
-import { EmailService } from '../../../../infrastructure/email/email.service';
-import { generateToken } from '../../../../common/utils/hash';
 import { RegisterUserUseCase } from './register-user.use-case';
+import { ValidateAgentRegistrationDataUseCase } from './validate-agent-registration-data.use-case';
 
 @Injectable()
 export class RegisterAgentUseCase {
   constructor(
+    private readonly validateAgentData: ValidateAgentRegistrationDataUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly createRequestUseCase: CreateAgentRequestUseCase,
   ) {}
 
   async execute(dto: RegisterAgentDto, lang: SupportedLang) {
+    // STEP 1: Validate all business rules first
+    const agency = await this.validateAgentData.execute(dto, lang);
 
-    // 1) create the user
-    const { userId, token } = await this.registerUserUseCase.execute(
+    // STEP 2: Create user
+    const { userId } = await this.registerUserUseCase.execute(
       {
         username: dto.username,
         email: dto.email,
@@ -27,13 +26,12 @@ export class RegisterAgentUseCase {
         first_name: dto.first_name,
         last_name: dto.last_name,
       },
-      
       lang,
       'agent',
     );
 
-    // 2) create agent request
-    await this.createRequestUseCase.execute(userId, dto, lang);
+    // STEP 3: Create registration request
+    await this.createRequestUseCase.execute(userId, dto, agency, lang);
 
     return {
       userId,

@@ -31,6 +31,7 @@ import { DeleteAgencyByOwnerUseCase } from './application/use-cases/delete-agenc
 import { ActivateAgencyByOwnerUseCase } from './application/use-cases/activate-agency-by-owner.use-case';
 import { CheckAgencyNameExistsUseCase } from './application/use-cases/check-agency-name-exists.use-case';
 import { CheckLicenseExistsUseCase } from './application/use-cases/check-license-exists.use-case';
+import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/validate-agency-before-register.use-case';
 
 @Module({
   imports: [PrismaModule, UsersModule,  FirebaseModule],
@@ -45,6 +46,7 @@ import { CheckLicenseExistsUseCase } from './application/use-cases/check-license
     },
 
     // USE-CASES
+    ValidateAgencyBeforeRegisterUseCase,
     DeleteAgencyByOwnerUseCase,
     GetAgencyByOwnerUseCase,
     CreateAgencyUseCase,
@@ -68,7 +70,7 @@ CheckLicenseExistsUseCase,
     DeleteAgencyByOwnerUseCase,
     CreateAgencyUseCase,
     GetAgencyByIdUseCase,
-    
+    ValidateAgencyBeforeRegisterUseCase,
     GetAgencyInfoUseCase,
     RegisterAgencyFromUserUseCase,
     GetAgencyByPublicCodeUseCase,

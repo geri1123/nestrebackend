@@ -1,0 +1,1 @@
+export type product_status="active" | "inactive" | "pending" | "draft" | "sold"

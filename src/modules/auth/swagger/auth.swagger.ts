@@ -2,7 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiSuccessResponse , ApiBadRequestResponse } from '../../../common/swagger/response.helper.ts.js';
 // import { ApiSuccessResponse, ApiBadRequestResponse, ApiUnauthorizedResponse } from '../../responses.swagger';
-import { RegisterAgentDto } from '../dto/register-agent.dto.js';
+import { RegisterAgentDto } from '../../registration/dto/register-agent.dto.js';
 import { RegisterAgencyOwnerDto } from '../../registration/dto/register-agency-owner.dto.js';
 import { BaseRegistrationDto } from '../../registration/dto/base-registration.dto.js';
 import { LoginDto } from '../dto/login.dto.js';
