@@ -39,7 +39,7 @@ export class ProductClicksService {
 async getClicksForProducts(productIds: (string | number)[]) {
   if (!productIds || productIds.length === 0) return new Map<string, number>();
 
-  // Ensure strings because productId in Mongo schema is string
+ 
   const ids = productIds.map(String);
 
   const clicks = await this.productClickModel.aggregate([

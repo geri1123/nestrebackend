@@ -1,3 +1,4 @@
+
 // products/search-products.controller.ts
 import {  Controller, Get,  NotFoundException,  Param,  Query, Req, UseGuards} from '@nestjs/common';
 import { SearchProductsService } from '../services/search-product.service';
@@ -105,9 +106,3 @@ async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) 
 
 
 }
-
-
-
-
-
-
