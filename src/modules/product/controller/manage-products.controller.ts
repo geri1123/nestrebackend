@@ -1,126 +1,260 @@
 
-import {  Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
-import { UpdateProductService } from "../services/update-product.service";
-import { CreateProductService } from "../services/create-product.service";
-import { FilesInterceptor } from "@nestjs/platform-express";
-import { Permissions } from "../../../common/decorators/permissions.decorator";
-import { ProductOwnershipAndPermissionGuard } from "../../../common/guard/product-ownership.guard";
-import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
-import { throwValidationErrors } from "../../../common/helpers/validation.helper";
-import { CreateProductDto } from "../dto/create-product.dto";
-import type { RequestWithUser } from "../../../common/types/request-with-user.interface";
-import { UpdateProductDto } from "../dto/update-product.dto";
-import {t } from "../../../locales";
-import { ProductsSearchResponseDto } from "../dto/product-frontend.dto";
-import { SearchProductsService } from "../services/search-product.service";
-import { SearchFiltersHelper } from "../utils/search-filters.helper";
-import { UserStatusGuard } from "../../../common/guard/status.guard";
+// import {  Body, Controller, ForbiddenException, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+// import { UpdateProductService } from "../services/update-product.service";
+// import { CreateProductService } from "../services/create-product.service";
+// import { FilesInterceptor } from "@nestjs/platform-express";
+// import { Permissions } from "../../../common/decorators/permissions.decorator";
+// import { ProductOwnershipAndPermissionGuard } from "../../../common/guard/product-ownership.guard";
+// import { plainToInstance } from "class-transformer";
+// import { validate } from "class-validator";
+// import { throwValidationErrors } from "../../../common/helpers/validation.helper";
+// import { CreateProductDto } from "../dto/create-product.dto";
+// import type { RequestWithUser } from "../../../common/types/request-with-user.interface";
+// import { UpdateProductDto } from "../dto/update-product.dto";
+// import {t } from "../../../locales";
+// import { ProductsSearchResponseDto } from "../dto/product-frontend.dto";
+// import { SearchProductsService } from "../services/search-product.service";
+// import { SearchFiltersHelper } from "../utils/search-filters.helper";
+// import { UserStatusGuard } from "../../../common/guard/status.guard";
 
-@Controller('products') 
-export class ManageProductController{
-    constructor(  
-         private readonly createproductService: CreateProductService,
-        private readonly updateProductService:UpdateProductService,
-        private readonly searchfilter:SearchFiltersHelper,
-        private readonly searchProductsService:SearchProductsService
-    ){}
-  @UseGuards(UserStatusGuard)
-       @Post("add")
+// @Controller('products') 
+// export class ManageProductController{
+//     constructor(  
+//          private readonly createproductService: CreateProductService,
+//         private readonly updateProductService:UpdateProductService,
+//         private readonly searchfilter:SearchFiltersHelper,
+//         private readonly searchProductsService:SearchProductsService
+//     ){}
+//   @UseGuards(UserStatusGuard)
+//        @Post("add")
      
-  @UseInterceptors(FilesInterceptor('images', 7)) 
-  async createProduct(
-    @Body()  body: Record<string, any>,
-    @UploadedFiles() images: Express.Multer.File[],
-    @Req() req:RequestWithUser
-  ) {
-   const language =req.language;
-   const userId=req.userId;
-   const agencyId=req.agencyId;
-   if (!userId) {
-  throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-}
-if (req.user?.role !== 'user' && !req.agencyId) {
-  throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
-}
- const dto = plainToInstance(CreateProductDto, body);
-const errors = await validate(dto);
-  if (errors.length > 0) throwValidationErrors(errors, language);
-   return this.createproductService.createProduct(dto ,images , language ,userId , agencyId!);
-  }
+//   @UseInterceptors(FilesInterceptor('images', 7)) 
+//   async createProduct(
+//     @Body()  body: Record<string, any>,
+//     @UploadedFiles() images: Express.Multer.File[],
+//     @Req() req:RequestWithUser
+//   ) {
+//    const language =req.language;
+//    const userId=req.userId;
+//    const agencyId=req.agencyId;
+//    if (!userId) {
+//   throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+// }
+// if (req.user?.role !== 'user' && !req.agencyId) {
+//   throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
+// }
+//  const dto = plainToInstance(CreateProductDto, body);
+// const errors = await validate(dto);
+//   if (errors.length > 0) throwValidationErrors(errors, language);
+//    return this.createproductService.createProduct(dto ,images , language ,userId , agencyId!);
+//   }
 
-@UseGuards(ProductOwnershipAndPermissionGuard, UserStatusGuard)
-
-
-  @Patch('update/:id')
-@UseInterceptors(FilesInterceptor('images', 7))
-async updateProduct(
-  @Param('id') id: string,
-  @Body() body: Record<string, any>,
-  @UploadedFiles() images: Express.Multer.File[],
-  @Req() req: RequestWithUser
-) {
-  const language = req.language;
-  const userId = req.userId;
-const agencyId=req.agencyId;
-  if (!userId) {
-    throw new UnauthorizedException(t('userNotAuthenticated', language));
-  }
-
-  const dto = plainToInstance(UpdateProductDto, body);
-  const errors = await validate(dto);
-  if (errors.length > 0) throwValidationErrors(errors, language);
-
-  return this.updateProductService.updateProduct(
-    Number(id),
-    dto,
-    userId,
-    agencyId!,
-    language,
-    images, 
-  );
-}
+// @UseGuards(ProductOwnershipAndPermissionGuard, UserStatusGuard)
 
 
-@Get("dashboard/products")
-async getDashboardProducts(
-  @Req() req: RequestWithUser, 
-  @Query() rawQuery: Record<string, any>,
-  @Query('page') page = '1',
-  @Query('view') view: 'mine' | 'agency' = 'mine' 
-): Promise<ProductsSearchResponseDto> {
-   const language = req.language;
-  const filters = this.searchfilter.parse(rawQuery, page , );
- if (view === 'mine') {
-    // Show only your own products
-    filters.userId = req.userId;
-  } else if (view === 'agency') {
+//   @Patch('update/:id')
+// @UseInterceptors(FilesInterceptor('images', 7))
+// async updateProduct(
+//   @Param('id') id: string,
+//   @Body() body: Record<string, any>,
+//   @UploadedFiles() images: Express.Multer.File[],
+//   @Req() req: RequestWithUser
+// ) {
+//   const language = req.language;
+//   const userId = req.userId;
+// const agencyId=req.agencyId;
+//   if (!userId) {
+//     throw new UnauthorizedException(t('userNotAuthenticated', language));
+//   }
+
+//   const dto = plainToInstance(UpdateProductDto, body);
+//   const errors = await validate(dto);
+//   if (errors.length > 0) throwValidationErrors(errors, language);
+
+//   return this.updateProductService.updateProduct(
+//     Number(id),
+//     dto,
+//     userId,
+//     agencyId!,
+//     language,
+//     images, 
+//   );
+// }
+
+
+// @Get("dashboard/products")
+// async getDashboardProducts(
+//   @Req() req: RequestWithUser, 
+//   @Query() rawQuery: Record<string, any>,
+//   @Query('page') page = '1',
+//   @Query('view') view: 'mine' | 'agency' = 'mine' 
+// ): Promise<ProductsSearchResponseDto> {
+//    const language = req.language;
+//   const filters = this.searchfilter.parse(rawQuery, page , );
+//  if (view === 'mine') {
+//     // Show only your own products
+//     filters.userId = req.userId;
+//   } else if (view === 'agency') {
    
-    if (!req.agencyId || (req.user?.role !== 'agent' && req.user?.role !== 'agency_owner')) {
-      throw new ForbiddenException(t("userNotAssociatedWithAgency", language))
-    }
+//     if (!req.agencyId || (req.user?.role !== 'agent' && req.user?.role !== 'agency_owner')) {
+//       throw new ForbiddenException(t("userNotAssociatedWithAgency", language))
+//     }
 
-    filters.agencyId = req.agencyId;
+//     filters.agencyId = req.agencyId;
 
-    if (req.user.role === 'agent' && !req.agentPermissions?.canViewAllPosts) {
+//     if (req.user.role === 'agent' && !req.agentPermissions?.canViewAllPosts) {
       
-      filters.status = 'active';
-    } else if (rawQuery.status) {
+//       filters.status = 'active';
+//     } else if (rawQuery.status) {
      
-      filters.status = rawQuery.status;
-    }
-  }
+//       filters.status = rawQuery.status;
+//     }
+//   }
 
-  // Determine if route is "protected"
-  const isProtectedRoute =
-    view === 'mine' ||
-    (view === 'agency' && (req.user?.role === 'agency_owner' || req.agentPermissions?.canViewAllPosts));
+//   // Determine if route is "protected"
+//   const isProtectedRoute =
+//     view === 'mine' ||
+//     (view === 'agency' && (req.user?.role === 'agency_owner' || req.agentPermissions?.canViewAllPosts));
 
  
-  return this.searchProductsService.getProducts(filters, language, isProtectedRoute);
+//   return this.searchProductsService.getProducts(filters, language, isProtectedRoute);
+// }
+
+
+// }
+
+
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UnauthorizedException,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { CreateProductUseCase } from '../application/use-cases/create-product.use-case';
+import { UpdateProductUseCase } from '../application/use-cases/update-product.use-case';
+import { SearchProductsUseCase } from '../application/use-cases/search-products.use-case';
+import { CreateProductDto } from '../dto/create-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
+import { ProductsSearchResponseDto } from '../dto/product-frontend.dto';
+import { SearchFiltersHelper } from '../utils/search-filters.helper';
+import { t } from '../../../locales';
+import { throwValidationErrors } from '../../../common/helpers/validation.helper';
+import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
+import { ProductOwnershipAndPermissionGuard } from '../../../common/guard/product-ownership.guard';
+import { UserStatusGuard } from '../../../common/guard/status.guard';
+
+@Controller('products')
+export class ManageProductController {
+  constructor(
+    private readonly createProductUseCase: CreateProductUseCase,
+    private readonly updateProductUseCase: UpdateProductUseCase,
+    private readonly searchProductsUseCase: SearchProductsUseCase,
+    private readonly searchFiltersHelper: SearchFiltersHelper
+  ) {}
+
+  @UseGuards(UserStatusGuard)
+  @Post('add')
+  @UseInterceptors(FilesInterceptor('images', 7))
+  async createProduct(
+    @Body() body: Record<string, any>,
+    @UploadedFiles() images: Express.Multer.File[],
+    @Req() req: RequestWithUser
+  ) {
+    const language = req.language;
+    const userId = req.userId;
+    const agencyId = req.agencyId;
+
+    if (!userId) {
+      throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+    }
+
+    if (req.user?.role !== 'user' && !req.agencyId) {
+      throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
+    }
+
+    const dto = plainToInstance(CreateProductDto, body);
+    const errors = await validate(dto);
+    if (errors.length > 0) throwValidationErrors(errors, language);
+
+    return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
+  }
+
+  @UseGuards(ProductOwnershipAndPermissionGuard, UserStatusGuard)
+  @Patch('update/:id')
+  @UseInterceptors(FilesInterceptor('images', 7))
+  async updateProduct(
+    @Param('id') id: string,
+    @Body() body: Record<string, any>,
+    @UploadedFiles() images: Express.Multer.File[],
+    @Req() req: RequestWithUser
+  ) {
+    const language = req.language;
+    const userId = req.userId;
+    const agencyId = req.agencyId;
+
+    if (!userId) {
+      throw new UnauthorizedException(t('userNotAuthenticated', language));
+    }
+
+    const dto = plainToInstance(UpdateProductDto, body);
+    const errors = await validate(dto);
+    if (errors.length > 0) throwValidationErrors(errors, language);
+
+    return this.updateProductUseCase.execute(
+      Number(id),
+      dto,
+      userId,
+      agencyId!,
+      language,
+      images
+    );
+  }
+
+  @Get('dashboard/products')
+  async getDashboardProducts(
+    @Req() req: RequestWithUser,
+    @Query() rawQuery: Record<string, any>,
+    @Query('page') page = '1',
+    @Query('view') view: 'mine' | 'agency' = 'mine'
+  ): Promise<ProductsSearchResponseDto> {
+    const language = req.language;
+    const filters = this.searchFiltersHelper.parse(rawQuery, page);
+
+    if (view === 'mine') {
+      // Show only your own products
+      filters.userId = req.userId;
+    } else if (view === 'agency') {
+      if (!req.agencyId || (req.user?.role !== 'agent' && req.user?.role !== 'agency_owner')) {
+        throw new ForbiddenException(t('userNotAssociatedWithAgency', language));
+      }
+
+      filters.agencyId = req.agencyId;
+
+      if (req.user.role === 'agent' && !req.agentPermissions?.canViewAllPosts) {
+        filters.status = 'active';
+      } else if (rawQuery.status) {
+        filters.status = rawQuery.status;
+      }
+    }
+
+    // Determine if route is "protected"
+    const isProtectedRoute =
+      view === 'mine' ||
+      (view === 'agency' &&
+        (req.user?.role === 'agency_owner' || req.agentPermissions?.canViewAllPosts));
+
+    return this.searchProductsUseCase.execute(filters, language, isProtectedRoute);
+  }
 }
-
-
-}
-
-

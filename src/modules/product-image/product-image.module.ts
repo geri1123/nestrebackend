@@ -1,20 +1,39 @@
-// import { Module } from '@nestjs/common';
-// import { ProductImageRepository } from './infrastructure/persistence/product-image.repository';
-// import { PRODUCT_IMAGE_REPOSITORY_TOKEN } from './domain/repositories/product-image.repository.interface';
-// import { UploadProductImagesUseCase } from './application/use-cases/upload-product-images.use-case';
-// import { DeleteProductImagesUseCase } from './application/use-cases/delete-product-images.use-case';
-// import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
-// import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
-// @Module({
-// imports: [PrismaModule, FirebaseModule],
-// providers: [
-// {
-// provide: PRODUCT_IMAGE_REPOSITORY_TOKEN,
-// useClass: ProductImageRepository,
-// },
-// UploadProductImagesUseCase,
-// DeleteProductImagesUseCase,
-// ],
-// exports: [UploadProductImagesUseCase, DeleteProductImagesUseCase, PRODUCT_IMAGE_REPOSITORY_TOKEN],
-// })
-// export class ProductImageModule {}
+import { Module } from '@nestjs/common';
+
+// Domain Repository (interface)
+import { IProductImageRepository } from './domain/repositories/product-image.repository.interface';
+
+// Infrastructure Repository (implementation)
+import { ProductImageRepository } from './infrastructure/persistence/product-image.repository';
+// Application Use Cases
+import { UploadProductImagesUseCase } from './application/use-cases/upload-product-images.use-case';
+import { DeleteProductImagesByProductIdUseCase } from './application/use-cases/delete-product-images.use-case';
+import { GetImagesByProductUseCase } from './application/use-cases/get-images-by-product.use-case';
+
+// External Services
+import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
+
+@Module({
+  providers: [
+    // Repository implementation bound to interface
+    {
+      provide: 'IProductImageRepository',
+      useClass: ProductImageRepository,
+    },
+
+    // Use Cases
+    UploadProductImagesUseCase,
+    DeleteProductImagesByProductIdUseCase,
+    GetImagesByProductUseCase,
+
+    // External Services
+    FirebaseService,
+  ],
+  exports: [
+    'IProductImageRepository',
+    UploadProductImagesUseCase,
+    DeleteProductImagesByProductIdUseCase,
+    GetImagesByProductUseCase,
+  ],
+})
+export class ProductImageModule {}

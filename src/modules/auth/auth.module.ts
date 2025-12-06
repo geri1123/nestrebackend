@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+
 
 import { EmailModule } from '../../infrastructure/email/email.module';
 
@@ -48,7 +48,7 @@ import { LoginUseCase } from './application/use-cases/login.use-case';
   ],
   providers: [
    
-   AuthService,
+  
   RefreshTokenUseCase,
   LoginUseCase,
   
@@ -59,6 +59,6 @@ import { LoginUseCase } from './application/use-cases/login.use-case';
   
    
   ],
-  exports: [AuthService, JwtModule], 
+  exports: [ RefreshTokenUseCase], 
 })
 export class AuthModule {}
