@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import {type ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
+import {SEARCH_PRODUCT_REPO, type ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
 import { SupportedLang } from '../../../../locales';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
@@ -8,6 +8,7 @@ import { ProductFrontendDto, ProductImageDto } from '../../dto/product-frontend.
 @Injectable()
 export class SearchProductsUseCase {
   constructor(
+     @Inject(SEARCH_PRODUCT_REPO)
     private readonly searchProductRepository: ISearchProductRepository,
     private readonly firebaseService: FirebaseService
   ) {}

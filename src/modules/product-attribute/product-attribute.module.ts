@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 // Domain Repositories (interfaces)
-import { IProductAttributeValueRepository } from './domain/repositories/product-attribute.repository.interface';
+import { IProductAttributeValueRepository, PRODUCT_ATTRIBUTE_VALUE_REPO } from './domain/repositories/product-attribute.repository.interface';
 import { IAttributeRepository } from './domain/repositories/attribute.repository.interface';
 
 // Infrastructure Repositories (implementations)
@@ -12,27 +12,27 @@ import { AttributeRepo } from '../filters/repositories/attributes/attributes.rep
 import { GetAttributesByProductUseCase } from './application/use-cases/get-attributes-by-product.use-case';
 import { CreateProductAttributeValuesUseCase } from './application/use-cases/create-product-attributes.use-case';
 import { DeleteProductAttributeValuesUseCase } from './application/use-cases/delete-product-attributes.use-case';
+import { FiltersModule } from '../filters/filters.module';
 
 @Module({
+    imports:[
+FiltersModule,
+    ],
   providers: [
     // Repository implementations bound to interfaces
     {
-      provide: 'IProductAttributeValueRepository',
+      provide: PRODUCT_ATTRIBUTE_VALUE_REPO,
       useClass: ProductAttributeValueRepository,
-    },
-    {
-      provide: 'IAttributeRepository',
-      useClass: AttributeRepo,
     },
 
     // Use Cases
+    
     CreateProductAttributeValuesUseCase,
     DeleteProductAttributeValuesUseCase,
     GetAttributesByProductUseCase,
   ],
   exports: [
-    'IProductAttributeValueRepository',
-    'IAttributeRepository',
+PRODUCT_ATTRIBUTE_VALUE_REPO,   
     CreateProductAttributeValuesUseCase,
     DeleteProductAttributeValuesUseCase,
     GetAttributesByProductUseCase,

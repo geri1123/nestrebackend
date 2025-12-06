@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 
 // Domain Repository (interface)
-import { IProductImageRepository } from './domain/repositories/product-image.repository.interface';
-
+import { PRODUCT_IMAGE_REPO } from './domain/repositories/product-image.repository.interface';
 // Infrastructure Repository (implementation)
 import { ProductImageRepository } from './infrastructure/persistence/product-image.repository';
 // Application Use Cases
@@ -17,7 +16,7 @@ import { FirebaseService } from '../../infrastructure/firebase/firebase.service'
   providers: [
     // Repository implementation bound to interface
     {
-      provide: 'IProductImageRepository',
+     provide:PRODUCT_IMAGE_REPO ,
       useClass: ProductImageRepository,
     },
 
@@ -30,7 +29,7 @@ import { FirebaseService } from '../../infrastructure/firebase/firebase.service'
     FirebaseService,
   ],
   exports: [
-    'IProductImageRepository',
+   PRODUCT_IMAGE_REPO,
     UploadProductImagesUseCase,
     DeleteProductImagesByProductIdUseCase,
     GetImagesByProductUseCase,

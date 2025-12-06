@@ -31,6 +31,9 @@ import { AdvertiseProductModule } from './modules/advertise-product/advertise-pr
 import { CleanupModule } from './modules/cleanup/cleanup.module';
 import { RegistrationModule } from './modules/registration/registration.module';
 import { EmailVerificationModule } from './modules/email-verification/email-verification.module';
+import { ProductImageModule } from './modules/product-image/product-image.module';
+import { ProductAttributeValueModule } from './modules/product-attribute/product-attribute.module';
+import { SoftAuthModule } from './common/soft-auth/soft-auth.module';
 
 @Module({
   imports: [
@@ -58,10 +61,12 @@ DatabaseModule,
 AuthModule,
 FiltersModule,
 ProductModule,
+ProductImageModule,
+ProductAttributeValueModule,
 AdvertiseProductModule,
 NotificationModule,
 EmailVerificationModule,
-
+SoftAuthModule,
     AgentModule, 
   ],
   controllers: [AppController],

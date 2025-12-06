@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import {type IProductImageRepository } from '../../domain/repositories/product-image.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
+import {PRODUCT_IMAGE_REPO, type IProductImageRepository } from '../../domain/repositories/product-image.repository.interface';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 
 @Injectable()
 export class DeleteProductImagesByProductIdUseCase {
   constructor(
+    @Inject(PRODUCT_IMAGE_REPO)
     private readonly productImageRepository: IProductImageRepository,
     private readonly firebaseService: FirebaseService
   ) {}

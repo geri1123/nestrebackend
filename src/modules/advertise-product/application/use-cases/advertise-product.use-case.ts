@@ -5,6 +5,7 @@ import { advertisement_type, wallet_transaction_type } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import {type IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
 import { ChangeWalletBalanceUseCase } from "../../../wallet/application/use-cases/change-wallet-balance.use-case";
+import { FindProductByIdUseCase } from "../../../product/application/use-cases/find-product-by-id.use-case";
 
 const AD_PRICING = { cheap: 5, normal: 10, premium: 20 };
 const AD_DURATION = { cheap: 7, normal: 14, premium: 30 };
@@ -15,12 +16,12 @@ export class AdvertiseProductUseCase {
   @Inject("IProductAdvertisementRepository")
   private readonly adRepo: IProductAdvertisementRepository,
     private readonly changeWalletBalanceUseCase: ChangeWalletBalanceUseCase,
-    private readonly productService: ProductService,
+    private readonly findProduct: FindProductByIdUseCase,
     private readonly prisma: PrismaService
   ) {}
 
   private async validate(productId: number, userId: number, language: SupportedLang) {
-    const product = await this.productService.findProductById(productId, language);
+    const product = await this.findProduct.execute(productId, language);
     if (!product) throw new BadRequestException(t("productNotFound", language));
     if (product.userId !== userId) throw new ForbiddenException(t("noPermissionToAdvertise", language));
     if (product.status !== "active") throw new BadRequestException(t("productNotActive", language));

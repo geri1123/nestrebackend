@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import {type IProductRepository } from '../../domain/repositories/product.repository.interface';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { Product } from '../../domain/entities/product.entity';
 import { UpdateProductDto } from '../../dto/update-product.dto';
 import { SupportedLang, t } from '../../../../locales';
@@ -12,6 +12,7 @@ import { FirebaseService } from '../../../../infrastructure/firebase/firebase.se
 @Injectable()
 export class UpdateProductUseCase {
   constructor(
+     @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
     private readonly deleteImagesUseCase: DeleteProductImagesByProductIdUseCase,
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,

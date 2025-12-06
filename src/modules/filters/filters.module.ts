@@ -20,5 +20,6 @@ import { LoationRepository } from './repositories/location/location.repository';
   
     
   ],
+  exports:[AttributeRepo]
 })
 export class FiltersModule {}

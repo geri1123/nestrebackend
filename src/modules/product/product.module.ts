@@ -54,8 +54,8 @@ import { SearchProductsController } from './controller/product.controller';
 import { ManageProductController } from './controller/manage-products.controller';
 
 // Domain Repositories (interfaces)
-import { IProductRepository } from './domain/repositories/product.repository.interface';
-import { ISearchProductRepository } from './domain/repositories/search-product.repository.interface';
+import { IProductRepository, PRODUCT_REPO } from './domain/repositories/product.repository.interface';
+import { ISearchProductRepository, SEARCH_PRODUCT_REPO } from './domain/repositories/search-product.repository.interface';
 
 // Infrastructure Repositories (implementations)
 import { ProductRepository } from './infrastructure/persisetence/product.repository';
@@ -79,6 +79,9 @@ import { ProductImageModule } from '../product-image/product-image.module';
 
 import { SoftAuthService } from '../../common/soft-auth/soft-auth.service';
 import { ProductAttributeValueModule } from '../product-attribute/product-attribute.module';
+import { FindProductByIdUseCase } from './application/use-cases/find-product-by-id.use-case';
+import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
+import { ProductOwnershipAndPermissionGuard } from '../../common/guard/product-ownership.guard';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController],
@@ -90,19 +93,21 @@ import { ProductAttributeValueModule } from '../product-attribute/product-attrib
     ProductImageModule,
     ProductAttributeValueModule,
     JwtModule.register({}),
+    SoftAuthModule,
   ],
   providers: [
     // Repository implementations bound to interfaces
     {
-      provide: 'IProductRepository',
+      provide: PRODUCT_REPO,
       useClass: ProductRepository,
     },
     {
-      provide: 'ISearchProductRepository',
+      provide: SEARCH_PRODUCT_REPO,
       useClass: SearchProductRepository,
     },
-
+ProductOwnershipAndPermissionGuard,
     // Use Cases
+    FindProductByIdUseCase,
     CreateProductUseCase,
     UpdateProductUseCase,
     GetProductByIdUseCase,
@@ -114,10 +119,11 @@ import { ProductAttributeValueModule } from '../product-attribute/product-attrib
     SoftAuthService,
   ],
   exports: [
-    'IProductRepository',
-    'ISearchProductRepository',
+    SEARCH_PRODUCT_REPO,
+    PRODUCT_REPO,
     GetProductByIdUseCase,
     GetProductForPermissionUseCase,
+    FindProductByIdUseCase,
   ],
 })
 export class ProductModule {}

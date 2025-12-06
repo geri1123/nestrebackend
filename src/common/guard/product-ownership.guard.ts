@@ -2,18 +2,18 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { t } from '../../locales';
 import { ProductService } from '../../modules/product/services/product-service';
+import { GetProductForPermissionUseCase } from '../../modules/product/application/use-cases/get-product-for-permission.use-case';
 
 @Injectable()
 export class ProductOwnershipAndPermissionGuard implements CanActivate {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly GetProductForPermission: GetProductForPermissionUseCase) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
     const productId = Number(req.params.id);
     const lang = req.language;
 
-    const product = await this.productService.getProductForPermissionCheck(productId, lang);
-    if (!product) throw new ForbiddenException(t('productNotFound', lang));
+    const product = await this.GetProductForPermission.execute(productId, lang);
 
     
     if (req.user?.role === 'agency_owner') {

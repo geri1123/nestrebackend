@@ -6,3 +6,6 @@ findById(id: number): Promise<productimage | null>;
  deleteByProductId(productId: number): Promise<void>;
 
 }
+
+
+export const PRODUCT_IMAGE_REPO = Symbol('PRODUCT_IMAGE_REPO');

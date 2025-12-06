@@ -1,6 +1,6 @@
 import { Product } from '../entities/product.entity';
 import { SupportedLang } from '../../../../locales';
-
+export const PRODUCT_REPO = Symbol('PRODUCT_REPO');
 export interface IProductRepository {
   create(product: Product): Promise<Product>;
   findById(id: number): Promise<Product | null>;
@@ -10,20 +10,3 @@ export interface IProductRepository {
   delete(id: number): Promise<void>;
 }
 
-// modules/product/domain/repositories/search-product.repository.interface.ts
-import { SearchFiltersDto } from '../../dto/product-filters.dto';
-import { SupportedLang } from '../../../../locales';
-
-export interface ISearchProductRepository {
-  searchProducts(
-    filters: SearchFiltersDto,
-    language: SupportedLang,
-    isProtectedRoute: boolean
-  ): Promise<any[]>;
-  
-  getProductsCount(
-    filters: SearchFiltersDto,
-    language: SupportedLang,
-    isProtectedRoute: boolean
-  ): Promise<number>;
-}

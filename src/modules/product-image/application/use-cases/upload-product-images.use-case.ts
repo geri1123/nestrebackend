@@ -1,5 +1,5 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import {type IProductImageRepository } from '../../domain/repositories/product-image.repository.interface';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import {PRODUCT_IMAGE_REPO, type IProductImageRepository } from '../../domain/repositories/product-image.repository.interface';
 import { ProductImage } from '../../domain/entities/product-image.entity';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { SupportedLang, t } from '../../../../locales';
@@ -7,6 +7,7 @@ import { SupportedLang, t } from '../../../../locales';
 @Injectable()
 export class UploadProductImagesUseCase {
   constructor(
+    @Inject(PRODUCT_IMAGE_REPO)
     private readonly productImageRepository: IProductImageRepository,
     private readonly firebaseService: FirebaseService
   ) {}

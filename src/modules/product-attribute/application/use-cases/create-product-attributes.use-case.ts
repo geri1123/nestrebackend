@@ -1,13 +1,15 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import {type IProductAttributeValueRepository } from '../../domain/repositories/product-attribute.repository.interface';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import {PRODUCT_ATTRIBUTE_VALUE_REPO, type IProductAttributeValueRepository } from '../../domain/repositories/product-attribute.repository.interface';
 import {type IAttributeRepository } from '../../domain/repositories/attribute.repository.interface';
 import { SupportedLang, t } from '../../../../locales';
+import { AttributeRepo } from '../../../filters/repositories/attributes/attributes.repository';
 
 @Injectable()
 export class CreateProductAttributeValuesUseCase {
   constructor(
+    @Inject(PRODUCT_ATTRIBUTE_VALUE_REPO)
     private readonly productAttributeValueRepository: IProductAttributeValueRepository,
-    private readonly attributeRepository: IAttributeRepository
+    private readonly atributerepo: AttributeRepo
   ) {}
 
   async execute(
@@ -18,7 +20,7 @@ export class CreateProductAttributeValuesUseCase {
   ): Promise<void> {
     if (!attributes || attributes.length === 0) return;
 
-    const validAttributeIds = await this.attributeRepository.getValidAttributeIdsBySubcategory(subcategoryId);
+    const validAttributeIds = await this.atributerepo.getValidAttributeIdsBySubcategory(subcategoryId);
     const validAttributeIdsSet = new Set(validAttributeIds);
 
     for (const attr of attributes) {

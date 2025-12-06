@@ -1,5 +1,5 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import {type IProductRepository } from '../../domain/repositories/product.repository.interface';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import {PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { Product } from '../../domain/entities/product.entity';
 import { CreateProductDto } from '../../dto/create-product.dto';
 import { SupportedLang, t } from '../../../../locales';
@@ -8,6 +8,7 @@ import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/
 @Injectable()
 export class CreateProductUseCase {
   constructor(
+    @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,
     private readonly createAttributeValuesUseCase: CreateProductAttributeValuesUseCase

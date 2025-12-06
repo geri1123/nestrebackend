@@ -23,6 +23,7 @@ import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { RegistrationModule } from '../registration/registration.module';
 import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
+import { SoftAuthService } from '../../common/soft-auth/soft-auth.service';
 
 
 @Module({
@@ -48,7 +49,6 @@ import { LoginUseCase } from './application/use-cases/login.use-case';
   ],
   providers: [
    
-  
   RefreshTokenUseCase,
   LoginUseCase,
   
@@ -59,6 +59,6 @@ import { LoginUseCase } from './application/use-cases/login.use-case';
   
    
   ],
-  exports: [ RefreshTokenUseCase], 
+  exports: [ RefreshTokenUseCase , JwtModule], 
 })
 export class AuthModule {}
