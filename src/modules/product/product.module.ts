@@ -68,7 +68,7 @@ import { SearchProductsUseCase } from './application/use-cases/search-products.u
 import { GetProductForPermissionUseCase } from './application/use-cases/get-product-for-permission.use-case';
 
 // Utilities
-import { SearchFiltersHelper } from './utils/search-filters.helper';
+import { SearchFiltersHelper } from './application/helpers/search-filters.helper';
 
 // External Modules
 import { UsersModule } from '../users/users.module';

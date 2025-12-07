@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { user_role, user_status } from '@prisma/client';
+import { advertisement_status, advertisement_type, user_role, user_status } from '@prisma/client';
 
 //product Images
 export class ProductImageDto {
@@ -31,7 +31,40 @@ export class ProductUserDto {
   @ApiProperty({nullable:true  , description:"active | suspended| inactive "})
   status?:user_status
 }
+export class ProductAdvertisementDto {
+  @ApiProperty({ 
+    example: 42,
+    description: 'Advertisement ID'
+  })
+  id?: number;
 
+  @ApiProperty({ 
+    example: 'premium',
+    enum: ['cheap', 'normal', 'premium'],
+    description: 'Type of advertisement'
+  })
+  adType?: advertisement_type;
+
+  @ApiProperty({ 
+    example: 'active',
+    enum: ['active', 'inactive', 'expired', 'pending'],
+    description: 'Current status of the advertisement'
+  })
+  status?: advertisement_status;
+
+  @ApiProperty({ 
+    example: '2025-12-01T10:00:00.000Z',
+    description: 'Advertisement start date'
+  })
+  startDate?: string;
+
+  @ApiProperty({ 
+    example: '2025-12-31T23:59:59.000Z',
+    nullable: true,
+    description: 'Advertisement end date'
+  })
+  endDate?: string | null;
+}
 //Product agency dto
 export class ProductAgencyDto {
   @ApiProperty({ 
@@ -119,6 +152,21 @@ user: ProductUserDto | null;
   @ApiProperty({ type: ProductAgencyDto, nullable: true,description: 'Agency information if product belongs to an agency'})
 
   agency: ProductAgencyDto | null;
+ @ApiProperty({ 
+    example: true,
+    description: 'Whether the product has an active advertisement',
+    required: false
+  })
+  isAdvertised?: boolean ;
+
+  @ApiProperty({ 
+    type: ProductAdvertisementDto ,
+    nullable: true,
+    description: 'Active advertisement details if product is advertised',
+    required: false
+  })
+  advertisement?: ProductAdvertisementDto | null;
+  
 }
 
 export class ProductsSearchResponseDto {

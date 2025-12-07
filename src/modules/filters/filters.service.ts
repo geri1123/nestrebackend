@@ -1,6 +1,6 @@
 // src/filters/filters.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CategoryRepository } from './repositories/category/category.repository';
 import { ListingTypeRepo } from './repositories/listingtype/listingtype.repository';
 import { SupportedLang } from '../../locales';
@@ -11,6 +11,10 @@ import { LoationRepository } from './repositories/location/location.repository';
 import { CityDto, CountryDto } from './dto/location.dto';
 import { CacheService } from '../../infrastructure/cache/cache.service';
 import { CategoryDto } from './dto/filters.dto';
+import { CATEGORY_REPO, type ICatRepository } from './repositories/category/Icategory.repository';
+import { LISTING_TYPE_REPO, type IListingTypeRepository } from './repositories/listingtype/Ilistingtype.repository';
+import { ATTRIBUTE_REPO,type IAttributeRepo } from './repositories/attributes/Iattribute.respository';
+import {type ILocationRepository, LOCATION_REPO } from './repositories/location/Ilocation.repository';
 @Injectable()
 export class FiltersService {
  
@@ -29,10 +33,14 @@ export class FiltersService {
   }
 
   constructor(
-    private readonly categoryRepo: CategoryRepository,
-    private readonly listingTypeRepo: ListingTypeRepo,
-    private readonly attributeRepo: AttributeRepo,
-    private readonly locationRepo: LoationRepository,
+    @Inject(CATEGORY_REPO)
+    private readonly categoryRepo: ICatRepository,
+    @Inject(LISTING_TYPE_REPO)
+    private readonly listingTypeRepo: IListingTypeRepository,
+    @Inject(ATTRIBUTE_REPO)
+    private readonly attributeRepo: IAttributeRepo,
+    @Inject(LOCATION_REPO)
+    private readonly locationRepo: ILocationRepository,
     private readonly cacheService: CacheService, 
   ) {}
 
@@ -118,7 +126,7 @@ async getListingTypes(
     console.log(`[DB EMPTY] No attributes found for subcategory ${subcategoryId} (${lang})`);
   }
 
-  return attributes;
+  return attributes ?? [];
 }
   async getCountries(): Promise<CountryDto[]> {
   const cacheKey = 'countries';

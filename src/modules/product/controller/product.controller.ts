@@ -111,7 +111,7 @@
 import { Controller, Get, Query, Param, Req, NotFoundException } from '@nestjs/common';
 import { SearchProductsUseCase } from '../application/use-cases/search-products.use-case';
 import { GetProductByIdUseCase } from '../application/use-cases/get-product-by-id.use-case';
-import { SearchFiltersHelper } from '../utils/search-filters.helper';
+import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
 import { Public } from '../../../common/decorators/public.decorator';
 import { ProductsSearchResponseDto } from '../dto/product-frontend.dto';
 import { t } from '../../../locales';

@@ -148,7 +148,7 @@ import { SearchProductsUseCase } from '../application/use-cases/search-products.
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { ProductsSearchResponseDto } from '../dto/product-frontend.dto';
-import { SearchFiltersHelper } from '../utils/search-filters.helper';
+import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
 import { t } from '../../../locales';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';

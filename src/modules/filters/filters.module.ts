@@ -6,6 +6,10 @@ import { ListingTypeRepo } from './repositories/listingtype/listingtype.reposito
 import { AttributeRepo } from './repositories/attributes/attributes.repository';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { LoationRepository } from './repositories/location/location.repository';
+import { CATEGORY_REPO } from './repositories/category/Icategory.repository';
+import { LISTING_TYPE_REPO } from './repositories/listingtype/Ilistingtype.repository';
+import { LOCATION_REPO } from './repositories/location/Ilocation.repository';
+import { ATTRIBUTE_REPO } from './repositories/attributes/Iattribute.respository';
 
 
 @Module({
@@ -17,9 +21,23 @@ import { LoationRepository } from './repositories/location/location.repository';
     ListingTypeRepo,
     AttributeRepo,
     LoationRepository,
-  
-    
+  {
+      provide: CATEGORY_REPO,
+      useClass: CategoryRepository,
+    },
+    {
+      provide: LISTING_TYPE_REPO,
+      useClass: ListingTypeRepo,
+    },
+     {
+      provide: LOCATION_REPO,
+      useClass: LoationRepository,
+    },
+    {
+      provide:ATTRIBUTE_REPO,
+      useClass:AttributeRepo
+    },
   ],
-  exports:[AttributeRepo]
+  exports:[AttributeRepo ,ATTRIBUTE_REPO]
 })
 export class FiltersModule {}

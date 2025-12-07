@@ -3,13 +3,15 @@ import {PRODUCT_ATTRIBUTE_VALUE_REPO, type IProductAttributeValueRepository } fr
 import {type IAttributeRepository } from '../../domain/repositories/attribute.repository.interface';
 import { SupportedLang, t } from '../../../../locales';
 import { AttributeRepo } from '../../../filters/repositories/attributes/attributes.repository';
+import { ATTRIBUTE_REPO, type IAttributeRepo } from '../../../filters/repositories/attributes/Iattribute.respository';
 
 @Injectable()
 export class CreateProductAttributeValuesUseCase {
   constructor(
     @Inject(PRODUCT_ATTRIBUTE_VALUE_REPO)
     private readonly productAttributeValueRepository: IProductAttributeValueRepository,
-    private readonly atributerepo: AttributeRepo
+    @Inject(ATTRIBUTE_REPO)
+    private readonly atributerepo: IAttributeRepo
   ) {}
 
   async execute(

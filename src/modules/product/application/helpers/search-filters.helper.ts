@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SearchFiltersDto } from '../dto/product-filters.dto';
+import { SearchFiltersDto } from '../../dto/product-filters.dto';
 
 @Injectable()
 export class SearchFiltersHelper {

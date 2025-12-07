@@ -6,38 +6,21 @@ import { comparePassword } from '../../../../common/utils/hash';
 import { FindUserForAuthUseCase } from '../../../users/application/use-cases/find-user-for-auth.use-case';
 import { UpdateLastLoginUseCase } from '../../../users/application/use-cases/update-last-login.use-case';
 import { FindUserByIdUseCase } from '../../../users/application/use-cases/find-user-by-id.use-case';
+import { AuthTokenService } from '../../infrastructure/services/auth-token.service';
 
-export interface CustomJwtPayload {
-  userId: number;
-  username: string;
-  email: string;
-  role: string;
-}
+
 
 @Injectable()
 export class LoginUseCase {
   constructor(
-    private readonly jwtService: JwtService,
+    // private readonly jwtService: JwtService,
+    private readonly authTokenService:AuthTokenService,
     private readonly findUserForAuthUseCase: FindUserForAuthUseCase,
     private readonly updateLastLoginUseCase: UpdateLastLoginUseCase,
     private readonly findUserByIdUseCase: FindUserByIdUseCase,
   ) {}
 
-private generateJwt(user: any, expiresInDays = 1): string {
-  const payload: CustomJwtPayload = {
-    userId: Number(user.id),
-    username: String(user.username),
-    email: String(user.email),
-    role: String(user.role),
-  };
 
-  // convert days → seconds
-  const expiresInSeconds = expiresInDays * 24 * 60 * 60;
-
-  return this.jwtService.sign(payload, {
-    expiresIn: expiresInSeconds,
-  });
-}
 
   async execute(dto: LoginDto, lang: SupportedLang = 'al') {
     const { identifier, password, rememberMe } = dto;
@@ -59,8 +42,26 @@ private generateJwt(user: any, expiresInDays = 1): string {
     const user = await this.findUserByIdUseCase.execute(authUser.id, lang);
     await this.updateLastLoginUseCase.execute(authUser.id);
 
-    const token = this.generateJwt(user, rememberMe ? 30 : 1);
+    // const token = this.generateJwt(user, rememberMe ? 30 : 1);
 
+const token = this.authTokenService.generate(user, rememberMe ? 30 : 1);
     return { user, token };
   }
 }
+
+
+// private generateJwt(user: any, expiresInDays = 1): string {
+//   const payload: CustomJwtPayload = {
+//     userId: Number(user.id),
+//     username: String(user.username),
+//     email: String(user.email),
+//     role: String(user.role),
+//   };
+
+//   // convert days → seconds
+//   const expiresInSeconds = expiresInDays * 24 * 60 * 60;
+
+//   return this.jwtService.sign(payload, {
+//     expiresIn: expiresInSeconds,
+//   });
+// }
