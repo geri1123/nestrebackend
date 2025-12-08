@@ -17,6 +17,8 @@ import { AddAgentPermissionsUseCase } from './application/use-cases/add-agenct-p
 import { EnsureIdCardUniqueUseCase } from './application/use-cases/ensure-idcard-unique.use-case';
 import { CreateAgencyUseCase } from '../agency/application/use-cases/create-agency.use-case';
 import { CreateAgentUseCase } from './application/use-cases/create-agent.use-case';
+import { GetAgentPermissionsUseCase } from './application/use-cases/get-agent-permission.use-case';
+import { UpdateAgentPermissionsUseCase } from './application/use-cases/update-agent-permissions.use-case';
 
 @Module({
   imports: [ NotificationModule , AgencyModule],
@@ -33,6 +35,8 @@ import { CreateAgentUseCase } from './application/use-cases/create-agent.use-cas
     AddAgentPermissionsUseCase,
     EnsureIdCardUniqueUseCase,
     CreateAgentUseCase,
+    UpdateAgentPermissionsUseCase,
+   GetAgentPermissionsUseCase,
    {
       provide: AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,
       useClass: AgentRepository,

@@ -38,14 +38,14 @@ export class NotificationTemplateService {
   [LanguageCode.it]: (data) =>
     `${data.username} vuole unirsi alla vostra agenzia.`,
 },
-      agent_updated_by_agent: {
-      [LanguageCode.al]: (data) =>
-        `${data.updatedByName} ka përditësuar informacionet tua: ${translateAgentChanges(data.dto, 'al')}.`,
-      [LanguageCode.en]: (data) =>
-        `${data.updatedByName} has updated your information: ${translateAgentChanges(data.dto, 'en')}.`,
-      [LanguageCode.it]: (data) =>
-        `${data.updatedByName} ha aggiornato le tue informazioni: ${translateAgentChanges(data.dto, 'it')}.`,
-    },
+   agent_updated_by_agent: {
+  [LanguageCode.al]: (data) =>
+    `${data.updatedByName} ka përditësuar informacionet tuaj: ${data.changesText}.`,
+  [LanguageCode.en]: (data) =>
+    `${data.updatedByName} has updated your information: ${data.changesText}.`,
+  [LanguageCode.it]: (data) =>
+    `${data.updatedByName} ha aggiornato le tue informazioni: ${data.changesText}.`,
+}
   };
 
 

@@ -21,21 +21,26 @@ export class AgentPermissionRepository
   }
 
   async createPermissions(
-    agencyAgentId: number,
-    agencyId: number,
-    permissions: AgentPermissionUpdateInput,
-  ): Promise<AgentPermissionEntity> {
-    const created = await this.prisma.agencyagent_permission.create({
-      data: {
-        agency_agent_id: agencyAgentId,
-        agency_id: agencyId,
-        ...permissions,
-      },
-    });
+  agencyAgentId: number,
+  agencyId: number,
+  permissions: AgentPermissionUpdateInput,
+): Promise<AgentPermissionEntity> {
+  const created = await this.prisma.agencyagent_permission.create({
+    data: {
+      agency_agent_id: agencyAgentId,
+      agency_id: agencyId,
+      // Explicitly set each field with defaults from your schema
+      can_edit_own_post: permissions.can_edit_own_post ?? true,
+      can_edit_others_post: permissions.can_edit_others_post ?? false,
+      can_approve_requests: permissions.can_approve_requests ?? false,
+      can_view_all_posts: permissions.can_view_all_posts ?? false,
+      can_delete_posts: permissions.can_delete_posts ?? false,
+      can_manage_agents: permissions.can_manage_agents ?? false,
+    },
+  });
 
-    return AgentMapper.toPermissionDomain(created);
-  }
-
+  return AgentMapper.toPermissionDomain(created);
+}
   async updatePermissions(
     agencyAgentId: number,
     permissions: AgentPermissionUpdateInput,

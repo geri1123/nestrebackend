@@ -99,18 +99,8 @@ export class UpdateAgentUseCase {
       }
     }
 
-    // const updatedByName = user.username;
-
-    // const translations = this.notificationTemplateService.getAllTranslations(
-    //   'agent_updated_by_agent',
-    //   { updatedByName, dto },
-    // );
-
-    // await this.notificationService.sendNotification({
-    //   userId: updatedAgent.agentUserId,
-    //   type: 'agent_updated_by_agent',
-    //   translations,
-    // });
+    
+    
 const changesText = translateAgentChanges(dto, language);
 
 const updatedByName = user.username;

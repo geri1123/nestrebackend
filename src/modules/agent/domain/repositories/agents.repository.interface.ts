@@ -14,12 +14,16 @@ export interface AgentUserProps {
   status: string;
 }
 
+// export interface AgentWithUserAndPermission {
+//   agent: AgentEntity;
+//   agentUser: AgentUserProps | null;
+//   permissionId?: number | null; // keep minimal; full permission handled by permission repo
+// }
 export interface AgentWithUserAndPermission {
   agent: AgentEntity;
   agentUser: AgentUserProps | null;
-  permissionId?: number | null; // keep minimal; full permission handled by permission repo
+  permission: AgentPermissionEntity | null;
 }
-
 export type AgentSort =
   | 'name_asc'
   | 'name_desc'

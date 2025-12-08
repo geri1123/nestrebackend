@@ -73,21 +73,24 @@ export class AgentController {
     );
   }
 
+ 
   @Patch('update/:id')
-  @Permissions(['can_manage_agents'])
-  @UseGuards(UserStatusGuard, AgentBelongsToAgencyGuard)
-  async updateAgencyAgents(
-    @Param('id') idParam: string,
-    @Req() req: RequestWithUser,
-    @Body() data: Record<string, any>,
-  ) {
+@Permissions('canManageAgents')
+@UseGuards(UserStatusGuard, AgentBelongsToAgencyGuard)
+async updateAgencyAgents(
+  @Param('id') idParam: string,
+  @Req() req: RequestWithUser,
+  @Body() data: Record<string, any>,
+) {
+  try {
     const id = Number(idParam);
     const agencyId = req.agencyId;
     const user = req.user;
     const language = req.language;
 
+
     if (!user) {
-      return null;
+      throw new ForbiddenException(t('userNotFound', language));
     }
 
     if (!agencyId) {
@@ -95,7 +98,23 @@ export class AgentController {
     }
 
     const dto = plainToInstance(UpdateAgentsDto, data);
+    
+    console.log('Transformed DTO:', dto);
 
-    return this.updateAgentUseCase.execute(id, agencyId, dto, language, user);
+    const result = await this.updateAgentUseCase.execute(
+      id, 
+      agencyId, 
+      dto, 
+      language, 
+      user
+    );
+    
+    console.log('Update Result:', result);
+    
+    return result;
+  } catch (error) {
+    
+    throw error;
   }
+}
 }

@@ -29,7 +29,7 @@ export class AgencyRequestsController {
   @Get('registration-requests')
   @UseGuards(UserStatusGuard)
   @Roles('agent', 'agency_owner')
-  @Permissions(['can_approve_requests']) 
+  @Permissions('canApproveRequests') 
   async getRegistrationRequests(
     @Req() req: RequestWithUser,
     @Query('page') page = 1,        
@@ -51,34 +51,77 @@ export class AgencyRequestsController {
   
 
 
+// @Patch('registration-requests/:id/status')
+// @UseGuards(UserStatusGuard)
+// @Roles('agent', 'agency_owner')
+//  @Permissions('canApproveRequests') 
+// async updateRegistrationRequestStatus(
+//   @Req() req: RequestWithUser,
+//   @Param('id', ParseIntPipe) requestId: number,
+//   @Body() body: Record<string, any>,
+// ) {
+//   const language = req.language || 'al';
+//   const userId = req.userId;
+  
+//   const dto = plainToInstance(UpdateRequestStatusDto, body);
+//   const errors = await validate(dto);
+//   if (errors.length > 0) throwValidationErrors(errors, language);
+//   if (body.action === 'approved' && !body.roleInAgency) {
+//     throw new BadRequestException(t('roleInAgencyRequired', language));
+//   }
+
+  
+//    return await this.updateAgencyRequestStatus.execute(
+//       requestId,
+//       req.agencyId!,
+//       userId,
+//       dto,
+//       language
+//     );
+// }
+
+
 @Patch('registration-requests/:id/status')
 @UseGuards(UserStatusGuard)
 @Roles('agent', 'agency_owner')
- @Permissions(['can_approve_requests']) 
+@Permissions('canApproveRequests') 
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,
   @Body() body: Record<string, any>,
 ) {
-  const language = req.language || 'al';
-  const userId = req.userId;
-  
-  const dto = plainToInstance(UpdateRequestStatusDto, body);
-  const errors = await validate(dto);
-  if (errors.length > 0) throwValidationErrors(errors, language);
-  if (body.action === 'approved' && !body.roleInAgency) {
-    throw new BadRequestException(t('roleInAgencyRequired', language));
-  }
+  try {
+    const language = req.language || 'al';
+    const userId = req.userId;
+    
+    console.log('=== Controller: Received request ===');
+    console.log('Request ID:', requestId);
+    console.log('Body:', body);
+    console.log('User ID:', userId);
+    console.log('Agency ID:', req.agencyId);
+    
+    const dto = plainToInstance(UpdateRequestStatusDto, body);
+    const errors = await validate(dto);
+    if (errors.length > 0) throwValidationErrors(errors, language);
+    
+    if (body.action === 'approved' && !body.roleInAgency) {
+      throw new BadRequestException(t('roleInAgencyRequired', language));
+    }
 
-  
-   return await this.updateAgencyRequestStatus.execute(
+    const result = await this.updateAgencyRequestStatus.execute(
       requestId,
       req.agencyId!,
       userId,
       dto,
       language
     );
+    
+    console.log('=== Controller: Success ===');
+    return result;
+  } catch (error) {
+    console.error('=== Controller: Error ===');
+    console.error('Error:', error);
+    throw error;
+  }
 }
-
-
 }

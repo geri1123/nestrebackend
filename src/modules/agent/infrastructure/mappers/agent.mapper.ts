@@ -25,23 +25,21 @@ export class AgentMapper {
     );
   }
 
-  static toPermissionDomain(
-    p: agencyagent_permission,
-  ): AgentPermissionEntity {
-    return new AgentPermissionEntity(
-      p.id,
-      p.agency_agent_id,
-      p.agency_id,
-      p.can_edit_own_post,
-      p.can_edit_others_post,
-      p.can_approve_requests,
-      p.can_view_all_posts,
-      p.can_delete_posts,
-      p.can_manage_agents,
-      p.created_at,
-      p.updated_at ?? null,
-    );
-  }
+ static toPermissionDomain(p: agencyagent_permission): AgentPermissionEntity {
+  return new AgentPermissionEntity(
+    p.id,
+    p.agency_agent_id,
+    p.agency_id,
+    p.can_edit_own_post,
+    p.can_edit_others_post,
+    p.can_approve_requests,
+    p.can_view_all_posts,
+    p.can_delete_posts,
+    p.can_manage_agents,
+    p.created_at,
+    p.updated_at ?? null,
+  );
+}
 
   static toAgentUserProps(u: user): AgentUserProps {
     return {
@@ -60,10 +58,12 @@ export class AgentMapper {
     agentUser: user | null;
     permission: agencyagent_permission | null;
   }): AgentWithUserAndPermission {
-    return {
-      agent: this.toDomain(input.agencyagent),
-      agentUser: input.agentUser ? this.toAgentUserProps(input.agentUser) : null,
-      permissionId: input.permission ? input.permission.id : null,
-    };
+  return {
+  agent: this.toDomain(input.agencyagent),
+  agentUser: input.agentUser ? this.toAgentUserProps(input.agentUser) : null,
+  permission: input.permission
+    ? this.toPermissionDomain(input.permission)
+    : null,
+};
   }
 }

@@ -12,7 +12,7 @@ export interface RequestWithUser extends Request {
   language: SupportedLang;
 user?:User;
   userId: number;
-  // user: BaseUserInfo;
+ 
 
   agencyId?: number | null;
   agencyAgentId?: number | null;
