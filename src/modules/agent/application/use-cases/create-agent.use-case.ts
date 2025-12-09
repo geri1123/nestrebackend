@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { AGENT_REPOSITORY_TOKENS } from "../../domain/repositories/agent.repository.tokens";
 import {type IAgentDomainRepository } from "../../domain/repositories/agents.repository.interface";
 import { CreateAgentDomainData } from "../../domain/types/create-agent.type";
+import { Prisma } from "@prisma/client";
 @Injectable()
 export class CreateAgentUseCase {
   constructor(
@@ -9,7 +10,13 @@ export class CreateAgentUseCase {
     private readonly agentRepo: IAgentDomainRepository,
   ) {}
 
-  async execute(data: CreateAgentDomainData) {
-    return this.agentRepo.createAgencyAgent(data);
-  }
+  
+  
+async execute(data: CreateAgentDomainData, tx?: Prisma.TransactionClient) {
+  return this.agentRepo.createAgencyAgent(data, tx);
 }
+}
+
+// async execute(data: CreateAgentDomainData) {
+  //   return this.agentRepo.createAgencyAgent(data);
+  // }

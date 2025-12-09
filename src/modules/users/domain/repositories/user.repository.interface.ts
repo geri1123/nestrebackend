@@ -1,4 +1,4 @@
-import { user_role } from "@prisma/client";
+import { Prisma, user_role } from "@prisma/client";
 import { User } from "../entities/user.entity";
 import { NavbarUser } from "../value-objects/navbar-user.vo";
 import { userStatus } from "../types/user-status.type";
@@ -10,7 +10,7 @@ export interface IUserDomainRepository {
   usernameExists(username: string): Promise<boolean>;
   emailExists(email: string): Promise<boolean>;
   create(data: CreateUserData): Promise<number>;
-  updateFields(userId: number, fields: Partial<UpdateUserFields>): Promise<void>;
+  updateFields(userId: number, fields: Partial<UpdateUserFields> , tx?: Prisma.TransactionClient): Promise<void>;
   updateUsername(userId: number, newUsername: string): Promise<void>;
   updateProfileImage(userId: number, imageUrl: string): Promise<void>;
   deleteProfileImage(userId: number): Promise<void>;

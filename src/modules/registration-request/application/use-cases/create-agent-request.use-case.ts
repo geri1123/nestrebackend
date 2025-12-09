@@ -1,8 +1,8 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { REG_REQ_TOKEN } from "../../domain/repositories/reg-req.repository.token";
 import {type IRegistrationRequestRepository } from "../../domain/repositories/registration-request.repository.interface";
 import { RegisterAgentDto } from "../../../registration/dto/register-agent.dto";
-import { SupportedLang } from "../../../../locales";
+import { SupportedLang, t } from "../../../../locales";
 import { RegistrationRequestEntity } from "../../domain/entities/registration-request.entity";
 
 @Injectable()
@@ -18,11 +18,13 @@ export class CreateAgentRequestUseCase {
     agency: { id: number; agencyName: string }, 
     lang: SupportedLang
   ) {
+    
+
     const entity = RegistrationRequestEntity.createNew({
       userId,
-      idCardNumber: dto.id_card_number,
+      idCardNumber: dto.id_card_number ||null ,
       agencyId: agency.id,
-      agencyName: agency.agencyName,
+      // agencyName: agency.agencyName,
       requestedRole: dto.requested_role,
       requestType: "agent_license_verification",
     });

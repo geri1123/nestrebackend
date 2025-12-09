@@ -13,6 +13,8 @@ productAlreadyAdvertised:"Questo prodotto è già pubblicizzato.",
     usernameCooldown: "Potrai cambiare il nome utente di nuovo il {date}.",
 failedToUpdateAgencyLogo: "Aggiornamento del logo dell'agenzia non riuscito.",
 noimagetodelete:"Nessuna immagine da eliminare.",
+     emailNotVerified: "L'utente deve verificare l'email prima dell'approvazione.",
+
 sameUsername: "Il nuovo nome utente non può essere uguale al nome utente attuale.",
     usernameChangedSuccessfully: "Nome utente aggiornato con successo.",
  successfullyAdvertised: "Prodotto pubblicizzato con successo",

@@ -11,6 +11,7 @@ sameUsername: "Emri i ri i përdoruesit nuk mund të jetë i njëjtë me emrin a
      noPermissionToAdvertise:"Nuk keni leje ta reklamoni këtë produkt.",
       amountMustBePositive: "Shuma duhet të jetë pozitive",
 productNotActive:"Ky produkt nuk është aktiv.",
+  emailNotVerified: "Përdoruesi duhet të verifikojë email-in para se të aprovohet.",
 productAlreadyAdvertised:"Ky produkt është tashmë i reklamuar.",
 successfullyAdvertised: "Produkti është reklamuar me sukses",
  tooManyRequests: 'Shumë kërkesa. Ju lutemi provoni përsëri më vonë.',

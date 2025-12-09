@@ -2,6 +2,7 @@ import { AgentEntity } from '../entities/agent.entity';
 import { AgentStatus } from '../types/agent-status.type';
 import { AgentRole } from '../types/agent-role.type';
 import { AgentPermissionEntity } from '../entities/agent-permission.entity';
+import { Prisma } from '@prisma/client';
 
 // basic aggregate used in listing:
 export interface AgentUserProps {
@@ -55,7 +56,7 @@ findByAgencyAndAgent(
 
   findExistingAgent(agentUserId: number): Promise<AgentEntity | null>;
 
-  createAgencyAgent(data: CreateAgentDomainData): Promise<AgentEntity>;
+  createAgencyAgent(data: CreateAgentDomainData ,tx?: Prisma.TransactionClient): Promise<AgentEntity>;
 
   getAgentWithPermissions(
     agencyAgentId: number,

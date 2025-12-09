@@ -9,7 +9,7 @@ export class RegistrationRequestEntity {
     public readonly id: number | null,
     public readonly userId: number,
     public readonly agencyId: number | null,
-    public readonly agencyName: string | null,
+    // public readonly agencyName: string | null,
     public readonly idCardNumber: string | null,
     public readonly requestType: RegistrationRequestRequestType,
     public status: registrationrequest_status,
@@ -32,7 +32,7 @@ export class RegistrationRequestEntity {
   static createNew(data: {
     userId: number;
     agencyId: number | null;
-    agencyName: string | null;
+    // agencyName: string | null;
     idCardNumber: string | null;
     requestType: RegistrationRequestRequestType;
     requestedRole: RegistrationRequestRequestRole;
@@ -41,7 +41,7 @@ export class RegistrationRequestEntity {
       null,
       data.userId,
       data.agencyId,
-      data.agencyName,
+      // data.agencyName,
       data.idCardNumber,
       data.requestType,
       "pending",

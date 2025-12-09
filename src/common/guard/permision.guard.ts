@@ -5,12 +5,21 @@ import { RequestWithUser } from '../types/request-with-user.interface';
 import { SupportedLang, t } from '../../locales';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { AgentPermissionEntity } from '../../modules/agent/domain/entities/agent-permission.entity';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+if (isPublic) {
+      console.log('=== PERMISSIONS GUARD: Public route, skipping checks ===');
+      return true;
+    }
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()]
@@ -18,7 +27,7 @@ export class PermissionsGuard implements CanActivate {
 
     console.log('=== PERMISSIONS GUARD DEBUG ===');
     console.log('Required Permissions:', requiredPermissions);
-
+   
     if (!requiredPermissions || requiredPermissions.length === 0) {
       console.log('No permissions required, allowing access');
       return true;

@@ -17,6 +17,7 @@ import { FindRequestsByUserIdUseCase } from "./application/use-cases/find-reques
 import { PrismaModule } from "../../infrastructure/prisma/prisma.module";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { GetRequestCountUseCase } from "./application/use-cases/get-request-count.use-case";
+import { CheckIdCardUniqueForRegistrationUseCase } from "./application/use-cases/check-id-card-unique.use-case";
 
 @Module({
   imports: [NotificationModule, AgencyModule, AgentModule ],
@@ -28,6 +29,7 @@ import { GetRequestCountUseCase } from "./application/use-cases/get-request-coun
     },
 PrismaService,
 DeleteRegistrationRequestsByUserUseCase,
+CheckIdCardUniqueForRegistrationUseCase,
     CreateAgentRequestUseCase,
     CheckAgentDataUseCase,
     GetRequestsUseCase,
@@ -49,6 +51,7 @@ DeleteRegistrationRequestsByUserUseCase,
     SetUnderReviewUseCase,
      GetRequestsUseCase,  
      UpdateRequestStatusUseCase,
+     CheckIdCardUniqueForRegistrationUseCase,
       REG_REQ_TOKEN.REG_REQ_REPOSITORY,
   ]
 })

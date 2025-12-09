@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { AgentPermissionEntity } from '../entities/agent-permission.entity';
 
 export type AgentPermissionUpdateInput = Partial<{
@@ -12,16 +13,19 @@ export type AgentPermissionUpdateInput = Partial<{
 export interface IAgentPermissionDomainRepository {
   getPermissionsByAgentId(
     agencyAgentId: number,
+    tx?: Prisma.TransactionClient,
   ): Promise<AgentPermissionEntity | null>;
 
   createPermissions(
     agencyAgentId: number,
     agencyId: number,
     permissions: AgentPermissionUpdateInput,
+     tx?: Prisma.TransactionClient,
   ): Promise<AgentPermissionEntity>;
 
   updatePermissions(
     agencyAgentId: number,
     permissions: AgentPermissionUpdateInput,
+    tx?: Prisma.TransactionClient,
   ): Promise<AgentPermissionEntity>;
 }

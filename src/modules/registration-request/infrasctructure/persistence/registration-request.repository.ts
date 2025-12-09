@@ -15,7 +15,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       data.id,
       data.user_id,
       data.agency_id,
-      data.agency_name,
+      // data.agency_name,
       data.id_card_number,
       data.request_type,
       data.status,
@@ -27,8 +27,8 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       // Add user mapping here
     data.user ? new RequestUserVO(
   data.user.email,
-  data.user.first_name,  // Pass as-is
-  data.user.last_name,   // Pass as-is
+  data.user.first_name,  
+  data.user.last_name,   
   data.user.role,
   data.user.status
 ) : undefined
@@ -40,7 +40,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       data: {
         user_id: req.userId,
         agency_id: req.agencyId,
-        agency_name: req.agencyName,
+        // agency_name: req.agencyName,
         id_card_number: req.idCardNumber,
         request_type: req.requestType,
         requested_role: req.requestedRole,

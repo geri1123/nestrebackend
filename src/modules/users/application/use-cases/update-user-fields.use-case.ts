@@ -3,6 +3,7 @@ import { USERS_REPOSITORY_TOKENS } from "../../domain/repositories/user.reposito
 import {type IUserDomainRepository, UpdateUserFields } from "../../domain/repositories/user.repository.interface";
 import { SupportedLang, t } from "../../../../locales";
 import { GetUserProfileUseCase } from "./get-user-profile.use-case";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class UpdateUserFieldsUseCase {
@@ -12,18 +13,27 @@ export class UpdateUserFieldsUseCase {
     private readonly getUser: GetUserProfileUseCase,
   ) {}
 
+  // async execute(
+  //   userId: number,
+  //   fields: Partial<UpdateUserFields>,
+  //   lang: SupportedLang = "al"
+  // ) {
+  //   const user = await this.getUser.execute(userId, lang);
+
+   
+
+  //   await this.repo.updateFields(userId, fields);
+
+  //   return { success: true };
+  // }
   async execute(
-    userId: number,
-    fields: Partial<UpdateUserFields>,
-    lang: SupportedLang = "al"
-  ) {
-    const user = await this.getUser.execute(userId, lang);
-
-    // (Optional) enforce domain rules:
-    // Example: user cannot downgrade themselves, etc.
-
-    await this.repo.updateFields(userId, fields);
-
-    return { success: true };
-  }
+  userId: number,
+  fields: Partial<UpdateUserFields>,
+  lang: SupportedLang = "al",
+  tx?: Prisma.TransactionClient,
+) {
+  const user = await this.getUser.execute(userId, lang);
+  await this.repo.updateFields(userId, fields, tx);
+  return { success: true };
+}
 }

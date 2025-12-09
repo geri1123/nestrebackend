@@ -71,23 +71,44 @@ export class AgentRepository implements IAgentDomainRepository {
     return result ? AgentMapper.toDomain(result) : null;
   }
 
-  async createAgencyAgent(data: CreateAgentDomainData): Promise<AgentEntity> {
-    const created = await this.prisma.agencyagent.create({
-      data: {
-        agency_id: data.agencyId,
-        agent_id: data.agentId,
-        added_by: data.addedBy ?? null,
-        id_card_number: data.idCardNumber ?? null,
-        role_in_agency: data.roleInAgency as any,
-        commission_rate: data.commissionRate ?? null,
-        start_date: new Date(),
-        status: data.status as any,
-      },
-    });
+  // async createAgencyAgent(data: CreateAgentDomainData): Promise<AgentEntity> {
+  //   const created = await this.prisma.agencyagent.create({
+  //     data: {
+  //       agency_id: data.agencyId,
+  //       agent_id: data.agentId,
+  //       added_by: data.addedBy ?? null,
+  //       id_card_number: data.idCardNumber ?? null,
+  //       role_in_agency: data.roleInAgency as any,
+  //       commission_rate: data.commissionRate ?? null,
+  //       start_date: new Date(),
+  //       status: data.status as any,
+  //     },
+  //   });
 
-    return AgentMapper.toDomain(created);
-  }
+  //   return AgentMapper.toDomain(created);
+  // }
+async createAgencyAgent(
+  data: CreateAgentDomainData,
+  tx?: Prisma.TransactionClient,
+): Promise<AgentEntity> {
 
+  const client = tx ?? this.prisma;
+
+  const created = await client.agencyagent.create({
+    data: {
+      agency_id: data.agencyId,
+      agent_id: data.agentId,
+      added_by: data.addedBy ?? null,
+      id_card_number: data.idCardNumber ?? null,
+      role_in_agency: data.roleInAgency as any,
+      commission_rate: data.commissionRate ?? null,
+      start_date: new Date(),
+      status: data.status as any,
+    },
+  });
+
+  return AgentMapper.toDomain(created);
+}
   async getAgentWithPermissions(
     agencyAgentId: number,
   ): Promise<{ agent: AgentEntity; hasPermission: boolean } | null> {

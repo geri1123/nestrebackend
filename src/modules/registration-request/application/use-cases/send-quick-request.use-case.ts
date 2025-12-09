@@ -24,7 +24,7 @@ export class SendQuickRequestUseCase {
     const entity = RegistrationRequestEntity.createNew({
       userId,
       agencyId: agency.id,
-      agencyName: agency.agency_name,
+      // agencyName: agency.agency_name,
       idCardNumber: null,
       requestedRole: "agent",
       requestType: "agent_license_verification",

@@ -5,6 +5,7 @@ import { IUserDomainRepository , CreateUserData  , UpdateUserFields } from '../.
 import { User } from '../../domain/entities/user.entity';
 import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
 import { hashPassword } from '../../../../common/utils/hash';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserRepository implements IUserDomainRepository {
@@ -115,17 +116,36 @@ export class UserRepository implements IUserDomainRepository {
     });
     return result.id;
   }
+async updateFields(
+  userId: number,
+  fields: Partial<UpdateUserFields>,
+  tx?: Prisma.TransactionClient
+): Promise<void> {
+  const client = tx ?? this.prisma;
 
-  async updateFields(userId: number, fields: Partial<UpdateUserFields>): Promise<void> {
-    const filtered = Object.fromEntries(
-      Object.entries(fields).filter(([_, val]) => val !== undefined),
-    ) as Partial<UpdateUserFields>;
+  const filtered = Object.fromEntries(
+    Object.entries(fields).filter(([_, val]) => val !== undefined),
+  );
 
-    if (Object.keys(filtered).length === 0) return;
+  if (Object.keys(filtered).length === 0) return;
 
-    (filtered as any).updated_at = new Date();
-    await this.prisma.user.update({ where: { id: userId }, data: filtered });
-  }
+  filtered.updated_at = new Date();
+
+  await client.user.update({
+    where: { id: userId },
+    data: filtered,
+  });
+}
+  // async updateFields(userId: number, fields: Partial<UpdateUserFields>): Promise<void> {
+  //   const filtered = Object.fromEntries(
+  //     Object.entries(fields).filter(([_, val]) => val !== undefined),
+  //   ) as Partial<UpdateUserFields>;
+
+  //   if (Object.keys(filtered).length === 0) return;
+
+  //   (filtered as any).updated_at = new Date();
+  //   await this.prisma.user.update({ where: { id: userId }, data: filtered });
+  // }
 
   async updateUsername(userId: number, newUsername: string): Promise<void> {
     await this.prisma.user.update({
