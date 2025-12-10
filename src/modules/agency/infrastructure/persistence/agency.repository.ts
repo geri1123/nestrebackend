@@ -3,7 +3,7 @@ import { PrismaService } from '../../../../infrastructure/prisma/prisma.service'
 import { IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { Agency } from '../../domain/entities/agency.entity';
 import { AgencyInfoVO } from '../../domain/value-objects/agency-info.vo';
-import { agency_status } from '@prisma/client';
+import { agency_status, Prisma } from '@prisma/client';
 import { generatePublicCode } from '../../../../common/utils/hash';
 
 @Injectable()
@@ -135,14 +135,18 @@ async getAgencyWithOwnerById(id: number): Promise<{
     address: string;
     owner_user_id: number;
     status: agency_status;
-  }): Promise<number> {
+   
+  },
+tx?: Prisma.TransactionClient
+): Promise<number> {
+   const client = tx ?? this.prisma;
     let publicCode: string;
 
     do {
       publicCode = generatePublicCode();
     } while (await this.publicCodeExists(publicCode));
 
-    const newAgency = await this.prisma.agency.create({
+    const newAgency = await client.agency.create({
       data: {
         ...data,
         public_code: publicCode,
@@ -162,8 +166,9 @@ async getAgencyWithOwnerById(id: number): Promise<{
     return this.mapToEntity(updated);
   }
 
-  async activateAgency(agencyId: number): Promise<void> {
-    await this.prisma.agency.update({
+  async activateAgency(agencyId: number , tx:Prisma.TransactionClient): Promise<void> {
+    const client=tx ?? this.prisma;
+    await client.agency.update({
       where: { id: agencyId },
       data: { status: agency_status.active },
     });

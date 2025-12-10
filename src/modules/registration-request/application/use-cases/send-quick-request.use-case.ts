@@ -25,9 +25,10 @@ export class SendQuickRequestUseCase {
       userId,
       agencyId: agency.id,
       // agencyName: agency.agency_name,
-      idCardNumber: null,
+      // idCardNumber: null,
       requestedRole: "agent",
       requestType: "agent_license_verification",
+      status: "under_review",  
     });
 
     await this.repo.create(entity);

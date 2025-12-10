@@ -1,10 +1,10 @@
-import { registrationrequest_status } from "@prisma/client";
+import { Prisma, registrationrequest_status } from "@prisma/client";
 import { RegistrationRequestEntity } from "../entities/registration-request.entity";
 
 export const REG_REQ_REPO = "REG_REQ_REPO";
 
 export interface IRegistrationRequestRepository {
-  create(request: RegistrationRequestEntity): Promise<number>;
+  create(request: RegistrationRequestEntity , tx?:Prisma.TransactionClient): Promise<number>;
 
   findByUserId(userId: number): Promise<RegistrationRequestEntity[]>;
 
@@ -17,15 +17,16 @@ export interface IRegistrationRequestRepository {
     take?: number
   ): Promise<RegistrationRequestEntity[]>;
 
-  setLatestUnderReview(userId: number): Promise<RegistrationRequestEntity | null>;
+  setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null>;
 
-  idCardExists(idCard: string): Promise<boolean>;
+  // idCardExists(idCard: string): Promise<boolean>;
 
   updateStatus(
     id: number,
     status: registrationrequest_status,
     reviewedBy?: number,
-    reviewNotes?: string
+    reviewNotes?: string,
+     tx?: Prisma.TransactionClient
   ): Promise<RegistrationRequestEntity>;
 
   countRequests(agencyId: number, status?: registrationrequest_status): Promise<number>;

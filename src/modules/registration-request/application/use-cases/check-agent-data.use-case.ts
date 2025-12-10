@@ -22,9 +22,7 @@ export class CheckAgentDataUseCase {
       errors.public_code = [t("invalidPublicCode", lang)];
     }
 
-    if (await this.repo.idCardExists(idCard)) {
-      errors.id_card_number = [t("idCardExists", lang)];
-    }
+    
 
     await this.ensureIdCardUnique.execute(idCard, lang);
 

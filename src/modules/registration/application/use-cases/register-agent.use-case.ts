@@ -4,38 +4,54 @@ import { CreateAgentRequestUseCase } from '../../../registration-request/applica
 import { SupportedLang, t } from '../../../../locales';
 import { RegisterUserUseCase } from './register-user.use-case';
 import { ValidateAgentRegistrationDataUseCase } from './validate-agent-registration-data.use-case';
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
 @Injectable()
 export class RegisterAgentUseCase {
   constructor(
+    private readonly prisma: PrismaService,
     private readonly validateAgentData: ValidateAgentRegistrationDataUseCase,
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly createRequestUseCase: CreateAgentRequestUseCase,
   ) {}
 
   async execute(dto: RegisterAgentDto, lang: SupportedLang) {
-    // STEP 1: Validate all business rules first
+    // Step 1: Validate business rules BEFORE the transaction
     const agency = await this.validateAgentData.execute(dto, lang);
 
-    // STEP 2: Create user
-    const { userId } = await this.registerUserUseCase.execute(
-      {
-        username: dto.username,
-        email: dto.email,
-        password: dto.password,
-        first_name: dto.first_name,
-        last_name: dto.last_name,
-      },
-      lang,
-      'agent',
-    );
+    // Step 2 + 3 inside transaction: create user + create registration request
+    const result = await this.prisma.$transaction(async (tx) => {
+      
+      // Create user inside tx
+      const { userId } = await this.registerUserUseCase.execute(
+        {
+          username: dto.username,
+          email: dto.email,
+          password: dto.password,
+          first_name: dto.first_name,
+          last_name: dto.last_name,
+        },
+        lang,
+        "agent",
+        tx
+      );
 
-    // STEP 3: Create registration request
-    await this.createRequestUseCase.execute(userId, dto, agency, lang);
+      // Create registration request inside tx
+      await this.createRequestUseCase.execute(
+        userId,
+        dto,
+        agency,
+        lang,
+        tx
+      );
 
+      return { userId };
+    });
+
+    // Transaction committed successfully
     return {
-      userId,
-      message: t('registrationSuccess', lang)
+      userId: result.userId,
+      message: t("registrationSuccess", lang)
     };
   }
 }

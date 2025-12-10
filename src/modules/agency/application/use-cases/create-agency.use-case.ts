@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
-import { agency_status } from '@prisma/client';
+import { agency_status, Prisma } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
@@ -26,6 +26,7 @@ export class CreateAgencyUseCase {
     ownerUserId: number,
     status: agency_status,
     lang: SupportedLang = 'al',
+    tx?: Prisma.TransactionClient 
   ): Promise<number> {
 
     const errors: Record<string, string[]> = {};
@@ -50,6 +51,9 @@ export class CreateAgencyUseCase {
       address: data.address,
       owner_user_id: ownerUserId,
       status,
-    });
+     
+    },
+  
+   tx);
   }
 }

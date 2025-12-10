@@ -28,6 +28,7 @@ import { RegisterUserUseCase } from '../registration/application/use-cases/regis
 import { RegisterAgencyOwnerUseCase } from '../registration/application/use-cases/register-agency-owner.use-case';
 import { RegisterAgentUseCase } from '../registration/application/use-cases/register-agent.use-case';
 import { AuthCookieService } from './infrastructure/services/auth-cookie.service';
+import { GoogleLoginUseCase } from './application/use-cases/google-login.use-case';
 
 @Public()
 @Controller('auth')
@@ -38,6 +39,7 @@ export class AuthController {
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly registerAgencyOwnerUseCase: RegisterAgencyOwnerUseCase,
     private readonly registerAgentUseCase: RegisterAgentUseCase,
+    private readonly googleLoginUseCase:GoogleLoginUseCase,
   ) {}
 
   @AuthSwagger.Login()
@@ -148,7 +150,15 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
     }
 
     return this.registerAgentUseCase.execute(dto, lang);
-  }
+  };
+  @Post('google')
+@Public()
+async googleLogin(
+  @Body('idToken') idToken: string,
+  @Res({ passthrough: true }) res: Response
+) {
+  return this.googleLoginUseCase.execute(idToken, res);
+}
 }
 
 

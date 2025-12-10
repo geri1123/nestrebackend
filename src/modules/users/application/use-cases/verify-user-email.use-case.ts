@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
 import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class VerifyUserEmailUseCase {
@@ -9,7 +10,7 @@ export class VerifyUserEmailUseCase {
     private readonly repo: IUserDomainRepository,
   ) {}
 
-  async execute(userId: number, newStatus: string): Promise<void> {
-    await this.repo.verifyEmail(userId, true, newStatus);
+  async execute(userId: number, newStatus: string ,  tx?: Prisma.TransactionClient): Promise<void> {
+    await this.repo.verifyEmail(userId, true, newStatus , tx);
   }
 }

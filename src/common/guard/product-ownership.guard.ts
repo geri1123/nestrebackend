@@ -3,6 +3,7 @@ import { RequestWithUser } from '../types/request-with-user.interface';
 import { t } from '../../locales';
 import { ProductService } from '../../modules/product/services/product-service';
 import { GetProductForPermissionUseCase } from '../../modules/product/application/use-cases/get-product-for-permission.use-case';
+import { user_role } from '@prisma/client';
 
 @Injectable()
 export class ProductOwnershipAndPermissionGuard implements CanActivate {
@@ -16,7 +17,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     const product = await this.GetProductForPermission.execute(productId, lang);
 
     
-    if (req.user?.role === 'agency_owner') {
+    if (req.user?.role === user_role.agency_owner) {
       if (product.agencyId !== req.agencyId) {
         throw new ForbiddenException(t('anotherAgency', lang));
       }
@@ -24,7 +25,7 @@ export class ProductOwnershipAndPermissionGuard implements CanActivate {
     }
 
     //  Agent
-    if (req.user?.role === 'agent') {
+    if (req.user?.role === user_role.agent) {
       if (!req.agencyAgentId) {
         throw new ForbiddenException(t('noAgency', lang));
       }

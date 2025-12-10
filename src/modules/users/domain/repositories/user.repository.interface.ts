@@ -9,12 +9,12 @@ export interface IUserDomainRepository {
   findByEmail(email: string): Promise<User | null>;
   usernameExists(username: string): Promise<boolean>;
   emailExists(email: string): Promise<boolean>;
-  create(data: CreateUserData): Promise<number>;
+  create(data: CreateUserData ,   tx?: Prisma.TransactionClient): Promise<number>;
   updateFields(userId: number, fields: Partial<UpdateUserFields> , tx?: Prisma.TransactionClient): Promise<void>;
   updateUsername(userId: number, newUsername: string): Promise<void>;
   updateProfileImage(userId: number, imageUrl: string): Promise<void>;
   deleteProfileImage(userId: number): Promise<void>;
-  verifyEmail(userId: number, emailVerified: boolean, status: string): Promise<void>;
+  verifyEmail(userId: number, emailVerified: boolean, status: string , tx?:Prisma.TransactionClient): Promise<void>;
   getNavbarUser(userId: number): Promise<NavbarUser | null>;
   findUnverifiedBefore(date: Date): Promise<{ id: number }[]>;
 deleteById(userId: number): Promise<void>;

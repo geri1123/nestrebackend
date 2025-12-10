@@ -1,8 +1,8 @@
 // repositories/notification/NotificationRepository.ts
 
 import {  NotificationStatus , LanguageCode } from "@prisma/client";
-import { PrismaService } from "../../infrastructure/prisma/prisma.service.js";
-import { INotificationRepository  , NotificationData } from "./Inotification.repository.js";
+import { PrismaService } from "../../../../infrastructure/prisma/prisma.service.js";
+import { INotificationRepository, NotificationData } from "../../domain/repository/notification.repository.interface.js";
 import { Injectable } from "@nestjs/common";
 @Injectable()
 export class NotificationRepository implements INotificationRepository {

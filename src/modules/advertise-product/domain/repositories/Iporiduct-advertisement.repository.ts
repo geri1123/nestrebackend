@@ -1,6 +1,6 @@
 import { Prisma, ProductAdvertisement, advertisement_type } from "@prisma/client";
 import { Advertisement } from "../entities/advertisement.entity";
-
+export const ADVERTISE_REPO = Symbol('ADVERTISE_REPO');
 export interface IProductAdvertisementRepository {
   
   createAdvertisementTx(

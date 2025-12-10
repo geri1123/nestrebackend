@@ -14,9 +14,7 @@ export class RegisterAgentDto extends BaseRegistrationDto {
     example: 'ID-AL-12345678',
     description: 'Official ID card number of the agent.',
   })
-  @IsNotEmpty({ message: 'idCardRequired' })
-  id_card_number: string;
-
+  
   @ApiProperty({
     example: 'agent',
     enum: ['agent', 'senior_agent', 'team_lead'],

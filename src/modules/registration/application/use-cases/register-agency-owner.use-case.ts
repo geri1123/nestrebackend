@@ -7,17 +7,20 @@ import { agency_status } from '@prisma/client';
 import { CreateAgencyUseCase } from '../../../agency/application/use-cases/create-agency.use-case';
 import { RegisterUserUseCase } from './register-user.use-case';
 import { ValidateAgencyBeforeRegisterUseCase } from '../../../agency/application/use-cases/validate-agency-before-register.use-case';
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
+
 @Injectable()
 export class RegisterAgencyOwnerUseCase {
   constructor(
     private readonly registerUser: RegisterUserUseCase,
     private readonly createAgencyUseCase: CreateAgencyUseCase,
     private readonly validateAgencyUseCase: ValidateAgencyBeforeRegisterUseCase,
+    private readonly prisma: PrismaService,  
   ) {}
 
   async execute(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
-
-    // 1️⃣ Validate agency BEFORE creating the user
+    
+   
     await this.validateAgencyUseCase.execute(
       {
         agency_name: dto.agency_name,
@@ -27,38 +30,99 @@ export class RegisterAgencyOwnerUseCase {
       lang,
     );
 
-    // 2️⃣ Create the user
-    const { userId } = await this.registerUser.execute(
-      {
-        username: dto.username,
-        email: dto.email,
-        password: dto.password,
-        first_name: dto.first_name,
-        last_name: dto.last_name,
-      },
-      lang,
-      'agency_owner',
-    );
+   
+    const result = await this.prisma.$transaction(async (tx) => {
 
-    // 3️⃣ Create agency
-    const agencyId = await this.createAgencyUseCase.execute(
-      {
-        agency_name: dto.agency_name,
-        license_number: dto.license_number,
-        address: dto.address,
-      },
-      userId,
-      agency_status.inactive,
-      lang,
-    );
+     
+      const { userId } = await this.registerUser.execute(
+        {
+          username: dto.username,
+          email: dto.email,
+          password: dto.password,
+          first_name: dto.first_name,
+          last_name: dto.last_name,
+        },
+        lang,
+        'agency_owner',
+        tx,   // <-- IMPORTANT
+      );
 
+      // 4️⃣ Create Agency inside the same transaction
+      const agencyId = await this.createAgencyUseCase.execute(
+        {
+          agency_name: dto.agency_name,
+          license_number: dto.license_number,
+          address: dto.address,
+        },
+        userId,
+        agency_status.inactive,
+        lang,
+        tx,   
+      );
+
+      return { userId, agencyId };
+    });
+
+   
     return {
-      userId,
-      agencyId,
+      ...result,
       message: t('registrationSuccess', lang),
     };
   }
 }
+
+// @Injectable()
+// export class RegisterAgencyOwnerUseCase {
+//   constructor(
+//     private readonly registerUser: RegisterUserUseCase,
+//     private readonly createAgencyUseCase: CreateAgencyUseCase,
+//     private readonly validateAgencyUseCase: ValidateAgencyBeforeRegisterUseCase,
+//   ) {}
+
+//   async execute(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
+
+  
+//     await this.validateAgencyUseCase.execute(
+//       {
+//         agency_name: dto.agency_name,
+//         license_number: dto.license_number,
+//         address: dto.address,
+//       },
+//       lang,
+//     );
+
+  
+//     const { userId } = await this.registerUser.execute(
+//       {
+//         username: dto.username,
+//         email: dto.email,
+//         password: dto.password,
+//         first_name: dto.first_name,
+//         last_name: dto.last_name,
+//       },
+//       lang,
+//       'agency_owner',
+//     );
+
+   
+//     const agencyId = await this.createAgencyUseCase.execute(
+//       {
+//         agency_name: dto.agency_name,
+//         license_number: dto.license_number,
+//         address: dto.address,
+//       },
+//       userId,
+//       agency_status.inactive,
+//       lang,
+//     );
+
+//     return {
+//       userId,
+//       agencyId,
+//       message: t('registrationSuccess', lang),
+//     };
+//   }
+// }
 
 // CREATE AGENCY
     // const agencyId = await this.createagencyusecase.execute({

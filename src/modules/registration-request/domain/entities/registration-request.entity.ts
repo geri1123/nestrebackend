@@ -10,7 +10,7 @@ export class RegistrationRequestEntity {
     public readonly userId: number,
     public readonly agencyId: number | null,
     // public readonly agencyName: string | null,
-    public readonly idCardNumber: string | null,
+    // public readonly idCardNumber: string | null,
     public readonly requestType: RegistrationRequestRequestType,
     public status: registrationrequest_status,
     public readonly requestedRole: RegistrationRequestRequestRole,
@@ -33,8 +33,9 @@ export class RegistrationRequestEntity {
     userId: number;
     agencyId: number | null;
     // agencyName: string | null;
-    idCardNumber: string | null;
+    // idCardNumber: string | null;
     requestType: RegistrationRequestRequestType;
+      status?: registrationrequest_status; 
     requestedRole: RegistrationRequestRequestRole;
   }): RegistrationRequestEntity {
     return new RegistrationRequestEntity(
@@ -42,9 +43,9 @@ export class RegistrationRequestEntity {
       data.userId,
       data.agencyId,
       // data.agencyName,
-      data.idCardNumber,
+      // data.idCardNumber,
       data.requestType,
-      "pending",
+       data.status ?? "pending",  
       data.requestedRole
     );
   }

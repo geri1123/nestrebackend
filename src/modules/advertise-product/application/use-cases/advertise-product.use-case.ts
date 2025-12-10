@@ -3,7 +3,7 @@ import { ProductService } from "../../../product/services/product-service";
 import { SupportedLang , t } from "../../../../locales";
 import { advertisement_type, wallet_transaction_type } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
-import {type IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
+import {ADVERTISE_REPO, type IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
 import { ChangeWalletBalanceUseCase } from "../../../wallet/application/use-cases/change-wallet-balance.use-case";
 import { FindProductByIdUseCase } from "../../../product/application/use-cases/find-product-by-id.use-case";
 
@@ -13,7 +13,7 @@ const AD_DURATION = { cheap: 7, normal: 14, premium: 30 };
 @Injectable()
 export class AdvertiseProductUseCase {
   constructor(
-  @Inject("IProductAdvertisementRepository")
+  @Inject(ADVERTISE_REPO)
   private readonly adRepo: IProductAdvertisementRepository,
     private readonly changeWalletBalanceUseCase: ChangeWalletBalanceUseCase,
     private readonly findProduct: FindProductByIdUseCase,

@@ -26,6 +26,8 @@ import { LoginUseCase } from './application/use-cases/login.use-case';
 import { SoftAuthService } from '../../common/soft-auth/soft-auth.service';
 import { AuthTokenService } from './infrastructure/services/auth-token.service';
 import { AuthCookieService } from './infrastructure/services/auth-cookie.service';
+import { GoogleLoginUseCase } from './application/use-cases/google-login.use-case';
+import { GoogleAuthService } from './infrastructure/services/google-auth.service';
 
 
 @Module({
@@ -50,7 +52,8 @@ import { AuthCookieService } from './infrastructure/services/auth-cookie.service
 }),
   ],
   providers: [
-   
+    GoogleAuthService,
+  GoogleLoginUseCase,
   RefreshTokenUseCase,
   LoginUseCase,
   AuthTokenService,

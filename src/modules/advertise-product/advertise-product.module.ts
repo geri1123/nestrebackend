@@ -6,13 +6,14 @@ import { ProductModule } from "../product/product.module";
 import { WalletModule } from "../wallet/wallet.module";
 import { AdvertiseProductUseCase } from "./application/use-cases/advertise-product.use-case";
 import { ExpireProductAdsUseCase } from "./application/use-cases/expired-addvertisement.use-cace";
+import { ADVERTISE_REPO } from "./domain/repositories/Iporiduct-advertisement.repository";
 
 
 @Module({
     imports:[ProductModule , WalletModule],
     providers:[
         {
-    provide: "IProductAdvertisementRepository",
+    provide: ADVERTISE_REPO,
     useClass: ProductAdvertisementRepository,
   },
         

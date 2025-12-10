@@ -100,9 +100,13 @@ export class UserRepository implements IUserDomainRepository {
     return !!user;
   }
 
-  async create(data: CreateUserData): Promise<number> {
+  async create(
+    data: CreateUserData,
+   tx?: Prisma.TransactionClient
+  ): Promise<number> {
+    const client = tx ?? this.prisma;
     const hashedPassword = await hashPassword(data.password);
-    const result = await this.prisma.user.create({
+    const result = await client.user.create({
       data: {
         username: data.username,
         email: data.email,
@@ -168,8 +172,9 @@ async updateFields(
     });
   }
 
-  async verifyEmail(userId: number, emailVerified: boolean, status: string): Promise<void> {
-    await this.prisma.user.update({
+  async verifyEmail(userId: number, emailVerified: boolean, status: string , tx?:Prisma.TransactionClient): Promise<void> {
+    const client =tx ?? this.prisma;
+    await client.user.update({
       where: { id: userId },
       data: { email_verified: emailVerified, status: status as any, updated_at: new Date() },
     });

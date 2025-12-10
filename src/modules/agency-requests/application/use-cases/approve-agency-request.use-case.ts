@@ -50,12 +50,7 @@ async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
   // Check if agent exists
   await this.findExistingAgent.execute(request.userId, language);
 
-let idCardNumber = request.idCardNumber ?? null;
 
-// Validate ID card only if provided
-if (idCardNumber) {
-  await this.ensureIdCardUnique.execute(idCardNumber, language);
-}
   const agent = await this.prisma.$transaction(async (tx) => {
 
     // Create agent
@@ -64,7 +59,7 @@ if (idCardNumber) {
         agencyId,
         agentId: request.userId,
         addedBy: approvedBy,
-       idCardNumber ,
+      //  idCardNumber ,
         roleInAgency,
         commissionRate,
         status: agencyagent_status.active,

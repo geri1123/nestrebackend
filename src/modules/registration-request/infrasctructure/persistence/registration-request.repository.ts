@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { IRegistrationRequestRepository } from "../../domain/repositories/registration-request.repository.interface";
 import { RegistrationRequestEntity } from "../../domain/entities/registration-request.entity";
-import { registrationrequest_status } from "@prisma/client";
+import { Prisma, registrationrequest_status } from "@prisma/client";
 import { RequestUserVO } from "../../domain/value-objects/request-user.vo";
 
 @Injectable()
@@ -16,7 +16,7 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       data.user_id,
       data.agency_id,
       // data.agency_name,
-      data.id_card_number,
+      // data.id_card_number,
       data.request_type,
       data.status,
       data.requested_role,
@@ -35,13 +35,14 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     );
   }
 
-  async create(req: RegistrationRequestEntity): Promise<number> {
-    const result = await this.prisma.registrationrequest.create({
+  async create(req: RegistrationRequestEntity,   tx?: Prisma.TransactionClient): Promise<number> {
+    const client = tx ?? this.prisma;
+    const result = await client.registrationrequest.create({
       data: {
         user_id: req.userId,
         agency_id: req.agencyId,
         // agency_name: req.agencyName,
-        id_card_number: req.idCardNumber,
+        // id_card_number: req.idCardNumber,
         request_type: req.requestType,
         requested_role: req.requestedRole,
         status: req.status,
@@ -52,13 +53,13 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     return result.id;
   }
 
-  async idCardExists(idCard: string): Promise<boolean> {
-    return !!(
-      await this.prisma.registrationrequest.findFirst({
-        where: { id_card_number: idCard },
-      })
-    );
-  }
+  // async idCardExists(idCard: string): Promise<boolean> {
+  //   return !!(
+  //     await this.prisma.registrationrequest.findFirst({
+  //       where: { id_card_number: idCard },
+  //     })
+  //   );
+  // }
 
   async findByUserId(userId: number): Promise<RegistrationRequestEntity[]> {
     const data = await this.prisma.registrationrequest.findMany({
@@ -118,8 +119,9 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     });
   }
 
-  async setLatestUnderReview(userId: number): Promise<RegistrationRequestEntity | null> {
-    const last = await this.prisma.registrationrequest.findFirst({
+  async setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null> {
+   const client =tx ?? this.prisma;
+    const last = await client.registrationrequest.findFirst({
       where: { user_id: userId },
       orderBy: { created_at: "desc" },
     });
@@ -138,9 +140,11 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     id: number,
     status: registrationrequest_status,
     reviewedBy?: number,
-    reviewNotes?: string
+    reviewNotes?: string,
+    tx?: Prisma.TransactionClient
   ): Promise<RegistrationRequestEntity> {
-    const updated = await this.prisma.registrationrequest.update({
+    const client =tx ?? this.prisma
+    const updated = await client.registrationrequest.update({
       where: { id },
       data: {
         status,

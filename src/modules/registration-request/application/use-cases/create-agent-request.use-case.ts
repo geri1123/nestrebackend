@@ -4,6 +4,7 @@ import {type IRegistrationRequestRepository } from "../../domain/repositories/re
 import { RegisterAgentDto } from "../../../registration/dto/register-agent.dto";
 import { SupportedLang, t } from "../../../../locales";
 import { RegistrationRequestEntity } from "../../domain/entities/registration-request.entity";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class CreateAgentRequestUseCase {
@@ -16,20 +17,23 @@ export class CreateAgentRequestUseCase {
     userId: number, 
     dto: RegisterAgentDto, 
     agency: { id: number; agencyName: string }, 
-    lang: SupportedLang
+    lang: SupportedLang,
+    tx?:Prisma.TransactionClient
+
   ) {
     
 
     const entity = RegistrationRequestEntity.createNew({
       userId,
-      idCardNumber: dto.id_card_number ||null ,
+      // idCardNumber: dto.id_card_number ||null ,
       agencyId: agency.id,
       // agencyName: agency.agencyName,
       requestedRole: dto.requested_role,
       requestType: "agent_license_verification",
+
     });
 
-    await this.repo.create(entity);
+    await this.repo.create(entity , tx);
   }
 }
 

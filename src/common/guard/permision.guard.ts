@@ -6,6 +6,7 @@ import { SupportedLang, t } from '../../locales';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { AgentPermissionEntity } from '../../modules/agent/domain/entities/agent-permission.entity';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { user_role } from '@prisma/client';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -52,7 +53,7 @@ if (isPublic) {
     }
 
     // agent: check assigned permissions
-    if (req.user.role === 'agent') {
+    if (req.user.role === user_role.agent) {
       if (!req.agencyAgentId) {
         console.log('Agent has no agencyAgentId, denying access');
         throw new ForbiddenException(t('insufficientPermissions', lang));

@@ -5,6 +5,7 @@ import { EmailService } from '../../../../infrastructure/email/email.service';
 import { CacheService } from '../../../../infrastructure/cache/cache.service';
 import { generateToken } from '../../../../common/utils/hash';
 import { SupportedLang, t } from '../../../../locales';
+import { Prisma } from '@prisma/client';
 
 export interface RegisterUserData {
   username: string;
@@ -27,6 +28,7 @@ export class RegisterUserUseCase {
     data: RegisterUserData,
     lang: SupportedLang,
     role: 'user' | 'agent' | 'agency_owner' = 'user',
+    tx?: Prisma.TransactionClient
   ) {
     const errors: Record<string, string[]> = {};
 
@@ -43,7 +45,7 @@ export class RegisterUserUseCase {
       ...data,
       role,
       status: 'inactive',
-    });
+    }, tx);
 
     const token = generateToken();
 
