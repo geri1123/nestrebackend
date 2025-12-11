@@ -7,10 +7,11 @@ import { WalletModule } from "../wallet/wallet.module";
 import { AdvertiseProductUseCase } from "./application/use-cases/advertise-product.use-case";
 import { ExpireProductAdsUseCase } from "./application/use-cases/expired-addvertisement.use-cace";
 import { ADVERTISE_REPO } from "./domain/repositories/Iporiduct-advertisement.repository";
+import { AdvertisementPricingModule } from "../advertisement-pricing/advertisement-prising.module";
 
 
 @Module({
-    imports:[ProductModule , WalletModule],
+    imports:[ProductModule , WalletModule , AdvertisementPricingModule],
     providers:[
         {
     provide: ADVERTISE_REPO,

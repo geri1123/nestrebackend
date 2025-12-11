@@ -166,7 +166,7 @@ model registrationrequest {
   id                   Int                                 @id @default(autoincrement())
   user_id              Int
   request_type         registrationrequest_request_type
-  id_card_number       String?
+ 
   agency_name          String?
   agency_id            Int?
   supporting_documents String?                             @db.Text
@@ -405,6 +405,17 @@ model ProductAdvertisement {
 
   @@index([productId])
   @@index([userId])
+}
+
+model AdvertisementPricing {
+  id        Int                @id @default(autoincrement())
+  adType    advertisement_type @unique
+  price     Float
+  duration  Int               
+  discount  Float?           
+  isActive  Boolean            @default(true)
+  updatedAt DateTime           @updatedAt
+  createdAt DateTime           @default(now())
 }
 enum advertisement_type {
   cheap

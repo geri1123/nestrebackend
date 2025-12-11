@@ -9,6 +9,8 @@ export const it = {
    amountMustBePositive: "L'importo deve essere positivo",
          productNotActive:"Questo prodotto non è attivo.",
 productAlreadyAdvertised:"Questo prodotto è già pubblicizzato.",
+    advertisementTypeNotActive:"Questo tipo di annuncio al momento non è attivo.",
+
     walletAlreadyExists:"Il portafoglio esiste già.",
     usernameCooldown: "Potrai cambiare il nome utente di nuovo il {date}.",
 failedToUpdateAgencyLogo: "Aggiornamento del logo dell'agenzia non riuscito.",

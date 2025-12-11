@@ -1,5 +1,5 @@
 import { LanguageCode, NotificationStatus } from "@prisma/client";
-
+export const NOTIFICATION_REPO = Symbol('NOTIFICATION_REPO');
 export interface NotificationTranslationInput {
   languageCode: LanguageCode;  
   message: string;

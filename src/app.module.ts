@@ -34,6 +34,7 @@ import { EmailVerificationModule } from './modules/email-verification/email-veri
 import { ProductImageModule } from './modules/product-image/product-image.module';
 import { ProductAttributeValueModule } from './modules/product-attribute/product-attribute.module';
 import { SoftAuthModule } from './common/soft-auth/soft-auth.module';
+import { AdvertisementPricingModule } from './modules/advertisement-pricing/advertisement-prising.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ NotificationModule,
 EmailVerificationModule,
 SoftAuthModule,
     AgentModule, 
+    AdvertisementPricingModule,
   ],
   controllers: [AppController],
   providers: [
