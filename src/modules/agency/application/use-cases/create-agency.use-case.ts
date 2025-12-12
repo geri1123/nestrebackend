@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { agency_status, Prisma } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
 import { validate } from 'class-validator';
@@ -16,7 +15,7 @@ export interface CreateAgencyData {
 @Injectable()
 export class CreateAgencyUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
   
   ) {}

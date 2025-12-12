@@ -1,7 +1,7 @@
 import { Prisma, registrationrequest_status } from "@prisma/client";
 import { RegistrationRequestEntity } from "../entities/registration-request.entity";
 
-export const REG_REQ_REPO = "REG_REQ_REPO";
+
 
 export interface IRegistrationRequestRepository {
   create(request: RegistrationRequestEntity , tx?:Prisma.TransactionClient): Promise<number>;

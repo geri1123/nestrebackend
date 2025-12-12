@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { USERS_REPOSITORY_TOKENS } from '../../../users/domain/repositories/user.repository.tokens';
-import {type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
 import { EmailService } from '../../../../infrastructure/email/email.service';
 import { CacheService } from '../../../../infrastructure/cache/cache.service';
 import { generateToken } from '../../../../common/utils/hash';
@@ -18,7 +18,7 @@ export interface RegisterUserData {
 @Injectable()
 export class RegisterUserUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+   @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
     private readonly emailService: EmailService,
     private readonly cacheService: CacheService,

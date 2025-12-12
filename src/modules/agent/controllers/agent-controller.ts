@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Query,
   Req,
@@ -22,35 +23,33 @@ import { GetAgentsUseCase } from '../application/use-cases/get-agents.use-case';
 import { UpdateAgentUseCase } from '../application/use-cases/update-agent.use-case';
 import { AgentBelongsToAgencyGuard } from '../../../common/guard/AgentBelongsToAgency.guard';
 import { agencyagent_status } from '@prisma/client';
+import { GetAgentMeUseCase } from '../application/use-cases/get-agent-me.use-case';
 
 @Controller('agents')
 export class AgentController {
   constructor(
     private readonly getAgentsUseCase: GetAgentsUseCase,
     private readonly updateAgentUseCase: UpdateAgentUseCase,
+    private readonly getAgentMeUseCase:GetAgentMeUseCase
   ) {}
 
   @Get('public/:agencyId')
-  async getPublicAgents(
-    @Param('agencyId') agencyIdParam: string,
-    @Req() req: RequestWithLang,
-    @Query() filters: FilterAgentsDto,
-    @Query('page') page = '1',
-  ) {
-    const language = req.language;
-    const agencyId = Number(agencyIdParam);
-
-    return this.getAgentsUseCase.execute(
-      agencyId,
-      parseInt(page, 10),
-      12,
-      language,
-      filters,
-      false,
-      'active' as agencyagent_status,
-    );
-  }
-
+async getPublicAgents(
+  @Param('agencyId', ParseIntPipe) agencyId: number,
+  @Req() req: RequestWithLang,
+  @Query() filters: FilterAgentsDto,
+  @Query('page') page = '1',
+) {
+  return this.getAgentsUseCase.execute(
+    agencyId,
+    parseInt(page, 10),
+    12,
+    req.language,
+    filters,
+    false,
+    agencyagent_status.active,
+  );
+}
   @UseGuards(UserStatusGuard)
   @Roles('agency_owner', 'agent')
   @Get('dashboard')
@@ -116,5 +115,16 @@ async updateAgencyAgents(
     
     throw error;
   }
+}
+
+@UseGuards(UserStatusGuard)
+@Roles('agent', 'agency_owner')
+@Get('me')
+async getAgentMe(@Req() req: RequestWithUser) {
+  if (!req.userId) {
+    throw new ForbiddenException(t('userNotAuthenticated', req.language));
+  }
+
+  return this.getAgentMeUseCase.execute(req.userId, req.language);
 }
 }

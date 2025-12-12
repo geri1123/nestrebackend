@@ -1,13 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { PaginatedAgenciesVO } from '../../domain/value-objects/paginated-agencies.vo';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 
 @Injectable()
 export class GetPaginatedAgenciesUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
     private readonly firebaseService: FirebaseService,
   ) {}

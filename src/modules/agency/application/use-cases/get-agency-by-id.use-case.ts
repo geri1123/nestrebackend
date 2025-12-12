@@ -1,13 +1,12 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { Agency } from '../../domain/entities/agency.entity';
 import { SupportedLang, t } from '../../../../locales';
 
 @Injectable()
 export class GetAgencyByIdUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
   ) {}
 

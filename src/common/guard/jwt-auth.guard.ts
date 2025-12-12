@@ -16,18 +16,20 @@ import { t, SupportedLang } from '../../locales';
 import { AppConfigService } from '../../infrastructure/config/config.service';
 import { GetUserProfileUseCase } from '../../modules/users/application/use-cases/get-user-profile.use-case';
 import { USERS_REPOSITORY_TOKENS } from '../../modules/users/domain/repositories/user.repository.tokens';
-import { type IUserDomainRepository } from '../../modules/users/domain/repositories/user.repository.interface';
+import { USER_REPO, type IUserDomainRepository } from '../../modules/users/domain/repositories/user.repository.interface';
 import { GetAgencyByOwnerUseCase } from '../../modules/agency/application/use-cases/get-agency-by-owner.use-case';
-import { FindAgentInAgencyUseCase } from '../../modules/agent/application/use-cases/find-agent-in-agency.use-case';
+import { GetSingleAgentInAgencyUseCase } from '../../modules/agent/application/use-cases/find-agent-in-agency.use-case';
 import { GetAgencyIdForAgentUseCase } from '../../modules/agent/application/use-cases/get-agency-id-for-agent.use-case';
+import { GetAgentAuthContextUseCase } from '../../modules/agent/application/use-cases/get-agent-auth-context.use-case';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
       private readonly getUserProfile: GetUserProfileUseCase,
-      @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+      @Inject(USER_REPO)
     private readonly userRepository: IUserDomainRepository,
-     private readonly FindAgentInAgency:FindAgentInAgencyUseCase,
+    //  private readonly FindAgentInAgency:GetSingleAgentInAgencyUseCase,
+    private readonly getAgentAuthContext:GetAgentAuthContextUseCase,
      private readonly getagencyIdForagent: GetAgencyIdForAgentUseCase,
   private readonly findbyOwner: GetAgencyByOwnerUseCase,
     private readonly config: AppConfigService, 
@@ -75,19 +77,26 @@ export class JwtAuthGuard implements CanActivate {
 
       if (user.role === 'agent') {
         // Fetch agent record
-        const agentRecord = await this.FindAgentInAgency.execute(
-          await this.getagencyIdForagent.execute(user.id) as number,
-          user.id,
-          lang,
-        );
-        if (!agentRecord) {
-          throw new UnauthorizedException(t('userNotAssociatedWithAgency', lang));
-        }
-
-       req.agencyId = agentRecord.agent.agencyId;
-req.agencyAgentId = agentRecord.agent.id;
-req.agentPermissions = agentRecord.permission;
-req.agentStatus = agentRecord.agent.status;
+        // const agentRecord = await this.FindAgentInAgency.execute(
+        //   await this.getagencyIdForagent.execute(user.id) as number,
+        //   user.id,
+        //   lang,
+        // );
+        // if (!agentRecord) {
+        //   throw new UnauthorizedException(t('userNotAssociatedWithAgency', lang));
+        // }
+const agentContext = await this.getAgentAuthContext.execute(user.id);
+if (!agentContext) {
+  throw new UnauthorizedException(t('userNotAssociatedWithAgency', lang));
+}
+  req.agencyId = agentContext.agencyId;
+req.agencyAgentId = agentContext.agencyAgentId;
+req.agentPermissions = agentContext.permissions;
+req.agentStatus = agentContext.status;
+//        req.agencyId = agentRecord.agent.agencyId;
+// req.agencyAgentId = agentRecord.agent.id;
+// req.agentPermissions = agentRecord.permission;
+// req.agentStatus = agentRecord.agent.status;
       }
 
       if (user.role === 'agency_owner') {

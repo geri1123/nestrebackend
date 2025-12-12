@@ -1,12 +1,11 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { SupportedLang, t } from '../../../../locales';
 
 @Injectable()
 export class FindUserByIdUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository
   ) {}
 

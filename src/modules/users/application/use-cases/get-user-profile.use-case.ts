@@ -1,13 +1,13 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { t, SupportedLang } from '../../../../locales';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
 
 @Injectable()
 export class GetUserProfileUseCase {
   constructor(  
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+        @Inject(USER_REPO)
+    
     private readonly userRepository: IUserDomainRepository,) {}
 
   async execute(userId: number, language: SupportedLang = 'al'): Promise<User> {

@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import {type IUserDomainRepository } from "../../../users/domain/repositories/user.repository.interface";
+import {USER_REPO, type IUserDomainRepository } from "../../../users/domain/repositories/user.repository.interface";
 
 import { USERS_REPOSITORY_TOKENS } from "../../../users/domain/repositories/user.repository.tokens";
 import { DeleteRegistrationRequestsByUserUseCase } from "../../../registration-request/application/use-cases/delete-requests-by-user.use-case";
@@ -8,7 +8,7 @@ import { DeleteAgencyByOwnerUseCase } from "../../../agency/application/use-case
 @Injectable()
 export class DeleteUserUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    @Inject(USER_REPO)
     private readonly usersRepo: IUserDomainRepository,
 
     private readonly deleteRequests: DeleteRegistrationRequestsByUserUseCase,

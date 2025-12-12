@@ -1,6 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { AGENCY_REPOSITORY_TOKENS } from "../../domain/repositories/agency.repository.tokens";
-import {type IAgencyDomainRepository } from "../../domain/repositories/agency.repository.interface";
+import {AGENCY_REPO, type IAgencyDomainRepository } from "../../domain/repositories/agency.repository.interface";
 import { CreateAgencyData } from "./create-agency.use-case";
 import { SupportedLang, t } from "../../../../locales";
 import { throwValidationErrors } from "../../../../common/helpers/validation.helper";
@@ -8,7 +7,7 @@ import { throwValidationErrors } from "../../../../common/helpers/validation.hel
 @Injectable()
 export class ValidateAgencyBeforeRegisterUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository
   ) {}
 

@@ -6,7 +6,6 @@ import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
 import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 
 // Repository token & interface
-import { AGENCY_REPOSITORY_TOKENS } from './domain/repositories/agency.repository.tokens';
 import { AgencyRepository } from './infrastructure/persistence/agency.repository';
 
 // Use-cases
@@ -32,7 +31,7 @@ import { ActivateAgencyByOwnerUseCase } from './application/use-cases/activate-a
 import { CheckAgencyNameExistsUseCase } from './application/use-cases/check-agency-name-exists.use-case';
 import { CheckLicenseExistsUseCase } from './application/use-cases/check-license-exists.use-case';
 import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/validate-agency-before-register.use-case';
-
+import { AGENCY_REPO } from './domain/repositories/agency.repository.interface';
 @Module({
   imports: [PrismaModule, UsersModule,  FirebaseModule],
 
@@ -41,7 +40,7 @@ import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/val
   providers: [
     // REPOSITORY
     {
-      provide: AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY,
+      provide:AGENCY_REPO,
       useClass: AgencyRepository,
     },
 
@@ -80,7 +79,7 @@ CheckLicenseExistsUseCase,
 CheckLicenseExistsUseCase,
 GetAgencyByOwnerUseCase,
 
-AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY
+AGENCY_REPO
   ],
 })
 export class AgencyModule {}

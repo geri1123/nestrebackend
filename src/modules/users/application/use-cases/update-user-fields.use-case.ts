@@ -1,6 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { USERS_REPOSITORY_TOKENS } from "../../domain/repositories/user.repository.tokens";
-import {type IUserDomainRepository, UpdateUserFields } from "../../domain/repositories/user.repository.interface";
+import {type IUserDomainRepository, UpdateUserFields, USER_REPO } from "../../domain/repositories/user.repository.interface";
 import { SupportedLang, t } from "../../../../locales";
 import { GetUserProfileUseCase } from "./get-user-profile.use-case";
 import { Prisma } from "@prisma/client";
@@ -8,7 +7,8 @@ import { Prisma } from "@prisma/client";
 @Injectable()
 export class UpdateUserFieldsUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+      @Inject(USER_REPO)
+  
     private readonly repo: IUserDomainRepository,
     private readonly getUser: GetUserProfileUseCase,
   ) {}

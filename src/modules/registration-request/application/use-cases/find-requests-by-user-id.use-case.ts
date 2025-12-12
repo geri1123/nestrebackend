@@ -1,6 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { SupportedLang, t } from '../../../../locales';
-import { REG_REQ_REPO } from '../../domain/repositories/registration-request.repository.interface';
 import {type IRegistrationRequestRepository } from '../../domain/repositories/registration-request.repository.interface';
 import { REG_REQ_TOKEN } from '../../domain/repositories/reg-req.repository.token';
 

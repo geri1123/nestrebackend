@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import {
   agencyagent,
+  agencyagent_role_in_agency,
   agencyagent_status,
   Prisma,
 } from '@prisma/client';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
 import { AgentMapper } from '../mappers/agent.mapper';
-import { AgentWithUserAndPermission , AgentSort , CreateAgentDomainData , IAgentDomainRepository } from '../../domain/repositories/agents.repository.interface';
+import { AgentWithUserAndPermission , AgentSort , CreateAgentDomainData , IAgentDomainRepository, AgentUserProps } from '../../domain/repositories/agents.repository.interface';
 import { AgentEntity } from '../../domain/entities/agent.entity';
 import { AgentStatus } from '../../domain/types/agent-status.type';
 import { AgentRole } from '../../domain/types/agent-role.type';
 import { AgentPermissionEntity } from '../../domain/entities/agent-permission.entity';
+import { AgentMeResponse } from '../../dto/agent-me.response';
 
 @Injectable()
 export class AgentRepository implements IAgentDomainRepository {
@@ -55,7 +57,30 @@ export class AgentRepository implements IAgentDomainRepository {
     permission: result.permission ? AgentMapper.toPermissionDomain(result.permission) : null,
   };
 }
+async getAgentAuthContext(userId: number): Promise<{
+  agencyId: number;
+  agencyAgentId: number;
+  roleInAgency: agencyagent_role_in_agency;
+  status: agencyagent_status;
+  permissions: AgentPermissionEntity | null;
+} | null> {
+  const record = await this.prisma.agencyagent.findFirst({
+    where: { agent_id: userId },
+    include: { permission: true },
+  });
 
+  if (!record) return null;
+
+  return {
+    agencyId: record.agency_id,
+    agencyAgentId: record.id,
+    roleInAgency: record.role_in_agency,
+    status: record.status,
+    permissions: record.permission
+      ? AgentMapper.toPermissionDomain(record.permission)
+      : null,
+  };
+}
   async findByIdCardNumber(idCardNumber: string): Promise<string | null> {
     const result = await this.prisma.agencyagent.findUnique({
       where: { id_card_number: idCardNumber },
@@ -226,4 +251,59 @@ async createAgencyAgent(
 
     return AgentMapper.toDomain(updated);
   }
+  async getAgentMe(
+  userId: number,
+): Promise<{
+  agent: AgentEntity;
+  agentUser: AgentUserProps;
+  agency: {
+    id: number;
+    agency_name: string;
+    logo: string | null;
+  };
+  permission: AgentPermissionEntity | null;
+} | null> {
+  const record = await this.prisma.agencyagent.findFirst({
+    where: {
+      agent_id: userId,
+      status: 'active',
+      agency: { status: 'active' },
+    },
+    include: {
+      agency: {
+        select: {
+          id: true,
+          agency_name: true,
+          logo: true,
+        },
+      },
+      agentUser: true,
+      permission: true,
+    },
+  });
+
+  if (!record || !record.agentUser || !record.agency) {
+    return null;
+  }
+
+  return {
+   
+    agent: AgentMapper.toDomain(record),
+
+   
+    agentUser: AgentMapper.toAgentUserProps(record.agentUser),
+
+  
+    agency: {
+      id: record.agency.id,
+      agency_name: record.agency.agency_name,
+      logo: record.agency.logo,
+    },
+
+ 
+    permission: record.permission
+      ? AgentMapper.toPermissionDomain(record.permission)
+      : null,
+  };
+}
 }

@@ -119,6 +119,7 @@ import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { ProductClicksService } from '../../product-clicks/product-clicks.service';
 import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
+import { product_status } from '@prisma/client';
 
 @Controller('products')
 export class SearchProductsController {
@@ -170,7 +171,7 @@ export class SearchProductsController {
     const filters = this.searchFiltersHelper.parse(req.query, page);
 
     filters.userId = agentId;
-    filters.status = 'active';
+    filters.status = product_status.active;
 
     return this.searchProductsUseCase.execute(filters, language, false);
   }

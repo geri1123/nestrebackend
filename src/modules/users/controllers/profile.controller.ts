@@ -20,6 +20,8 @@ import { throwValidationErrors } from '../../../common/helpers/validation.helper
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { GetNavbarUserUseCase } from '../application/use-cases/get-navbar-user.use-case';
 import { UpdateUserProfileUseCase } from '../application/use-cases/update-user-profile.use-case';
+import { type RequestWithLang } from '../../../middlewares/language.middleware';
+import { GetUserProfileUseCase } from '../application/use-cases/get-user-profile.use-case';
 
 @Controller('profile')
 export class ProfileController {
@@ -27,8 +29,17 @@ export class ProfileController {
     private readonly getNavbarUserUseCase: GetNavbarUserUseCase,
     private readonly updateProfileUseCase: UpdateUserProfileUseCase,
     private readonly changeUsernameUseCase: ChangeUsernameUseCase,
+    private readonly getUserProfile:GetUserProfileUseCase,
   ) {}
-
+  @Get('me')
+  async getUserinfo(@Req() req: RequestWithUser){
+    if (!req.userId){
+       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+    }
+    const me= await this.getUserProfile.execute(req.userId , req.language);
+    return me;
+  }
+ 
   @Get('navbar')
   async getProfile(@Req() req: RequestWithUser) {
     if (!req.userId) {

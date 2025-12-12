@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { GetUserProfileUseCase } from './get-user-profile.use-case';
 import { t, SupportedLang } from '../../../../locales';
 import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
@@ -14,7 +14,8 @@ export interface UpdateProfileData {
 @Injectable()
 export class UpdateUserProfileUseCase {
   constructor(
-   @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+      @Inject(USER_REPO)
+  
              private readonly userRepository: IUserDomainRepository,
     private readonly getUserProfile: GetUserProfileUseCase,
   ) {}

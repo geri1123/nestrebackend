@@ -2,7 +2,7 @@ import { Prisma, user_role } from "@prisma/client";
 import { User } from "../entities/user.entity";
 import { NavbarUser } from "../value-objects/navbar-user.vo";
 import { userStatus } from "../types/user-status.type";
-
+export const USER_REPO = Symbol('USER_REPO');
 export interface IUserDomainRepository {
   findById(userId: number): Promise<User | null>;
   findByIdentifier(identifier: string): Promise<User | null>;

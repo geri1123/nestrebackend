@@ -1,6 +1,5 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { SupportedLang, t } from '../../../../locales';
 import { GetUserProfileUseCase } from './get-user-profile.use-case';
@@ -8,7 +7,7 @@ import { GetUserProfileUseCase } from './get-user-profile.use-case';
 @Injectable()
 export class DeleteProfileImageUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
 
     private readonly firebase: FirebaseService,

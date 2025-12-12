@@ -1,7 +1,7 @@
 import { agency_status, Prisma } from '@prisma/client';
 import { Agency } from '../entities/agency.entity';
 import { AgencyInfoVO } from '../value-objects/agency-info.vo';
-
+export const AGENCY_REPO = Symbol('AGENCY_REPO');
 export interface IAgencyDomainRepository {
   // Query methods
   findById(id: number): Promise<Agency | null>;

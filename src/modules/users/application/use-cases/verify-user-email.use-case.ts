@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class VerifyUserEmailUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+       @Inject(USER_REPO)
+   
     private readonly repo: IUserDomainRepository,
   ) {}
 

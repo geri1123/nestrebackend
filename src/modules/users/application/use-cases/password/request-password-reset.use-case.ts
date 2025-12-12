@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import {type IUserDomainRepository } from "../../../domain/repositories/user.repository.interface";
+import {USER_REPO, type IUserDomainRepository } from "../../../domain/repositories/user.repository.interface";
 import { USERS_REPOSITORY_TOKENS } from "../../../domain/repositories/user.repository.tokens";
 import { EmailService } from "../../../../../infrastructure/email/email.service";
 import { CacheService } from "../../../../../infrastructure/cache/cache.service";
@@ -9,7 +9,8 @@ import { generateToken } from "../../../../../common/utils/hash";
 @Injectable()
 export class RequestPasswordResetUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+      @Inject(USER_REPO)
+   
     private readonly userRepo: IUserDomainRepository,
     private readonly emailService: EmailService,
     private readonly cacheService: CacheService,

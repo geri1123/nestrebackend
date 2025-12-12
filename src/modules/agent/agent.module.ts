@@ -9,7 +9,7 @@ import { UpdateAgentUseCase } from './application/use-cases/update-agent.use-cas
 import { AgencyModule } from '../agency/agency.module';
 import { NotificationModule } from '../notification/notification.module';
 import { AGENT_REPOSITORY_TOKENS } from './domain/repositories/agent.repository.tokens';
-import { FindAgentInAgencyUseCase } from './application/use-cases/find-agent-in-agency.use-case';
+import { GetSingleAgentInAgencyUseCase } from './application/use-cases/find-agent-in-agency.use-case';
 import { GetAgencyIdForAgentUseCase } from './application/use-cases/get-agency-id-for-agent.use-case';
 import { GetAgentByIdUseCase } from './application/use-cases/get-agent-by-id.use-case';
 import { FindExistingAgentUseCase } from './application/use-cases/find-existing-agent.use-case';
@@ -19,6 +19,8 @@ import { CreateAgencyUseCase } from '../agency/application/use-cases/create-agen
 import { CreateAgentUseCase } from './application/use-cases/create-agent.use-case';
 import { GetAgentPermissionsUseCase } from './application/use-cases/get-agent-permission.use-case';
 import { UpdateAgentPermissionsUseCase } from './application/use-cases/update-agent-permissions.use-case';
+import { GetAgentAuthContextUseCase } from './application/use-cases/get-agent-auth-context.use-case';
+import { GetAgentMeUseCase } from './application/use-cases/get-agent-me.use-case';
 
 @Module({
   imports: [ NotificationModule , AgencyModule],
@@ -28,15 +30,17 @@ import { UpdateAgentPermissionsUseCase } from './application/use-cases/update-ag
     FirebaseService,
     AgentRepository,
     GetAgencyIdForAgentUseCase,
-    FindAgentInAgencyUseCase,
+    GetSingleAgentInAgencyUseCase,
     AgentPermissionRepository,
     GetAgentByIdUseCase,
     FindExistingAgentUseCase,
     AddAgentPermissionsUseCase,
     EnsureIdCardUniqueUseCase,
     CreateAgentUseCase,
+    GetAgentAuthContextUseCase,
     UpdateAgentPermissionsUseCase,
    GetAgentPermissionsUseCase,
+   GetAgentMeUseCase ,
    {
       provide: AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,
       useClass: AgentRepository,
@@ -50,7 +54,8 @@ import { UpdateAgentPermissionsUseCase } from './application/use-cases/update-ag
     UpdateAgentUseCase,
   ],
   exports: [
-  FindAgentInAgencyUseCase,
+       GetAgentAuthContextUseCase,
+  GetSingleAgentInAgencyUseCase,
     GetAgentsUseCase,
     UpdateAgentUseCase,
     GetAgencyIdForAgentUseCase,

@@ -1,6 +1,5 @@
 import { Inject, Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { AgencyInfoVO } from '../../domain/value-objects/agency-info.vo';
 import { SupportedLang, t } from '../../../../locales';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
@@ -8,7 +7,7 @@ import { FirebaseService } from '../../../../infrastructure/firebase/firebase.se
 @Injectable()
 export class GetAgencyInfoUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
     private readonly firebaseService: FirebaseService,
   ) {}

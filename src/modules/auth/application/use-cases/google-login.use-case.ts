@@ -1,18 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
 import { GoogleAuthService } from '../../infrastructure/services/google-auth.service';
 import { generateUsername } from '../../../../common/utils/generate-username';
 import { AuthTokenService } from '../../infrastructure/services/auth-token.service';
 import { AuthCookieService } from '../../infrastructure/services/auth-cookie.service';
 import { Response } from 'express';
 import { user_role, user_status } from '@prisma/client';
-import { USERS_REPOSITORY_TOKENS } from '../../../users/domain/repositories/user.repository.tokens';
 
 @Injectable()
 export class GoogleLoginUseCase {
   constructor(
     private readonly googleAuth: GoogleAuthService,
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    @Inject(USER_REPO)
     private readonly users: IUserDomainRepository,
     private readonly authToken: AuthTokenService,
     private readonly cookie: AuthCookieService,

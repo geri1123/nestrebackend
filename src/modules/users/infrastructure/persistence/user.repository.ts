@@ -6,7 +6,7 @@ import { User } from '../../domain/entities/user.entity';
 import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
 import { hashPassword } from '../../../../common/utils/hash';
 import { Prisma } from '@prisma/client';
-
+export const USER_REPO = Symbol('USER_REPO');
 @Injectable()
 export class UserRepository implements IUserDomainRepository {
   constructor(private readonly prisma: PrismaService) {}

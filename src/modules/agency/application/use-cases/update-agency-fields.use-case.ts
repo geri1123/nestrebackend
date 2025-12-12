@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { GetAgencyByIdUseCase } from './get-agency-by-id.use-case';
 import { SupportedLang } from '../../../../locales';
 
@@ -15,7 +14,7 @@ export interface UpdateAgencyFieldsData {
 @Injectable()
 export class UpdateAgencyFieldsUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
     private readonly getAgencyById: GetAgencyByIdUseCase,
   ) {}

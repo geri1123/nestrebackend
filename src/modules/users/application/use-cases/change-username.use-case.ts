@@ -1,17 +1,16 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
-import {type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
 import { GetUserProfileUseCase } from './get-user-profile.use-case';
 import { t, SupportedLang } from '../../../../locales';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
 
 @Injectable()
 export class ChangeUsernameUseCase {
   constructor(
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    @Inject(USER_REPO)
     private readonly userRepository: IUserDomainRepository,
 
-    @Inject(USERS_REPOSITORY_TOKENS.USERNAME_HISTORY_REPOSITORY)
+    @Inject(USERNAME_REPO)
     private readonly usernameHistoryRepository: IUsernameHistoryDomainRepository,
     private readonly getUserProfile: GetUserProfileUseCase,
   ) {}

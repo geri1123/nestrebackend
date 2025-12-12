@@ -29,17 +29,19 @@ import { PasswordController } from './controllers/password-recovery.controller';
 import { FindUserForVerificationUseCase } from './application/use-cases/find-user-for-verification.use-case';
 import { VerifyUserEmailUseCase } from './application/use-cases/verify-user-email.use-case';
 import { FindUserForAuthUseCase } from './application/use-cases/find-user-for-auth.use-case';
+import { USER_REPO } from './domain/repositories/user.repository.interface';
+import { USERNAME_REPO } from './domain/repositories/username-history.repository.interface';
 @Module({
   imports: [ FirebaseModule, EmailModule, AppCacheModule],
   controllers: [ProfileController , PasswordController],
   providers: [
     // Repository providers
     {
-      provide: USERS_REPOSITORY_TOKENS.USER_REPOSITORY,
+      provide: USER_REPO,
       useClass: UserRepository,
     },
     {
-      provide: USERS_REPOSITORY_TOKENS.USERNAME_HISTORY_REPOSITORY,
+      provide:USERNAME_REPO,
       useClass: UsernameHistoryRepository,
     },
     
@@ -63,7 +65,7 @@ import { FindUserForAuthUseCase } from './application/use-cases/find-user-for-au
   FindUserForAuthUseCase,
   ],
   exports: [
-USERS_REPOSITORY_TOKENS.USER_REPOSITORY, 
+USER_REPO, 
     GetUserProfileUseCase,
 
   UpdateUserFieldsUseCase,

@@ -1,14 +1,13 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 
 import { SupportedLang, t } from '../../../../locales';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ActivateAgencyByOwnerUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly repo: IAgencyDomainRepository,
   ) {}
 

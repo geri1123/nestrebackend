@@ -1,11 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { AGENCY_REPOSITORY_TOKENS } from '../../domain/repositories/agency.repository.tokens';
-import {type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
+import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 
 @Injectable()
 export class CheckLicenseExistsUseCase {
   constructor(
-    @Inject(AGENCY_REPOSITORY_TOKENS.AGENCY_REPOSITORY)
+    @Inject(AGENCY_REPO)
     private readonly agencyRepo: IAgencyDomainRepository,
   ) {}
 

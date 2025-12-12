@@ -5,7 +5,7 @@ import { SupportedLang, t } from "../../../../locales";
 
 
 @Injectable()
-export class FindAgentInAgencyUseCase {
+export class GetSingleAgentInAgencyUseCase {
   constructor(
     @Inject(AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY)
     private readonly agentRepo: IAgentDomainRepository,
@@ -15,7 +15,7 @@ export class FindAgentInAgencyUseCase {
     const record = await this.agentRepo.findByAgencyAndAgent(agencyId, agentUserId);
 
     if (!record) {
-      throw new NotFoundException(t("userNotFound", lang));
+      throw new NotFoundException(t("agentNotFound", lang));
     }
 
     return record; 

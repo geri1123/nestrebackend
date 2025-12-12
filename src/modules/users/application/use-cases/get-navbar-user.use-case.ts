@@ -1,14 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { t, SupportedLang } from '../../../../locales';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
 
 @Injectable()
 export class GetNavbarUserUseCase {
   constructor(
-     @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+       @Inject(USER_REPO)
+   
   private readonly userRepository: IUserDomainRepository,
     private readonly firebaseService: FirebaseService,
   ) {}

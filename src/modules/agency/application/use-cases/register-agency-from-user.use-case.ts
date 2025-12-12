@@ -3,16 +3,15 @@ import { agency_status, user_role } from '@prisma/client';
 import { CreateAgencyUseCase , CreateAgencyData } from './create-agency.use-case';
 import { UpdateUserProfileUseCase } from '../../../users/application/use-cases/update-user-profile.use-case';
 import { SupportedLang } from '../../../../locales';
-import { validate } from 'class-validator';
-import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
+
 import { USERS_REPOSITORY_TOKENS } from '../../../users/domain/repositories/user.repository.tokens';
-import {type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
+import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
 
 @Injectable()
 export class RegisterAgencyFromUserUseCase {
   constructor(
     private readonly createAgency: CreateAgencyUseCase,
-    @Inject(USERS_REPOSITORY_TOKENS.USER_REPOSITORY)
+    @Inject(USER_REPO)
     private readonly userRepository: IUserDomainRepository,
   ) {}
 
