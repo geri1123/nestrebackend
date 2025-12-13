@@ -35,6 +35,7 @@ import { ProductImageModule } from './modules/product-image/product-image.module
 import { ProductAttributeValueModule } from './modules/product-attribute/product-attribute.module';
 import { SoftAuthModule } from './common/soft-auth/soft-auth.module';
 import { AdvertisementPricingModule } from './modules/advertisement-pricing/advertisement-prising.module';
+import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ DatabaseModule,
     AgencyRequestsModule,
      SaveProductModule,
     FirebaseModule,
+    CloudinaryModule,
     AgencyModule,
 AuthModule,
 FiltersModule,

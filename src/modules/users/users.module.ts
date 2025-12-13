@@ -35,8 +35,9 @@ import { ProfilePictureController } from './controllers/profile-picture.controll
 import { DeleteProfileImageUseCase } from './application/use-cases/delete-profile-image.use-case';
 import { UploadProfileImageUseCase } from './application/use-cases/update-profile-image.use-case';
 import { CommonModule } from '../../common/common.module';
+import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
 @Module({
-  imports: [ FirebaseModule, EmailModule, AppCacheModule , CommonModule],
+  imports: [ FirebaseModule, EmailModule, AppCacheModule , CommonModule  , CloudinaryModule],
   controllers: [ProfileController , PasswordController , ProfilePictureController],
   providers: [
     // Repository providers

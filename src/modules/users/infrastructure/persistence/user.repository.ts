@@ -6,34 +6,36 @@ import { User } from '../../domain/entities/user.entity';
 import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
 import { hashPassword } from '../../../../common/utils/hash';
 import { Prisma } from '@prisma/client';
-export const USER_REPO = Symbol('USER_REPO');
+
 @Injectable()
 export class UserRepository implements IUserDomainRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(userId: number): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        role: true,
-        first_name: true,
-        last_name: true,
-        about_me: true,
-        profile_img: true,
-        phone: true,
-        status: true,
-        email_verified: true,
-        last_login: true,
-        created_at: true,
-        updated_at: true,
-      },
-    });
+  const user = await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      role: true,
+      first_name: true,
+      last_name: true,
+      about_me: true,
+      profile_img_url: true,
+      profile_img_public_id: true,
+      phone: true,
+      status: true,
+      email_verified: true,
+      last_login: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
 
-    return user ? User.create(user as any) : null;
-  }
+  return user ? User.create(user as any) : null;
+}
+
 
   async findByIdentifier(identifier: string): Promise<User | null> {
     const user = await this.prisma.user.findFirst({
@@ -49,7 +51,8 @@ export class UserRepository implements IUserDomainRepository {
         first_name: true,
         last_name: true,
         about_me: true,
-        profile_img: true,
+          profile_img_url: true,
+      profile_img_public_id: true,
         phone: true,
         last_login: true,
         created_at: true,
@@ -73,7 +76,8 @@ export class UserRepository implements IUserDomainRepository {
         status: true,
         role: true,
         about_me: true,
-        profile_img: true,
+       profile_img_url: true,
+      profile_img_public_id: true,
         phone: true,
         last_login: true,
         created_at: true,
@@ -158,20 +162,31 @@ async updateFields(
     });
   }
 
-  async updateProfileImage(userId: number, imageUrl: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { profile_img: imageUrl, updated_at: new Date() },
-    });
-  }
+  async updateProfileImage(
+  userId: number,
+  imageUrl: string,
+  publicId: string,
+): Promise<void> {
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      profile_img_url: imageUrl,
+      profile_img_public_id: publicId,
+      updated_at: new Date(),
+    },
+  });
+}
 
-  async deleteProfileImage(userId: number): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { profile_img: null, updated_at: new Date() },
-    });
-  }
-
+async deleteProfileImage(userId: number): Promise<void> {
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      profile_img_url: null,
+      profile_img_public_id: null,
+      updated_at: new Date(),
+    },
+  });
+}
   async verifyEmail(userId: number, emailVerified: boolean, status: string , tx?:Prisma.TransactionClient): Promise<void> {
     const client =tx ?? this.prisma;
     await client.user.update({
@@ -180,23 +195,28 @@ async updateFields(
     });
   }
 
-  async getNavbarUser(userId: number): Promise<NavbarUser | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        username: true,
-        email: true,
-        profile_img: true,
-        last_login: true,
-        role: true,
-      },
-    });
+async getNavbarUser(userId: number): Promise<NavbarUser | null> {
+  const user = await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      username: true,
+      email: true,
+      profile_img_url: true,
+      last_login: true,
+      role: true,
+    },
+  });
 
-    return user
-      ? new NavbarUser(user.username, user.email, user.profile_img, user.last_login, user.role)
-      : null;
-  }
-
+  return user
+    ? new NavbarUser(
+        user.username,
+        user.email,
+        user.profile_img_url,
+        user.last_login,
+        user.role,
+      )
+    : null;
+}
     async findUnverifiedBefore(date: Date) {
     return this.prisma.user.findMany({
       where: { email_verified: false, created_at: { lt: date } },

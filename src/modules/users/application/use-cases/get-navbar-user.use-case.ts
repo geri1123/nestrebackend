@@ -23,9 +23,7 @@ export class GetNavbarUserUseCase {
       });
     }
 
-    const publicUrl = navUser.profileImg
-      ? this.firebaseService.getPublicUrl(navUser.profileImg)
-      : null;
+    const publicUrl = navUser ? navUser.profileImg : null;
 
     return new NavbarUser(
       navUser.username,

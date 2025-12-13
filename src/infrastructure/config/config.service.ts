@@ -102,6 +102,19 @@ get googleClientSecret(): string {
 get mongoUri(): string {
   return this.configService.get<string>('MONGO_URI','');
 }
+
+//cloudinary
+get cloudinaryCloudName(): string {
+  return this.configService.get<string>('CLOUDINARY_CLOUD_NAME')!;
+}
+
+get cloudinaryApiKey(): string {
+  return this.configService.get<string>('CLOUDINARY_API_KEY')!;
+}
+
+get cloudinaryApiSecret(): string {
+  return this.configService.get<string>('CLOUDINARY_API_SECRET')!;
+}
 }
 
 

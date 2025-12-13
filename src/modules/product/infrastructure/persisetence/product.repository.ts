@@ -106,7 +106,7 @@ export class ProductRepository implements IProductRepository {
             listing_type_translation: { where: { language }, select: { name: true }, take: 1 },
           },
         },
-        user: { select: { username: true, email: true, first_name: true, last_name: true, profile_img: true, phone: true, role: true, status: true } },
+        user: { select: { username: true, email: true, first_name: true, last_name: true,     profile_img_url: true, phone: true, role: true, status: true } },
         agency: { select: { agency_name: true, logo: true, address: true, phone: true, created_at: true, status: true } },
       },
     });

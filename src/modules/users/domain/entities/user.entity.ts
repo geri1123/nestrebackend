@@ -9,7 +9,8 @@ export class User {
     public firstName: string | null,
     public lastName: string | null,
     public aboutMe: string | null,
-    public profileImg: string | null,
+    public profileImgUrl: string | null,
+    public profileImgPublicId: string | null,
     public phone: string | null,
     public readonly role: userRole,
     public readonly status: userStatus,
@@ -19,6 +20,7 @@ export class User {
     public readonly lastLogin: Date | null,
   ) {}
 
+  /* ---------- FACTORY ---------- */
   static create(props: {
     id: number;
     username: string;
@@ -26,7 +28,8 @@ export class User {
     first_name: string | null;
     last_name: string | null;
     about_me: string | null;
-    profile_img: string | null;
+    profile_img_url: string | null;
+    profile_img_public_id: string | null;
     phone: string | null;
     role: string;
     status: string;
@@ -42,7 +45,8 @@ export class User {
       props.first_name,
       props.last_name,
       props.about_me,
-      props.profile_img,
+      props.profile_img_url,
+      props.profile_img_public_id,
       props.phone,
       props.role as userRole,
       props.status as userStatus,
@@ -53,14 +57,17 @@ export class User {
     );
   }
 
-  canUpdateUsername(lastChangeDate: Date | null, daysLimit: number = 60): boolean {
-    if (!lastChangeDate) return true;
-    const daysSinceLastChange = (Date.now() - lastChangeDate.getTime()) / (1000 * 60 * 60 * 24);
-    return daysSinceLastChange >= daysLimit;
-  }
+  /* ---------- DOMAIN RULES ---------- */
 
   isActive(): boolean {
     return this.status === 'active' && this.emailVerified;
+  }
+
+  canUpdateUsername(lastChangeDate: Date | null, daysLimit = 60): boolean {
+    if (!lastChangeDate) return true;
+    const days =
+      (Date.now() - lastChangeDate.getTime()) / (1000 * 60 * 60 * 24);
+    return days >= daysLimit;
   }
 
   updateProfile(data: {
@@ -75,15 +82,19 @@ export class User {
     if (data.phone !== undefined) this.phone = data.phone;
   }
 
-    updateProfileImage(newUrl: string) {
-    this.profileImg = newUrl;
+  /* ---------- IMAGE LOGIC ---------- */
+
+  updateProfileImage(url: string, publicId: string) {
+    this.profileImgUrl = url;
+    this.profileImgPublicId = publicId;
   }
 
   removeProfileImage() {
-    this.profileImg = null;
+    this.profileImgUrl = null;
+    this.profileImgPublicId = null;
   }
 
   hasProfileImage(): boolean {
-    return !!this.profileImg;
+    return !!this.profileImgUrl;
   }
 }

@@ -12,8 +12,13 @@ export interface IUserDomainRepository {
   create(data: CreateUserData ,   tx?: Prisma.TransactionClient): Promise<number>;
   updateFields(userId: number, fields: Partial<UpdateUserFields> , tx?: Prisma.TransactionClient): Promise<void>;
   updateUsername(userId: number, newUsername: string): Promise<void>;
-  updateProfileImage(userId: number, imageUrl: string): Promise<void>;
-  deleteProfileImage(userId: number): Promise<void>;
+     updateProfileImage(
+  userId: number,
+  imageUrl: string,
+  publicId: string,
+): Promise<void>
+   deleteProfileImage(userId: number): Promise<void> ;
+  
   verifyEmail(userId: number, emailVerified: boolean, status: string , tx?:Prisma.TransactionClient): Promise<void>;
   getNavbarUser(userId: number): Promise<NavbarUser | null>;
   findUnverifiedBefore(date: Date): Promise<{ id: number }[]>;

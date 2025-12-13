@@ -223,8 +223,9 @@ model user {
   first_name                   String?
   last_name                    String?
   about_me                     String?               @db.Text
-  profile_img                  String?
-  phone                        String?
+profile_img_url        String?   @db.Text
+  profile_img_public_id  String?
+    phone                        String?
   website                      String?
   role                         user_role
   status                       user_status           @default(active)
