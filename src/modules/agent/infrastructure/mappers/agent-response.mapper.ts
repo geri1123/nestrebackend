@@ -10,6 +10,7 @@ export function mapAgentToResponse(
     agentUser: AgentUserProps;
     agency: { id: number; agency_name: string; logo: string | null };
     permission: AgentPermissionEntity | null;
+      addedBy?: { id: number; username: string } | null;
   },
   firebase: FirebaseService,
 ): AgentMeResponse {
@@ -48,5 +49,6 @@ export function mapAgentToResponse(
           canManageAgents: record.permission.canManageAgents,
         }
       : null,
+         addedBy: record.addedBy ?? null,
   };
 }

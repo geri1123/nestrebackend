@@ -24,13 +24,16 @@ import { UpdateAgentUseCase } from '../application/use-cases/update-agent.use-ca
 import { AgentBelongsToAgencyGuard } from '../../../common/guard/AgentBelongsToAgency.guard';
 import { agencyagent_status } from '@prisma/client';
 import { GetAgentMeUseCase } from '../application/use-cases/get-agent-me.use-case';
+import { get } from 'http';
+import { GetAgentByIdInAgencyUseCase } from '../application/use-cases/get-agent-in-agency.use-case';
 
 @Controller('agents')
 export class AgentController {
   constructor(
     private readonly getAgentsUseCase: GetAgentsUseCase,
     private readonly updateAgentUseCase: UpdateAgentUseCase,
-    private readonly getAgentMeUseCase:GetAgentMeUseCase
+    private readonly getAgentMeUseCase:GetAgentMeUseCase,
+    private readonly GetAgentByIdInAgency:GetAgentByIdInAgencyUseCase
   ) {}
 
   @Get('public/:agencyId')
@@ -126,5 +129,25 @@ async getAgentMe(@Req() req: RequestWithUser) {
   }
 
   return this.getAgentMeUseCase.execute(req.userId, req.language);
+}
+
+
+
+@UseGuards(UserStatusGuard)
+@Roles('agent', 'agency_owner')
+@Get(':id')
+async getAgentById(
+  @Param('id', ParseIntPipe) agencyAgentId: number,
+  @Req() req: RequestWithUser,
+) {
+  if (!req.agencyId) {
+    throw new ForbiddenException(t('agencyNotFound', req.language));
+  }
+
+  return this.GetAgentByIdInAgency.execute(
+    agencyAgentId,
+    req.agencyId,
+    req.language,
+  );
 }
 }

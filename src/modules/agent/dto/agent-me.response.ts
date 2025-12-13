@@ -1,7 +1,4 @@
-import { AgentRole } from "../domain/types/agent-role.type";
-import { AgentStatus } from "../domain/types/agent-status.type";
-
-export interface AgentMeResponse {
+export class AgentMeResponse {
   user: {
     id: number;
     username: string;
@@ -12,11 +9,11 @@ export interface AgentMeResponse {
 
   agent: {
     agencyAgentId: number;
-    roleInAgency: AgentRole;
-    status: AgentStatus;
+    roleInAgency: string;
+    status: string;
     commissionRate: number | null;
- startDate: Date | null; 
- endDate: Date | null;
+    startDate: Date | null;
+    endDate: Date | null;
   };
 
   agency: {
@@ -32,5 +29,11 @@ export interface AgentMeResponse {
     canViewAllPosts: boolean;
     canDeletePosts: boolean;
     canManageAgents: boolean;
+  } | null;
+
+
+  addedBy?: {
+    id: number;
+    username: string;
   } | null;
 }

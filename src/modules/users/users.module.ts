@@ -31,9 +31,13 @@ import { VerifyUserEmailUseCase } from './application/use-cases/verify-user-emai
 import { FindUserForAuthUseCase } from './application/use-cases/find-user-for-auth.use-case';
 import { USER_REPO } from './domain/repositories/user.repository.interface';
 import { USERNAME_REPO } from './domain/repositories/username-history.repository.interface';
+import { ProfilePictureController } from './controllers/profile-picture.controller';
+import { DeleteProfileImageUseCase } from './application/use-cases/delete-profile-image.use-case';
+import { UploadProfileImageUseCase } from './application/use-cases/update-profile-image.use-case';
+import { CommonModule } from '../../common/common.module';
 @Module({
-  imports: [ FirebaseModule, EmailModule, AppCacheModule],
-  controllers: [ProfileController , PasswordController],
+  imports: [ FirebaseModule, EmailModule, AppCacheModule , CommonModule],
+  controllers: [ProfileController , PasswordController , ProfilePictureController],
   providers: [
     // Repository providers
     {
@@ -52,7 +56,7 @@ import { USERNAME_REPO } from './domain/repositories/username-history.repository
     GetNavbarUserUseCase,
     UpdateUserProfileUseCase,
     ChangeUsernameUseCase,
-   
+   UploadProfileImageUseCase,
       FindUserByIdentifierUseCase,
   FindUserByIdUseCase,
   UpdateLastLoginUseCase,
@@ -63,6 +67,7 @@ import { USERNAME_REPO } from './domain/repositories/username-history.repository
   VerifyUserEmailUseCase,
   UserRepository,
   FindUserForAuthUseCase,
+  DeleteProfileImageUseCase,
   ],
   exports: [
 USER_REPO, 

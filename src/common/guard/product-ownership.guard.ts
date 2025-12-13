@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { RequestWithUser } from '../types/request-with-user.interface';
 import { t } from '../../locales';
-import { ProductService } from '../../modules/product/services/product-service';
+
 import { GetProductForPermissionUseCase } from '../../modules/product/application/use-cases/get-product-for-permission.use-case';
 import { user_role } from '@prisma/client';
 

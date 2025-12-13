@@ -14,12 +14,22 @@ export interface AgentUserProps {
   profile_img: string | null;
   status: string;
 }
+export type AgentAddedByProps = {
+  id: number;
+  username: string;
+};
+export type AgentMeRecord = {
+  agent: AgentEntity;
+  agentUser: AgentUserProps;
+  agency: {
+    id: number;
+    agency_name: string;
+    logo: string | null;
+  };
+  permission: AgentPermissionEntity | null;
+   addedBy?: AgentAddedByProps | null;
+};
 
-// export interface AgentWithUserAndPermission {
-//   agent: AgentEntity;
-//   agentUser: AgentUserProps | null;
-//   permissionId?: number | null; // keep minimal; full permission handled by permission repo
-// }
 export interface AgentWithUserAndPermission {
   agent: AgentEntity;
   agentUser: AgentUserProps | null;
@@ -95,16 +105,11 @@ getAgentAuthContext(userId: number): Promise<{
       status: AgentStatus;
     }>,
   ): Promise<AgentEntity>;
- getAgentMe(
+getAgentMe(
   userId: number,
-): Promise<{
-  agent: AgentEntity;
-  agentUser: AgentUserProps;
-  agency: {
-    id: number;
-    agency_name: string;
-    logo: string | null;
-  };
-  permission: AgentPermissionEntity | null;
-} | null>;
+): Promise<AgentMeRecord | null>;
+getAgentByIdInAgency(
+    agencyAgentId: number,
+    agencyId: number,
+  ): Promise<AgentMeRecord | null>;
 }

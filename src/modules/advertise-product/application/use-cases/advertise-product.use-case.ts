@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, ForbiddenException, Inject } from "@nestjs/common";
-import { ProductService } from "../../../product/services/product-service";
+
 import { SupportedLang , t } from "../../../../locales";
 import { advertisement_type, wallet_transaction_type } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";

@@ -32,8 +32,9 @@ import { CheckAgencyNameExistsUseCase } from './application/use-cases/check-agen
 import { CheckLicenseExistsUseCase } from './application/use-cases/check-license-exists.use-case';
 import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/validate-agency-before-register.use-case';
 import { AGENCY_REPO } from './domain/repositories/agency.repository.interface';
+import { CommonModule } from '../../common/common.module';
 @Module({
-  imports: [PrismaModule, UsersModule,  FirebaseModule],
+  imports: [PrismaModule, UsersModule,  FirebaseModule ,CommonModule],
 
   controllers: [AgencyController],
 
@@ -62,7 +63,7 @@ ActivateAgencyByOwnerUseCase,
 CheckAgencyNameExistsUseCase,
 CheckLicenseExistsUseCase,
     // UTILS
-    ImageUtilsService,
+
   ],
 
   exports: [

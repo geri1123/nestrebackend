@@ -8,7 +8,7 @@ import {
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
 import { AgentMapper } from '../mappers/agent.mapper';
-import { AgentWithUserAndPermission , AgentSort , CreateAgentDomainData , IAgentDomainRepository, AgentUserProps } from '../../domain/repositories/agents.repository.interface';
+import { AgentWithUserAndPermission , AgentSort , CreateAgentDomainData , IAgentDomainRepository, AgentUserProps, AgentMeRecord } from '../../domain/repositories/agents.repository.interface';
 import { AgentEntity } from '../../domain/entities/agent.entity';
 import { AgentStatus } from '../../domain/types/agent-status.type';
 import { AgentRole } from '../../domain/types/agent-role.type';
@@ -202,6 +202,7 @@ async createAgencyAgent(
         agencyagent: r,
         agentUser: r.agentUser,
         permission: r.permission!,
+
       }),
     );
   }
@@ -251,18 +252,9 @@ async createAgencyAgent(
 
     return AgentMapper.toDomain(updated);
   }
-  async getAgentMe(
+async getAgentMe(
   userId: number,
-): Promise<{
-  agent: AgentEntity;
-  agentUser: AgentUserProps;
-  agency: {
-    id: number;
-    agency_name: string;
-    logo: string | null;
-  };
-  permission: AgentPermissionEntity | null;
-} | null> {
+): Promise<AgentMeRecord | null> { 
   const record = await this.prisma.agencyagent.findFirst({
     where: {
       agent_id: userId,
@@ -279,6 +271,69 @@ async createAgencyAgent(
       },
       agentUser: true,
       permission: true,
+       addedByUser: {
+    select: {
+      id: true,
+      username: true,
+    },
+  },
+    },
+  });
+
+  if (!record || !record.agentUser || !record.agency) {
+    return null;
+  }
+
+return {
+  agent: AgentMapper.toDomain(record),
+  agentUser: AgentMapper.toAgentUserProps(record.agentUser),
+  agency: {
+    id: record.agency.id,
+    agency_name: record.agency.agency_name,
+    logo: record.agency.logo,
+  },
+  permission: record.permission
+    ? AgentMapper.toPermissionDomain(record.permission)
+    : null,
+
+ 
+  addedBy: record.addedByUser
+    ? {
+        id: record.addedByUser.id,
+        username: record.addedByUser.username,
+      }
+    : null,
+};
+
+}
+
+async getAgentByIdInAgency(
+  agencyAgentId: number,
+  agencyId: number,
+): Promise<AgentMeRecord | null> {
+  const record = await this.prisma.agencyagent.findFirst({
+    where: {
+      id: agencyAgentId,
+      agency_id: agencyId,
+      status: 'active',
+      agency: { status: 'active' },
+    },
+    include: {
+      agency: {
+        select: {
+          id: true,
+          agency_name: true,
+          logo: true,
+        },
+      },
+      agentUser: true,
+      permission: true,
+       addedByUser: {
+    select: {
+      id: true,
+      username: true,
+    },
+  },
     },
   });
 
@@ -287,23 +342,23 @@ async createAgencyAgent(
   }
 
   return {
-   
     agent: AgentMapper.toDomain(record),
-
-   
     agentUser: AgentMapper.toAgentUserProps(record.agentUser),
-
-  
     agency: {
       id: record.agency.id,
       agency_name: record.agency.agency_name,
       logo: record.agency.logo,
     },
-
- 
     permission: record.permission
       ? AgentMapper.toPermissionDomain(record.permission)
       : null,
+      addedBy: record.addedByUser
+    ? {
+        id: record.addedByUser.id,
+        username: record.addedByUser.username,
+      }
+    : null,
   };
+  
 }
 }

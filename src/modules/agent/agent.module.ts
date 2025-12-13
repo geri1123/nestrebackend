@@ -21,6 +21,7 @@ import { GetAgentPermissionsUseCase } from './application/use-cases/get-agent-pe
 import { UpdateAgentPermissionsUseCase } from './application/use-cases/update-agent-permissions.use-case';
 import { GetAgentAuthContextUseCase } from './application/use-cases/get-agent-auth-context.use-case';
 import { GetAgentMeUseCase } from './application/use-cases/get-agent-me.use-case';
+import { GetAgentByIdInAgencyUseCase } from './application/use-cases/get-agent-in-agency.use-case';
 
 @Module({
   imports: [ NotificationModule , AgencyModule],
@@ -41,6 +42,7 @@ import { GetAgentMeUseCase } from './application/use-cases/get-agent-me.use-case
     UpdateAgentPermissionsUseCase,
    GetAgentPermissionsUseCase,
    GetAgentMeUseCase ,
+   GetAgentByIdInAgencyUseCase,
    {
       provide: AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,
       useClass: AgentRepository,

@@ -9,7 +9,6 @@ import { ApproveAgencyRequestUseCase } from "./application/use-cases/approve-age
 import { RejectAgencyRequestUseCase } from "./application/use-cases/reject-agency-request.use-case";
 import { UpdateAgencyRequestStatusUseCase } from "./application/use-cases/update-agency-request-status.use-case";
 import { EmailModule } from "../../infrastructure/email/email.module";
-import { CreateAgencyUseCase } from "../agency/application/use-cases/create-agency.use-case";
 
 @Module({
   imports: [
