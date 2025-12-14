@@ -1,5 +1,5 @@
-import { agency_status } from "@prisma/client";
 import { AgencyStatus } from "../types/agency-status.type";
+
 export class Agency {
   constructor(
     public readonly id: number,
@@ -9,6 +9,7 @@ export class Agency {
     public ownerUserId: number,
     public status: AgencyStatus,
     public publicCode: string,
+    public logoPublicId?: string,
     public agencyEmail?: string,
     public phone?: string,
     public website?: string,
@@ -32,16 +33,22 @@ export class Agency {
     if (data.website !== undefined) this.website = data.website;
   }
 
-  updateLogo(logoPath: string): void {
-    this.logo = logoPath;
+  updateLogo(url: string, publicId: string): void {
+    this.logo = url;
+    this.logoPublicId = publicId;
   }
 
   removeLogo(): void {
     this.logo = undefined;
+    this.logoPublicId = undefined;
+  }
+
+  hasCustomLogo(): boolean {
+    return !!this.logoPublicId;
   }
 
   activate(): void {
-    if (this.status !=="active") {
+    if (this.status !== "active") {
       this.status = "active";
     }
   }
@@ -68,6 +75,7 @@ export class Agency {
     ownerUserId: number;
     status: AgencyStatus;
     publicCode: string;
+    logoPublicId?: string; 
     agencyEmail?: string;
     phone?: string;
     website?: string;
@@ -83,6 +91,7 @@ export class Agency {
       data.ownerUserId,
       data.status,
       data.publicCode,
+      data.logoPublicId, 
       data.agencyEmail,
       data.phone,
       data.website,

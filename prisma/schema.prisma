@@ -12,6 +12,7 @@ model agency {
   agency_name         String
   public_code         String?               @unique(map: "Agency_public_code_key")
   logo                String?
+   logo_public_id      String?  
   license_number      String                @unique(map: "Agency_license_number_key")
   agency_email        String?
   phone               String?
@@ -331,6 +332,7 @@ model productimage {
   productId Int
   userId    Int
   imageUrl  String? @db.Text
+  publicId  String? @db.Text 
   product   product @relation(fields: [productId], references: [id], map: "ProductImage_productId_fkey")
   user      user    @relation(fields: [userId], references: [id], map: "ProductImage_userId_fkey")
 

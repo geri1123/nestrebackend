@@ -20,8 +20,7 @@ export function mapAgentToResponse(
       username: record.agentUser.username,
       firstName: record.agentUser.first_name,
       lastName: record.agentUser.last_name,
-      profileImg: record.agentUser.profile_img
-        ? firebase.getPublicUrl(record.agentUser.profile_img)
+      profileImg: record.agentUser.profile_img        ? record.agentUser.profile_img
         : null,
     },
     agent: {
@@ -36,7 +35,7 @@ export function mapAgentToResponse(
       id: record.agency.id,
       name: record.agency.agency_name,
       logo: record.agency.logo
-        ? firebase.getPublicUrl(record.agency.logo)
+        ? record.agency.logo
         : null,
     },
     permissions: record.permission

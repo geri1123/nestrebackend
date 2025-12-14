@@ -70,7 +70,7 @@ export class GetAgentsUseCase {
               first_name: item.agentUser.first_name,
               last_name: item.agentUser.last_name,
               profile_image: item.agentUser.profile_img
-                ? this.firebaseService.getPublicUrl(item.agentUser.profile_img)
+                ? item.agentUser.profile_img
                 : null,
             }
           : null,

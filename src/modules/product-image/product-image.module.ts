@@ -15,9 +15,10 @@ import { GetImagesByProductUseCase } from './application/use-cases/get-images-by
 // External Services
 import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 import { CommonModule } from '../../common/common.module';
+import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
 
 @Module({
-  imports:[FirebaseModule , CommonModule],
+  imports:[FirebaseModule , CommonModule ,  CloudinaryModule],
   providers: [
     // Repository implementation bound to interface
     {

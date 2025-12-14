@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import {PRODUCT_IMAGE_REPO, type IProductImageRepository } from '../../domain/repositories/product-image.repository.interface';
+import { PRODUCT_IMAGE_REPO, type IProductImageRepository } from '../../domain/repositories/product-image.repository.interface';
 import { ProductImage } from '../../domain/entities/product-image.entity';
-import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
+import { CloudinaryService } from '../../../../infrastructure/cloudinary/cloudinary.service';  // Changed
 import { SupportedLang, t } from '../../../../locales';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class UploadProductImagesUseCase {
   constructor(
     @Inject(PRODUCT_IMAGE_REPO)
     private readonly productImageRepository: IProductImageRepository,
-    private readonly firebaseService: FirebaseService
+    private readonly cloudinaryService: CloudinaryService,  
   ) {}
 
   async execute(
@@ -38,12 +38,17 @@ export class UploadProductImagesUseCase {
     try {
       const uploadedImages = await Promise.all(
         files.map(async (file) => {
-          const filePath = await this.firebaseService.uploadFile(file, `products/${productId}`);
+          // Upload to Cloudinary
+          const cloudinaryResult = await this.cloudinaryService.uploadFile(
+            file,
+            `products/${userId}/${productId}`
+          );
           
           const imageEntity = ProductImage.create({
             productId,
             userId,
-            imageUrl: filePath,
+            imageUrl: cloudinaryResult.url,
+            publicId: cloudinaryResult.publicId,  // Add this
           });
 
           const imageRecord = await this.productImageRepository.create(imageEntity);
@@ -52,7 +57,11 @@ export class UploadProductImagesUseCase {
             throw new BadRequestException(t('imageUrlMissingAfterUpload', language));
           }
 
-          return { id: imageRecord.id, imageUrl: imageRecord.imageUrl };
+          return { 
+            id: imageRecord.id, 
+            imageUrl: imageRecord.imageUrl,
+            publicId: imageRecord.publicId  // Optional: return this too
+          };
         })
       );
 

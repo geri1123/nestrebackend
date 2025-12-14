@@ -18,20 +18,22 @@ export class AgencyRepository implements IAgencyDomainRepository {
     const data = await this.prisma.agency.findUnique({ where: { id } });
     return data ? this.mapToEntity(data) : null;
   }
-async getAgencyWithOwnerById(id: number): Promise<{
-  id: number;
-  agency_name: string;
-  owner_user_id: number;
-} | null> {
-  return this.prisma.agency.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      agency_name: true,
-      owner_user_id: true,
-    },
-  });
-}
+
+  async getAgencyWithOwnerById(id: number): Promise<{
+    id: number;
+    agency_name: string;
+    owner_user_id: number;
+  } | null> {
+    return this.prisma.agency.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        agency_name: true,
+        owner_user_id: true,
+      },
+    });
+  }
+
   async findByOwnerUserId(ownerUserId: number): Promise<Agency | null> {
     const data = await this.prisma.agency.findFirst({
       where: { owner_user_id: ownerUserId },
@@ -47,48 +49,62 @@ async getAgencyWithOwnerById(id: number): Promise<{
   }
 
   async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfoVO | null> {
-  const agency = await this.prisma.agency.findUnique({
-    where: { id: agencyId },
-    include: {
-      user: {
-        select: {
-          username: true,
-          first_name: true,
-          last_name: true,
-          email: true,
+    const agency = await this.prisma.agency.findUnique({
+      where: { id: agencyId },
+      include: {
+        user: {
+          select: {
+            username: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  if (!agency) return null;
+    if (!agency) return null;
 
-  return {
-    id: agency.id,
-    agencyName: agency.agency_name,
-    licenseNumber: agency.license_number,
-    address: agency.address,                 // string | null
-    status: agency.status,
-    publicCode: agency.public_code,
-    agencyEmail: agency.agency_email,        // string | null
-    phone: agency.phone,                     // string | null
-    website: agency.website,                 // string | null
-    logo: agency.logo,                       // string | null
-    ownerUserId: agency.owner_user_id,
-    ownerName: agency.user
-      ? `${agency.user.first_name} ${agency.user.last_name}`
-      : undefined,
-    ownerEmail: agency.user?.email ?? undefined,
-    createdAt: agency.created_at,
-  };
-}
+    return {
+      id: agency.id,
+      agencyName: agency.agency_name,
+      licenseNumber: agency.license_number,
+      address: agency.address,
+      status: agency.status,
+      publicCode: agency.public_code,
+      agencyEmail: agency.agency_email,
+      phone: agency.phone,
+      website: agency.website,
+      logo: agency.logo,
+      ownerUserId: agency.owner_user_id,
+      ownerName: agency.user
+        ? `${agency.user.first_name} ${agency.user.last_name}`
+        : undefined,
+      ownerEmail: agency.user?.email ?? undefined,
+      createdAt: agency.created_at,
+    };
+  }
 
-  async findLogoById(agencyId: number): Promise<{ logo: string | null } | null> {
-  return this.prisma.agency.findUnique({
-    where: { id: agencyId },
-    select: { logo: true },
-  });
-}
+  // 👇 UPDATED METHOD
+  async findLogoById(agencyId: number): Promise<{ 
+    logo: string | null; 
+    logoPublicId: string | null; 
+  } | null> {
+    const result = await this.prisma.agency.findUnique({
+      where: { id: agencyId },
+      select: { 
+        logo: true,
+        logo_public_id: true, // 👈 ADDED
+      },
+    });
+
+    if (!result) return null;
+
+    return {
+      logo: result.logo,
+      logoPublicId: result.logo_public_id, // 👈 ADDED
+    };
+  }
 
   async getAllAgencies(skip: number, limit: number): Promise<any[]> {
     return this.prisma.agency.findMany({
@@ -129,17 +145,17 @@ async getAgencyWithOwnerById(id: number): Promise<{
   // COMMAND METHODS
   // ---------------------------------------------------------------------------
 
-  async create(data: {
-    agency_name: string;
-    license_number: string;
-    address: string;
-    owner_user_id: number;
-    status: agency_status;
-   
-  },
-tx?: Prisma.TransactionClient
-): Promise<number> {
-   const client = tx ?? this.prisma;
+  async create(
+    data: {
+      agency_name: string;
+      license_number: string;
+      address: string;
+      owner_user_id: number;
+      status: agency_status;
+    },
+    tx?: Prisma.TransactionClient
+  ): Promise<number> {
+    const client = tx ?? this.prisma;
     let publicCode: string;
 
     do {
@@ -158,26 +174,42 @@ tx?: Prisma.TransactionClient
   }
 
   async updateFields(agencyId: number, data: any): Promise<Agency> {
+    // Map camelCase to snake_case for Prisma
+    const prismaData: any = {};
+    
+    if (data.logo !== undefined) prismaData.logo = data.logo;
+    if (data.logoPublicId !== undefined) prismaData.logo_public_id = data.logoPublicId;
+    if (data.agencyName !== undefined) prismaData.agency_name = data.agencyName;
+    if (data.agencyEmail !== undefined) prismaData.agency_email = data.agencyEmail;
+    if (data.phone !== undefined) prismaData.phone = data.phone;
+    if (data.address !== undefined) prismaData.address = data.address;
+    if (data.website !== undefined) prismaData.website = data.website;
+    if (data.status !== undefined) prismaData.status = data.status;
+
     const updated = await this.prisma.agency.update({
       where: { id: agencyId },
-      data,
+      data: prismaData,
     });
 
     return this.mapToEntity(updated);
   }
 
-  async activateAgency(agencyId: number , tx:Prisma.TransactionClient): Promise<void> {
-    const client=tx ?? this.prisma;
+  async activateAgency(agencyId: number, tx?: Prisma.TransactionClient): Promise<void> {
+    const client = tx ?? this.prisma;
     await client.agency.update({
       where: { id: agencyId },
       data: { status: agency_status.active },
     });
   }
 
+  
   async deleteLogo(agencyId: number): Promise<void> {
     await this.prisma.agency.update({
       where: { id: agencyId },
-      data: { logo: null },
+      data: { 
+        logo: null,
+        logo_public_id: null, 
+      },
     });
   }
 
@@ -193,6 +225,7 @@ tx?: Prisma.TransactionClient
     return existing !== null;
   }
 
+  // 👇 UPDATED METHOD
   private mapToEntity(data: any): Agency {
     return Agency.create({
       id: data.id,
@@ -202,6 +235,7 @@ tx?: Prisma.TransactionClient
       ownerUserId: data.owner_user_id,
       status: data.status,
       publicCode: data.public_code,
+      logoPublicId: data.logo_public_id, 
       agencyEmail: data.agency_email,
       phone: data.phone,
       website: data.website,
@@ -210,6 +244,7 @@ tx?: Prisma.TransactionClient
       updatedAt: data.updated_at,
     });
   }
+
   async deleteByOwnerUserId(ownerUserId: number): Promise<number> {
     const result = await this.prisma.agency.deleteMany({
       where: { owner_user_id: ownerUserId },
@@ -217,183 +252,3 @@ tx?: Prisma.TransactionClient
     return result.count;
   }
 }
-// import { Injectable } from '@nestjs/common';
-// import { generatePublicCode } from '../../common/utils/hash';
-// import {   agency   } from '@prisma/client';
-// import { AgencyInfo } from '../../modules/agency/types/agency-info';
-// import { PrismaService } from '../../infrastructure/prisma/prisma.service';
-// import { PlainAgencyInput } from '../../modules/agency/types/agency-create-input';
-// import { IAgencyRepository } from './Iagency.repository';
-// @Injectable()
-// export class AgencyRepository implements IAgencyRepository {
-//   constructor(private prisma : PrismaService) {}
-//  async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfo | null> {
-//   const agency = await this.prisma.agency.findUnique({
-//     where: { id: agencyId },
-//     select: {
-//       id: true,
-//       agency_name: true,
-//       logo: true,
-//       license_number: true,
-//       phone: true,
-//       website: true,
-//       status: true,
-//       public_code: true,
-//       agency_email: true,
-//       address: true,
-//       owner_user_id: true,
-//       created_at: true,
-//       updated_at: true,
-//       user: { 
-//         select: {
-//           username: true,
-//           first_name: true,
-//           last_name: true,
-//         },
-//       },
-//     },
-//   });
-
-//   if (!agency) return null;
-
-//   return agency as AgencyInfo;
-// }
-
-//   async licenseExists(license: string): Promise<boolean> {
-//     const agency = await this.prisma.agency.findFirst({
-//       where: { license_number: license },
-//       select: { id: true },
-//     });
-//     return agency !== null;
-//   }
-// async findLogoById(agencyId: number): Promise<{ logo: string | null } | null> {
-//   return this.prisma.agency.findUnique({
-//     where: { id: agencyId },
-//     select: { logo: true },
-//   });
-// }
-// async findWithOwnerById(
-//   agencyId: number
-// ): Promise<{ id: number; agency_name: string; owner_user_id: number; status: string; } | null> {
-  
-//   return this.prisma.agency.findUnique({
-//     where: { id: agencyId },
-//     select: {
-//       id: true,
-//       agency_name: true,
-//       owner_user_id: true,
-//       status: true,
-      
-//     },
-//   });
-// }
-//   async findByOwnerUserId(ownerUserId: number): Promise<{ id: number } | null> {
-//   const agency = await this.prisma.agency.findFirst({
-//     where: { owner_user_id: ownerUserId },
-//     select: { id: true },
-//   });
-//   return agency || null;
-// }
-  
-//   async findByPublicCode(publicCode: string): Promise<agency | null> {
-//     return this.prisma.agency.findUnique({
-//       where: { public_code: publicCode },
-//     });
-//   }
-
-//   async agencyNameExist(agencyName: string): Promise<boolean> {
-//     const agency = await this.prisma.agency.findFirst({
-//       where: { agency_name: agencyName },
-//       select: { id: true },
-//     });
-//     return agency !== null;
-//   }
-
-//  async create(agencyData: PlainAgencyInput): Promise<number> {
-//   let publicCode: string;
-//   do {
-//     publicCode = generatePublicCode();
-//   } while (await this.publicCodeExists(publicCode));
-
-//   const newAgency = await this.prisma.agency.create({
-//     data: {
-//       ...agencyData,
-//       public_code: publicCode,
-//       // status: 'inactive',
-//       status: agencyData.status ?? 'inactive',
-//     },
-//     select: { id: true },
-//   });
-
-//   return newAgency.id;
-// }
-//   private async publicCodeExists(publicCode: string): Promise<boolean> {
-//     const existing = await this.prisma.agency.findUnique({
-//       where: { public_code: publicCode },
-//       select: { id: true },
-//     });
-//     return existing !== null;
-//   }
-// async activateAgency(agencyId: number): Promise<void> {
-//   await this.prisma.agency.update({
-//     where: { id: agencyId },
-//     data: { status: 'active' },
-//   });
-// }
-  
-// async getAllAgencies(skip: number, take: number): Promise<agency[]> {
-//   return this.prisma.agency.findMany({
-//     where: { status: 'active' },
-//     orderBy: { created_at: 'desc' },
-//     skip,
-//     take,
-//   });
-// } async countAgencies(): Promise<number> {
-//     return this.prisma.agency.count({
-//       where: { status: 'active' },
-//     });
-//   }
-//   async updateAgencyFields(
-//     agencyId: number,
-//     fields: Partial<PlainAgencyInput>
-//   ): Promise<void> {
-//     const allowedFields = [
-//       'agency_name',
-//       'logo',
-//       'license_number',
-//       'agency_email',
-//       'phone',
-//       'address',
-//       'website',
-//       'status',
-//     ] as const;
-
-//     const filteredData = Object.fromEntries(
-//       Object.entries(fields).filter(
-//         ([key, val]) => val !== undefined && allowedFields.includes(key as typeof allowedFields[number])
-//       )
-//     ) as Partial<PlainAgencyInput>;
-
-//     if (Object.keys(filteredData).length === 0) return;
-
-//     await this.prisma.agency.update({
-//       where: { id: agencyId },
-//       data: { ...filteredData },
-//     });
-//   }
-//  async deleteLogo(agencyId: number): Promise<void> {
-//   await this.prisma.agency.update({
-//     where: { id: agencyId },
-//     data: {
-//       logo: null,
-//     },
-//   });
-// };
-// async deleteByOwnerUserId(ownerUserId: number): Promise<number> {
-//     const result = await this.prisma.agency.deleteMany({
-//       where: { owner_user_id: ownerUserId },
-//     });
-//     return result.count;
-//   }
-
-// }

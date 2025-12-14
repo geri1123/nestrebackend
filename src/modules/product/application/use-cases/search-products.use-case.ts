@@ -25,7 +25,7 @@ export class SearchProductsUseCase {
 
     const productsForFrontend: ProductFrontendDto[] = products.map((product) => {
       const images: ProductImageDto[] = product.productimage.map((img: ProductImageDto) => ({
-        imageUrl: img.imageUrl ? this.firebaseService.getPublicUrl(img.imageUrl) : null,
+        imageUrl: img.imageUrl ? img.imageUrl : null,
       }));
 
       const hasActiveAd = product.advertisements && product.advertisements.length > 0;
@@ -56,7 +56,7 @@ export class SearchProductsUseCase {
         agency: product.agency
           ? {
               agency_name: product.agency.agency_name || 'Unknown Agency',
-              logo: product.agency.logo ? this.firebaseService.getPublicUrl(product.agency.logo) : null,
+              logo: product.agency.logo ? product.agency.logo : null,
             }
           : null,
         isAdvertised: hasActiveAd,

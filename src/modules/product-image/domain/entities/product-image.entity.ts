@@ -3,7 +3,8 @@ export class ProductImage {
     public readonly id: number,
     public readonly productId: number,
     public readonly userId: number,
-    public readonly imageUrl: string
+    public readonly imageUrl: string,
+    public readonly publicId?: string 
   ) {}
 
   static create(data: {
@@ -11,12 +12,14 @@ export class ProductImage {
     productId: number;
     userId: number;
     imageUrl: string;
+      publicId?: string;  
   }): ProductImage {
     return new ProductImage(
       data.id || 0,
       data.productId,
       data.userId,
-      data.imageUrl
+      data.imageUrl,
+        data.publicId 
     );
   }
 
@@ -25,7 +28,8 @@ export class ProductImage {
       id: this.id,
       productId: this.productId,
       userId: this.userId,
-      imageUrl: this.imageUrl
+      imageUrl: this.imageUrl,
+       publicId: this.publicId 
     };
   }
 }

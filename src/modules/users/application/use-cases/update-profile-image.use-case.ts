@@ -3,14 +3,22 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
-import { USER_REPO,type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import {
+  USER_REPO,
+  type IUserDomainRepository,
+} from '../../domain/repositories/user.repository.interface';
 import { CloudinaryService } from '../../../../infrastructure/cloudinary/cloudinary.service';
 import { ImageUtilsService } from '../../../../common/utils/image-utils.service';
 import { SupportedLang, t } from '../../../../locales';
+import { CloudinaryUploadResult } from '../../../../infrastructure/cloudinary/types/cloudinary-upload.result';
 
 @Injectable()
 export class UploadProfileImageUseCase {
+  private readonly logger = new Logger(UploadProfileImageUseCase.name);
+
   constructor(
     @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
@@ -22,14 +30,17 @@ export class UploadProfileImageUseCase {
     userId: number,
     file: Express.Multer.File,
     lang: SupportedLang,
-  ): Promise<string> {
+  ): Promise<{ url: string; publicId: string }> {
+    
 
-    // 1️⃣ Validate image
+    
     this.imageUtils.validateFile(file, lang);
+    this.logger.debug(`Image validation passed for user ${userId}`);
 
-    // 2️⃣ Load user
+   
     const user = await this.userRepo.findById(userId);
     if (!user) {
+      this.logger.warn(`User not found: ${userId}`);
       throw new NotFoundException({
         success: false,
         message: t('userNotFound', lang),
@@ -37,40 +48,94 @@ export class UploadProfileImageUseCase {
     }
 
     const oldPublicId = user.profileImgPublicId;
+    let uploadResult: CloudinaryUploadResult | null = null;
 
-    // 3️⃣ Upload new image
-    const uploadResult = await this.cloudinary.uploadFile(
-      file,
-      `profile-images/${userId}`,
-    );
+    try {
+    
+      uploadResult = await this.cloudinary.uploadFile(
+        file,
+        `profile-images/${userId}`,
+      );
 
-    if (!uploadResult?.url || !uploadResult?.publicId) {
-      throw new BadRequestException({
+      if (!uploadResult?.url || !uploadResult?.publicId) {
+        throw new BadRequestException({
+          success: false,
+          message: t('imageUploadFailed', lang),
+        });
+      }
+
+      this.logger.log(
+        `Image uploaded to Cloudinary for user ${userId}: ${uploadResult.publicId}`,
+      );
+
+    
+      user.updateProfileImage(uploadResult.url, uploadResult.publicId);
+
+  
+      await this.userRepo.updateProfileImage(
+        userId,
+        uploadResult.url,
+        uploadResult.publicId,
+      );
+
+      this.logger.log(`Database updated for user ${userId}`);
+
+    
+      if (oldPublicId) {
+        try {
+          await this.cloudinary.deleteFile(oldPublicId);
+          this.logger.log(`Old image deleted for user ${userId}: ${oldPublicId}`);
+        } catch (err) {
+          this.logger.warn(
+            `Failed to delete old Cloudinary image for user ${userId}: ${oldPublicId}`,
+            err,
+          );
+         
+        }
+      }
+
+      this.logger.log(
+        `Profile image upload completed successfully for user ${userId}`,
+      );
+
+      // 7️⃣ Return result
+      return {
+        url: uploadResult.url,
+        publicId: uploadResult.publicId,
+      };
+    } catch (error) {
+      // Rollback: delete newly uploaded image if DB update failed
+      if (uploadResult?.publicId) {
+        this.logger.error(
+          `Database update failed for user ${userId}. Rolling back Cloudinary upload: ${uploadResult.publicId}`,
+        );
+        try {
+          await this.cloudinary.deleteFile(uploadResult.publicId);
+          this.logger.log(
+            `Successfully rolled back Cloudinary upload: ${uploadResult.publicId}`,
+          );
+        } catch (rollbackErr) {
+          this.logger.error(
+            `Failed to rollback Cloudinary upload: ${uploadResult.publicId}`,
+            rollbackErr,
+          );
+          // Log but continue - we'll have an orphaned image, but at least we know about it
+        }
+      }
+
+      // Re-throw the original error
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+
+      this.logger.error(
+        `Unexpected error during profile image upload for user ${userId}`,
+        error,
+      );
+      throw new InternalServerErrorException({
         success: false,
         message: t('imageUploadFailed', lang),
       });
     }
-
-    // 4️⃣ Update domain entity
-    user.updateProfileImage(uploadResult.url, uploadResult.publicId);
-
-    // 5️⃣ Persist
-    await this.userRepo.updateProfileImage(
-      userId,
-      uploadResult.url,
-      uploadResult.publicId,
-    );
-
-    // 6️⃣ Delete old image (best effort)
-    if (oldPublicId) {
-      try {
-        await this.cloudinary.deleteFile(oldPublicId);
-      } catch (err) {
-        console.warn('⚠️ Failed to delete old Cloudinary image', err);
-      }
-    }
-
-    // 7️⃣ Return URL
-    return uploadResult.url;
   }
 }

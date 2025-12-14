@@ -112,7 +112,7 @@ export class AgencyController {
 
   // -----------
   // UPLOAD LOGO
-  // -----------s
+  // -----------
   @Roles('agency_owner')
   @Patch('upload-logo')
   @UseInterceptors(FileInterceptor('file'))

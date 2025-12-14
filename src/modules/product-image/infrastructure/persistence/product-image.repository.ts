@@ -13,6 +13,7 @@ export class ProductImageRepository implements IProductImageRepository {
         productId: image.productId,
         userId: image.userId,
         imageUrl: image.imageUrl,
+        publicId: image.publicId, 
       },
     });
 
@@ -21,6 +22,7 @@ export class ProductImageRepository implements IProductImageRepository {
       productId: created.productId,
       userId: created.userId,
       imageUrl: created.imageUrl || '',
+      publicId: created.publicId || undefined,  
     });
   }
 
@@ -35,6 +37,7 @@ export class ProductImageRepository implements IProductImageRepository {
         productId: img.productId,
         userId: img.userId,
         imageUrl: img.imageUrl || '',
+        publicId: img.publicId || undefined,  
       })
     );
   }

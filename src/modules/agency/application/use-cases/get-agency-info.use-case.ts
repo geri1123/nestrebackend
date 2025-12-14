@@ -31,10 +31,9 @@ export class GetAgencyInfoUseCase {
       throw new NotFoundException(t('agencyNotFound', language));
     }
 
-    // Transform logo path to public URL
-    if (agencyInfo.logo) {
-      agencyInfo.logo = this.firebaseService.getPublicUrl(agencyInfo.logo) || null;
-    }
+    // if (agencyInfo.logo) {
+    //   agencyInfo.logo = agencyInfo.logo || null;
+    // }
 
     return agencyInfo;
   }
