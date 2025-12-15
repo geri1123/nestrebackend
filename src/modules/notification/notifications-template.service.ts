@@ -16,7 +16,7 @@ export class NotificationTemplateService {
   private readonly templates: NotificationTemplates = {
     agent_email_confirmed: {
       [LanguageCode.al]: (user) =>
-        `${user.username || 'Përdoruesi'} ka konfirmuar email-in dhe dëshiron të bashkohet me agjensionin tuaj.`,
+        `${user.username || 'Përdoruesi'} ka konfirmuar email-in dhe dëshiron të bashkohet me agjencine tuaj.`,
       [LanguageCode.en]: (user) =>
         `${user.username || 'User'} has confirmed their email and wants to join your agency.`,
       [LanguageCode.it]: (user) =>

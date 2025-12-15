@@ -1,29 +1,59 @@
-// repositories/notification/NotificationRepository.ts
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
+import {
+  INotificationRepository,
+  NotificationData,
+  GetNotificationsParams,
+} from '../../domain/repository/notification.repository.interface';
+import { LanguageCode, NotificationStatus } from '@prisma/client';
 
-import {  NotificationStatus , LanguageCode } from "@prisma/client";
-import { PrismaService } from "../../../../infrastructure/prisma/prisma.service.js";
-import { INotificationRepository, NotificationData } from "../../domain/repository/notification.repository.interface.js";
-import { Injectable } from "@nestjs/common";
 @Injectable()
 export class NotificationRepository implements INotificationRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async createNotification({ userId, type, translations }: NotificationData) {
+  async createNotification(data: NotificationData) {
     return this.prisma.notification.create({
       data: {
-        userId,
-        type,
+        userId: data.userId,
+        type: data.type,
         status: NotificationStatus.unread,
+        metadata: data.metadata || {},
         notificationtranslation: {
-          create: translations.map((t) => ({
-            languageCode: t.languageCode,
-            message: t.message,
+          create: data.translations.map((translation) => ({
+            languageCode: translation.languageCode,
+          
+            message: translation.message,
           })),
         },
       },
       include: {
         notificationtranslation: true,
       },
+    });
+  }
+
+  async getNotifications(params: GetNotificationsParams) {
+    const { userId, languageCode, limit = 10, offset = 0, status } = params;
+
+    return this.prisma.notification.findMany({
+      where: {
+        userId,
+        ...(status && { status }),
+      },
+      include: {
+        notificationtranslation: languageCode
+          ? {
+              where: {
+              languageCode: languageCode,
+              },
+            }
+          : true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: offset,
     });
   }
 
@@ -35,37 +65,44 @@ export class NotificationRepository implements INotificationRepository {
       },
     });
   }
-async getNotifications(params: {
-  userId: number;
-  limit?: number;
-  offset?: number;
-  languageCode?: LanguageCode;
-}): Promise<Array<{ id: number; translations: Array<{ languageCode: LanguageCode; message: string }> }>> {
-  const notifications = await this.prisma.notification.findMany({
-    where: { userId: params.userId },
-    take: params.limit,
-    skip: params.offset,
-    orderBy: { createdAt: "desc" },
-    include: {
-      notificationtranslation: {
-        where: { languageCode: params.languageCode },
-        select: { languageCode: true, message: true },
-      },
-    },
-  });
 
-  
-  return notifications.map((n) => ({
-    id: n.id,
-     status: n.status,
-    translations: n.notificationtranslation ?? [],
-    
-  }));
-}
-async changeNotificationStatus(notificationId: number, status: NotificationStatus) {
+  async changeNotificationStatus(notificationId: number, status: NotificationStatus) {
     return this.prisma.notification.update({
       where: { id: notificationId },
-      data: { status },
+      data: {
+        status,
+        ...(status === NotificationStatus.read && { readAt: new Date() }),
+      },
+    });
+  }
+
+  async markAllAsReadForUser(userId: number): Promise<{ count: number }> {
+    const result = await this.prisma.notification.updateMany({
+      where: {
+        userId,
+        status: NotificationStatus.unread,
+      },
+      data: {
+        status: NotificationStatus.read,
+        readAt: new Date(),
+      },
+    });
+
+    return { count: result.count };
+  }
+
+  async deleteNotification(notificationId: number) {
+    return this.prisma.notification.delete({
+      where: { id: notificationId },
+    });
+  }
+
+  async getNotificationById(notificationId: number) {
+    return this.prisma.notification.findUnique({
+      where: { id: notificationId },
+      include: {
+        notificationtranslation: true,
+      },
     });
   }
 }

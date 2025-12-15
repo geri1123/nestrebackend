@@ -146,6 +146,8 @@ model notification {
   userId                  Int
   type                    String
   status                  NotificationStatus        @default(unread)
+   metadata                Json?                     // Add this field
+  readAt                  DateTime?   
   createdAt               DateTime                  @default(now())
   user                    user                      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Notification_userId_fkey")
   notificationtranslation notificationtranslation[]

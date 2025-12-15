@@ -44,10 +44,10 @@ export class RegisterAgencyOwnerUseCase {
         },
         lang,
         'agency_owner',
-        tx,   // <-- IMPORTANT
+        tx,   
       );
 
-      // 4️⃣ Create Agency inside the same transaction
+      
       const agencyId = await this.createAgencyUseCase.execute(
         {
           agency_name: dto.agency_name,

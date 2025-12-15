@@ -28,10 +28,12 @@ import { AuthTokenService } from './infrastructure/services/auth-token.service';
 import { AuthCookieService } from './infrastructure/services/auth-cookie.service';
 import { GoogleLoginUseCase } from './application/use-cases/google-login.use-case';
 import { GoogleAuthService } from './infrastructure/services/google-auth.service';
+import { SharedAuthModule } from '../../infrastructure/auth/shared-auth.module';
 
 
 @Module({
   imports: [
+    SharedAuthModule,
     NotificationModule,
     EmailModule,
     UsersModule,
@@ -41,15 +43,7 @@ import { GoogleAuthService } from './infrastructure/services/google-auth.service
     AgentModule,
     RegistrationRequestModule,
     AppCacheModule,
-  
-   JwtModule.registerAsync({
-  imports: [AppConfigModule],
-  useFactory: async (configService: AppConfigService) => ({
-    secret: configService.jwtSecret, 
-    signOptions: { expiresIn: '1d' },
-  }),
-  inject: [AppConfigService],
-}),
+
   ],
   providers: [
     GoogleAuthService,
@@ -64,6 +58,15 @@ import { GoogleAuthService } from './infrastructure/services/google-auth.service
   
    
   ],
-  exports: [ RefreshTokenUseCase , JwtModule], 
+  exports: [ RefreshTokenUseCase ], 
 })
 export class AuthModule {}
+  
+//    JwtModule.registerAsync({
+//   imports: [AppConfigModule],
+//   useFactory: async (configService: AppConfigService) => ({
+//     secret: configService.jwtSecret, 
+//     signOptions: { expiresIn: '1d' },
+//   }),
+//   inject: [AppConfigService],
+// }),

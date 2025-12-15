@@ -41,7 +41,7 @@ export class VerifyEmailUseCase {
     throw new BadRequestException({ errors: { token: [t('tokenRequired', lang)] } });
   }
 
-  // 1️⃣ Validate token from cache (must stay outside transaction)
+  
   const cacheKey = `email_verification:${token}`;
   const cached = await this.cache.get<{ userId: number; role: string }>(cacheKey);
 
@@ -51,7 +51,7 @@ export class VerifyEmailUseCase {
 
   const { userId, role } = cached;
 
-  // 2️⃣ Run all DB operations inside one transaction
+ 
   const result = await this.prisma.$transaction(async (tx) => {
 
     const user = await this.findUserById.execute(userId, lang);
@@ -72,7 +72,7 @@ export class VerifyEmailUseCase {
 
   const user = result;
 
-  // 3️⃣ Actions AFTER transaction (side effects)
+
   await this.cache.delete(cacheKey);
 
   const name = user.firstName ?? 'User';

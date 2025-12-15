@@ -33,12 +33,14 @@ import { RegistrationModule } from './modules/registration/registration.module';
 import { EmailVerificationModule } from './modules/email-verification/email-verification.module';
 import { ProductImageModule } from './modules/product-image/product-image.module';
 import { ProductAttributeValueModule } from './modules/product-attribute/product-attribute.module';
-import { SoftAuthModule } from './common/soft-auth/soft-auth.module';
 import { AdvertisementPricingModule } from './modules/advertisement-pricing/advertisement-prising.module';
 import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
+import { SharedAuthModule } from './infrastructure/auth/shared-auth.module';
 
 @Module({
   imports: [
+        SharedAuthModule, 
+
   ThrottlerModule.forRoot({
   throttlers: [
     {
@@ -69,7 +71,7 @@ ProductAttributeValueModule,
 AdvertiseProductModule,
 NotificationModule,
 EmailVerificationModule,
-SoftAuthModule,
+SharedAuthModule,
     AgentModule, 
     AdvertisementPricingModule,
   ],

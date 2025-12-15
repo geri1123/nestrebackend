@@ -98,13 +98,13 @@ export class UploadProfileImageUseCase {
         `Profile image upload completed successfully for user ${userId}`,
       );
 
-      // 7️⃣ Return result
+      
       return {
         url: uploadResult.url,
         publicId: uploadResult.publicId,
       };
     } catch (error) {
-      // Rollback: delete newly uploaded image if DB update failed
+      
       if (uploadResult?.publicId) {
         this.logger.error(
           `Database update failed for user ${userId}. Rolling back Cloudinary upload: ${uploadResult.publicId}`,
@@ -119,11 +119,9 @@ export class UploadProfileImageUseCase {
             `Failed to rollback Cloudinary upload: ${uploadResult.publicId}`,
             rollbackErr,
           );
-          // Log but continue - we'll have an orphaned image, but at least we know about it
         }
       }
 
-      // Re-throw the original error
       if (error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
       }

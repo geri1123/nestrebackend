@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// ✅ Use classes instead of interfaces for DTOs
+
 export class SubcategoryDto {
   @ApiProperty({ example: 1 })
   id: number;

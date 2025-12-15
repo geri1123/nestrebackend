@@ -7,7 +7,6 @@ import { DeleteProductImagesByProductIdUseCase } from '../../../product-image/ap
 import { UploadProductImagesUseCase } from '../../../product-image/application/use-cases/upload-product-images.use-case';
 import { DeleteProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/delete-product-attributes.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
-import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 
 @Injectable()
 export class UpdateProductUseCase {
@@ -18,7 +17,6 @@ export class UpdateProductUseCase {
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,
     private readonly deleteAttributesUseCase: DeleteProductAttributeValuesUseCase,
     private readonly createAttributesUseCase: CreateProductAttributeValuesUseCase,
-    private readonly firebaseService: FirebaseService
   ) {}
 
   async execute(
@@ -74,7 +72,7 @@ export class UpdateProductUseCase {
       imagesResponse = uploadedImages
         .map(img => ({
           id: img.id,
-          imageUrl: this.firebaseService.getPublicUrl(img.imageUrl),
+          imageUrl: img.imageUrl,
         }))
         .filter(img => img.imageUrl !== null) as { id: number; imageUrl: string }[];
     }

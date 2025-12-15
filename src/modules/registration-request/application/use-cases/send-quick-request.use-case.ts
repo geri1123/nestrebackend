@@ -39,7 +39,7 @@ export class SendQuickRequestUseCase {
       userId: agency.owner_user_id,
       type: "user_send_request",
       translations,
-      messageData: { username },
+      metadata: { username }, 
     });
   }
 }

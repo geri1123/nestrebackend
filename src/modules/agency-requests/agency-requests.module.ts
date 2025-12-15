@@ -9,6 +9,7 @@ import { ApproveAgencyRequestUseCase } from "./application/use-cases/approve-age
 import { RejectAgencyRequestUseCase } from "./application/use-cases/reject-agency-request.use-case";
 import { UpdateAgencyRequestStatusUseCase } from "./application/use-cases/update-agency-request-status.use-case";
 import { EmailModule } from "../../infrastructure/email/email.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { EmailModule } from "../../infrastructure/email/email.module";
     RegistrationRequestModule,
     AgentModule,
     UsersModule,
-    EmailModule
+    EmailModule,
+    NotificationModule
   ],
   controllers: [AgencyRequestsController],
   providers: [

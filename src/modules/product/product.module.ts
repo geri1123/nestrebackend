@@ -2,7 +2,6 @@
 
 
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 
 // Controllers
 import { SearchProductsController } from './controller/product.controller';
@@ -21,23 +20,19 @@ import { UpdateProductUseCase } from './application/use-cases/update-product.use
 import { GetProductByIdUseCase } from './application/use-cases/get-product-by-id.use-case';
 import { SearchProductsUseCase } from './application/use-cases/search-products.use-case';
 import { GetProductForPermissionUseCase } from './application/use-cases/get-product-for-permission.use-case';
-
 // Utilities
 import { SearchFiltersHelper } from './application/helpers/search-filters.helper';
-
-// External Modules
 import { UsersModule } from '../users/users.module';
 import { AgentModule } from '../agent/agent.module';
 import { AgencyModule } from '../agency/agency.module';
 import { ProductClicksModule } from '../product-clicks/product-clicks.module';
 import { ProductImageModule } from '../product-image/product-image.module';
 
-import { SoftAuthService } from '../../common/soft-auth/soft-auth.service';
 import { ProductAttributeValueModule } from '../product-attribute/product-attribute.module';
 import { FindProductByIdUseCase } from './application/use-cases/find-product-by-id.use-case';
-import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
 import { ProductOwnershipAndPermissionGuard } from '../../common/guard/product-ownership.guard';
 import { CommonModule } from '../../common/common.module';
+import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
@@ -47,13 +42,12 @@ import { CommonModule } from '../../common/common.module';
     AgentModule,
     AgencyModule,
     ProductClicksModule,
+SoftAuthModule,
     ProductImageModule,
     ProductAttributeValueModule,
-    JwtModule.register({}),
-    SoftAuthModule,
+    
   ],
   providers: [
-    // Repository implementations bound to interfaces
     {
       provide: PRODUCT_REPO,
       useClass: ProductRepository,
@@ -73,7 +67,7 @@ ProductOwnershipAndPermissionGuard,
 
     // Utilities
     SearchFiltersHelper,
-    SoftAuthService,
+    // SoftAuthService,
   ],
   exports: [
     SEARCH_PRODUCT_REPO,

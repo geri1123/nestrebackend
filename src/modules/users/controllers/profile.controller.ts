@@ -20,7 +20,6 @@ import { throwValidationErrors } from '../../../common/helpers/validation.helper
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { GetNavbarUserUseCase } from '../application/use-cases/get-navbar-user.use-case';
 import { UpdateUserProfileUseCase } from '../application/use-cases/update-user-profile.use-case';
-import { type RequestWithLang } from '../../../middlewares/language.middleware';
 import { GetUserProfileUseCase } from '../application/use-cases/get-user-profile.use-case';
 
 @Controller('profile')

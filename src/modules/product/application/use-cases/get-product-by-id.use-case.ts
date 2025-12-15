@@ -11,7 +11,6 @@ export class GetProductByIdUseCase {
   constructor(
     @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
-    private readonly firebaseService: FirebaseService,
     private readonly productClicksService: ProductClicksService
   ) {}
 

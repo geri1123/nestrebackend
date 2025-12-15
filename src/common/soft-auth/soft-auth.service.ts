@@ -1,16 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { UserRepository } from '../../modules/users/infrastructure/persistence/user.repository';
 import { RequestWithUser } from '../types/request-with-user.interface';
-import { AppConfigService } from '../../infrastructure/config/config.service';
+import { CustomJwtPayload } from '../../modules/auth/infrastructure/services/auth-token.service';
+import {type IUserDomainRepository, USER_REPO } from '../../modules/users/domain/repositories/user.repository.interface';
 
 @Injectable()
 export class SoftAuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepo: UserRepository,
-    private readonly config: AppConfigService,
+      @Inject(USER_REPO)
+    private readonly userRepo: IUserDomainRepository,
   ) {}
 
   async attachUserIfExists(req: RequestWithUser) {
@@ -22,9 +21,10 @@ export class SoftAuthService {
     if (!token) return;
 
     try {
-      const decoded = this.jwtService.verify(token, {
-        secret: this.config.jwtSecret,
-      });
+      // const decoded = this.jwtService.verify(token, {
+        // secret: this.config.jwtSecret,
+      // });
+const decoded = this.jwtService.verify<CustomJwtPayload>(token);
 
       const user = await this.userRepo.findById(decoded.userId);
       if (!user) return;

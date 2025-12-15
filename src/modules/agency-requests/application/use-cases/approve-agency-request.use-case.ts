@@ -13,6 +13,8 @@ import { GetUserProfileUseCase } from "../../../users/application/use-cases/get-
 import { FindUserByIdUseCase } from "../../../users/application/use-cases/find-user-by-id.use-case";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { EnsureIdCardUniqueUseCase } from "../../../agent/application/use-cases/ensure-idcard-unique.use-case";
+import { NotificationTemplateService } from "../../../notification/notifications-template.service";
+import { NotificationService } from "../../../notification/notification.service";
 
 export interface ApproveRequestInput {
   request: RegistrationRequestEntity;
@@ -34,6 +36,8 @@ export class ApproveAgencyRequestUseCase {
     private readonly updateUserFields: UpdateUserFieldsUseCase,
     private readonly getuser:FindUserByIdUseCase,
     private readonly emailService: EmailService,
+    private readonly notificationService: NotificationService,
+    private readonly notificationTemplateService: NotificationTemplateService,
   ) {}
 async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
   const { request, agencyId, approvedBy, roleInAgency, commissionRate, permissions } = input;
@@ -88,10 +92,22 @@ async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
     return agent;
   });
 
-  // Email must be OUTSIDE transaction
   const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
   await this.emailService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
-
+const translations =
+  this.notificationTemplateService.getAllTranslations(
+    'agency_confirm_agent',
+    {},
+  );
+  await this.notificationService.sendNotification({
+  userId: request.userId,
+  type: 'agency_confirm_agent',
+  translations,
+  metadata: {
+    agencyId,
+    approvedBy,
+  },
+});
   return agent;
 }
 //   async execute(input: ApproveRequestInput, language: SupportedLang = "al") {

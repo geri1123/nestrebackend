@@ -13,7 +13,6 @@ import { AgentEntity } from '../../domain/entities/agent.entity';
 import { AgentStatus } from '../../domain/types/agent-status.type';
 import { AgentRole } from '../../domain/types/agent-role.type';
 import { AgentPermissionEntity } from '../../domain/entities/agent-permission.entity';
-import { AgentMeResponse } from '../../dto/agent-me.response';
 
 @Injectable()
 export class AgentRepository implements IAgentDomainRepository {

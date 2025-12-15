@@ -94,7 +94,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       where: { id: agencyId },
       select: { 
         logo: true,
-        logo_public_id: true, // 👈 ADDED
+        logo_public_id: true, 
       },
     });
 
@@ -102,7 +102,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
 
     return {
       logo: result.logo,
-      logoPublicId: result.logo_public_id, // 👈 ADDED
+      logoPublicId: result.logo_public_id,
     };
   }
 
