@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { t, SupportedLang } from '../../../../locales';
+import { format } from 'path';
 
 @Injectable()
 export class GetUserProfileUseCase {
@@ -20,7 +21,7 @@ export class GetUserProfileUseCase {
         errors: { user: [t('userNotFound', language)] },
       });
     }
-
+ 
     return user;
   }
 }

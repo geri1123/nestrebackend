@@ -13,7 +13,7 @@ export class SavedProductDto {
   country?: string;
   user: { username: string };
   images: SavedProductImage[];
-  savedAt: string;
+  savedAt: string | null
 }
 
 export class PaginatedSavedProductsDto {

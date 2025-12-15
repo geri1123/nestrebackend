@@ -43,7 +43,7 @@ export class GetSavedProductsUseCase {
         country: saved.product.city?.country?.name || 'No Country',
         user: { username: saved.product.user?.username || 'Unknown' },
         images,
-        savedAt: formatDate(saved.saved_at),
+        savedAt: formatDate(saved.saved_at ),
       };
     });
 

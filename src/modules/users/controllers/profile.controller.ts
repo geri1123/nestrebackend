@@ -21,6 +21,9 @@ import type { RequestWithUser } from '../../../common/types/request-with-user.in
 import { GetNavbarUserUseCase } from '../application/use-cases/get-navbar-user.use-case';
 import { UpdateUserProfileUseCase } from '../application/use-cases/update-user-profile.use-case';
 import { GetUserProfileUseCase } from '../application/use-cases/get-user-profile.use-case';
+import { UserProfileResponse } from '../responses/user-profile.response';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { NavbarProfileResponse } from '../responses/user-nav-response.response';
 
 @Controller('profile')
 export class ProfileController {
@@ -30,15 +33,20 @@ export class ProfileController {
     private readonly changeUsernameUseCase: ChangeUsernameUseCase,
     private readonly getUserProfile:GetUserProfileUseCase,
   ) {}
+
+  @ApiOkResponse({ type: UserProfileResponse })
   @Get('me')
   async getUserinfo(@Req() req: RequestWithUser){
     if (!req.userId){
        throw new UnauthorizedException(t('userNotAuthenticated', req.language));
     }
     const me= await this.getUserProfile.execute(req.userId , req.language);
-    return me;
-  }
- 
+
+    return  UserProfileResponse.fromDomain(me);  
+}
+    
+  
+ @ApiOkResponse({type:NavbarProfileResponse})
   @Get('navbar')
   async getProfile(@Req() req: RequestWithUser) {
     if (!req.userId) {
@@ -47,7 +55,7 @@ export class ProfileController {
 
     const profile = await this.getNavbarUserUseCase.execute(req.userId, req.language);
 
-    return { success: true, profile };
+    return  NavbarProfileResponse.fromDomain(profile) ;
   }
 
   @Patch('update')

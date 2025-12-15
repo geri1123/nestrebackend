@@ -1,4 +1,6 @@
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string | null): string |null {
+
+    if (!date) return null;
   const d = new Date(date);
 
   // Example: "Nov 06, 2025 18:02"
