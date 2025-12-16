@@ -11,6 +11,7 @@ import { SupportedLang, t } from './locales';
 import { ValidationError } from 'class-validator';
 import { translateValidationMessage } from './common/helpers/validation.helper';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { requestContext } from './common/context/request-context';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,43 +19,72 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
- 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-      exceptionFactory: (errors: ValidationError[]) => {
-        if (!errors || errors.length === 0) {
-          // safety check
-          return new BadRequestException({
-            success: false,
-            message: t('validationFailed', 'al'),
-          });
+ app.useGlobalPipes(
+  new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    exceptionFactory: (errors: ValidationError[]) => {
+      const store = requestContext.getStore();
+      const lang: SupportedLang = store?.language ?? 'al';
+
+      const formatted: Record<string, string[]> = {};
+
+      for (const err of errors) {
+        if (err.constraints) {
+          formatted[err.property] = Object.values(err.constraints).map(
+            code => translateValidationMessage(code, lang),
+          );
         }
+      }
 
-        const formatted: Record<string, string[]> = {};
-        const lang: SupportedLang = 'al'; 
+      return new BadRequestException({
+        success: false,
+        message: t('validationFailed', lang),
+        errors: formatted,
+      });
+    },
+  }),
+);
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     transform: true,
+  //     whitelist: true,
+  //     forbidNonWhitelisted: true,
+  //     transformOptions: {
+  //       enableImplicitConversion: true,
+  //     },
+  //     exceptionFactory: (errors: ValidationError[]) => {
+  //       if (!errors || errors.length === 0) {
+  //         // safety check
+  //         return new BadRequestException({
+  //           success: false,
+  //           message: t('validationFailed', 'al'),
+  //         });
+  //       }
 
-        for (const err of errors) {
-          if (err.constraints) {
-            formatted[err.property] = Object.values(err.constraints).map(code =>
-              translateValidationMessage(code, lang)
-            );
-          }
-        }
+  //       const formatted: Record<string, string[]> = {};
+  //       const lang: SupportedLang = 'al'; 
 
-        return new BadRequestException({
-          success: false,
-          message: t('validationFailed', lang),
-          errors: formatted,
-        });
-      },
-    }),
-  );
+  //       for (const err of errors) {
+  //         if (err.constraints) {
+  //           formatted[err.property] = Object.values(err.constraints).map(code =>
+  //             translateValidationMessage(code, lang)
+  //           );
+  //         }
+  //       }
+
+  //       return new BadRequestException({
+  //         success: false,
+  //         message: t('validationFailed', lang),
+  //         errors: formatted,
+  //       });
+  //     },
+  //   }),
+  // );
 
   
   app.useGlobalFilters(new AllExceptionsFilter());

@@ -78,6 +78,7 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
   @HttpCode(HttpStatus.CREATED)
   async registerUser(
     @Body() body: Record<string, any>,
+    
     @Req() req: RequestWithLang,
   ) {
     const lang = req.language || 'al';

@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { PaginatedAgenciesVO } from '../../domain/value-objects/paginated-agencies.vo';
 import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
+import { PaginatedAgenciesResponse } from '../../responses/paginated-agencies.response';
 
 @Injectable()
 export class GetPaginatedAgenciesUseCase {
@@ -11,7 +12,7 @@ export class GetPaginatedAgenciesUseCase {
     private readonly firebaseService: FirebaseService,
   ) {}
 
-  async execute(page: number = 1, limit: number = 12): Promise<PaginatedAgenciesVO> {
+  async execute(page: number = 1, limit: number = 12): Promise<PaginatedAgenciesResponse>  {
     const skip = (page - 1) * limit;
 
     const [agencies, total] = await Promise.all([

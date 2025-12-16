@@ -6,6 +6,7 @@ import { SupportedLang } from '../../../../locales';
 
 import { USERS_REPOSITORY_TOKENS } from '../../../users/domain/repositories/user.repository.tokens';
 import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
+import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
 @Injectable()
 export class RegisterAgencyFromUserUseCase {
@@ -13,6 +14,7 @@ export class RegisterAgencyFromUserUseCase {
     private readonly createAgency: CreateAgencyUseCase,
     @Inject(USER_REPO)
     private readonly userRepository: IUserDomainRepository,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(
@@ -20,17 +22,26 @@ export class RegisterAgencyFromUserUseCase {
     userId: number,
     language: SupportedLang = 'al',
   ): Promise<{ agencyId: number }> {
-    // Update user role to agency_owner
-    await this.userRepository.updateFields(userId, { role: user_role.agency_owner });
 
-    // Create agency
-    const agencyId = await this.createAgency.execute(
-      data,
-      userId,
-      agency_status.active,
-      language,
-    );
+    return this.prisma.$transaction(async (tx) => {
 
-    return { agencyId };
+      
+      const agencyId = await this.createAgency.execute(
+        data,
+        userId,
+        agency_status.active,
+        language,
+        tx,
+      );
+
+     
+      await this.userRepository.updateFields(
+        userId,
+        { role: user_role.agency_owner },
+        tx,
+      );
+
+      return { agencyId };
+    });
   }
 }

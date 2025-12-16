@@ -22,8 +22,10 @@ import { GetNavbarUserUseCase } from '../application/use-cases/get-navbar-user.u
 import { UpdateUserProfileUseCase } from '../application/use-cases/update-user-profile.use-case';
 import { GetUserProfileUseCase } from '../application/use-cases/get-user-profile.use-case';
 import { UserProfileResponse } from '../responses/user-profile.response';
-import { ApiOkResponse } from '@nestjs/swagger';
+import {  ApiBody, ApiOkResponse, ApiOperation, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { NavbarProfileResponse } from '../responses/user-nav-response.response';
+import { ApiBadRequestResponse, ApiSuccessResponse } from '../../../common/swagger/response.helper.ts';
+import { ApiChangeUsername, ApiGetNavbarProfile, ApiGetUserProfile, ApiUpdateProfile } from '../decorators/profile.decorators';
 
 @Controller('profile')
 export class ProfileController {
@@ -34,8 +36,9 @@ export class ProfileController {
     private readonly getUserProfile:GetUserProfileUseCase,
   ) {}
 
-  @ApiOkResponse({ type: UserProfileResponse })
+
   @Get('me')
+  @ApiGetUserProfile()
   async getUserinfo(@Req() req: RequestWithUser){
     if (!req.userId){
        throw new UnauthorizedException(t('userNotAuthenticated', req.language));
@@ -46,7 +49,7 @@ export class ProfileController {
 }
     
   
- @ApiOkResponse({type:NavbarProfileResponse})
+ @ApiGetNavbarProfile()
   @Get('navbar')
   async getProfile(@Req() req: RequestWithUser) {
     if (!req.userId) {
@@ -59,6 +62,7 @@ export class ProfileController {
   }
 
   @Patch('update')
+  @ApiUpdateProfile()
   async updateProfile(@Req() req: RequestWithUser, @Body() data: Record<string, any>) {
     if (!req.userId) {
       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
@@ -81,6 +85,8 @@ export class ProfileController {
   }
 
   @Patch('username')
+
+ @ApiChangeUsername()
   @HttpCode(HttpStatus.OK)
   async changeUsername(@Req() req: RequestWithUser, @Body() body: Record<string, any>) {
     if (!req.userId) {

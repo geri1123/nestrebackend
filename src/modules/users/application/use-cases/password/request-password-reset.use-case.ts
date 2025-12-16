@@ -22,7 +22,12 @@ export class RequestPasswordResetUseCase {
     if (!user || user.status !== 'active') {
       throw new NotFoundException({
         success: false,
-        message: t('userNotFound', lang),
+        message: t('validationFailed', lang),
+        errors: {
+    email: [
+      t("userNotFound" ,lang)
+    ]
+  }
       });
     }
 

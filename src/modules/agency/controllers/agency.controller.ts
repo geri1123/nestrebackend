@@ -34,6 +34,9 @@ import { UpdateAgencyFieldsUseCase } from '../application/use-cases/update-agenc
 import { UploadAgencyLogoUseCase } from '../application/use-cases/upload-logo.use-case';
 import { DeleteAgencyLogoUseCase } from '../application/use-cases/delete-agency-logo.use-case';
 import { RegisterAgencyFromUserUseCase } from '../application/use-cases/register-agency-from-user.use-case';
+import { ApiCreateAgency, ApiDeleteAgencyLogo, ApiGetAgencyInfoPrivate, ApiGetAgencyInfoPublic, ApiGetPaginatedAgencies, ApiUpdateAgencyFields, ApiUploadAgencyLogo } from '../decorators/agency.decorators';
+import { throwValidationErrors } from '../../../common/helpers/validation.helper';
+import { validate } from 'class-validator';
 
 @Controller('agencies')
 export class AgencyController {
@@ -50,6 +53,7 @@ export class AgencyController {
   // PUBLIC: GET PAGINATED AGENCIES
   // ---------------------------------------------------------
   @Public()
+  @ApiGetPaginatedAgencies()
   @Get()
   async getAllAgencies(@Query('page') page = 1) {
     return this.getPaginatedAgencies.execute(Number(page), 12);
@@ -59,6 +63,7 @@ export class AgencyController {
   // PRIVATE AGENCY INFO
   // ---------------------------------------------------------
   @Roles('agency_owner', 'agent')
+  @ApiGetAgencyInfoPrivate()
   @Get('agencyinfo')
   async getAgencyInfoPrivate(@Req() req: RequestWithUser) {
     if (!req.agencyId) {
@@ -76,6 +81,7 @@ export class AgencyController {
   // PUBLIC AGENCY DETAIL
   // ---------------------------------------------------------
   @Public()
+  @ApiGetAgencyInfoPublic()
   @Get(':id/detail')
   async getAgencyInfoPublic(
     @Param('id') id: string,
@@ -93,16 +99,24 @@ export class AgencyController {
   // ---------------------------------------------------------
   @Roles('agency_owner')
   @Patch('update-fields')
+  @ApiUpdateAgencyFields()
   async updateFields(
     @Req() req: RequestWithUser,
-    @Body() body: Record<string, any>,
+    // @Body() body: Record<string, any>,
+    @Body() dto:UpdateAgencyDto,
   ) {
     if (!req.agencyId) {
       throw new ForbiddenException(t('noAgency', req.language));
     }
 
-    const dto = plainToInstance(UpdateAgencyDto, body);
+    // const dto = plainToInstance(UpdateAgencyDto, body);
 
+    // Validate DTO
+    const errors = await validate(dto);
+  
+    if (errors.length > 0) {
+      throwValidationErrors(errors, req.language);
+    }
     return this.updateAgencyFields.execute(
       req.agencyId,
       dto,
@@ -115,6 +129,7 @@ export class AgencyController {
   // -----------
   @Roles('agency_owner')
   @Patch('upload-logo')
+  @ApiUploadAgencyLogo()
   @UseInterceptors(FileInterceptor('file'))
   async uploadAgencyLogoRoute(
     @Req() req: RequestWithUser,
@@ -142,6 +157,7 @@ export class AgencyController {
   // ---------------------------------------------------------
   @Roles('agency_owner')
   @Delete('logo')
+  @ApiDeleteAgencyLogo()
   async deleteLogo(@Req() req: RequestWithUser) {
     if (!req.agencyId) {
       throw new ForbiddenException(t('noAgency', req.language));
@@ -160,15 +176,16 @@ export class AgencyController {
   // ---------------------------------------------------------
   @Roles('user')
   @Post('create-agency')
+  @ApiCreateAgency()
   async createAgency(
     @Req() req: RequestWithUser,
-    @Body() data: Record<string, any>,
+    @Body() dto: CreateAgencyDto,
   ) {
     if (!req.userId) {
       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
     }
 
-    const dto = plainToInstance(CreateAgencyDto, data);
+    // const dto = plainToInstance(CreateAgencyDto, data);
 
     const agency = await this.registerAgencyFromUser.execute(
       dto,

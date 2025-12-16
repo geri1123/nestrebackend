@@ -13,17 +13,17 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SupportedLang, t } from '../../../locales';
 
-import { ApiProfilePictureUpload, ApiProfilePictureDelete } from '../swager/upload-image.swager';
-import { ProfileSwagger } from '../swager/profile.swagger';
 
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 
 // Use Cases
 import { DeleteProfileImageUseCase } from '../application/use-cases/delete-profile-image.use-case';
 import { UploadProfileImageUseCase } from '../application/use-cases/update-profile-image.use-case';
+import { ApiProfilePictureDelete, ApiProfilePictureUpload } from '../decorators/profile-picture.decorators';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('profile-image')
-@ProfileSwagger.ApiTagsProfile()
+@ApiTags('Profile')
 export class ProfilePictureController {
   constructor(
     private readonly uploadProfileUseCase: UploadProfileImageUseCase,
@@ -38,30 +38,30 @@ export class ProfilePictureController {
     @Req() req: RequestWithUser,
   ) {
     try {
-      console.log('🎯 Controller: uploadProfilePicture called');
-      console.log('📋 Request userId:', req.userId);
-      console.log('📋 Request language:', req.language);
-      console.log('📋 File received:', !!file);
+      console.log(' Controller: uploadProfilePicture called');
+      console.log(' Request userId:', req.userId);
+      console.log(' Request language:', req.language);
+      console.log(' File received:', !!file);
       
       const userId = req.userId;
       const language: SupportedLang = req.language || 'al';
 
       if (!userId) {
-        console.log('❌ No userId found');
+        console.log(' No userId found');
         throw new UnauthorizedException(t('userNotAuthenticated', language));
       }
 
       if (!file) {
-        console.log('❌ No file uploaded');
+        console.log(' No file uploaded');
         throw new BadRequestException({
           success: false,
           message: t('noImageUploaded', language),
         });
       }
 
-      console.log('🚀 Calling uploadProfileUseCase.execute...');
+      console.log(' Calling uploadProfileUseCase.execute...');
       const imageUrl = await this.uploadProfileUseCase.execute(userId, file, language);
-      console.log('✅ Use case completed, imageUrl:', imageUrl);
+      console.log(' Use case completed, imageUrl:', imageUrl);
 
       const response = {
         success: true,
@@ -69,11 +69,11 @@ export class ProfilePictureController {
         imageUrl,
       };
       
-      console.log('📤 Sending response:', response);
+      console.log(' Sending response:', response);
       return response;
 
     } catch (error) {
-      console.error('❌❌❌ CONTROLLER ERROR:', error);
+      console.error(' CONTROLLER ERROR:', error);
       console.error('Error name:', error?.name);
       console.error('Error message:', error?.message);
       console.error('Error stack:', error?.stack);
@@ -97,7 +97,7 @@ export class ProfilePictureController {
   @ApiProfilePictureDelete()
   async deleteProfilePicture(@Req() req: RequestWithUser) {
     try {
-      console.log('🎯 Controller: deleteProfilePicture called');
+      console.log(' Controller: deleteProfilePicture called');
       
       const userId = req.userId;
       const language: SupportedLang = req.language || 'al';
@@ -114,7 +114,7 @@ export class ProfilePictureController {
       };
       
     } catch (error) {
-      console.error('❌❌❌ DELETE CONTROLLER ERROR:', error);
+      console.error(' DELETE CONTROLLER ERROR:', error);
       
       if (error instanceof BadRequestException || 
           error instanceof UnauthorizedException) {

@@ -10,6 +10,7 @@ import { validate } from "class-validator";
 import { t } from "../../../locales";
 import { RecoverPasswordDto } from "../dto/recover-password.dto";
 import { Public } from "../../../common/decorators/public.decorator";
+import { ApiForgotPassword, ApiResetPassword } from "../decorators/password.decoretors";
 
 @Controller('password')
 export class PasswordController {
@@ -20,6 +21,7 @@ export class PasswordController {
 
   @Public()
   @Post('reset-password')
+  @ApiResetPassword()
   async resetPassword(@Body() body: any, @Req() req: RequestWithLang) {
     const lang = req.language || 'al';
     const dto = plainToInstance(ResetPasswordDto, body);
@@ -36,6 +38,7 @@ export class PasswordController {
 
   @Public()
   @Post('forgot-password')
+  @ApiForgotPassword()
   async forgotPassword(@Body() body: any, @Req() req: RequestWithLang) {
     const lang = req.language || 'al';
     const dto = plainToInstance(RecoverPasswordDto, body);

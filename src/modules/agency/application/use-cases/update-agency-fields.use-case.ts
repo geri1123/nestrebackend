@@ -19,46 +19,47 @@ export class UpdateAgencyFieldsUseCase {
     private readonly getAgencyById: GetAgencyByIdUseCase,
   ) {}
 
-  async execute(
-    agencyId: number,
-    data: UpdateAgencyFieldsData,
-    language: SupportedLang = 'al',
-  ): Promise<{ success: boolean; message: string; data: any }> {
-    // Verify agency exists
-    const agency = await this.getAgencyById.execute(agencyId, language);
+async execute(
+  agencyId: number,
+  data: UpdateAgencyFieldsData,
+  language: SupportedLang = 'al',
+): Promise<{ success: boolean; message: string; data: any }> {
 
-    // Update domain entity
-    agency.updateFields({
-      agencyName: data.agencyName,
-      agencyEmail: data.agencyEmail,
-      phone: data.phone,
-      address: data.address,
-      website: data.website,
-    });
+  const agency = await this.getAgencyById.execute(agencyId, language);
 
-    // Prepare data for persistence
-    const dataToUpdate: any = {};
-    if (data.agencyName !== undefined) dataToUpdate.agency_name = data.agencyName;
-    if (data.agencyEmail !== undefined) dataToUpdate.agency_email = data.agencyEmail;
-    if (data.phone !== undefined) dataToUpdate.phone = data.phone;
-    if (data.address !== undefined) dataToUpdate.address = data.address;
-    if (data.website !== undefined) dataToUpdate.website = data.website;
+  agency.updateFields({
+    agencyName: data.agencyName,
+    agencyEmail: data.agencyEmail,
+    phone: data.phone,
+    address: data.address,
+    website: data.website,
+  });
 
-    if (Object.keys(dataToUpdate).length === 0) {
-      return {
-        success: false,
-        message: 'No fields provided.',
-        data: null,
-      };
-    }
 
-    // Persist changes
-    const updatedAgency = await this.agencyRepository.updateFields(agencyId, dataToUpdate);
-
+  if (
+    data.agencyName === undefined &&
+    data.agencyEmail === undefined &&
+    data.phone === undefined &&
+    data.address === undefined &&
+    data.website === undefined
+  ) {
     return {
-      success: true,
-      message: 'Agency updated successfully.',
-      data: updatedAgency,
+      success: false,
+      message: 'No fields provided.',
+      data: null,
     };
   }
+
+  
+  const updatedAgency = await this.agencyRepository.updateFields(
+    agencyId,
+    data
+  );
+
+  return {
+    success: true,
+    message: 'Agency updated successfully.',
+    data: updatedAgency,
+  };
+}
 }
