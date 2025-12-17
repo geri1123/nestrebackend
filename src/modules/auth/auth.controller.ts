@@ -47,15 +47,16 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 240000 } })
   @HttpCode(HttpStatus.OK)
   async login(
-    @Body() body: Record<string, any>,
+    // @Body() body: Record<string, any>,
+    @Body() dto:LoginDto,
     @Req() req: RequestWithLang,
     @Res({ passthrough: true }) res: Response,
   ) {
     const lang: SupportedLang = req.language || 'al';
-    const dto = plainToInstance(LoginDto, body);
+    // const dto = plainToInstance(LoginDto, body);
 
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, lang);
+    // const errors = await validate(dto);
+    // if (errors.length > 0) throwValidationErrors(errors, lang);
 
     const { user, token } = await this.loginUseCase.execute(dto, lang);
 this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
@@ -77,23 +78,12 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
   @Throttle({ default: { limit: 6, ttl: 240000 } })
   @HttpCode(HttpStatus.CREATED)
   async registerUser(
-    @Body() body: Record<string, any>,
-    
+    // @Body() body: Record<string, any>,
+    @Body() dto:BaseRegistrationDto,
+     
     @Req() req: RequestWithLang,
   ) {
     const lang = req.language || 'al';
-    const dto = plainToInstance(BaseRegistrationDto, body);
-
-    // Validate DTO
-    const errors = await validate(dto);
-    if (dto.password !== dto.repeatPassword) {
-      throwValidationErrors(errors, lang, {
-        repeatPassword: [t('passwordsMismatch', lang)],
-      });
-    }
-    if (errors.length > 0) {
-      throwValidationErrors(errors, lang);
-    }
 
     await this.registerUserUseCase.execute(dto, lang, 'user');
 
@@ -108,22 +98,23 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
   @Throttle({ default: { limit: 6, ttl: 240000 } })
   @HttpCode(HttpStatus.CREATED)
   async registerAgencyOwner(
-    @Body() body: Record<string, any>,
+    // @Body() body: Record<string, any>,
+    @Body() dto:RegisterAgencyOwnerDto,
     @Req() req: RequestWithLang,
   ) {
     const lang = req.language || 'al';
-    const dto = plainToInstance(RegisterAgencyOwnerDto, body);
+    // const dto = plainToInstance(RegisterAgencyOwnerDto, body);
 
     // Validate DTO
-    const errors = await validate(dto);
-    if (dto.password !== dto.repeatPassword) {
-      throwValidationErrors(errors, lang, {
-        repeatPassword: [t('passwordsMismatch', lang)],
-      });
-    }
-    if (errors.length > 0) {
-      throwValidationErrors(errors, lang);
-    }
+    // const errors = await validate(dto);
+    // if (dto.password !== dto.repeatPassword) {
+    //   throwValidationErrors(errors, lang, {
+    //     repeatPassword: [t('passwordsMismatch', lang)],
+    //   });
+    // }
+    // if (errors.length > 0) {
+    //   throwValidationErrors(errors, lang);
+    // }
 
     return this.registerAgencyOwnerUseCase.execute(dto, lang);
   }
@@ -133,22 +124,23 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
   @Throttle({ default: { limit: 6, ttl: 240000 } })
   @HttpCode(HttpStatus.CREATED)
   async registerAgent(
-    @Body() body: Record<string, any>,
+    // @Body() body: Record<string, any>,
+    @Body() dto:RegisterAgentDto,
     @Req() req: RequestWithLang,
   ) {
     const lang = req.language || 'al';
-    const dto = plainToInstance(RegisterAgentDto, body);
+    // const dto = plainToInstance(RegisterAgentDto, body);
 
-    // Validate DTO
-    const errors = await validate(dto);
-    if (dto.password !== dto.repeatPassword) {
-      throwValidationErrors(errors, lang, {
-        repeatPassword: [t('passwordsMismatch', lang)],
-      });
-    }
-    if (errors.length > 0) {
-      throwValidationErrors(errors, lang);
-    }
+    // // Validate DTO
+    // const errors = await validate(dto);
+    // if (dto.password !== dto.repeatPassword) {
+    //   throwValidationErrors(errors, lang, {
+    //     repeatPassword: [t('passwordsMismatch', lang)],
+    //   });
+    // }
+    // if (errors.length > 0) {
+    //   throwValidationErrors(errors, lang);
+    // }
 
     return this.registerAgentUseCase.execute(dto, lang);
   };

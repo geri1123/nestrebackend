@@ -1,26 +1,56 @@
 import { agencyagent_role_in_agency, agencyagent_status } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateAgentsDto {
+  @ApiPropertyOptional({
+    enum: agencyagent_role_in_agency,
+    example: 'agent',
+    description: 'Role of the agent in the agency',
+  })
   @IsOptional()
   @IsEnum(agencyagent_role_in_agency, { message: 'roleInAgencyRequired' })
   role_in_agency?: agencyagent_role_in_agency;
 
+  @ApiPropertyOptional({
+    example: 10,
+    description: 'Commission rate (must be >= 0)',
+  })
   @IsOptional()
   @IsNumber({}, { message: 'invalidCommissionRate' })
   @Min(0, { message: 'invalidCommissionRate' })
   @Type(() => Number)
   commission_rate?: number;
 
+  @ApiPropertyOptional({
+    example: '2025-12-31',
+    description: 'Agent end date (ISO string)',
+  })
   @IsOptional()
   @IsDateString({}, { message: 'endDateInvalid' })
   end_date?: string;
 
+  @ApiPropertyOptional({
+    enum: agencyagent_status,
+    example: 'active',
+    description: 'Agent status',
+  })
   @IsOptional()
   @IsEnum(agencyagent_status, { message: 'statusInvalid' })
   status?: agencyagent_status;
 
+  @ApiPropertyOptional({
+    example: {
+     can_edit_own_post: true,
+    can_edit_others_post: true,
+    can_approve_requests: true,
+    can_view_all_posts: true,
+    can_delete_posts: true,
+    can_manage_agents: true,
+    },
+    description: 'Agent permissions',
+  })
   permissions?: {
     can_edit_own_post?: boolean;
     can_edit_others_post?: boolean;

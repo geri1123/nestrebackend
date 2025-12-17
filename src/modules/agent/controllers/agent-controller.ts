@@ -24,8 +24,8 @@ import { UpdateAgentUseCase } from '../application/use-cases/update-agent.use-ca
 import { AgentBelongsToAgencyGuard } from '../../../common/guard/AgentBelongsToAgency.guard';
 import { agencyagent_status } from '@prisma/client';
 import { GetAgentMeUseCase } from '../application/use-cases/get-agent-me.use-case';
-import { get } from 'http';
 import { GetAgentByIdInAgencyUseCase } from '../application/use-cases/get-agent-in-agency.use-case';
+import { ApiAgentDecorators } from '../decorators/agent.decorator';
 
 @Controller('agents')
 export class AgentController {
@@ -37,6 +37,7 @@ export class AgentController {
   ) {}
 
   @Get('public/:agencyId')
+  @ApiAgentDecorators.GetPublicAgents()
 async getPublicAgents(
   @Param('agencyId', ParseIntPipe) agencyId: number,
   @Req() req: RequestWithLang,
@@ -55,6 +56,7 @@ async getPublicAgents(
 }
   @UseGuards(UserStatusGuard)
   @Roles('agency_owner', 'agent')
+  @ApiAgentDecorators.GetPrivateAgents()
   @Get('dashboard')
   async getPrivateAgents(
     @Req() req: RequestWithUser,
@@ -79,6 +81,7 @@ async getPublicAgents(
   @Patch('update/:id')
 @Permissions('canManageAgents')
 @UseGuards(UserStatusGuard, AgentBelongsToAgencyGuard)
+@ApiAgentDecorators.UpdateAgent()
 async updateAgencyAgents(
   @Param('id') idParam: string,
   @Req() req: RequestWithUser,
@@ -122,6 +125,7 @@ async updateAgencyAgents(
 
 @UseGuards(UserStatusGuard)
 @Roles('agent', 'agency_owner')
+@ApiAgentDecorators.GetAgentMe()
 @Get('me')
 async getAgentMe(@Req() req: RequestWithUser) {
   if (!req.userId) {
@@ -136,6 +140,7 @@ async getAgentMe(@Req() req: RequestWithUser) {
 @UseGuards(UserStatusGuard)
 @Roles('agent', 'agency_owner')
 @Get(':id')
+@ApiAgentDecorators.GetAgentById()
 async getAgentById(
   @Param('id', ParseIntPipe) agencyAgentId: number,
   @Req() req: RequestWithUser,

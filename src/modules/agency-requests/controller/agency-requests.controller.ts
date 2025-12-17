@@ -15,6 +15,7 @@ import { Permissions } from "../../../common/decorators/permissions.decorator";
 import { UserStatusGuard } from "../../../common/guard/status.guard";
 import { GetAgencyRequestsUseCase } from "../application/use-cases/get-agency-requests.use-case";
 import { UpdateAgencyRequestStatusUseCase } from "../application/use-cases/update-agency-request-status.use-case";
+import { ApiAgencyRequestsDecorators } from "../decorators/agency-requests.decorator";
 
 
 
@@ -30,6 +31,7 @@ export class AgencyRequestsController {
   @UseGuards(UserStatusGuard)
   @Roles('agent', 'agency_owner')
   @Permissions('canApproveRequests') 
+  @ApiAgencyRequestsDecorators.GetRegistrationRequests()
   async getRegistrationRequests(
     @Req() req: RequestWithUser,
     @Query('page') page = 1,        
@@ -85,6 +87,7 @@ export class AgencyRequestsController {
 @UseGuards(UserStatusGuard)
 @Roles('agent', 'agency_owner')
 @Permissions('canApproveRequests') 
+@ApiAgencyRequestsDecorators.UpdateRequestStatus()
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,
   @Param('id', ParseIntPipe) requestId: number,

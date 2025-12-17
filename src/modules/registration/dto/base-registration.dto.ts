@@ -1,6 +1,7 @@
 import { ApiBody, ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEmail, Equals, IsNotEmpty, MinLength, ValidateIf, Matches } from 'class-validator';
+import { Match } from '../../../common/decorators/match-password.decorator';
 
 export class BaseRegistrationDto {
   @ApiProperty({
@@ -25,12 +26,9 @@ export class BaseRegistrationDto {
   @MinLength(8, { message: 'passwordMin' })
    @Matches(/^\S+$/, { message: 'passwordNoSpaces' }) 
   password: string;
-@ApiProperty({
-    example: 'P@ssword123',
-    description: 'Must match the password field.',
-  })
-  @ValidateIf(o => o.password !== undefined)
-  @IsNotEmpty({ message: 'passwordsMismatch' })
+ @ApiProperty({ example: 'P@ssword123' })
+  @IsNotEmpty({ message: 'repeatPasswordRequired' })
+  @Match('password', { message: 'passwordsMismatch' })
   repeatPassword: string;
  @ApiProperty({
     example: 'John',

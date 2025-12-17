@@ -9,7 +9,8 @@ export const en = {
     productNotActive:"This product is not active.",
     usernameCooldown: "You can change your username again on {date}.",
     advertisementTypeNotActive:"This advertisement type is currently not active.",
-
+    notificationDeletedSuccessfully: 'Notification deleted successfully',
+notificationMarkedAsRead: 'Notification marked as read',
 amountMustBePositive: "Amount must be positive",
 sameUsername: "The new username cannot be the same as the current username.",
     usernameChangedSuccessfully: "Username changed successfully.",

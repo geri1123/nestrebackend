@@ -10,13 +10,13 @@ export const it = {
          productNotActive:"Questo prodotto non è attivo.",
 productAlreadyAdvertised:"Questo prodotto è già pubblicizzato.",
     advertisementTypeNotActive:"Questo tipo di annuncio al momento non è attivo.",
-
+notificationMarkedAsRead: 'Notifica segnata come letta',
     walletAlreadyExists:"Il portafoglio esiste già.",
     usernameCooldown: "Potrai cambiare il nome utente di nuovo il {date}.",
 failedToUpdateAgencyLogo: "Aggiornamento del logo dell'agenzia non riuscito.",
 noimagetodelete:"Nessuna immagine da eliminare.",
      emailNotVerified: "L'utente deve verificare l'email prima dell'approvazione.",
-
+ notificationDeletedSuccessfully: 'Notifica eliminata con successo',
 sameUsername: "Il nuovo nome utente non può essere uguale al nome utente attuale.",
     usernameChangedSuccessfully: "Nome utente aggiornato con successo.",
  successfullyAdvertised: "Prodotto pubblicizzato con successo",

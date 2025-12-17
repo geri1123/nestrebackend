@@ -4,6 +4,8 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
 import { SendQuickRequestUseCase } from "./application/use-cases/send-quick-request.use-case";
+import { ApiAcceptedResponse } from "@nestjs/swagger";
+import { ApiSendQuickRequest } from "./decorators/registration-request.decorators";
 
 @Controller('registration-request')
 
@@ -15,6 +17,7 @@ export class RegistrationRequestController{
     }
 
     @Roles('user')
+    @ApiSendQuickRequest()
 @Post('quick-request/:agencyId')
 async sendQuickRequest(
   @Req() req: RequestWithUser,
