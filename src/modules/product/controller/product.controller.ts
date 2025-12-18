@@ -11,6 +11,8 @@ import type { RequestWithUser } from '../../../common/types/request-with-user.in
 import { ProductClicksService } from '../../product-clicks/product-clicks.service';
 import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
 import { product_status } from '@prisma/client';
+import { ApiProductTags, ApiSearchAgencyProducts, ApiSearchAgentProducts, ApiSearchProducts } from '../decorators/search-product.decorator';
+import { ApiGetProtectedProduct, ApiGetPublicProduct } from '../decorators/product-detail.decorator';
 
 @Controller('products')
 export class SearchProductsController {
@@ -24,6 +26,7 @@ export class SearchProductsController {
 
   @Public()
   @Get('search')
+  @ApiSearchProducts()
   async searchAll(
     @Req() req: RequestWithLang,
     @Query() rawQuery: Record<string, any>,
@@ -37,6 +40,7 @@ export class SearchProductsController {
 
   @Public()
   @Get('agency/:agencyId')
+  @ApiSearchAgencyProducts()
   async getAgencyProducts(
     @Param('agencyId') agencyId: number,
     @Req() req: RequestWithLang,
@@ -53,6 +57,7 @@ export class SearchProductsController {
 
   @Public()
   @Get('agent/:agentId')
+  @ApiSearchAgentProducts()
   async getAgentProducts(
     @Param('agentId') agentId: number,
     @Req() req: RequestWithLang,
@@ -69,6 +74,7 @@ export class SearchProductsController {
 
   @Public()
   @Get('public/:id')
+@ApiGetPublicProduct()
   async getPublicProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
     await this.softAuth.attachUserIfExists(req);
     
@@ -90,6 +96,7 @@ export class SearchProductsController {
   }
 
   @Get('protected/:id')
+  @ApiGetProtectedProduct()
   async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
     const product = await this.getProductByIdUseCase.execute(id, req.language, true, req);
     if (!product) throw new NotFoundException(t('productNotFound', req.language));

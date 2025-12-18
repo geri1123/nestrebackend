@@ -28,6 +28,9 @@ import { throwValidationErrors } from '../../../common/helpers/validation.helper
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { ProductOwnershipAndPermissionGuard } from '../../../common/guard/product-ownership.guard';
 import { UserStatusGuard } from '../../../common/guard/status.guard';
+import { ApiCreateProduct } from '../decorators/create-product.decorator';
+import { ApiDashboardProducts } from '../decorators/dashboard-products.decorator';
+import { ApiUpdateProduct } from '../decorators/update-product.decorator';
 
 @Controller('products')
 export class ManageProductController {
@@ -40,6 +43,7 @@ export class ManageProductController {
 
   @UseGuards(UserStatusGuard)
   @Post('add')
+  @ApiCreateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
   async createProduct(
     @Body() body: Record<string, any>,
@@ -67,10 +71,13 @@ export class ManageProductController {
 
   @UseGuards(ProductOwnershipAndPermissionGuard, UserStatusGuard)
   @Patch('update/:id')
+  @ApiUpdateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
   async updateProduct(
     @Param('id') id: string,
     @Body() body: Record<string, any>,
+        // @Body() dto:UpdateProductDto,
+
     @UploadedFiles() images: Express.Multer.File[],
     @Req() req: RequestWithUser
   ) {
@@ -97,6 +104,7 @@ export class ManageProductController {
   }
 
   @Get('dashboard/products')
+  @ApiDashboardProducts()
   async getDashboardProducts(
     @Req() req: RequestWithUser,
     @Query() rawQuery: Record<string, any>,

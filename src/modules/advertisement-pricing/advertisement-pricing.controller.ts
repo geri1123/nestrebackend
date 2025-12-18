@@ -35,8 +35,8 @@ export class AdvertisementPricingController {
     return this.updatePricing.execute(type as any, body);
   }
 
-//   @Post()
-// async create(@Body() dto: CreatePricingDto) {
-//   return this.createPricing.execute(dto);
-// }
+  @Post()
+async create(@Body() dto: CreatePricingDto) {
+  return this.createPricing.execute(dto);
+}
 }
