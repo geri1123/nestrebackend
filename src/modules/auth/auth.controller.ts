@@ -15,7 +15,7 @@ import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../locales';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator';
-import { AuthSwagger } from './swagger/auth.swagger';
+import { AuthSwagger } from './responses/auth-swagger.response';
 
 import { LoginDto } from './dto/login.dto';
 import { BaseRegistrationDto } from '../registration/dto/base-registration.dto';

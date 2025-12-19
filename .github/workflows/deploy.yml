@@ -61,6 +61,4 @@ jobs:
           export FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
 
       - name: Deploy to server
-        run: |
-          
-          ssh user@your-server "cd /path/to/app && npm ci && npm run build && pm2 restart all"
+        run: example

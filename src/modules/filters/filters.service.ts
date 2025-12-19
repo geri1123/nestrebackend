@@ -1,13 +1,9 @@
 // src/filters/filters.service.ts
 
 import { Inject, Injectable } from '@nestjs/common';
-import { CategoryRepository } from './repositories/category/category.repository';
-import { ListingTypeRepo } from './repositories/listingtype/listingtype.repository';
 import { SupportedLang } from '../../locales';
 import { product_status } from '@prisma/client';
-import { AttributeRepo } from './repositories/attributes/attributes.repository';
 import { AttributeDto } from './dto/attribute.dto';
-import { LoationRepository } from './repositories/location/location.repository';
 import { CityDto, CountryDto } from './dto/location.dto';
 import { CacheService } from '../../infrastructure/cache/cache.service';
 import { CategoryDto } from './dto/filters.dto';
@@ -43,30 +39,58 @@ export class FiltersService {
     private readonly locationRepo: ILocationRepository,
     private readonly cacheService: CacheService, 
   ) {}
+ private mapCategories(categories: any[]): CategoryDto[] {
+    return (categories ?? []).map((category) => {
+      const subcategories = (category.subcategory ?? []).map((subcat) => {
+        const [translation] = subcat.subcategorytranslation ?? [];
 
-async getCategories(
+        return {
+          id: subcat.id,
+          name: translation?.name ?? 'No translation',
+          slug: translation?.slug ?? null,
+          categoryId: subcat.categoryId,
+          productCount: subcat._count?.product ?? 0,
+        };
+      });
+
+      const totalCategoryProducts = subcategories.reduce(
+        (sum:any, s:any) => sum + s.productCount,
+        0,
+      );
+
+      const [translation] = category.categorytranslation ?? [];
+
+      return {
+        id: category.id,
+        name: translation?.name ?? 'No translation',
+        slug: translation?.slug ?? null,
+        productCount: totalCategoryProducts,
+        subcategories,
+      };
+    });
+  }
+ async getCategories(
   lang: SupportedLang = 'al',
   status: product_status = product_status.active,
-) {
+): Promise<CategoryDto[]> {
   const cacheKey = `categories:${lang}`;
-  let categories = await this.cacheService.get<CategoryDto[]>(cacheKey);
 
-  if (categories) {
-    console.log(`[CACHE HIT] Categories for ${lang}`);
-    return categories;
+  try {
+    const cached = await this.cacheService.get<CategoryDto[]>(cacheKey);
+    if (cached) {
+console.log(`[CACHE HIT] category for ${lang}`);   
+   return cached;
+    }
+    const raw = await this.categoryRepo.getAllCategories(lang, status);
+    const mapped = this.mapCategories(raw);
+
+    await this.cacheService.set(cacheKey, mapped, this.getTTL('categories'));
+    return mapped;
+  } catch (err: any) {
+    console.error('🔥 getCategories ERROR:', err?.message);
+    console.error(err);
+    throw err; // let Nest print stack trace too
   }
-
-  console.log(`[CACHE MISS] Categories for ${lang}`);
-  categories = await this.categoryRepo.getAllCategories(lang, status);
-
-  if (categories && categories.length > 0) {
-    await this.cacheService.set(cacheKey, categories, this.getTTL('categories'));
-    console.log(`[CACHE SET] Cached categories for ${lang}`);
-  } else {
-    console.log(`[DB EMPTY] No categories found for ${lang}`);
-  }
-
-  return categories;
 }
 //get listing type
 async getListingTypes(

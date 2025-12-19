@@ -17,10 +17,7 @@ import { ATTRIBUTE_REPO } from './repositories/attributes/Iattribute.respository
   controllers: [FiltersController],
   providers: [
     FiltersService,
-    CategoryRepository,
-    ListingTypeRepo,
-    AttributeRepo,
-    LoationRepository,
+ 
   {
       provide: CATEGORY_REPO,
       useClass: CategoryRepository,
@@ -38,6 +35,6 @@ import { ATTRIBUTE_REPO } from './repositories/attributes/Iattribute.respository
       useClass:AttributeRepo
     },
   ],
-  exports:[AttributeRepo ,ATTRIBUTE_REPO]
+  exports:[ ATTRIBUTE_REPO]
 })
 export class FiltersModule {}

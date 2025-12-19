@@ -1,20 +1,8 @@
 import { LanguageCode, product_status } from "@prisma/client";
 export const CATEGORY_REPO = Symbol('CATEGORY_REPO');
 export interface ICatRepository {
-  getAllCategories(
+ getAllCategories(
     language: LanguageCode,
-    status?: product_status
-  ): Promise<{
-    id: number;
-    name: string;
-    slug: string | null;
-    productCount: number;
-    subcategories: {
-      id: number;
-      name: string;
-      slug: string | null;
-      categoryId: number;
-      productCount: number;
-    }[];
-  }[]>;
+    status?: product_status,
+  ): Promise<any[]>
 }

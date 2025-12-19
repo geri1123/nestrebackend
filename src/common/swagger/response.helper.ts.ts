@@ -35,7 +35,6 @@ export const ApiBadRequestResponse = (exampleMessage: string, errorsExample?: ob
     }),
   );
 
-// ✅ FIXED 200 Success
 export const ApiSuccessResponse = (exampleMessage: string, dataExample?: object) =>
   applyDecorators(
     ApiResponse({
@@ -45,7 +44,7 @@ export const ApiSuccessResponse = (exampleMessage: string, dataExample?: object)
         example: {
           success: true,
           message: exampleMessage,
-          ...(dataExample ?? {}), // ✅ spread data directly
+          ...(dataExample ?? {}),  
         },
       },
     }),

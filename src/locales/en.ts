@@ -5,6 +5,7 @@ export const en = {
    faildCreateWallet:"Failed to create wallet. Please try again.",
    walletSuccessfullyCreated:"Wallet successfully created.",
    walletNotFound:'Wallet not found.',
+   repeatPasswordRequired: 'Password confirmation is required.',
     successfullyAdvertised: "Product successfully advertised",
     productNotActive:"This product is not active.",
     usernameCooldown: "You can change your username again on {date}.",
