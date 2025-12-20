@@ -1,9 +1,8 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { SupportedLang, t } from '../../../../locales';
 import { ProductFrontendDto } from '../../dto/product-frontend.dto';
 import { RequestWithUser } from '../../../../common/types/request-with-user.interface';
-import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
 
 @Injectable()

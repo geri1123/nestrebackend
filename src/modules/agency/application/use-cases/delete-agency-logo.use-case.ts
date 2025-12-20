@@ -1,7 +1,6 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { GetAgencyByIdUseCase } from './get-agency-by-id.use-case';
-import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { SupportedLang, t } from '../../../../locales';
 
 @Injectable()
@@ -10,7 +9,6 @@ export class DeleteAgencyLogoUseCase {
     @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
     private readonly getAgencyById: GetAgencyByIdUseCase,
-    private readonly firebaseService: FirebaseService,
   ) {}
 
   async execute(agencyId: number, language: SupportedLang = 'al'): Promise<void> {
@@ -30,7 +28,7 @@ export class DeleteAgencyLogoUseCase {
 
     // Delete from storage
     try {
-      await this.firebaseService.deleteFile(oldImagePath);
+      await oldImagePath;
     } catch (error) {
       console.warn(`Failed to delete agency logo from storage:`, error);
     }

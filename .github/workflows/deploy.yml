@@ -1,64 +1,64 @@
-name: CI/CD Pipeline
+name: Backend CI/CD
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    env:
+      # NON-SECRET CONFIG
+      NODE_ENV: production
+      PASSWORD_RESET_TOKEN_EXPIRATION: 10
+      CORS_ORIGIN: ${{ secrets.CORS_ORIGIN || 'http://localhost:3000' }}
+      CLIENT_BASE_URL: http://localhost:3000
+      REDIS_TTL: 3600
+
+      # SECRETS
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      EMAIL_SERVICE: ${{ secrets.EMAIL_SERVICE }}
+
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - name: Run unit tests
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build
+
+      - name: Run tests
         run: npm run test
-      - name: Run e2e tests
-        run: npm run test:e2e
-      - name: Upload coverage report
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist
-
-      - name: Set production environment variables
-        run: |
-          export DATABASE_URL=${{ secrets.DATABASE_URL }}
-          export JWT_SECRET=${{ secrets.JWT_SECRET }}
-          export EMAIL_USER=${{ secrets.EMAIL_USER }}
-          export EMAIL_PASS=${{ secrets.EMAIL_PASS }}
-          export EMAIL_SERVICE=${{ secrets.EMAIL_SERVICE }}
-          export REDIS_URL=${{ secrets.REDIS_URL }}
-          export REDIS_TTL=${{ secrets.REDIS_TTL }}
-          export FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
-          export FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
-          export FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
-          export FIREBASE_CLIENT_ID=${{ secrets.FIREBASE_CLIENT_ID }}
-          export FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
-
-      - name: Deploy to server
-        run: example

@@ -53,43 +53,45 @@ export class SavedProductRepository implements ISavedProductRepository {
   }
 
   async findByUserPaginated(
-    userId: number,
-    language: SupportedLang,
-    skip: number,
-    take: number
-  ) {
-    return this.prisma.savedProduct.findMany({
-      where: {
-        user_id: userId,
-        product: { status: product_status.active },
-      },
-      include: {
-        product: {
-          include: {
-            productimage: { select: { imageUrl: true }, take: 2 },
-            subcategory: {
-              select: {
-                subcategorytranslation: { where: { language }, select: { name: true } },
-                category: {
-                  select: {
-                    categorytranslation: { where: { language }, select: { name: true } },
-                  },
+  userId: number,
+  language: SupportedLang,
+  skip: number,
+  take: number
+) {
+  const lang = language as unknown as LanguageCode;
+  
+  return this.prisma.savedProduct.findMany({
+    where: {
+      user_id: userId,
+      product: { status: product_status.active },
+    },
+    include: {
+      product: {
+        include: {
+          productimage: { select: { imageUrl: true }, take: 2 },
+          subcategory: {
+            select: {
+              subcategorytranslation: { where: { language: lang }, select: { name: true } },
+              category: {
+                select: {
+                  categorytranslation: { where: { language: lang }, select: { name: true } },
                 },
               },
             },
-            user: { select: { username: true } },
-            city: { select: { name: true, country: true } },
-            listing_type: {
-              select: {
-                listing_type_translation: { where: { language }, select: { name: true } },
-              },
+          },
+          user: { select: { username: true } },
+          city: { select: { name: true, country: true } },
+          listing_type: {
+            select: {
+              listing_type_translation: { where: { language: lang }, select: { name: true } },
             },
           },
         },
       },
-      skip,
-      take,
-      orderBy: { saved_at: 'desc' },
-    });
-  }
+    },
+    skip,
+    take,
+    orderBy: { saved_at: 'desc' },
+  });
+}
 }

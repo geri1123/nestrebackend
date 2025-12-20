@@ -13,12 +13,11 @@ import { DeleteProductImagesByProductIdUseCase } from './application/use-cases/d
 import { GetImagesByProductUseCase } from './application/use-cases/get-images-by-product.use-case';
 
 // External Services
-import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
 
 @Module({
-  imports:[FirebaseModule , CommonModule ,  CloudinaryModule],
+  imports:[  CommonModule ,  CloudinaryModule],
   providers: [
     // Repository implementation bound to interface
     {

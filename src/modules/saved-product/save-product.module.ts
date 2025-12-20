@@ -4,10 +4,9 @@ import { SaveProductUseCase } from './application/use-cases/save-product.usecase
 import { UnsaveProductUseCase } from './application/use-cases/unsave-product.usecase';
 import { GetSavedProductsUseCase } from './application/use-cases/get-saved-products.usecase';
 import { SavedProductRepository } from './infrasctructure/persistence/save-product.repository';
-import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 
 @Module({
-  imports:[FirebaseModule],
+  imports:[],
   controllers: [SaveProductController],
   providers: [
     SaveProductUseCase,

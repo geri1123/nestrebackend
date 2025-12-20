@@ -3,7 +3,6 @@ import { AGENT_REPOSITORY_TOKENS } from '../../domain/repositories/agent.reposit
 import {type IAgentDomainRepository } from '../../domain/repositories/agents.repository.interface';
 import { AgentMeResponse } from '../../dto/agent-me.response';
 import { SupportedLang, t } from '../../../../locales';
-import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { mapAgentToResponse } from '../../infrastructure/mappers/agent-response.mapper';
 
 @Injectable()
@@ -11,7 +10,6 @@ export class GetAgentMeUseCase {
   constructor(
     @Inject(AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY)
     private readonly agentRepo: IAgentDomainRepository,
-    private readonly firebase: FirebaseService,
   ) {}
 
   async execute(
@@ -25,6 +23,6 @@ export class GetAgentMeUseCase {
     }
 
    
-    return mapAgentToResponse(record, this.firebase);
+    return mapAgentToResponse(record);
   }
 }

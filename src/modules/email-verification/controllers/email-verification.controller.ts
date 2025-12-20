@@ -19,6 +19,7 @@ import { t } from '../../../locales';
 // USE-CASES DIRECTLY
 import { VerifyEmailUseCase } from '../application/use-cases/verify-email.use-case';
 import { ResendVerificationEmailUseCase } from '../application/use-cases/resend-verification-email.use-case';
+import { EmailVerificationSwagger } from '../responses/email-verification.response';
 @Controller('auth')
 @Public()
 export class EmailVerificationController {
@@ -29,7 +30,9 @@ export class EmailVerificationController {
 
   // ---------------------------------
   // GET /auth/verify-email?token=xxx
+
   // ---------------------------------
+ @EmailVerificationSwagger.VerifyEmail()
   @Get('verify-email')
   @HttpCode(200)
 
@@ -55,6 +58,7 @@ export class EmailVerificationController {
   // -------------------------------------------
   // POST /auth/resend-verification
   // -------------------------------------------
+  @EmailVerificationSwagger.ResendVerificationEmail()
   @Post('resend-verification')
  
   async resendVerificationEmail(

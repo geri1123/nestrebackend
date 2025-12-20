@@ -7,7 +7,6 @@ import { SupportedLang ,t } from '../../../../locales';
 import { FilterAgentsDto } from '../../dto/filter-agents.dto';
 import { AgentPaginationResponseDto } from '../../dto/agentsinagency.dto';
 import {type IAgentDomainRepository } from '../../domain/repositories/agents.repository.interface';
-import { FirebaseService } from '../../../../infrastructure/firebase/firebase.service';
 import { agencyagent_status } from '@prisma/client';
 import { formatDate } from '../../../../common/utils/date';
 import { AGENT_REPOSITORY_TOKENS } from '../../domain/repositories/agent.repository.tokens';
@@ -17,7 +16,6 @@ export class GetAgentsUseCase {
   constructor(
   @Inject(AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY)
     private readonly agentRepo: IAgentDomainRepository,
-    private readonly firebaseService: FirebaseService,
   ) {}
 
   async execute(

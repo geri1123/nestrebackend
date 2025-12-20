@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 
 // Infrastructure
 import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
-import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 
 // Repository token & interface
 import { AgencyRepository } from './infrastructure/persistence/agency.repository';
@@ -22,7 +21,6 @@ import { GetAgencyWithOwnerByIdUseCase } from './application/use-cases/get-agenc
 import { AgencyController } from './controllers/agency.controller';
 
 // Extra utils
-import { ImageUtilsService } from '../../common/utils/image-utils.service';
 import { UsersModule } from '../users/users.module';
 import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-owner.use-case';
 import { GetAgencyByPublicCodeUseCase } from './application/use-cases/check-public-code.use-case';
@@ -34,7 +32,7 @@ import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/val
 import { AGENCY_REPO } from './domain/repositories/agency.repository.interface';
 import { CommonModule } from '../../common/common.module';
 @Module({
-  imports: [PrismaModule, UsersModule,  FirebaseModule ,CommonModule],
+  imports: [PrismaModule, UsersModule ,CommonModule],
 
   controllers: [AgencyController],
 

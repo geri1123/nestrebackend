@@ -2,7 +2,6 @@
 // src/modules/users/users.module.ts
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
-import { FirebaseModule } from '../../infrastructure/firebase/firebase.module';
 import { EmailModule } from '../../infrastructure/email/email.module';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 
@@ -37,7 +36,7 @@ import { UploadProfileImageUseCase } from './application/use-cases/update-profil
 import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
 @Module({
-  imports: [ FirebaseModule, EmailModule, AppCacheModule , CommonModule  , CloudinaryModule],
+  imports: [  EmailModule, AppCacheModule , CommonModule  , CloudinaryModule],
   controllers: [ProfileController , PasswordController , ProfilePictureController],
   providers: [
     // Repository providers

@@ -2,7 +2,7 @@ import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
-import { FirebaseModule } from './infrastructure/firebase/firebase.module';
+
 import { AppConfigModule } from './infrastructure/config/config.module';
 import { LanguageMiddleware } from './middlewares/language.middleware';
 import { AuthModule } from './modules/auth/auth.module';
@@ -60,7 +60,7 @@ DatabaseModule,
     CleanupModule,
     AgencyRequestsModule,
      SaveProductModule,
-    FirebaseModule,
+    
     CloudinaryModule,
     AgencyModule,
 AuthModule,

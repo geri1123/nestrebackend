@@ -91,7 +91,7 @@ async function bootstrap() {
 
   
   app.enableCors({
-    origin: '*',
+    origin: configService.clientBaseUrl,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });

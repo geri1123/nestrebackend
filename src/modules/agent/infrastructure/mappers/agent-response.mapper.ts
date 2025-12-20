@@ -1,4 +1,3 @@
-import { FirebaseService } from "../../../../infrastructure/firebase/firebase.service";
 import { AgentPermissionEntity } from "../../domain/entities/agent-permission.entity";
 import { AgentEntity } from "../../domain/entities/agent.entity";
 import { AgentUserProps } from "../../domain/repositories/agents.repository.interface";
@@ -12,7 +11,7 @@ export function mapAgentToResponse(
     permission: AgentPermissionEntity | null;
       addedBy?: { id: number; username: string } | null;
   },
-  firebase: FirebaseService,
+
 ): AgentMeResponse {
   return {
     user: {
