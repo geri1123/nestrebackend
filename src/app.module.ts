@@ -17,7 +17,7 @@ import { AgencyModule } from './modules/agency/agency.module';
 import { UsersModule } from './modules/users/users.module';
 import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
 import { AgentModule } from './modules/agent/agent.module';
-import { PermissionsGuard } from './common/guard/permision.guard';
+import { PermissionsGuard } from './common/guard/permissions.guard';
 import { SaveProductModule } from './modules/saved-product/save-product.module';
 
 import { DatabaseModule } from './infrastructure/database/database.module';

@@ -16,13 +16,10 @@ export class RegisterAgentUseCase {
   ) {}
 
   async execute(dto: RegisterAgentDto, lang: SupportedLang) {
-    // Step 1: Validate business rules BEFORE the transaction
     const agency = await this.validateAgentData.execute(dto, lang);
 
-    // Step 2 + 3 inside transaction: create user + create registration request
     const result = await this.prisma.$transaction(async (tx) => {
       
-      // Create user inside tx
       const { userId } = await this.registerUserUseCase.execute(
         {
           username: dto.username,
@@ -36,7 +33,6 @@ export class RegisterAgentUseCase {
         tx
       );
 
-      // Create registration request inside tx
       await this.createRequestUseCase.execute(
         userId,
         dto,
@@ -48,7 +44,6 @@ export class RegisterAgentUseCase {
       return { userId };
     });
 
-    // Transaction committed successfully
     return {
       userId: result.userId,
       message: t("registrationSuccess", lang)

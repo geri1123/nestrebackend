@@ -35,21 +35,17 @@ export class UploadAgencyLogoUseCase {
   ): Promise<{ url: string; publicId: string }> {
     this.logger.log(`Starting agency logo upload for agency ${agencyId}`);
 
-    // 1️⃣ Validate file
     this.imageUtilsService.validateFile(file, language);
     this.logger.debug(`Image validation passed for agency ${agencyId}`);
 
-    // 2️⃣ Verify agency exists
     await this.getAgencyById.execute(agencyId, language);
 
-    // 3️⃣ Get current logo details
     const logoData = await this.agencyRepository.findLogoById(agencyId);
     const oldLogoPublicId = logoData?.logoPublicId;
 
     let uploadResult: CloudinaryUploadResult | null = null;
 
     try {
-      // 4️⃣ Upload new logo to Cloudinary
       uploadResult = await this.cloudinary.uploadFile(
         file,
         `agency-logos/${agencyId}`,
@@ -66,7 +62,6 @@ export class UploadAgencyLogoUseCase {
         `Logo uploaded to Cloudinary for agency ${agencyId}: ${uploadResult.publicId}`,
       );
 
-      // 5️⃣ Update agency in database
       await this.agencyRepository.updateFields(agencyId, {
         logo: uploadResult.url,
         logoPublicId: uploadResult.publicId,
@@ -74,7 +69,6 @@ export class UploadAgencyLogoUseCase {
 
       this.logger.log(`Database updated for agency ${agencyId}`);
 
-      // 6️⃣ Delete old logo (best effort) - only after successful DB update
       if (oldLogoPublicId && !this.imageUtilsService.isDefaultImage(oldLogoPublicId)) {
         try {
           await this.cloudinary.deleteFile(oldLogoPublicId);
@@ -86,7 +80,6 @@ export class UploadAgencyLogoUseCase {
             `Failed to delete old Cloudinary logo for agency ${agencyId}: ${oldLogoPublicId}`,
             err,
           );
-          // Don't throw - this is best effort
         }
       }
 
@@ -94,13 +87,11 @@ export class UploadAgencyLogoUseCase {
         `Agency logo upload completed successfully for agency ${agencyId}`,
       );
 
-      // 7️⃣ Return result
       return {
         url: uploadResult.url,
         publicId: uploadResult.publicId,
       };
     } catch (error) {
-      // Rollback: delete newly uploaded logo if DB update failed
       if (uploadResult?.publicId) {
         this.logger.error(
           `Database update failed for agency ${agencyId}. Rolling back Cloudinary upload: ${uploadResult.publicId}`,
@@ -118,7 +109,6 @@ export class UploadAgencyLogoUseCase {
         }
       }
 
-      // Re-throw the original error
       if (error instanceof BadRequestException) {
         throw error;
       }

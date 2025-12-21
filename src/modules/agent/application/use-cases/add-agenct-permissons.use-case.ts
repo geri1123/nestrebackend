@@ -13,7 +13,5 @@ export class AddAgentPermissionsUseCase {
 async execute(agentId: number, agencyId: number, permissions: any, tx?: Prisma.TransactionClient) {
   return this.permissionRepo.createPermissions(agentId, agencyId, permissions, tx);
 }
-  // async execute(agentId: number, agencyId: number, permissions: any) {
-  //   return this.permissionRepo.createPermissions(agentId, agencyId, permissions);
-  // }
+ 
 }

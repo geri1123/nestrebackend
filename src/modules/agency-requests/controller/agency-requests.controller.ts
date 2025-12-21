@@ -10,7 +10,7 @@ import { UpdateRequestStatusDto } from "../dto/agency-request.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { throwValidationErrors } from "../../../common/helpers/validation.helper";
-import { PermissionsGuard } from "../../../common/guard/permision.guard";
+import { PermissionsGuard } from "../../../common/guard/permissions.guard";
 import { Permissions } from "../../../common/decorators/permissions.decorator";
 import { UserStatusGuard } from "../../../common/guard/status.guard";
 import { GetAgencyRequestsUseCase } from "../application/use-cases/get-agency-requests.use-case";
