@@ -48,7 +48,7 @@ export class UploadProductImagesUseCase {
             productId,
             userId,
             imageUrl: cloudinaryResult.url,
-            publicId: cloudinaryResult.publicId,  // Add this
+            publicId: cloudinaryResult.publicId,  
           });
 
           const imageRecord = await this.productImageRepository.create(imageEntity);
@@ -60,14 +60,14 @@ export class UploadProductImagesUseCase {
           return { 
             id: imageRecord.id, 
             imageUrl: imageRecord.imageUrl,
-            publicId: imageRecord.publicId  // Optional: return this too
+            publicId: imageRecord.publicId  
           };
         })
       );
 
       return uploadedImages;
     } catch (error) {
-      console.error('❌ Error uploading product images:', error);
+      console.error(' Error uploading product images:', error);
       throw new BadRequestException(t('errorUploadingProductImages', language));
     }
   }

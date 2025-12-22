@@ -17,8 +17,11 @@ export interface IRegistrationRequestRepository {
     take?: number
   ): Promise<RegistrationRequestEntity[]>;
 
-  setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null>;
-
+  // setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null>;
+  setLatestUnderReview(
+    userId: number,
+    tx?: Prisma.TransactionClient
+  ): Promise<boolean>;
   // idCardExists(idCard: string): Promise<boolean>;
 
   updateStatus(

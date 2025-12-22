@@ -119,23 +119,42 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     });
   }
 
-  async setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null> {
-   const client =tx ?? this.prisma;
-    const last = await client.registrationrequest.findFirst({
-      where: { user_id: userId },
-      orderBy: { created_at: "desc" },
-    });
+  // async setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null> {
+  //  const client =tx ?? this.prisma;
+  //   const last = await client.registrationrequest.findFirst({
+  //     where: { user_id: userId },
+  //     orderBy: { created_at: "desc" },
+  //   });
 
-    if (!last) return null;
+  //   if (!last) return null;
 
-    const updated = await this.prisma.registrationrequest.update({
-      where: { id: last.id },
-      data: { status: "under_review" },
-    });
+  //   const updated = await this.prisma.registrationrequest.update({
+  //     where: { id: last.id },
+  //     data: { status: "under_review" },
+  //   });
 
-    return this.mapToEntity(updated);
-  }
+  //   return this.mapToEntity(updated);
+  // }
+async setLatestUnderReview(
+  userId: number,
+  tx?: Prisma.TransactionClient
+): Promise<boolean> {
+  const client = tx ?? this.prisma;
 
+  const last = await client.registrationrequest.findFirst({
+    where: { user_id: userId },
+    orderBy: { created_at: "desc" },
+  });
+
+  if (!last) return false;
+
+  await client.registrationrequest.update({
+    where: { id: last.id },
+    data: { status: "under_review" },
+  });
+
+  return true;
+}
   async updateStatus(
     id: number,
     status: registrationrequest_status,
