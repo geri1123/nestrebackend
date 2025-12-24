@@ -33,6 +33,7 @@ import { FindProductByIdUseCase } from './application/use-cases/find-product-by-
 import { ProductOwnershipAndPermissionGuard } from '../../common/guard/product-ownership.guard';
 import { CommonModule } from '../../common/common.module';
 import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
+import { GetMostClickedProductsUseCase } from './application/use-cases/get-most-clicked-products.use-case';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
@@ -64,7 +65,7 @@ ProductOwnershipAndPermissionGuard,
     GetProductByIdUseCase,
     SearchProductsUseCase,
     GetProductForPermissionUseCase,
-
+GetMostClickedProductsUseCase,
     // Utilities
     SearchFiltersHelper,
     // SoftAuthService,

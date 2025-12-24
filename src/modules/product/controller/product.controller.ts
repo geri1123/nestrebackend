@@ -13,6 +13,9 @@ import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
 import { product_status } from '@prisma/client';
 import { ApiProductTags, ApiSearchAgencyProducts, ApiSearchAgentProducts, ApiSearchProducts } from '../decorators/search-product.decorator';
 import { ApiGetProtectedProduct, ApiGetPublicProduct } from '../decorators/product-detail.decorator';
+import { SearchFiltersDto } from '../dto/product-filters.dto';
+import { GetMostClickedProductsUseCase } from '../application/use-cases/get-most-clicked-products.use-case';
+import { ApiProductsMostClickResponse } from '../decorators/most-clicks.decorator';
 
 @Controller('products')
 export class SearchProductsController {
@@ -21,6 +24,7 @@ export class SearchProductsController {
     private readonly getProductByIdUseCase: GetProductByIdUseCase,
     private readonly searchFiltersHelper: SearchFiltersHelper,
     private readonly productClicksService: ProductClicksService,
+    private readonly getMostClickedProductsUseCase: GetMostClickedProductsUseCase,
     private readonly softAuth: SoftAuthService
   ) {}
 
@@ -102,5 +106,22 @@ export class SearchProductsController {
     if (!product) throw new NotFoundException(t('productNotFound', req.language));
 
     return product;
+  }
+   @Public()
+  @Get('most-clicks')
+  @ApiProductsMostClickResponse()
+  async getMostClicksProducts(
+    @Req() req: RequestWithLang,
+    @Query('limit') limit = '12'
+  ) {
+    const language = req.language;
+    const limitValue = Math.min(Math.max(1, parseInt(limit, 10) || 12), 100);
+
+    const products = await this.getMostClickedProductsUseCase.execute(
+      limitValue,
+      language
+    );
+
+    return { products };
   }
 }
