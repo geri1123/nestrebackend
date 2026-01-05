@@ -13,19 +13,7 @@ export class UpdateUserFieldsUseCase {
     private readonly getUser: GetUserProfileUseCase,
   ) {}
 
-  // async execute(
-  //   userId: number,
-  //   fields: Partial<UpdateUserFields>,
-  //   lang: SupportedLang = "al"
-  // ) {
-  //   const user = await this.getUser.execute(userId, lang);
-
-   
-
-  //   await this.repo.updateFields(userId, fields);
-
-  //   return { success: true };
-  // }
+  
   async execute(
   userId: number,
   fields: Partial<UpdateUserFields>,

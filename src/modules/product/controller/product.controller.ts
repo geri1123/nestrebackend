@@ -37,8 +37,11 @@ export class SearchProductsController {
     @Query('page') page = '1'
   ): Promise<ProductsSearchResponseDto> {
     const language = req.language;
+     console.log(" RAW QUERY RECEIVED:", rawQuery);
+  console.log("PAGE:", page);
+  console.log(" LANGUAGE:", req.language);
     const filters = this.searchFiltersHelper.parse(rawQuery, page);
-
+  console.log(" FILTERS AFTER PARSE:", filters);
     return this.searchProductsUseCase.execute(filters, language, false);
   }
 

@@ -21,9 +21,7 @@ export class SoftAuthService {
     if (!token) return;
 
     try {
-      // const decoded = this.jwtService.verify(token, {
-        // secret: this.config.jwtSecret,
-      // });
+     
 const decoded = this.jwtService.verify<CustomJwtPayload>(token);
 
       const user = await this.userRepo.findById(decoded.userId);

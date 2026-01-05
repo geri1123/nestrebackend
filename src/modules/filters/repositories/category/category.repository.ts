@@ -14,10 +14,9 @@ async getAllCategories(
   status?: product_status,
 ) {
   return this.prisma.category.findMany({
-    select: {  // ← Use select instead of include
+    select: {
       id: true,
       slug: true,
-      // Leave out createdAt and updated_at
       categorytranslation: {
         where: { language },
         select: { name: true, slug: true },
