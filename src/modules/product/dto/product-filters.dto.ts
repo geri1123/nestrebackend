@@ -77,6 +77,15 @@ export class SearchFiltersDto {
     items: { type: 'number' },
   },
 })
+ @ApiPropertyOptional({ description: 'Minimum build year', example: 2020, type: Number })
+  @IsOptional()
+  @IsNumber()
+  buildYearMin?: number;
+
+  @ApiPropertyOptional({ description: 'Maximum build year', example: 2010, type: Number })
+  @IsOptional()
+  @IsNumber()
+  buildYearMax?: number;
 @IsOptional()
   @IsOptional()
   attributes?: Record<number, number[]>;

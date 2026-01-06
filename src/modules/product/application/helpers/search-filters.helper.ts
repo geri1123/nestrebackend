@@ -8,7 +8,7 @@ export class SearchFiltersHelper {
     const pageValue = Math.max(1, parseInt(page, 10) || 1);
     const offsetValue = (pageValue - 1) * FIXED_LIMIT;
 
-    // 🔹 Parse attribute codes: bedrooms=2-bedrooms,3-bedrooms
+    // Parse attribute codes: bedrooms=2-bedrooms,3-bedrooms
     const attributeCodes: Record<string, string> = {};
     
     // Also support old format: attributes[1]=4,5
@@ -63,6 +63,8 @@ export class SearchFiltersHelper {
       areaLow: rawQuery.areaLow ? Number(rawQuery.areaLow) : undefined,
       areaHigh: rawQuery.areaHigh ? Number(rawQuery.areaHigh) : undefined,
       cities,
+        buildYearMin: rawQuery.buildYearMin ? Number(rawQuery.buildYearMin) : undefined,
+  buildYearMax: rawQuery.buildYearMax ? Number(rawQuery.buildYearMax) : undefined,
       country: rawQuery.country,
       sortBy: rawQuery.sortBy as SearchFiltersDto['sortBy'],
       status: rawQuery.status,

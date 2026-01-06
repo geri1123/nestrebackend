@@ -34,6 +34,8 @@ import { ProductOwnershipAndPermissionGuard } from '../../common/guard/product-o
 import { CommonModule } from '../../common/common.module';
 import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
 import { GetMostClickedProductsUseCase } from './application/use-cases/get-most-clicked-products.use-case';
+import { ProductSearchQueryBuilder } from './infrastructure/search/product-search-query.builder';
+import { SearchFiltersResolver } from './infrastructure/search/search-filters-resolver.service';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
@@ -57,6 +59,8 @@ SoftAuthModule,
       provide: SEARCH_PRODUCT_REPO,
       useClass: SearchProductRepository,
     },
+    ProductSearchQueryBuilder,
+    SearchFiltersResolver,
 ProductOwnershipAndPermissionGuard,
     // Use Cases
     FindProductByIdUseCase,
