@@ -1,5 +1,4 @@
-import { SocketConnectionService } from './socket-connection.service';
-
+import { SocketConnectionService } from "../socket-connection.service";
 describe('SocketConnectionService', () => {
   let service: SocketConnectionService;
 

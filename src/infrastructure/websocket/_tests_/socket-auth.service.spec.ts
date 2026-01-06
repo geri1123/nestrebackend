@@ -1,4 +1,4 @@
-import { SocketAuthService } from "./socket-auth.service";
+import { SocketAuthService } from "../socket-auth.service";
 
 describe('SocketAuthService - extractToken', () => {
   it('should extract token from cookies', () => {

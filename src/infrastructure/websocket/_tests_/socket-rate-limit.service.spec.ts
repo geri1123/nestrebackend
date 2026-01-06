@@ -1,4 +1,4 @@
-import { SocketRateLimitService } from './socket-rate-limit.service';
+import { SocketRateLimitService } from '../socket-rate-limit.service';
 
 describe('SocketRateLimitService', () => {
   let service: SocketRateLimitService;
