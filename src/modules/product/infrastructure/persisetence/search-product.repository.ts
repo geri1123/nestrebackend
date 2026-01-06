@@ -242,8 +242,6 @@
 //     return whereConditions;
 //   }
 // }
-
-
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 import { ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
@@ -273,7 +271,7 @@ export class SearchProductRepository implements ISearchProductRepository {
     language: SupportedLang,
     isProtectedRoute: boolean = false
   ): Promise<any[]> {
-    // Resolve slugs to IDs before building conditions
+    // Resolve slugs/codes to IDs before building conditions
     await this.resolveSlugsToids(filters);
 
     const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
@@ -389,7 +387,7 @@ export class SearchProductRepository implements ISearchProductRepository {
       },
     });
 
-    console.log('📦 PRODUCTS FOUND BEFORE CLICK MERGE:', allProducts.length);
+    console.log(' PRODUCTS FOUND BEFORE CLICK MERGE:', allProducts.length);
 
     const productIds = allProducts.map(p => p.id);
     const clicksMap = await this.productClicksService.getClicksForProducts(productIds);
@@ -418,7 +416,7 @@ export class SearchProductRepository implements ISearchProductRepository {
       filters.offset! + filters.limit!
     );
 
-    console.log('📄 PRODUCTS RETURNED (paginated):', paginatedProducts.length);
+    console.log(' PRODUCTS RETURNED (paginated):', paginatedProducts.length);
 
     return paginatedProducts;
   }
@@ -428,108 +426,182 @@ export class SearchProductRepository implements ISearchProductRepository {
     language: SupportedLang,
     isProtectedRoute: boolean = false
   ): Promise<number> {
-    // Resolve slugs to IDs before counting
+    // Resolve slugs/codes to IDs before counting
     await this.resolveSlugsToids(filters);
     
     const whereConditions: any = this.buildWhereConditions(filters, language, isProtectedRoute);
     const count = await this.prisma.product.count({ where: whereConditions });
-    console.log('🧮 TOTAL COUNT FOR FILTERS:', count);
+    console.log(' TOTAL COUNT FOR FILTERS:', count);
     return count;
   }
 
   /**
-   * Resolve slugs (from frontend) to IDs (for DB)
+   * Resolve slugs and attribute codes to IDs
    * This mutates the filters object.
    */
   private async resolveSlugsToids(filters: SearchFiltersDto): Promise<void> {
-    const normalizedCategory    = this.normalizeSlug(filters.category);
+    const normalizedCategory = this.normalizeSlug(filters.category);
     const normalizedSubcategory = this.normalizeSlug(filters.subcategory);
     const normalizedListingType = this.normalizeSlug(filters.listingtype);
 
-    // 🔹 CATEGORY
+    console.log(' RESOLVING SLUGS:', {
+      original: {
+        category: filters.category,
+        subcategory: filters.subcategory,
+        listingtype: filters.listingtype
+      },
+      normalized: {
+        category: normalizedCategory,
+        subcategory: normalizedSubcategory,
+        listingtype: normalizedListingType
+      }
+    });
+
     if (normalizedCategory && !filters.categoryId) {
-      const category = await this.prisma.category.findFirst({
-        where: {
-          OR: [
-            { slug: normalizedCategory },
-            {
-              categorytranslation: {
-                some: {
-                  OR: [
-                    { slug: normalizedCategory },
-                    { name: filters.category }  // match by translated name too
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        select: { id: true }
-      });
-
-      filters.categoryId = category?.id;
-    }
-
-    // 🔹 SUBCATEGORY
-    if (normalizedSubcategory && !filters.subcategoryId) {
-      const subcategory = await this.prisma.subcategory.findFirst({
-        where: {
-          OR: [
-            { slug: normalizedSubcategory },
-            {
-              subcategorytranslation: {
-                some: {
-                  OR: [
-                    { slug: normalizedSubcategory },
-                    { name: filters.subcategory } // e.g. "Zyrë"
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        select: { id: true, categoryId: true }
-      });
-
-      filters.subcategoryId = subcategory?.id;
-
-      // Auto-bind parent category if missing
-      if (!filters.categoryId && subcategory?.categoryId) {
-        filters.categoryId = subcategory.categoryId;
+      try {
+        const category = await this.prisma.category.findUnique({
+          where: { slug: normalizedCategory },
+        });
+        
+        if (!category) {
+          console.warn(` Category slug "${normalizedCategory}" not found in database`);
+        } else {
+          console.log(` Category found: ${category.slug} (ID: ${category.id})`);
+        }
+        
+        filters.categoryId = category?.id || undefined;
+      } catch (error) {
+        console.error(' Error finding category:', error);
+        throw error;
       }
     }
 
-    // 🔹 LISTING TYPE
-    if (normalizedListingType && !filters.listingTypeId) {
-      const listingType = await this.prisma.listing_type.findFirst({
-        where: {
-          OR: [
-            { slug: normalizedListingType },
-            {
-              listing_type_translation: {
-                some: {
-                  OR: [
-                    { slug: normalizedListingType },
-                    { name: filters.listingtype }
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        select: { id: true }
-      });
+    //  SUBCATEGORY – canonical slug only
+    if (normalizedSubcategory && !filters.subcategoryId) {
+      try {
+        const subcategory = await this.prisma.subcategory.findUnique({
+          where: { slug: normalizedSubcategory },
+        });
+        
+        if (!subcategory) {
+          console.warn(` Subcategory slug "${normalizedSubcategory}" not found in database`);
+        } else {
+          console.log(` Subcategory found: ${subcategory.slug} (ID: ${subcategory.id})`);
+        }
+        
+        filters.subcategoryId = subcategory?.id || undefined;
 
-      filters.listingTypeId = listingType?.id;
+        // Auto-bind parent category
+        if (!filters.categoryId && subcategory?.categoryId) {
+          filters.categoryId = subcategory.categoryId;
+          console.log(` Auto-bound parent categoryId: ${subcategory.categoryId}`);
+        }
+      } catch (error) {
+        console.error(' Error finding subcategory:', error);
+        throw error;
+      }
     }
 
-    console.log('✅ RESOLVED IDs:', {
+    //  LISTING TYPE – canonical slug only
+    if (normalizedListingType && !filters.listingTypeId) {
+      try {
+        const listingType = await this.prisma.listing_type.findFirst({
+          where: { slug: normalizedListingType },
+        });
+        
+        if (!listingType) {
+          console.warn(`Listing type slug "${normalizedListingType}" not found in database`);
+        } else {
+          console.log(` Listing type found: ${listingType.slug} (ID: ${listingType.id})`);
+        }
+        
+        filters.listingTypeId = listingType?.id || undefined;
+      } catch (error) {
+        console.error('Error finding listing type:', error);
+        throw error;
+      }
+    }
+
+    if (filters.attributeCodes && Object.keys(filters.attributeCodes).length > 0) {
+      const resolvedAttributes: Record<number, number[]> = filters.attributes || {};
+
+      for (const [attributeCode, valueCodes] of Object.entries(filters.attributeCodes)) {
+        try {
+          // Normalize attribute code
+          const normalizedAttrCode = this.normalizeSlug(attributeCode);
+          if (!normalizedAttrCode) {
+            console.warn(` Empty attribute code after normalization: "${attributeCode}"`);
+            continue;
+          }
+
+          console.log(`Looking for attribute code: "${normalizedAttrCode}"`);
+
+          // Find attribute by code
+          const attribute = await this.prisma.attribute.findFirst({
+            where: { 
+              code: normalizedAttrCode,
+              // Optionally filter by subcategory if available
+              ...(filters.subcategoryId && { subcategoryId: filters.subcategoryId })
+            }
+          });
+
+          if (!attribute) {
+            console.warn(` Attribute code "${attributeCode}" not found${filters.subcategoryId ? ` for subcategoryId ${filters.subcategoryId}` : ''}`);
+            continue;
+          }
+
+          console.log(` Attribute found: ${attribute.code} (ID: ${attribute.id})`);
+
+          // Split and normalize value codes
+          const valueCodeArray = valueCodes
+            .split(',')
+            .map(v => this.normalizeSlug(v.trim()))
+            .filter((code): code is string => code !== undefined);
+
+          if (valueCodeArray.length === 0) {
+            console.warn(` No valid value codes for attribute "${attributeCode}"`);
+            continue;
+          }
+
+          console.log(` Looking for value codes: [${valueCodeArray.join(', ')}]`);
+
+          // Find attribute values by code
+          const attributeValues = await this.prisma.attribute_value.findMany({
+            where: {
+              attribute_id: attribute.id,
+              value_code: { in: valueCodeArray }
+            },
+            select: { id: true, value_code: true }
+          });
+
+          if (attributeValues.length > 0) {
+            const valueIds = attributeValues.map(av => av.id);
+            resolvedAttributes[attribute.id] = [
+              ...(resolvedAttributes[attribute.id] || []),
+              ...valueIds
+            ];
+            console.log(`Found ${attributeValues.length} values: ${attributeValues.map(av => av.value_code).join(', ')}`);
+          } else {
+            console.warn(` No values found for attribute "${attributeCode}" with codes: ${valueCodeArray.join(', ')}`);
+          }
+        } catch (error) {
+          console.error(` Error resolving attribute "${attributeCode}":`, error);
+          // Continue with other attributes instead of failing completely
+        }
+      }
+
+      filters.attributes = resolvedAttributes;
+    }
+
+    console.log(' RESOLVED IDs:', {
       category: filters.category,
       subcategory: filters.subcategory,
       listingtype: filters.listingtype,
       categoryId: filters.categoryId,
       subcategoryId: filters.subcategoryId,
       listingTypeId: filters.listingTypeId,
+      attributeCodes: filters.attributeCodes,
+      attributes: filters.attributes,
     });
   }
 
@@ -588,6 +660,7 @@ export class SearchProductRepository implements ISearchProductRepository {
       if (filters.pricelow !== undefined) whereConditions.price.gte = filters.pricelow;
       if (filters.pricehigh !== undefined) whereConditions.price.lte = filters.pricehigh;
     }
+
 
     if (filters.cities || filters.country) {
       whereConditions.city = {};

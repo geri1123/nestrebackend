@@ -1,21 +1,22 @@
-
-
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AttributeValueDto {
   @ApiProperty({ example: 4 })
   id: number;
 
-  @ApiProperty({ example: '1 Dhome' })
-  name: string;
+  @ApiProperty({ example: '2-rooms' })  //Canonical code
+  value_code: string;
 
-  @ApiProperty({ example: '1-dhome', nullable: true })
-  slug: string | null;
+  @ApiProperty({ example: '2 Dhoma' })
+  name: string;
 }
 
 export class AttributeDto {
   @ApiProperty({ example: 1 })
   id: number;
+
+  @ApiProperty({ example: 'rooms' }) 
+  code: string;
 
   @ApiProperty({ 
     example: 'select',
@@ -26,9 +27,6 @@ export class AttributeDto {
 
   @ApiProperty({ example: 'Dhoma' })
   name: string;
-
-  @ApiProperty({ example: 'dhoma', nullable: true })
-  slug: string | null;
 
   @ApiProperty({ type: [AttributeValueDto] })
   values: AttributeValueDto[];

@@ -3,12 +3,12 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SearchFiltersDto {
   // Slug fields (from URL path)
-  @ApiPropertyOptional({ description: 'Category slug', example: 'komerciale', type: String })
+  @ApiPropertyOptional({ description: 'Category slug', example: 'commercial', type: String })
   @IsOptional()
   @IsString()
   category?: string;
 
-  @ApiPropertyOptional({ description: 'Subcategory slug', example: 'zyrë', type: String })
+  @ApiPropertyOptional({ description: 'Subcategory slug', example: 'office', type: String })
   @IsOptional()
   @IsString()
   subcategory?: string;
@@ -23,7 +23,7 @@ export class SearchFiltersDto {
   subcategoryId?: number;
 
   // Listing type (can be slug or ID)
-  @ApiPropertyOptional({ description: 'Listing type slug', example: 'ne-shitje', type: String })
+  @ApiPropertyOptional({ description: 'Listing type slug', example: 'for-sale', type: String })
   @IsOptional()
   @IsString()
   listingtype?: string;
@@ -57,11 +57,27 @@ export class SearchFiltersDto {
   @IsString()
   country?: string;
 
-  // @ApiPropertyOptional({ 
-  //   description: 'Attributes', 
-  //   example: { 1: [4, 5], 2: [10] },
-  //   type: 'object' 
-  // })
+ 
+  @ApiPropertyOptional({
+  description: 'Attribute codes with comma-separated value codes',
+  example: { bedrooms: '2-bedrooms,3-bedrooms', parking: 'yes' },
+  type: 'object',
+  additionalProperties: { type: 'string' },
+})
+@IsOptional()
+  attributeCodes?: Record<string, string>;
+
+  // Resolved: ID-based attributes (for DB queries)
+ @ApiPropertyOptional({
+  description: 'Attribute IDs (resolved from codes)',
+  example: { 1: [4, 5], 2: [10] },
+  type: 'object',
+  additionalProperties: {
+    type: 'array',
+    items: { type: 'number' },
+  },
+})
+@IsOptional()
   @IsOptional()
   attributes?: Record<number, number[]>;
 
@@ -97,8 +113,6 @@ export class SearchFiltersDto {
   @IsNumber()
   agencyId?: number;
 }
-
-
 // import { IsOptional, IsString, IsEnum, IsNumber } from 'class-validator';
 // import { ApiPropertyOptional } from '@nestjs/swagger';
 

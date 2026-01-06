@@ -39,7 +39,7 @@ export class FiltersService {
     private readonly locationRepo: ILocationRepository,
     private readonly cacheService: CacheService, 
   ) {}
- private mapCategories(categories: any[]): CategoryDto[] {
+   private mapCategories(categories: any[]): CategoryDto[] {
     return (categories ?? []).map((category) => {
       const subcategories = (category.subcategory ?? []).map((subcat) => {
         const [translation] = subcat.subcategorytranslation ?? [];
@@ -47,14 +47,14 @@ export class FiltersService {
         return {
           id: subcat.id,
           name: translation?.name ?? 'No translation',
-          slug: translation?.slug ?? null,
+          slug: subcat.slug,  
           categoryId: subcat.categoryId,
           productCount: subcat._count?.product ?? 0,
         };
       });
 
       const totalCategoryProducts = subcategories.reduce(
-        (sum:any, s:any) => sum + s.productCount,
+        (sum: any, s: any) => sum + s.productCount,
         0,
       );
 
@@ -63,7 +63,7 @@ export class FiltersService {
       return {
         id: category.id,
         name: translation?.name ?? 'No translation',
-        slug: translation?.slug ?? null,
+        slug: category.slug,  
         productCount: totalCategoryProducts,
         subcategories,
       };

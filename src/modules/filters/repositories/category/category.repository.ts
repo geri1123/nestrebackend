@@ -1,46 +1,50 @@
 import { Injectable } from "@nestjs/common";
-
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { ICatRepository } from "./Icategory.repository";
 import { LanguageCode } from "@prisma/client";
 import { product_status } from "@prisma/client";
-import { CategoryDto } from "../../dto/filters.dto.js";
+
 @Injectable()
 export class CategoryRepository implements ICatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-async getAllCategories(
-  language: LanguageCode,
-  status?: product_status,
-) {
-  return this.prisma.category.findMany({
-    select: {
-      id: true,
-      slug: true,
-      categorytranslation: {
-        where: { language },
-        select: { name: true, slug: true },
-      },
-      subcategory: {
-        select: {
-          id: true,
-          categoryId: true,
-          slug: true,
-          subcategorytranslation: {
-            where: { language },
-            select: { name: true, slug: true },
+  async getAllCategories(
+    language: LanguageCode,
+    status?: product_status,
+  ) {
+    return this.prisma.category.findMany({
+      select: {
+        id: true,
+        slug: true,  // ✅ Canonical slug from category table
+        categorytranslation: {
+          where: { language },
+          select: { 
+            name: true
+            // ❌ Remove slug from here - we don't need translation slug
           },
-          _count: {
-            select: {
-              product: {
-                where: status ? { status } : undefined,
+        },
+        subcategory: {
+          select: {
+            id: true,
+            categoryId: true,
+            slug: true,  // ✅ Canonical slug from subcategory table
+            subcategorytranslation: {
+              where: { language },
+              select: { 
+                name: true
+                // ❌ Remove slug from here
+              },
+            },
+            _count: {
+              select: {
+                product: {
+                  where: status ? { status } : undefined,
+                },
               },
             },
           },
         },
       },
-    },
-  });
+    });
+  }
 }
-}
-

@@ -5,6 +5,7 @@ export const al = {
    faildCreateWallet:"Krijimi i portofolit dështoi. Ju lutemi provoni përsëri.",
 walletSuccessfullyCreated:"Portofoli u krijua me sukses.",
 walletNotFound:"Portofoli nuk u gjet.",
+failedCreatingProduct:"Dështoi krijimi i produktit.",
 repeatPasswordRequired: 'Konfirmimi i fjalëkalimit është i detyrueshëm.',
 usernameCooldown: "Mund ta ndryshoni emrin e përdoruesit përsëri më {date}.",
 sameUsername: "Emri i ri i përdoruesit nuk mund të jetë i njëjtë me emrin aktual.",

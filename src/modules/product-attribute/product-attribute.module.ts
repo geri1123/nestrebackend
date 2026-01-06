@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 
 // Domain Repositories (interfaces)
-import { IProductAttributeValueRepository, PRODUCT_ATTRIBUTE_VALUE_REPO } from './domain/repositories/product-attribute.repository.interface';
-import { IAttributeRepository } from './domain/repositories/attribute.repository.interface';
+import {  PRODUCT_ATTRIBUTE_VALUE_REPO } from './domain/repositories/product-attribute.repository.interface';
 
 // Infrastructure Repositories (implementations)
 import { ProductAttributeValueRepository } from './infrastructure/persistence/product-attribute.repository';

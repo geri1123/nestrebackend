@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
 
+import { ApiProperty } from '@nestjs/swagger';
 
 export class SubcategoryDto {
   @ApiProperty({ example: 1 })
@@ -8,7 +8,7 @@ export class SubcategoryDto {
   @ApiProperty({ example: 'Shtepi private' })
   name: string;
 
-  @ApiProperty({ example: 'shtepi-private', nullable: true })
+  @ApiProperty({ example: 'house', nullable: true })  
   slug: string | null;
 
   @ApiProperty({ example: 1 })
@@ -25,7 +25,7 @@ export class CategoryDto {
   @ApiProperty({ example: 'Residenciale' })
   name: string;
 
-  @ApiProperty({ example: 'residenciale', nullable: true })
+  @ApiProperty({ example: 'residential', nullable: true })  
   slug: string | null;
 
   @ApiProperty({ example: 68 })
@@ -42,14 +42,13 @@ export class ListingTypeDto {
   @ApiProperty({ example: 'Ne shitje' })
   name: string;
 
-  @ApiProperty({ example: 'ne-shitje', nullable: true })
+  @ApiProperty({ example: 'for-sale', nullable: true }) 
   slug: string | null;
 
   @ApiProperty({ example: 38 })
   productCount: number;
 }
 
-// Main response DTO
 export class FiltersResponseDto {
   @ApiProperty({ example: true })
   success: boolean;

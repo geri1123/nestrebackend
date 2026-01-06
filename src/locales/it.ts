@@ -26,6 +26,7 @@ sameUsername: "Il nuovo nome utente non può essere uguale al nome utente attual
     phoneMustBeDigits: "Il numero di telefono deve contenere solo cifre",
    agentInactive: "L'agente è inattivo",
    agencyInactive: "L'agenzia non è attiva",
+  
     accountSuspended:  'Il tuo account è sospeso.',
     walletNotFound:'Portafoglio non trovato.',
     amountAddedSuccessfully:"Importo aggiunto con successo", 
