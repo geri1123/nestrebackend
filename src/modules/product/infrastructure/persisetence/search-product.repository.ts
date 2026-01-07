@@ -11,7 +11,7 @@ export class SearchProductRepository implements ISearchProductRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly productClicksService: ProductClicksService,
-    private readonly filtersResolver: SearchFiltersResolver,
+    // private readonly filtersResolver: SearchFiltersResolver,
     private readonly queryBuilder: ProductSearchQueryBuilder,
   ) {}
 
@@ -20,8 +20,8 @@ export class SearchProductRepository implements ISearchProductRepository {
     language: SupportedLang,
     isProtectedRoute: boolean = false,
   ): Promise<any[]> {
-    // 🔹 Resolve slugs/codes to IDs before building conditions
-    await this.filtersResolver.resolve(filters);
+    //Resolve slugs/codes to IDs before building conditions
+    // await this.filtersResolver.resolve(filters);
 
     const whereConditions: any = this.queryBuilder.build(
       filters,
@@ -200,7 +200,7 @@ export class SearchProductRepository implements ISearchProductRepository {
     language: SupportedLang,
     isProtectedRoute: boolean = false,
   ): Promise<number> {
-    await this.filtersResolver.resolve(filters);
+    // await this.filtersResolver.resolve(filters);
 
     const whereConditions: any = this.queryBuilder.build(
       filters,
