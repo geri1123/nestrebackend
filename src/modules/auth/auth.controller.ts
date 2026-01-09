@@ -144,6 +144,7 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
 
     return this.registerAgentUseCase.execute(dto, lang);
   };
+  @AuthSwagger.GoogleLogin()
   @Post('google')
 @Public()
 async googleLogin(
@@ -151,6 +152,12 @@ async googleLogin(
   @Res({ passthrough: true }) res: Response
 ) {
   return this.googleLoginUseCase.execute(idToken, res);
+}
+
+@Post("logout")
+logout(@Res({ passthrough: true }) res: Response) {
+  this.authCookieService.clearAuthCookie(res);
+  return { success: true };
 }
 }
 

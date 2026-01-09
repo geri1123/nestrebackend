@@ -123,6 +123,7 @@ export class AuthSwagger {
     
     );
   }
+  
   static Login() {
     return applyDecorators(
       ApiOperation({
@@ -149,6 +150,46 @@ ApiUnauthorizedResponse(    ),
       }),
     );
   }
+ static GoogleLogin() {
+  return applyDecorators(
+    ApiOperation({
+      summary: "Login with Google",
+      description:
+        "Logs in or registers a user using Google ID token. Sets httpOnly auth cookie.",
+    }),
+
+    ApiBody({
+      schema: {
+        type: "object",
+        required: ["idToken"],
+        properties: {
+          idToken: {
+            type: "string",
+            example:
+              "eyJhbGciOiJSUzI1NiIsImtpZCI6IiIsInR5cCI6IkpXVCJ9...",
+            description: "Google ID token from Google Sign-In",
+          },
+        },
+      },
+    }),
+
+    ApiSuccessResponse("Google login successful", {
+      success: true,
+      user: {
+        id: 1,
+        username: "john_doe",
+        email: "john@gmail.com",
+        role: "user",
+      },
+    }),
+
+    
+
+    ApiBadRequestResponse("Validation failed", {
+      idToken: ["idToken is required"],
+    }),
+  );
+}
   }
 
     

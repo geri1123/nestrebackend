@@ -15,7 +15,7 @@ import { CACHE_KEYV } from './cache.constants';
       useFactory: async (config: AppConfigService) => {
         const keyv = new Keyv({
           store: new KeyvRedis({ url: config.redisUrl }) as any,
-          ttl: config.redisTTL,
+          // ttl: config.redisTTL,
         });
 
         keyv.on('error', err => console.error('Keyv Redis Error', err));
