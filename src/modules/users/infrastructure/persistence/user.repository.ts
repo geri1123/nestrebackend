@@ -119,7 +119,10 @@ export class UserRepository implements IUserDomainRepository {
         last_name: data.last_name,
         role: data.role,
         status: data.status as any,
-        email_verified: false,
+        email_verified: data.email_verified ?? false,
+      google_user: data.google_user ?? false,     
+      google_id: data.google_id ?? null,  
+        
       },
     });
     return result.id;

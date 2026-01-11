@@ -54,6 +54,10 @@ export interface CreateUserData {
   last_name: string | null;
   role: 'user' | 'agency_owner' | 'agent';
   status: string;
+    email_verified?: boolean;  
+  google_user?: boolean;     
+  google_id?: string;   
+   
 }
 
 export interface UpdateUserFields {

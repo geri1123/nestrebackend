@@ -20,21 +20,21 @@ export class GoogleLoginUseCase {
   async execute(idToken: string, res: Response) {
     const googleUser = await this.googleAuth.verify(idToken);
 
-    // 1. Check if existing user
+    
     const existing = await this.users.findByEmail(googleUser.email);
     let userId: number;
 
     if (existing) {
       userId = existing.id;
     } else {
-      // 2. Create new username
+    
       let username = googleUser.email.split('@')[0];
 
       if (await this.users.usernameExists(username)) {
         username = generateUsername(username);
       }
 
-      // 3. Create user without password
+     
       userId = await this.users.create({
         email: googleUser.email,
         username,
@@ -43,12 +43,16 @@ export class GoogleLoginUseCase {
         last_name: googleUser.lastName,
         role: user_role.user, 
         status: user_status.active,
+           email_verified: true,       
+      google_user: true,            
+      google_id: googleUser.id, 
+      
       });
     }
 
     const user = await this.users.findById(userId);
 
-    const token = this.authToken.generate(user, 30); // 30 days
+    const token = this.authToken.generate(user, 30); 
     this.cookie.setAuthCookie(res, token, true);
 
     return { success: true, user };

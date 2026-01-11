@@ -45,6 +45,7 @@ export class RegisterUserUseCase {
       ...data,
       role,
       status: 'inactive',
+    
     }, tx);
 
     const token = generateToken();
