@@ -45,7 +45,7 @@ export class EmailService {
     if (!token?.trim()) throw new Error('Verification token cannot be empty');
     const langSegment = language === 'al' ? '' : `/${language}`;
     // const link = `${this.configService.port}${langSegment}/verify-email?token=${token}`;
-    const link = `${this.configService.port}${langSegment}/verify-email?token=${token}`;
+    const link = `${this.configService.clientBaseUrl}${langSegment}/verify-email?token=${token}`;
     return this.sendEmail(to, 'Verify Your Account', verificationEmailTemplate(name, link));
   }
   async sendWelcomeEmail(to: string, name: string) {

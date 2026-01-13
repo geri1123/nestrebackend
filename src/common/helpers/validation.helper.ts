@@ -103,6 +103,7 @@ case 'endDateInvalid':return t("endDateInvalid", lang);
 case "agencyNameRequired":return t("agencyNameRequired",lang)
 case "phoneMustBeDigits":return t("phoneMustBeDigits", lang)
 case "websiteInvalid":return t("websiteInvalid" , lang);
+case 'repeatPasswordRequired':return t('repeatPasswordRequired', lang);
 default: return code;
   }
 }

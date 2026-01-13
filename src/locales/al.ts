@@ -12,6 +12,7 @@ sameUsername: "Emri i ri i përdoruesit nuk mund të jetë i njëjtë me emrin a
 advertisementTypeNotActive:"Ky lloj reklame aktualisht nuk është aktiv.",
     usernameChangedSuccessfully: "Emri i përdoruesit u ndryshua me sukses.",
      noPermissionToAdvertise:"Nuk keni leje ta reklamoni këtë produkt.",
+     
       notificationMarkedAsRead: 'Njoftimi u shënua si i lexuar',
       amountMustBePositive: "Shuma duhet të jetë pozitive",
        notificationDeletedSuccessfully: 'Njoftimi u fshi me sukses',
