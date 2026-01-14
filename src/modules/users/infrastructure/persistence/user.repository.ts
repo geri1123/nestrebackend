@@ -241,6 +241,7 @@ async findByIdentifierForAuth(identifier: string) {
       role: true,
       username: true,
       email: true,
+      email_verified: true,
     }
   });
 };

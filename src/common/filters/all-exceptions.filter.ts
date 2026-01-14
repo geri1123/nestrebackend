@@ -1,3 +1,5 @@
+
+
 import {
   ExceptionFilter,
   Catch,
@@ -16,9 +18,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
     let errors = {};
+    let code: string | undefined = undefined; 
 
     if (exception instanceof HttpException) {
-    
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
 
@@ -26,6 +28,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const responseObj = exceptionResponse as any;
         message = responseObj.message || message;
         errors = responseObj.errors || {};
+        code = responseObj.code; 
       } else {
         message = exceptionResponse as string;
       }
@@ -35,6 +38,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       success: false,
       message,
       ...(Object.keys(errors).length > 0 && { errors }),
+      ...(code && { code }), 
     });
   }
 }

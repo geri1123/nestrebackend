@@ -34,6 +34,7 @@ deleteById(userId: number): Promise<void>;
     role: string;
     username: string;
     email: string;
+    email_verified  : boolean;
   } | null>;
   updatePassword(userId: number, newPassword: string): Promise<void>;
   findByIdentifierForVerification(identifier: string): Promise<{

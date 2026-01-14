@@ -1,9 +1,6 @@
-import { IsString, MinLength, IsNotEmpty, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { SupportedLang, t } from '../../../locales';
-
-
-
+import { IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import { Match } from '../../../common/decorators/match-password.decorator';
 
 export class ResetPasswordDto {
   @ApiProperty({ example: 'token-from-email' })
@@ -11,17 +8,19 @@ export class ResetPasswordDto {
   token: string;
 
   @ApiProperty({ example: 'newStrongPassword123' })
-  @IsString({ message: 'passwordMustBeString' })
-  @MinLength(8, { message: 'newPasswordMinLength' })
+ 
   @IsNotEmpty({ message: 'passwordRequired' })
+   @IsString({ message: 'passwordMustBeString' })
+  @MinLength(8, { message: 'newPasswordMinLength' })
+  @Matches(/^\S+$/, { message: 'passwordNoSpaces' }) 
   newPassword: string;
 
   @ApiProperty({ example: 'newStrongPassword123' })
   @IsString({ message: 'passwordMustBeString' })
   @IsNotEmpty({ message: 'confirmPasswordRequired' })
+  @Match('newPassword', { message: 'passwordsMismatch' })
   repeatPassword: string;
 }
-
 
 // export type ResetPasswordDto = {
 //   token: string;

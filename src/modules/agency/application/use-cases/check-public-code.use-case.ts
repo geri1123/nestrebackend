@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { SupportedLang, t } from '../../../../locales';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { Agency } from '../../domain/entities/agency.entity';
+import { error } from 'node:console';
 
 @Injectable()
 export class GetAgencyByPublicCodeUseCase {
@@ -16,7 +17,10 @@ export class GetAgencyByPublicCodeUseCase {
     if (!agency) {
       throw new BadRequestException({
         success: false,
-        message: t('agencyNotFound', language),
+        message: t('validationFailed', language),
+        errors:{
+          public_code: [t('agencyNotFound', language)],
+        }
       });
     }
 

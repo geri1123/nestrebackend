@@ -32,14 +32,21 @@ export class RegisterUserUseCase {
   ) {
     const errors: Record<string, string[]> = {};
 
-    if (await this.userRepo.usernameExists(data.username))
-      errors.username = [t('usernameExists', lang)];
+   const normalizedUsername = data.username.replace(/\s+/g, "").toLowerCase();
 
+if (await this.userRepo.usernameExists(normalizedUsername)) {
+  errors.username = [t("usernameExists", lang)];
+}
     if (await this.userRepo.emailExists(data.email))
       errors.email = [t('emailExists', lang)];
 
-    if (Object.keys(errors).length > 0)
-      throw new BadRequestException({ success: false, errors });
+   if (Object.keys(errors).length > 0) {
+  throw new BadRequestException({
+    success: false,
+    message: t('validationFailed', lang),
+    errors,
+  });
+}
 
     const userId = await this.userRepo.create({
       ...data,

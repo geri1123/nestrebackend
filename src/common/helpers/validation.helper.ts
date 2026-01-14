@@ -36,6 +36,7 @@ export function throwValidationErrors(
 }
 export function translateValidationMessage(code: string, lang: SupportedLang): string {
   switch (code) {
+    case 'usernameRequired': return t('usernameRequired', lang);
     case 'usernameMustBeString': return t('usernameStringError', lang);
     case 'usernameLength': return t('usernameMin', lang);
     case 'usernameInvalidChars': return t('usernameInvalidChars', lang);

@@ -22,16 +22,16 @@ export class PasswordController {
   @Public()
   @Post('reset-password')
   @ApiResetPassword()
-  async resetPassword(@Body() body: any, @Req() req: RequestWithLang) {
+  async resetPassword(@Body() body: ResetPasswordDto, @Req() req: RequestWithLang) {
     const lang = req.language || 'al';
-    const dto = plainToInstance(ResetPasswordDto, body);
+    // const dto = plainToInstance(ResetPasswordDto, body);
 
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, lang);
-    if (dto.newPassword !== dto.repeatPassword)
-      throwValidationErrors([], lang, { repeatPassword: [t('passwordsMismatch', lang)] });
+    // const errors = await validate(dto);
+    // if (errors.length > 0) throwValidationErrors(errors, lang);
+    // if (dto.newPassword !== dto.repeatPassword)
+    //   throwValidationErrors([], lang, { repeatPassword: [t('passwordsMismatch', lang)] });
 
-    await this.resetPasswordUseCase.execute(dto.token, dto.newPassword, lang);
+    await this.resetPasswordUseCase.execute(body.token, body.newPassword, lang);
 
     return { success: true, message: t('passwordResetSuccess', lang) };
   }
@@ -39,14 +39,14 @@ export class PasswordController {
   @Public()
   @Post('forgot-password')
   @ApiForgotPassword()
-  async forgotPassword(@Body() body: any, @Req() req: RequestWithLang) {
+  async forgotPassword(@Body() body: RecoverPasswordDto, @Req() req: RequestWithLang) {
     const lang = req.language || 'al';
-    const dto = plainToInstance(RecoverPasswordDto, body);
+    // const dto = plainToInstance(RecoverPasswordDto, body);
 
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, lang);
+    // const errors = await validate(dto);
+    // if (errors.length > 0) throwValidationErrors(errors, lang);
 
-    await this.requestPasswordResetUseCase.execute(dto.email, lang);
+    await this.requestPasswordResetUseCase.execute(body.email, lang);
 
     return { success: true, message: t('passwordResetLinkSent', lang) };
   }
