@@ -35,7 +35,9 @@ import { ProductImageModule } from './modules/product-image/product-image.module
 import { ProductAttributeValueModule } from './modules/product-attribute/product-attribute.module';
 import { AdvertisementPricingModule } from './modules/advertisement-pricing/advertisement-prising.module';
 import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
-import { SharedAuthModule } from './infrastructure/auth/shared-auth.module';
+import { SharedAuthModule } from './infrastructure/auth/modules/shared-auth.module';
+import { AuthContextService } from './infrastructure/auth/services/auth-context.service';
+import { AuthContextModule } from './infrastructure/auth/modules/auth-context.module';
 
 @Module({
   imports: [
@@ -64,6 +66,7 @@ DatabaseModule,
     CloudinaryModule,
     AgencyModule,
 AuthModule,
+AuthContextModule,
 FiltersModule,
 ProductModule,
 ProductImageModule,
@@ -77,6 +80,7 @@ SharedAuthModule,
   ],
   controllers: [AppController],
   providers: [
+    //  AuthContextService, 
     AppService,
   {
     provide:APP_GUARD,

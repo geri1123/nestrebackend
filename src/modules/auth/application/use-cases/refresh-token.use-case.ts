@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { SupportedLang } from '../../../../locales';
 import { FindUserByIdUseCase } from '../../../users/application/use-cases/find-user-by-id.use-case';
-import { AuthTokenService } from '../../infrastructure/services/auth-token.service';
+import { AuthTokenService } from '../../../../infrastructure/auth/services/auth-token.service';
 
 @Injectable()
 export class RefreshTokenUseCase {

@@ -5,7 +5,7 @@ import { NotificationController } from './notification.controller';
 import { NotificationTemplateService } from './notifications-template.service';
 import { NotificationRepository } from './infrastructure/persistence/notification.repository';
 import { NOTIFICATION_REPO } from './domain/repository/notification.repository.interface';
-import { SharedAuthModule } from '../../infrastructure/auth/shared-auth.module';
+import { SharedAuthModule } from '../../infrastructure/auth/modules/shared-auth.module';
 import { SocketAuthService } from '../../infrastructure/websocket/socket-auth.service';
 import { SocketConnectionService } from '../../infrastructure/websocket/socket-connection.service';
 import { SocketRateLimitService } from '../../infrastructure/websocket/socket-rate-limit.service';

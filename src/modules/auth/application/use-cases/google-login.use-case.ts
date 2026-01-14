@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
 import { GoogleAuthService } from '../../infrastructure/services/google-auth.service';
 import { generateUsername } from '../../../../common/utils/generate-username';
-import { AuthTokenService } from '../../infrastructure/services/auth-token.service';
+import { AuthTokenService } from '../../../../infrastructure/auth/services/auth-token.service';
 import { AuthCookieService } from '../../infrastructure/services/auth-cookie.service';
 import { Response } from 'express';
 import { user_role, user_status } from '@prisma/client';

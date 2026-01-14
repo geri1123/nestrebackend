@@ -6,7 +6,7 @@ import { comparePassword } from '../../../../common/utils/hash';
 import { FindUserForAuthUseCase } from '../../../users/application/use-cases/find-user-for-auth.use-case';
 import { UpdateLastLoginUseCase } from '../../../users/application/use-cases/update-last-login.use-case';
 import { FindUserByIdUseCase } from '../../../users/application/use-cases/find-user-by-id.use-case';
-import { AuthTokenService } from '../../infrastructure/services/auth-token.service';
+import { AuthTokenService } from '../../../../infrastructure/auth/services/auth-token.service';
 
 @Injectable()
 export class LoginUseCase {
