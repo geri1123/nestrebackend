@@ -2,9 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { agency_status, Prisma } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
-import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
-import { CheckAgencyNameExistsUseCase } from './check-agency-name-exists.use-case';
 
 export interface CreateAgencyData {
   agency_name: string;

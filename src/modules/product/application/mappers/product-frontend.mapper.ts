@@ -2,7 +2,7 @@ import { ProductFrontendDto, ProductImageDto } from '../../dto/product-frontend.
 
 export class ProductFrontendMapper {
   static toDto(product: any): ProductFrontendDto {
-    const images: ProductImageDto[] = product.productimage.map((img) => ({
+    const images: ProductImageDto[] = product.productimage.map((img:any) => ({
       imageUrl: img.imageUrl ?? null,
     }));
 

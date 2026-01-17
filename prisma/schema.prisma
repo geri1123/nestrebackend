@@ -367,6 +367,7 @@ model SavedProduct {
   saved_at   DateTime @default(now())
 
   @@unique([user_id, product_id]) 
+  @@map("savedproduct")  
 }
 
 model Wallet {
@@ -379,6 +380,7 @@ model Wallet {
 
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
+   @@map("wallet")
 }
 
 model WalletTransaction {
@@ -391,7 +393,7 @@ model WalletTransaction {
   description   String?  
    productAdvertisement ProductAdvertisement?
   createdAt     DateTime @default(now())
-
+  @@map("wallettransaction")  
 }
 
 model ProductAdvertisement {
@@ -410,6 +412,7 @@ model ProductAdvertisement {
 
   @@index([productId])
   @@index([userId])
+   @@map("productadvertisement") 
 }
 
 model AdvertisementPricing {
@@ -421,17 +424,20 @@ model AdvertisementPricing {
   isActive  Boolean            @default(true)
   updatedAt DateTime           @updatedAt
   createdAt DateTime           @default(now())
+    @@map("advertisementpricing") 
 }
 enum advertisement_type {
   cheap
   normal
   premium
+    @@map("advertisement_type")  
 }
 enum advertisement_status {
   active
   inactive
   expired
   pending
+   @@map("advertisement_status") 
 }
 enum LanguageCode {
   en
@@ -442,6 +448,7 @@ enum wallet_transaction_type{
   topup
   withdraw
   purchase
+    @@map("wallettransaction_type")
 }
 enum registrationrequest_request_type {
   agent_license_verification
