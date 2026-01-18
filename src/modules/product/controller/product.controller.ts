@@ -16,6 +16,8 @@ import { ApiGetProtectedProduct, ApiGetPublicProduct } from '../decorators/produ
 import { SearchFiltersDto } from '../dto/product-filters.dto';
 import { GetMostClickedProductsUseCase } from '../application/use-cases/get-most-clicked-products.use-case';
 import { ApiProductsMostClickResponse } from '../decorators/most-clicks.decorator';
+import { GetRelatedProductsUseCase } from '../application/use-cases/get-related.use-case';
+import { ApiGetRelatedProducts } from '../decorators/related-products.decorator';
 
 @Controller('products')
 export class SearchProductsController {
@@ -25,6 +27,7 @@ export class SearchProductsController {
     private readonly searchFiltersHelper: SearchFiltersHelper,
     private readonly productClicksService: ProductClicksService,
     private readonly getMostClickedProductsUseCase: GetMostClickedProductsUseCase,
+    private readonly getRelatedProductsUseCase: GetRelatedProductsUseCase,
     private readonly softAuth: SoftAuthService
   ) {}
 
@@ -127,4 +130,37 @@ export class SearchProductsController {
 
     return { products };
   }
+
+  @Public()
+@Get('public/:id/related')
+  @ApiGetRelatedProducts()
+async getRelatedProducts(
+  @Param('id') id: number,
+  @Req() req: RequestWithLang,
+  @Query('limit') limit = '6',
+) {
+  const language = req.language;
+  const limitValue = Math.min(Math.max(1, parseInt(limit, 10) || 6), 12);
+
+  // First get the product to know its category/subcategory
+  const productResult = await this.getProductByIdUseCase.execute(
+    id,
+    language,
+    false,
+  );
+
+  if (!productResult.product || !productResult.relatedData) {
+    return { products: [] };
+  }
+
+  const relatedProducts = await this.getRelatedProductsUseCase.execute(
+    id,
+    productResult.relatedData.subcategoryId,
+    productResult.relatedData.categoryId,
+    language,
+    limitValue,
+  );
+
+  return { products: relatedProducts };
+}
 }

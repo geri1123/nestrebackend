@@ -20,6 +20,7 @@ import { UpdateProductUseCase } from './application/use-cases/update-product.use
 import { GetProductByIdUseCase } from './application/use-cases/get-product-by-id.use-case';
 import { SearchProductsUseCase } from './application/use-cases/search-products.use-case';
 import { GetProductForPermissionUseCase } from './application/use-cases/get-product-for-permission.use-case';
+import { GetRelatedProductsUseCase } from './application/use-cases/get-related.use-case';
 // Utilities
 import { SearchFiltersHelper } from './application/helpers/search-filters.helper';
 import { UsersModule } from '../users/users.module';
@@ -63,6 +64,7 @@ SoftAuthModule,
     SearchFiltersResolver,
 ProductOwnershipAndPermissionGuard,
     // Use Cases
+    GetRelatedProductsUseCase,
     FindProductByIdUseCase,
     CreateProductUseCase,
     UpdateProductUseCase,

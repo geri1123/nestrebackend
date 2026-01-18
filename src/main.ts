@@ -40,7 +40,20 @@ async function bootstrap() {
           );
         }
       }
-
+  app.use((req, res, next) => {
+    if (req.url.includes('profile-image') && req.method === 'PATCH') {
+      console.log('═══════════════════════════════════════');
+      console.log('🔍 MIDDLEWARE INTERCEPTED REQUEST');
+      console.log('URL:', req.url);
+      console.log('Method:', req.method);
+      console.log('Content-Type:', req.headers['content-type']);
+      console.log('Body:', req.body);
+      console.log('File:', req.file);
+      console.log('Files:', req.files);
+      console.log('═══════════════════════════════════════');
+    }
+    next();
+  });
       return new BadRequestException({
         success: false,
         message: t('validationFailed', lang),
@@ -49,43 +62,7 @@ async function bootstrap() {
     },
   }),
 );
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     transform: true,
-  //     whitelist: true,
-  //     forbidNonWhitelisted: true,
-  //     transformOptions: {
-  //       enableImplicitConversion: true,
-  //     },
-  //     exceptionFactory: (errors: ValidationError[]) => {
-  //       if (!errors || errors.length === 0) {
-  //         // safety check
-  //         return new BadRequestException({
-  //           success: false,
-  //           message: t('validationFailed', 'al'),
-  //         });
-  //       }
-
-  //       const formatted: Record<string, string[]> = {};
-  //       const lang: SupportedLang = 'al'; 
-
-  //       for (const err of errors) {
-  //         if (err.constraints) {
-  //           formatted[err.property] = Object.values(err.constraints).map(code =>
-  //             translateValidationMessage(code, lang)
-  //           );
-  //         }
-  //       }
-
-  //       return new BadRequestException({
-  //         success: false,
-  //         message: t('validationFailed', lang),
-  //         errors: formatted,
-  //       });
-  //     },
-  //   }),
-  // );
-
+  
   
   app.useGlobalFilters(new AllExceptionsFilter());
 

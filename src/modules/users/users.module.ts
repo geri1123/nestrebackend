@@ -1,14 +1,12 @@
 
 // src/modules/users/users.module.ts
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
 import { EmailModule } from '../../infrastructure/email/email.module';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 
 // Repositories
 import { UserRepository } from './infrastructure/persistence/user.repository';
 import { UsernameHistoryRepository } from './infrastructure/persistence/usernamehistory.repository';
-import { USERS_REPOSITORY_TOKENS } from './domain/repositories/user.repository.tokens';
 // Use Cases
 import { GetUserProfileUseCase } from './application/use-cases/get-user-profile.use-case';
 import { GetNavbarUserUseCase } from './application/use-cases/get-navbar-user.use-case';
