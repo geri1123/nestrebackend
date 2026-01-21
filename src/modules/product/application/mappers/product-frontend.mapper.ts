@@ -21,6 +21,7 @@ export class ProductFrontendMapper {
         product.subcategory?.category?.categorytranslation?.[0]?.name ?? 'No Category',
       subcategoryName:
         product.subcategory?.subcategorytranslation?.[0]?.name ?? 'No Subcategory',
+        area: product.area,
       listingTypeName:
         product.listing_type?.listing_type_translation?.[0]?.name ?? 'No Listing Type',
       user: { username: product.user?.username ?? 'Unknown' },

@@ -26,17 +26,14 @@ export class GetRelatedProductsUseCase {
       status: 'active',
     };
 
-    // Get products from same subcategory
     let products = await this.searchProductRepository.searchProducts(
       filters,
       language,
       false,
     );
 
-    // Filter out the current product
     products = products.filter((p) => p.id !== productId);
 
-    // If we don't have enough products
     if (products.length < limit) {
       const categoryFilters: SearchFiltersDto = {
         categoryId,
@@ -51,7 +48,6 @@ export class GetRelatedProductsUseCase {
         false,
       );
 
-      // Add category products that arent already included
       const existingIds = new Set(products.map((p) => p.id));
       const additionalProducts = categoryProducts.filter(
         (p) => p.id !== productId && !existingIds.has(p.id),
@@ -60,7 +56,6 @@ export class GetRelatedProductsUseCase {
       products = [...products, ...additionalProducts];
     }
 
-    // Limit to requested number
     products = products.slice(0, limit);
 
     return products.map(ProductFrontendMapper.toDto);

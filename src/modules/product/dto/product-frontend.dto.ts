@@ -142,6 +142,9 @@ export class ProductFrontendDto {
 totalClicks?:number;
   @ApiProperty({ example: 'For Sale',description: 'Listing type name in selected language'})
   listingTypeName: string;
+
+    @ApiProperty({ example: '100 m',description: 'Area of the product'})
+  area?: number | null;
   @ApiProperty({example:"1", description:"user id in product"})
   userId:number;
   @ApiProperty({example:"3", description:"agencyid in product if exist"})

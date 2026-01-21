@@ -86,14 +86,17 @@ export class ProductRepository implements IProductRepository {
         createdAt: true,
         updatedAt: true,
         buildYear: true,
+        subcategoryId: true,
         productimage: { select: { imageUrl: true } },
         city: { select: { name: true } },
         subcategory: {
           select: {
+            id:true,
             slug: true,
             subcategorytranslation: { where: { language }, select: { name: true }, take: 1 },
             category: {
               select: {
+                id: true, 
                 slug: true,
                 categorytranslation: { where: { language }, select: { name: true }, take: 1 },
               },

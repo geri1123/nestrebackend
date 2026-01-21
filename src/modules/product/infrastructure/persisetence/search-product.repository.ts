@@ -64,12 +64,14 @@ export class SearchProductRepository implements ISearchProductRepository {
         updatedAt: true,
         userId: true,
         buildYear: true,
+        area: true,
         agencyId: true,
         productimage: { take: 2, select: { imageUrl: true } },
         city: { select: { name: true } },
         subcategory: {
           select: {
             slug: true,
+            categoryId: true,
             subcategorytranslation: {
               where: { language },
               select: { name: true },
