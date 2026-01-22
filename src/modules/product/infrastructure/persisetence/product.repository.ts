@@ -70,7 +70,6 @@ export class ProductRepository implements IProductRepository {
       updatedAt: product.updatedAt,
     });
   }
-
 async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
   return this.prisma.product.findUnique({
     where: { id },
@@ -87,8 +86,38 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       updatedAt: true,
       buildYear: true,
       subcategoryId: true,
+      area: true,
       productimage: { select: { imageUrl: true } },
       city: { select: { name: true } },
+
+      
+      productattributevalue: {
+        select: {
+          id: true,
+          attributeId: true,
+          attributeValueId: true,
+          attributes: {  
+            select: {
+              inputType:true,
+              attributeTranslation: {  
+                where: { language },
+                select: { name: true },
+                take: 1,
+              },
+            },
+          },
+          attribute_values: {  
+            select: {
+              value_code:true,
+              attributeValueTranslations: {  
+                where: { language },
+                select: { name: true },
+                take: 1,
+              },
+            },
+          },
+        },
+      },
 
       subcategory: {
         select: {

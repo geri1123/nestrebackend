@@ -49,7 +49,6 @@ import { SearchFiltersResolver } from './infrastructure/search/search-filters-re
 SoftAuthModule,
     ProductImageModule,
     ProductAttributeValueModule,
-    
   ],
   providers: [
     {

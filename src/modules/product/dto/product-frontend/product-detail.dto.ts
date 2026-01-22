@@ -13,6 +13,45 @@ export class ProductDetailImageDto {
   imageUrl: string | null;
 }
 
+//attribute dto
+export class ProductAttributeDto {
+  @ApiProperty({ 
+    example: 1,
+    description: 'Attribute ID'
+  })
+  attributeId: number;
+
+  @ApiProperty({ 
+    example: 'Bedrooms',
+    description: 'Attribute name'
+  })
+  attributeName: string;
+
+  @ApiProperty({ 
+    example: 'select',
+    description: 'Input type for the attribute (text, number, select, checkbox, etc.)'
+  })
+  inputType: string;
+
+  @ApiProperty({ 
+    example: 3,
+    description: 'Attribute value ID'
+  })
+  attributeValueId: number;
+
+  @ApiProperty({ 
+    example: '3',
+    description: 'Attribute value (translated)'
+  })
+  attributeValue: string;
+
+  @ApiProperty({ 
+    example: '3',
+    description: 'Raw value code from database'
+  })
+  valueCode: string;
+}
+
 export class RelatedDataDto {
   @ApiProperty({ example: 5 })
   subcategoryId: number;
@@ -74,6 +113,7 @@ export class ProductDetailUserDto {
   })
   status: user_status;
 }
+//
 
 /**
  * DTO for agency information in product detail
@@ -295,7 +335,11 @@ export class ProductDetailDto {
     description: 'Active advertisement details if product is advertised'
   })
   advertisement: ProductDetailAdvertisementDto | null;
-
+  @ApiProperty({ 
+    type: [ProductAttributeDto],
+    description: 'Product attributes and their values'
+  })
+  attributes: ProductAttributeDto[];
   @ApiProperty({ 
     example: 245,
     description: 'Total number of clicks on this product'

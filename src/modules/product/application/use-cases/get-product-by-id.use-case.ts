@@ -109,10 +109,92 @@
 //   }
 // }
 
+// import { Inject, Injectable } from '@nestjs/common';
+// import { PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
+// import { SupportedLang } from '../../../../locales';
+
+// import { RequestWithUser } from '../../../../common/types/request-with-user.interface';
+// import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
+// import { ProductDetailResponseDto } from '../../dto/product-frontend/product-detail.dto';
+// import { ProductDetailMapper } from '../mappers/peoduct-detail.mapper';
+
+// @Injectable()
+// export class GetProductByIdUseCase {
+//   constructor(
+//     @Inject(PRODUCT_REPO)
+//     private readonly productRepository: IProductRepository,
+//     private readonly productClicksService: ProductClicksService
+//   ) {}
+
+//   async execute(
+//     id: number,
+//     language: SupportedLang,
+//     isProtectedRoute: boolean,
+//     req?: RequestWithUser
+//   ): Promise<ProductDetailResponseDto> {
+//     const product = await this.productRepository.findByIdWithDetails(id, language);
+
+//     if (!product) {
+//       return { product: null };
+//     }
+
+//     // Get click count
+//     const productClicks = await this.productClicksService.getClicksByProduct(`${id}`);
+//     const totalClicks = productClicks.reduce((sum, c) => sum + c.count, 0);
+
+//     // Check status and permissions
+//     if (product.status !== 'active') {
+//       if (!isProtectedRoute) {
+//         return { product: null };
+//       }
+
+//       const isOwner = req?.userId === product.userId;
+//       const isAgencyOwner = 
+//         req?.user?.role === 'agency_owner' && 
+//         req?.agencyId === product.agencyId;
+//       const canAgentSee = 
+//         req?.user?.role === 'agent' && 
+//         req?.agentPermissions?.canViewAllPosts;
+
+//       if (!isOwner && !isAgencyOwner && !canAgentSee) {
+//         return { product: null };
+//       }
+//     }
+
+//     if (
+//       product.user?.status === 'suspended' || 
+//       product.agency?.status === 'suspended'
+//     ) {
+//       return { product: null };
+//     }
+
+//     // Map to DTO
+//     const dto = ProductDetailMapper.toDto(product, totalClicks);
+
+//     const subcategoryId = product.subcategory?.id;
+//     const categoryId = product.subcategory?.category?.id;
+
+//     console.log(' Related data extraction:', {
+//       productId: product.id,
+//       subcategoryId,
+//       categoryId,
+//       hasSubcategory: !!product.subcategory,
+//       hasCategory: !!product.subcategory?.category
+//     });
+
+//     return {
+//       product: dto,
+//       relatedData: subcategoryId && categoryId
+//         ? { subcategoryId, categoryId }
+//         : undefined,
+//     };
+//   }
+// }
+
+
 import { Inject, Injectable } from '@nestjs/common';
 import { PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { SupportedLang } from '../../../../locales';
-
 import { RequestWithUser } from '../../../../common/types/request-with-user.interface';
 import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
 import { ProductDetailResponseDto } from '../../dto/product-frontend/product-detail.dto';
@@ -123,7 +205,7 @@ export class GetProductByIdUseCase {
   constructor(
     @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
-    private readonly productClicksService: ProductClicksService
+    private readonly productClicksService: ProductClicksService,
   ) {}
 
   async execute(
@@ -168,19 +250,10 @@ export class GetProductByIdUseCase {
       return { product: null };
     }
 
-    // Map to DTO
     const dto = ProductDetailMapper.toDto(product, totalClicks);
 
     const subcategoryId = product.subcategory?.id;
     const categoryId = product.subcategory?.category?.id;
-
-    console.log('📊 Related data extraction:', {
-      productId: product.id,
-      subcategoryId,
-      categoryId,
-      hasSubcategory: !!product.subcategory,
-      hasCategory: !!product.subcategory?.category
-    });
 
     return {
       product: dto,

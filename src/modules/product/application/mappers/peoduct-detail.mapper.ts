@@ -1,8 +1,6 @@
-import { ProductDetailDto, ProductDetailImageDto } from  "../../dto/product-frontend/product-detail.dto";
-
+import { ProductDetailDto, ProductDetailImageDto, ProductAttributeDto } from "../../dto/product-frontend/product-detail.dto";
 
 export class ProductDetailMapper {
-
   static toDto(product: any, totalClicks: number = 0): ProductDetailDto {
     const images: ProductDetailImageDto[] = product.productimage.map((img: any) => ({
       imageUrl: img.imageUrl ?? null,
@@ -14,6 +12,21 @@ export class ProductDetailMapper {
         ad.endDate &&
         new Date(ad.endDate) > new Date()
     );
+
+    // Map attributes with inputType and valueCode
+    const attributes: ProductAttributeDto[] = product.productattributevalue?.map((attr: any) => {
+      const translatedValue = attr.attribute_values?.attributeValueTranslations?.[0]?.name;
+      const valueCode = attr.attribute_values?.value_code;
+      
+      return {
+        attributeId: attr.attributeId,
+        attributeName: attr.attributes?.attributeTranslation?.[0]?.name ?? 'Unknown Attribute',
+        inputType: attr.attributes?.inputType ?? 'text', 
+        attributeValueId: attr.attributeValueId,
+        attributeValue: translatedValue ?? valueCode ?? 'Unknown Value', 
+        valueCode: valueCode ?? '', 
+      };
+    }) || [];
 
     return {
       id: product.id,
@@ -68,6 +81,7 @@ export class ProductDetailMapper {
           }
         : null,
       totalClicks,
+      attributes, 
     };
   }
 }
