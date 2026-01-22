@@ -1,15 +1,13 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
-import { PRODUCTS_SEARCH_EXAMPLE } from './product-search.example';
-
-const isProd = process.env.NODE_ENV === 'production';
+import { ApiExtraModels, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ProductListResponseDto } from '../dto/product-frontend/product-list.dto'; // adjust path
+import { ProductListItemDto } from '../dto/product-frontend/product-list.dto';
 
 export const ApiProductsSearchResponse = () =>
   applyDecorators(
+    ApiExtraModels(ProductListResponseDto, ProductListItemDto),
     ApiOkResponse({
       description: 'Products retrieved successfully',
-      schema: isProd
-        ? undefined 
-        : { example: PRODUCTS_SEARCH_EXAMPLE },
+      type: ProductListResponseDto,
     }),
   );

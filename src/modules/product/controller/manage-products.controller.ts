@@ -21,7 +21,6 @@ import { UpdateProductUseCase } from '../application/use-cases/update-product.us
 import { SearchProductsUseCase } from '../application/use-cases/search-products.use-case';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
-import { ProductsSearchResponseDto } from '../dto/product-frontend.dto';
 import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
 import { t } from '../../../locales';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
@@ -31,7 +30,8 @@ import { UserStatusGuard } from '../../../common/guard/status.guard';
 import { ApiCreateProduct } from '../decorators/create-product.decorator';
 import { ApiDashboardProducts } from '../decorators/dashboard-products.decorator';
 import { ApiUpdateProduct } from '../decorators/update-product.decorator';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Products')
 @Controller('products')
 export class ManageProductController {
   constructor(
@@ -110,7 +110,7 @@ export class ManageProductController {
     @Query() rawQuery: Record<string, any>,
     @Query('page') page = '1',
     @Query('view') view: 'mine' | 'agency' = 'mine'
-  ): Promise<ProductsSearchResponseDto> {
+  ) {
     const language = req.language;
     const filters = this.searchFiltersHelper.parse(rawQuery, page);
 

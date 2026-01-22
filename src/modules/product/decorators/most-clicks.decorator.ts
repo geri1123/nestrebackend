@@ -1,16 +1,14 @@
-
 import { applyDecorators } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
-import { PRODUCTS_MOST_CLICKS_EXAMPLE } from './products-most-clicks.example';
+import { ApiExtraModels, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-const isProd = process.env.NODE_ENV === 'production';
+import { MostClickedProductsResponseDto } from '../dto/product-frontend/most-click.dto';
+import { ProductListItemDto } from '../dto/product-frontend/product-list.dto'; 
 
 export const ApiProductsMostClickResponse = () =>
   applyDecorators(
+    ApiExtraModels(MostClickedProductsResponseDto, ProductListItemDto),
     ApiOkResponse({
       description: 'Products retrieved successfully',
-      schema: isProd
-        ? undefined 
-        : { example:PRODUCTS_MOST_CLICKS_EXAMPLE },
+      type: MostClickedProductsResponseDto,
     }),
   );

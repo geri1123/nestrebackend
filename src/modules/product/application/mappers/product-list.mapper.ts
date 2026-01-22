@@ -1,8 +1,8 @@
-import { ProductFrontendDto, ProductImageDto } from '../../dto/product-frontend.dto';
-
-export class ProductFrontendMapper {
-  static toDto(product: any): ProductFrontendDto {
-    const images: ProductImageDto[] = product.productimage.map((img:any) => ({
+import { ProductListItemDto  ,ProductListImageDto} from "../../dto/product-frontend/product-list.dto";
+export class ProductListMapper {
+  
+  static toDto(product: any): ProductListItemDto {
+    const images: ProductListImageDto[] = product.productimage.map((img: any) => ({
       imageUrl: img.imageUrl ?? null,
     }));
 
@@ -13,18 +13,21 @@ export class ProductFrontendMapper {
       title: product.title,
       price: product.price,
       city: product.city?.name ?? 'Unknown',
+      status: product.status,
       createdAt: product.createdAt.toISOString(),
       image: images,
-      userId: product.userId,
-      status: product.status,
       categoryName:
         product.subcategory?.category?.categorytranslation?.[0]?.name ?? 'No Category',
       subcategoryName:
         product.subcategory?.subcategorytranslation?.[0]?.name ?? 'No Subcategory',
-        area: product.area,
       listingTypeName:
         product.listing_type?.listing_type_translation?.[0]?.name ?? 'No Listing Type',
-      user: { username: product.user?.username ?? 'Unknown' },
+      area: product.area ?? null,
+      userId: product.userId,
+      agencyId: product.agencyId ?? null,
+      user: {
+        username: product.user?.username ?? 'Unknown',
+      },
       agency: product.agency
         ? {
             agency_name: product.agency.agency_name,
@@ -38,7 +41,14 @@ export class ProductFrontendMapper {
             status: product.advertisements[0].status,
           }
         : null,
-      totalClicks: product.clickCount,
+      totalClicks: product.clickCount ?? 0,
     };
+  }
+
+  /**
+   * Convert an array of database products to list item DTOs
+   */
+  static toDtoArray(products: any[]): ProductListItemDto[] {
+    return products.map((product) => this.toDto(product));
   }
 }

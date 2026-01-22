@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SEARCH_PRODUCT_REPO, type ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
 import { SupportedLang } from '../../../../locales';
-import { ProductFrontendDto } from '../../dto/product-frontend.dto';
-import { ProductFrontendMapper } from '../mappers/product-frontend.mapper';
+import { ProductListMapper } from '../mappers/product-list.mapper';
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
+import { ProductListItemDto } from '../../dto/product-frontend/product-list.dto';
 
 @Injectable()
 export class GetRelatedProductsUseCase {
@@ -18,7 +18,7 @@ export class GetRelatedProductsUseCase {
     categoryId: number,
     language: SupportedLang,
     limit: number = 6,
-  ): Promise<ProductFrontendDto[]> {
+  ): Promise<ProductListItemDto[]> {
     const filters: SearchFiltersDto = {
       subcategoryId, 
       limit,
@@ -58,6 +58,6 @@ export class GetRelatedProductsUseCase {
 
     products = products.slice(0, limit);
 
-    return products.map(ProductFrontendMapper.toDto);
+    return products.map(ProductListMapper.toDto);
   }
 }

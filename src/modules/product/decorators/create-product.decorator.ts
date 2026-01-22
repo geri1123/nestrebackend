@@ -4,7 +4,7 @@ import {
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
-  ApiCreatedResponse,
+  
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import {
@@ -12,7 +12,6 @@ import {
   ApiSuccessResponse,
   ApiUnauthorizedResponse,
 } from '../../../common/swagger/response.helper.ts';
-import { ProductFrontendDto } from '../dto/product-frontend.dto';
 
 export const ApiCreateProduct = () =>
   applyDecorators(
@@ -81,7 +80,7 @@ export const ApiCreateProduct = () =>
             example: 'draft',
           },
 
-          // 🔑 attributes[]
+          //  attributes[]
           attributes: {
             type: 'array',
             example: [

@@ -5,24 +5,21 @@ import {
   ApiOkResponse,
   ApiBearerAuth,
   ApiTags,
+  ApiExtraModels,
 } from '@nestjs/swagger';
-import { PRODUCTS_SEARCH_EXAMPLE } from './product-search.example';
 import { ApiUnauthorizedResponse } from '../../../common/swagger/response.helper.ts';
 
-const isProd = process.env.NODE_ENV === 'production';
+import { ProductListResponseDto, ProductListItemDto } from '../dto/product-frontend/product-list.dto'; // adjust path
 
 export const ApiDashboardProducts = () =>
   applyDecorators(
     ApiOperation({
       summary: 'Get dashboard products',
-      description:
-        'Get products for dashboard. View can be personal or agency-based.',
+      description: 'Get products for dashboard. View can be personal or agency-based.',
     }),
 
-    // AUTH REQUIRED
     ApiBearerAuth(),
 
-    // ---------------- QUERY PARAMS ----------------
     ApiQuery({
       name: 'view',
       required: false,
@@ -30,14 +27,7 @@ export const ApiDashboardProducts = () =>
       example: 'mine',
       description: 'Choose which products to view',
     }),
-
-    ApiQuery({
-      name: 'page',
-      required: false,
-      type: Number,
-      example: 1,
-    }),
-
+    ApiQuery({ name: 'page', required: false, type: Number, example: 1 }),
     ApiQuery({
       name: 'status',
       required: false,
@@ -46,10 +36,10 @@ export const ApiDashboardProducts = () =>
       description: 'Filter by product status (agency view)',
     }),
 
-    // ---------------- RESPONSE ----------------
+    ApiExtraModels(ProductListResponseDto, ProductListItemDto),
     ApiOkResponse({
       description: 'Dashboard products retrieved successfully',
-      schema: isProd ? undefined : { example: PRODUCTS_SEARCH_EXAMPLE },
+      type: ProductListResponseDto,
     }),
 
     ApiUnauthorizedResponse(),

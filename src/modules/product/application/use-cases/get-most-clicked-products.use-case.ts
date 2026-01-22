@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { SEARCH_PRODUCT_REPO,type ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
 import { SupportedLang } from '../../../../locales';
-import { ProductFrontendDto } from '../../dto/product-frontend.dto';
-import { ProductFrontendMapper } from '../mappers/product-frontend.mapper';
+import { ProductListItemDto  } from '../../dto/product-frontend/product-list.dto';
+import { ProductListMapper } from '../mappers/product-list.mapper';
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class GetMostClickedProductsUseCase {
   async execute(
     limit: number,
     language: SupportedLang,
-  ): Promise<ProductFrontendDto[]> {
+  ): Promise<ProductListItemDto[]> {
     const filters: SearchFiltersDto = {
       sortBy: 'most_clicks',
       limit,
@@ -29,6 +29,6 @@ export class GetMostClickedProductsUseCase {
       false
     );
 
-    return products.map(ProductFrontendMapper.toDto);
+    return products.map(ProductListMapper.toDto);
   }
 }

@@ -4,45 +4,30 @@ import {
   ApiQuery,
   ApiParam,
   ApiTags,
+  ApiExtraModels,
 } from '@nestjs/swagger';
-import {
-  ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
-} from '../../../common/swagger/response.helper.ts';
+
 import { ApiProductsSearchResponse } from './product-search-response.swagger';
+import { SearchFiltersDto } from '../dto/product-filters.dto'; // adjust path
 
 // ---------------------------------------------------------
 // TAG
 // ---------------------------------------------------------
-export const ApiProductTags = () =>
-  applyDecorators(ApiTags('Products'));
 
 // ---------------------------------------------------------
 // SEARCH PRODUCTS (PUBLIC)
 // ---------------------------------------------------------
 export const ApiSearchProducts = () =>
   applyDecorators(
+
     ApiOperation({ summary: 'Search products (Public)' }),
 
-    ApiQuery({ name: 'page', required: false, type: Number }),
-    ApiQuery({ name: 'categoryId', required: false, type: Number }),
-    ApiQuery({ name: 'subcategoryId', required: false, type: Number }),
-    ApiQuery({ name: 'listingTypeId', required: false, type: Number }),
-    ApiQuery({
-      name: 'cities',
-      required: false,
-      type: String,
-      example: 'Tirana,Durrës',
-    }),
-    ApiQuery({
-      name: 'attributes[1]',
-      required: false,
-      type: String,
-      example: '4,5',
-    }),
+    ApiExtraModels(SearchFiltersDto),
+    ApiQuery({ type: SearchFiltersDto }),
+
+    ApiQuery({ name: 'page', required: false, type: Number, example: 1 }),
 
     ApiProductsSearchResponse(),
-
   );
 
 // ---------------------------------------------------------
@@ -50,6 +35,7 @@ export const ApiSearchProducts = () =>
 // ---------------------------------------------------------
 export const ApiSearchAgencyProducts = () =>
   applyDecorators(
+
     ApiOperation({ summary: 'Get products by agency (Public)' }),
 
     ApiParam({
@@ -58,17 +44,19 @@ export const ApiSearchAgencyProducts = () =>
       example: 3,
     }),
 
-    ApiQuery({ name: 'page', required: false, type: Number }),
+    ApiExtraModels(SearchFiltersDto),
+    ApiQuery({ type: SearchFiltersDto }),
+    ApiQuery({ name: 'page', required: false, type: Number, example: 1 }),
 
     ApiProductsSearchResponse(),
   );
 
-
-//=-----
-//agents products
-//---
+// ---------------------------------------------------------
+// PRODUCTS BY AGENT (PUBLIC)
+// ---------------------------------------------------------
 export const ApiSearchAgentProducts = () =>
   applyDecorators(
+
     ApiOperation({
       summary: 'Get products by agent (Public)',
       description: 'Get active products published by a specific agent',
@@ -81,12 +69,9 @@ export const ApiSearchAgentProducts = () =>
       description: 'Agent (user) ID',
     }),
 
-    ApiQuery({
-      name: 'page',
-      required: false,
-      type: Number,
-      example: 1,
-    }),
+    ApiExtraModels(SearchFiltersDto),
+    ApiQuery({ type: SearchFiltersDto }),
+    ApiQuery({ name: 'page', required: false, type: Number, example: 1 }),
 
     ApiProductsSearchResponse(),
   );

@@ -71,50 +71,102 @@ export class ProductRepository implements IProductRepository {
     });
   }
 
-  async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
-    return this.prisma.product.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        price: true,
-        status: true,
-        userId: true,
-        agencyId: true,
-        description: true,
-        streetAddress: true,
-        createdAt: true,
-        updatedAt: true,
-        buildYear: true,
-        subcategoryId: true,
-        productimage: { select: { imageUrl: true } },
-        city: { select: { name: true } },
-        subcategory: {
-          select: {
-            id:true,
-            slug: true,
-            subcategorytranslation: { where: { language }, select: { name: true }, take: 1 },
-            category: {
-              select: {
-                id: true, 
-                slug: true,
-                categorytranslation: { where: { language }, select: { name: true }, take: 1 },
+async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
+  return this.prisma.product.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      status: true,
+      userId: true,
+      agencyId: true,
+      description: true,
+      streetAddress: true,
+      createdAt: true,
+      updatedAt: true,
+      buildYear: true,
+      subcategoryId: true,
+      productimage: { select: { imageUrl: true } },
+      city: { select: { name: true } },
+
+      subcategory: {
+        select: {
+          id: true,
+          slug: true,
+          subcategorytranslation: {
+            where: { language },
+            select: { name: true },
+            take: 1,
+          },
+          category: {
+            select: {
+              id: true,
+              slug: true,
+              categorytranslation: {
+                where: { language },
+                select: { name: true },
+                take: 1,
               },
             },
           },
         },
-        listing_type: {
-          select: {
-            slug: true,
-            listing_type_translation: { where: { language }, select: { name: true }, take: 1 },
+      },
+
+      listing_type: {
+        select: {
+          slug: true,
+          listing_type_translation: {
+            where: { language },
+            select: { name: true },
+            take: 1,
           },
         },
-        user: { select: { username: true, email: true, first_name: true, last_name: true,     profile_img_url: true, phone: true, role: true, status: true } },
-        agency: { select: { agency_name: true, logo: true, address: true, phone: true, created_at: true, status: true } },
       },
-    });
-  }
 
+      user: {
+        select: {
+          username: true,
+          email: true,
+          first_name: true,
+          last_name: true,
+          profile_img_url: true,
+          phone: true,
+          role: true,
+          status: true,
+        },
+      },
+
+      agency: {
+        select: {
+          agency_name: true,
+          logo: true,
+          address: true,
+          phone: true,
+          created_at: true,
+          status: true,
+        },
+      },
+
+      advertisements: {
+        where: {
+          status: 'active',
+          startDate: { lte: new Date() },
+          endDate: { gte: new Date() },
+        },
+        select: {
+          id: true,
+          startDate: true,
+          endDate: true,
+          status: true,
+          adType: true,
+        },
+        orderBy: { endDate: 'desc' },
+        take: 1,
+      },
+    },
+  });
+}
   async findForPermissionCheck(id: number): Promise<{ id: number; userId: number | null; agencyId: number | null } | null> {
     return this.prisma.product.findUnique({
       where: { id },

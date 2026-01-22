@@ -4,21 +4,21 @@ import { SearchProductsUseCase } from '../application/use-cases/search-products.
 import { GetProductByIdUseCase } from '../application/use-cases/get-product-by-id.use-case';
 import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
 import { Public } from '../../../common/decorators/public.decorator';
-import { ProductsSearchResponseDto } from '../dto/product-frontend.dto';
 import { t } from '../../../locales';
 import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { ProductClicksService } from '../../product-clicks/product-clicks.service';
 import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
 import { product_status } from '@prisma/client';
-import { ApiProductTags, ApiSearchAgencyProducts, ApiSearchAgentProducts, ApiSearchProducts } from '../decorators/search-product.decorator';
+import { ApiSearchAgencyProducts, ApiSearchAgentProducts, ApiSearchProducts } from '../decorators/search-product.decorator';
 import { ApiGetProtectedProduct, ApiGetPublicProduct } from '../decorators/product-detail.decorator';
 import { SearchFiltersDto } from '../dto/product-filters.dto';
 import { GetMostClickedProductsUseCase } from '../application/use-cases/get-most-clicked-products.use-case';
 import { ApiProductsMostClickResponse } from '../decorators/most-clicks.decorator';
 import { GetRelatedProductsUseCase } from '../application/use-cases/get-related.use-case';
 import { ApiGetRelatedProducts } from '../decorators/related-products.decorator';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Products')
 @Controller('products')
 export class SearchProductsController {
   constructor(
@@ -38,7 +38,7 @@ export class SearchProductsController {
     @Req() req: RequestWithLang,
     @Query() rawQuery: Record<string, any>,
     @Query('page') page = '1'
-  ): Promise<ProductsSearchResponseDto> {
+  ) {
     const language = req.language;
      console.log(" RAW QUERY RECEIVED:", rawQuery);
   console.log("PAGE:", page);
