@@ -10,9 +10,7 @@ import { generatePublicCode } from '../../../../common/utils/hash';
 export class AgencyRepository implements IAgencyDomainRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  // ---------------------------------------------------------------------------
   // QUERY METHODS
-  // ---------------------------------------------------------------------------
 
   async findById(id: number): Promise<Agency | null> {
     const data = await this.prisma.agency.findUnique({ where: { id } });
@@ -85,7 +83,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     };
   }
 
-  // 👇 UPDATED METHOD
+  
   async findLogoById(agencyId: number): Promise<{ 
     logo: string | null; 
     logoPublicId: string | null; 
@@ -121,9 +119,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     });
   }
 
-  // ---------------------------------------------------------------------------
   // VALIDATION METHODS
-  // ---------------------------------------------------------------------------
 
   async agencyNameExists(name: string): Promise<boolean> {
     const exists = await this.prisma.agency.findFirst({
@@ -141,9 +137,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     return exists !== null;
   }
 
-  // ---------------------------------------------------------------------------
   // COMMAND METHODS
-  // ---------------------------------------------------------------------------
 
   async create(
     data: {
@@ -174,7 +168,6 @@ export class AgencyRepository implements IAgencyDomainRepository {
   }
 
   async updateFields(agencyId: number, data: any): Promise<Agency> {
-    // Map camelCase to snake_case for Prisma
     const prismaData: any = {};
     
     if (data.logo !== undefined) prismaData.logo = data.logo;
@@ -213,9 +206,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     });
   }
 
-  // ---------------------------------------------------------------------------
   // PRIVATE HELPERS
-  // ---------------------------------------------------------------------------
 
   private async publicCodeExists(publicCode: string): Promise<boolean> {
     const existing = await this.prisma.agency.findUnique({
@@ -225,7 +216,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     return existing !== null;
   }
 
-  // 👇 UPDATED METHOD
+  //  UPDATED METHOD
   private mapToEntity(data: any): Agency {
     return Agency.create({
       id: data.id,

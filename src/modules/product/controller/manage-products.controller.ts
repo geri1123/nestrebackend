@@ -97,7 +97,7 @@ export class ManageProductController {
       Number(id),
       dto,
       userId,
-      agencyId!,
+      // agencyId!,
       language,
       images
     );
@@ -115,7 +115,7 @@ export class ManageProductController {
     const filters = this.searchFiltersHelper.parse(rawQuery, page);
 
     if (view === 'mine') {
-      // Show only your own products
+      // Show own products
       filters.userId = req.userId;
     } else if (view === 'agency') {
       if (!req.agencyId || (req.user?.role !== 'agent' && req.user?.role !== 'agency_owner')) {
@@ -131,7 +131,7 @@ export class ManageProductController {
       }
     }
 
-    // Determine if route is "protected"
+    //  if route is "protected"
     const isProtectedRoute =
       view === 'mine' ||
       (view === 'agency' &&

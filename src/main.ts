@@ -40,20 +40,7 @@ async function bootstrap() {
           );
         }
       }
-  app.use((req, res, next) => {
-    if (req.url.includes('profile-image') && req.method === 'PATCH') {
-      console.log('═══════════════════════════════════════');
-      console.log('🔍 MIDDLEWARE INTERCEPTED REQUEST');
-      console.log('URL:', req.url);
-      console.log('Method:', req.method);
-      console.log('Content-Type:', req.headers['content-type']);
-      console.log('Body:', req.body);
-      console.log('File:', req.file);
-      console.log('Files:', req.files);
-      console.log('═══════════════════════════════════════');
-    }
-    next();
-  });
+
       return new BadRequestException({
         success: false,
         message: t('validationFailed', lang),
@@ -85,8 +72,8 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, swaggerDocument);
 
   await app.listen(configService.port);
-  console.log(`🚀 Server running on port ${configService.port}`);
-  console.log(`📘 Swagger available at http://localhost:${configService.port}/api/docs`);
+  console.log(` Server running on port ${configService.port}`);
+  console.log(` Swagger available at http://localhost:${configService.port}/api/docs`);
 }
 
 bootstrap();

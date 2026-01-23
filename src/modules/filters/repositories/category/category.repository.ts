@@ -4,51 +4,6 @@ import { ICatRepository } from "./Icategory.repository";
 import { LanguageCode } from "@prisma/client";
 import { product_status } from "@prisma/client";
 
-// @Injectable()
-// export class CategoryRepository implements ICatRepository {
-//   constructor(private readonly prisma: PrismaService) {}
-
-//   async getAllCategories(
-//     language: LanguageCode,
-//     status?: product_status,
-//   ) {
-//     return this.prisma.category.findMany({
-//       select: {
-//         id: true,
-//         slug: true,
-//         categorytranslation: {
-//           where: { language },
-//           select: { 
-//             name: true
-          
-//           },
-//         },
-//         subcategory: {
-//           select: {
-//             id: true,
-//             categoryId: true,
-//             slug: true,  
-//             subcategorytranslation: {
-//               where: { language },
-//               select: { 
-//                 name: true
-                
-//               },
-//             },
-//             _count: {
-//               select: {
-//                 product: {
-//                   where: status ? { status } : undefined,
-//                 },
-//               },
-//             },
-//           },
-//         },
-//       },
-//     });
-//   }
-// }
-// category.repository.ts
 @Injectable()
 export class CategoryRepository implements ICatRepository {
   constructor(private readonly prisma: PrismaService) {}

@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { advertisement_status, advertisement_type } from '@prisma/client';
 
-/**
- * DTO for product images in list view
- */
+
+ // DTO for product images in list view
+ 
 export class ProductListImageDto {
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/image.png', 
@@ -13,9 +13,9 @@ export class ProductListImageDto {
   imageUrl: string | null;
 }
 
-/**
- * DTO for user information in product list
- */
+
+ // DTO for user information in product list
+
 export class ProductListUserDto {
   @ApiProperty({ 
     example: 'john_doe',
@@ -24,9 +24,8 @@ export class ProductListUserDto {
   username: string;
 }
 
-/**
- * DTO for agency information in product list
- */
+// DTO for agency information in product list
+
 export class ProductListAgencyDto {
   @ApiProperty({ 
     example: 'Prime Real Estate',
@@ -42,9 +41,9 @@ export class ProductListAgencyDto {
   logo: string | null;
 }
 
-/**
- * DTO for advertisement information in product list
- */
+
+  // DTO for advertisement information in product list
+
 export class ProductListAdvertisementDto {
   @ApiProperty({ 
     example: 42,
@@ -60,9 +59,8 @@ export class ProductListAdvertisementDto {
   status: advertisement_status;
 }
 
-/**
- * DTO for individual product in list view
- */
+ // DTO for individual product in list view
+ 
 export class ProductListItemDto {
   @ApiProperty({ 
     example: 132,

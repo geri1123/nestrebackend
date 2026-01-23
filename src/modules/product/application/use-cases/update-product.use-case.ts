@@ -23,9 +23,9 @@ export class UpdateProductUseCase {
     productId: number,
     dto: UpdateProductDto,
     userId: number,
-    agencyId: number | undefined,
     language: SupportedLang,
-    images?: Express.Multer.File[]
+    images?: Express.Multer.File[],
+    // agencyId:number,
   ) {
     const product = await this.productRepository.findById(productId);
     if (!product) {

@@ -8,15 +8,9 @@ import {
 } from '@nestjs/swagger';
 
 import { ApiProductsSearchResponse } from './product-search-response.swagger';
-import { SearchFiltersDto } from '../dto/product-filters.dto'; // adjust path
+import { SearchFiltersDto } from '../dto/product-filters.dto';
 
-// ---------------------------------------------------------
-// TAG
-// ---------------------------------------------------------
 
-// ---------------------------------------------------------
-// SEARCH PRODUCTS (PUBLIC)
-// ---------------------------------------------------------
 export const ApiSearchProducts = () =>
   applyDecorators(
 
@@ -30,9 +24,8 @@ export const ApiSearchProducts = () =>
     ApiProductsSearchResponse(),
   );
 
-// ---------------------------------------------------------
 // PRODUCTS BY AGENCY (PUBLIC)
-// ---------------------------------------------------------
+
 export const ApiSearchAgencyProducts = () =>
   applyDecorators(
 
@@ -51,9 +44,7 @@ export const ApiSearchAgencyProducts = () =>
     ApiProductsSearchResponse(),
   );
 
-// ---------------------------------------------------------
 // PRODUCTS BY AGENT (PUBLIC)
-// ---------------------------------------------------------
 export const ApiSearchAgentProducts = () =>
   applyDecorators(
 

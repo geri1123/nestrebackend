@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { advertisement_status, advertisement_type, user_role, user_status } from '@prisma/client';
 
-/**
- * DTO for product images in detail view
- */
+
+ // DTO for product images in detail view
+ 
 export class ProductDetailImageDto {
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/image.png', 
@@ -59,9 +59,9 @@ export class RelatedDataDto {
   @ApiProperty({ example: 2 })
   categoryId: number;
 }
-/**
- * DTO for user information in product detail
- */
+
+ // DTO for user information in product detail
+ 
 export class ProductDetailUserDto {
   @ApiProperty({ 
     example: 'john_doe',
@@ -115,9 +115,9 @@ export class ProductDetailUserDto {
 }
 //
 
-/**
- * DTO for agency information in product detail
- */
+
+ // DTO for agency information in product detail
+ 
 export class ProductDetailAgencyDto {
   @ApiProperty({ 
     example: 'Prime Real Estate',
@@ -160,9 +160,9 @@ export class ProductDetailAgencyDto {
   created_at: Date;
 }
 
-/**
- * DTO for advertisement information in product detail
- */
+
+ // DTO for advertisement information in product detail
+
 export class ProductDetailAdvertisementDto {
   @ApiProperty({ 
     example: 42,
@@ -198,9 +198,9 @@ export class ProductDetailAdvertisementDto {
   endDate: string | null;
 }
 
-/**
- * DTO for product detail view
- */
+
+ // DTO for product detail view
+ 
 export class ProductDetailDto {
   @ApiProperty({ 
     example: 132,
@@ -347,9 +347,9 @@ export class ProductDetailDto {
   totalClicks: number;
 }
 
-/**
- * DTO for product detail response with related data
- */
+
+// DTO for product detail response with related data
+ 
 
 export class ProductDetailResponseDto {
   @ApiProperty({ type: () => ProductDetailDto, nullable: true })

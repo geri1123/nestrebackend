@@ -3,7 +3,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 export class SearchFiltersDto {
-  /* ================= SLUGS ================= */
+  /* SLUGS */
 
   @ApiPropertyOptional({ description: 'Category slug', example: 'commercial' })
   @IsOptional()
@@ -20,7 +20,7 @@ export class SearchFiltersDto {
   @IsString()
   listingtype?: string;
 
-  /* ================= IDS ================= */
+  /*  IDS  */
 
   @ApiPropertyOptional({ description: 'Category ID', example: 1 })
   @IsOptional()
@@ -37,7 +37,7 @@ export class SearchFiltersDto {
   @Type(() => Number)
   listingTypeId?: number;
 
-  /* ================= PRICE / AREA ================= */
+  /*  PRICE / AREA  */
 
   @ApiPropertyOptional({ description: 'Minimum price', example: 50000 })
   @IsOptional()
@@ -59,7 +59,7 @@ export class SearchFiltersDto {
   @Type(() => Number)
   areaHigh?: number;
 
-  /* ================= LOCATION ================= */
+  /*  LOCATION  */
 
   @ApiPropertyOptional({ description: 'Cities', example: ['Tirana', 'Durres'], type: [String] })
   @IsOptional()
@@ -70,7 +70,7 @@ export class SearchFiltersDto {
   @IsString()
   country?: string;
 
-  /* ================= ATTRIBUTES ================= */
+  /*  ATTRIBUTES  */
 
   @ApiPropertyOptional({
     description: 'Attribute codes → value codes',
@@ -93,7 +93,7 @@ export class SearchFiltersDto {
   @IsOptional()
   attributes?: Record<number, number[]>;
 
-  /* ================= BUILD YEAR ================= */
+  /*  BUILD YEAR  */
 
   @ApiPropertyOptional({ description: 'Minimum build year', example: 2010 })
   @IsOptional()

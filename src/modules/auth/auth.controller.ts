@@ -7,9 +7,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
-import { throwValidationErrors } from '../../common/helpers/validation.helper';
+
 import type { Response } from 'express';
 import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../locales';
@@ -53,10 +51,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const lang: SupportedLang = req.language || 'al';
-    // const dto = plainToInstance(LoginDto, body);
-
-    // const errors = await validate(dto);
-    // if (errors.length > 0) throwValidationErrors(errors, lang);
 
     const { user, token } = await this.loginUseCase.execute(dto, lang);
 this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
@@ -103,18 +97,6 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
     @Req() req: RequestWithLang,
   ) {
     const lang = req.language || 'al';
-    // const dto = plainToInstance(RegisterAgencyOwnerDto, body);
-
-    // Validate DTO
-    // const errors = await validate(dto);
-    // if (dto.password !== dto.repeatPassword) {
-    //   throwValidationErrors(errors, lang, {
-    //     repeatPassword: [t('passwordsMismatch', lang)],
-    //   });
-    // }
-    // if (errors.length > 0) {
-    //   throwValidationErrors(errors, lang);
-    // }
 
     return this.registerAgencyOwnerUseCase.execute(dto, lang);
   }
@@ -124,24 +106,11 @@ this.authCookieService.setAuthCookie(res, token, dto.rememberMe ?? false);
   @Throttle({ default: { limit: 6, ttl: 240000 } })
   @HttpCode(HttpStatus.CREATED)
   async registerAgent(
-    // @Body() body: Record<string, any>,
     @Body() dto:RegisterAgentDto,
     @Req() req: RequestWithLang,
   ) {
     const lang = req.language || 'al';
-    // const dto = plainToInstance(RegisterAgentDto, body);
-
-    // // Validate DTO
-    // const errors = await validate(dto);
-    // if (dto.password !== dto.repeatPassword) {
-    //   throwValidationErrors(errors, lang, {
-    //     repeatPassword: [t('passwordsMismatch', lang)],
-    //   });
-    // }
-    // if (errors.length > 0) {
-    //   throwValidationErrors(errors, lang);
-    // }
-
+ 
     return this.registerAgentUseCase.execute(dto, lang);
   };
   @AuthSwagger.GoogleLogin()
@@ -162,16 +131,4 @@ logout(@Res({ passthrough: true }) res: Response) {
 }
 
 
-
- // const maxAge = dto.rememberMe
-    //   ? 30 * 24 * 60 * 60 * 1000
-    //   : 24 * 60 * 60 * 1000;
-
-    // res.cookie('token', token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    //   maxAge,
-    //   path: '/',
-    // });
 
