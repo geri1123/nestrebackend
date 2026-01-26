@@ -225,4 +225,9 @@ imageUrlMissingAfterUpload: "L'URL dell'immagine manca dopo il caricamento.",
  productNotFound: "Prodotto non trovato.",
 productUpdated: "Prodotto aggiornato con successo.",
     cannotApproveOtherAgency: "Non puoi approvare/rifiutare richieste per un'altra agenzia",
-  } as const
+      messagerequired:"Il messaggio è obbligatorio",
+fullnamerequired:"Il nome completo è obbligatorio" ,
+messagesendsuccessfully:"Messaggio inviato con successo",
+productOwnerNotFound:"Proprietario del prodotto non trovato",
+emailSendFailed:"Invio dell'email fallito",
+ } as const

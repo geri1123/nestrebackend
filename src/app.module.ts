@@ -38,6 +38,7 @@ import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module'
 import { SharedAuthModule } from './infrastructure/auth/modules/shared-auth.module';
 import { AuthContextService } from './infrastructure/auth/services/auth-context.service';
 import { AuthContextModule } from './infrastructure/auth/modules/auth-context.module';
+import { ContactModule } from './modules/contact/contact.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ EmailVerificationModule,
 SharedAuthModule,
     AgentModule, 
     AdvertisementPricingModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [

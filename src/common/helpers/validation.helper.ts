@@ -5,7 +5,7 @@ import { BadRequestException } from '@nestjs/common';
 export function throwValidationErrors(
   errors: ValidationError[],
   lang: SupportedLang = 'al',
-  extraErrors?: Record<string, string[]>, // optional extra errors
+  extraErrors?: Record<string, string[]>, //  extra errors
 ) {
   const formatted: Record<string, string[]> = {};
 
@@ -21,7 +21,7 @@ export function throwValidationErrors(
   }
 });
 
-  // Merge extra custom errors
+  //extra custom errors
   if (extraErrors) {
     Object.assign(formatted, extraErrors);
   }
@@ -105,6 +105,9 @@ case "agencyNameRequired":return t("agencyNameRequired",lang)
 case "phoneMustBeDigits":return t("phoneMustBeDigits", lang)
 case "websiteInvalid":return t("websiteInvalid" , lang);
 case 'repeatPasswordRequired':return t('repeatPasswordRequired', lang);
+//contact form
+case 'fullnamerequired' :return t("fullnamerequired" , lang);
+case 'messagerequired':return t("messagerequired" , lang);
 default: return code;
   }
 }

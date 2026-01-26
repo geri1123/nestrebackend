@@ -10,6 +10,7 @@ import {
   AgentWellcomeEmailTemplate,
   AgentRejectedEmailTemplate,
   passwordRecoveryTemplate,
+  contactMessageTemplate,
 } from './tamplates';
 
 @Injectable()
@@ -84,5 +85,45 @@ async sendAgentRejectedEmail(to: string, name: string) {
       lang !== 'al' ? `/${lang}` : ''
     }/recover-password?token=${token}&exp=${expiration.getTime()}`;
     return this.sendEmail(to, 'Password Recovery', passwordRecoveryTemplate(name, resetLink));
+  }
+
+
+   async sendContactMessageEmail(params: {
+    senderName: string;
+    senderEmail: string;
+    recipientEmail: string;
+    message: string;
+    productName: string;
+    productPrice: number;
+    productCategory: string;
+    productListingType: string;
+    productImage?:string;
+  }): Promise<boolean> {
+    const {
+      senderName,
+      senderEmail,
+      recipientEmail,
+      message,
+      productName,
+      productPrice,
+      productCategory,
+      productListingType,
+      productImage
+    } = params;
+
+    const subject = `New inquiry about ${productName} - ${productPrice} - ${productCategory}/${productListingType}`;
+
+    const html = contactMessageTemplate(
+      senderName,
+      senderEmail,
+      message,
+      productName,
+      productPrice,
+      productCategory,
+      productListingType,
+      productImage
+    );
+
+    return this.sendEmail(recipientEmail, subject, html);
   }
 }

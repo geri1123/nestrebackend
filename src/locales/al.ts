@@ -231,4 +231,10 @@ invalidAttributeForSubcategory:"Atribut i pavlefshëm për këtë nënkategori",
 
       forbiddenProduct: "Nuk keni leje për të modifikuar këtë produkt",
   cannotApproveOtherAgency: "Nuk mund të aprovoheni/refuzoni kërkesat për një agjenci tjetër",
+
+  messagerequired:"Mesazhi është i detyrueshëm",
+fullnamerequired:"Emri i plotë është i detyrueshëm",
+messagesendsuccessfully:"Mesazhi u dërgua me sukses",
+productOwnerNotFound:"Pronari i produktit nuk u gjet",
+emailSendFailed:"Dështoi dërgimi i email-it",
 } as const
