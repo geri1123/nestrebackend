@@ -49,9 +49,8 @@ export class AgencyController {
     private readonly registerAgencyFromUser: RegisterAgencyFromUserUseCase,
   ) {}
 
-  // ---------------------------------------------------------
   // PUBLIC: GET PAGINATED AGENCIES
-  // ---------------------------------------------------------
+
   @Public()
   @ApiGetPaginatedAgencies()
   @Get()
@@ -59,9 +58,7 @@ export class AgencyController {
     return this.getPaginatedAgencies.execute(Number(page), 12);
   }
 
-  // ---------------------------------------------------------
   // PRIVATE AGENCY INFO
-  // ---------------------------------------------------------
   @Roles('agency_owner', 'agent')
   @ApiGetAgencyInfoPrivate()
   @Get('agencyinfo')
@@ -77,9 +74,7 @@ export class AgencyController {
     );
   }
 
-  // ---------------------------------------------------------
   // PUBLIC AGENCY DETAIL
-  // ---------------------------------------------------------
   @Public()
   @ApiGetAgencyInfoPublic()
   @Get(':id/detail')
@@ -94,24 +89,19 @@ export class AgencyController {
     );
   }
 
-  // ---------------------------------------------------------
   // UPDATE FIELDS
-  // ---------------------------------------------------------
   @Roles('agency_owner')
   @Patch('update-fields')
   @ApiUpdateAgencyFields()
   async updateFields(
     @Req() req: RequestWithUser,
-    // @Body() body: Record<string, any>,
     @Body() dto:UpdateAgencyDto,
   ) {
     if (!req.agencyId) {
       throw new ForbiddenException(t('noAgency', req.language));
     }
 
-    // const dto = plainToInstance(UpdateAgencyDto, body);
 
-    // Validate DTO
     const errors = await validate(dto);
   
     if (errors.length > 0) {
@@ -124,9 +114,7 @@ export class AgencyController {
     );
   }
 
-  // -----------
   // UPLOAD LOGO
-  // -----------
   @Roles('agency_owner')
   @Patch('upload-logo')
   @ApiUploadAgencyLogo()
@@ -152,9 +140,7 @@ export class AgencyController {
     };
   }
 
-  // ---------------------------------------------------------
   // DELETE LOGO
-  // ---------------------------------------------------------
   @Roles('agency_owner')
   @Delete('logo')
   @ApiDeleteAgencyLogo()
@@ -171,9 +157,7 @@ export class AgencyController {
     };
   }
 
-  // ---------------------------------------------------------
   // CREATE AGENCY
-  // ---------------------------------------------------------
   @Roles('user')
   @Post('create-agency')
   @ApiCreateAgency()
@@ -185,7 +169,6 @@ export class AgencyController {
       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
     }
 
-    // const dto = plainToInstance(CreateAgencyDto, data);
 
     const agency = await this.registerAgencyFromUser.execute(
       dto,

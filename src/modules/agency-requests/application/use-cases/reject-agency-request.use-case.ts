@@ -11,7 +11,6 @@ export class RejectAgencyRequestUseCase {
   ) {}
 
   async execute(request: RegistrationRequestEntity) {
-    // Update user status back to active with user role
     await this.updateUserFields.execute(request.userId, {
       status: "active",
       role: "user"

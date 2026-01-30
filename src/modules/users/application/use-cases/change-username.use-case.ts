@@ -23,7 +23,6 @@ export class ChangeUsernameUseCase {
     // Get user
     const user = await this.getUserProfile.execute(userId, language);
 
-    // Check if username is different
     if (user.username === newUsername) {
       throw new BadRequestException({
         success: false,
@@ -32,7 +31,6 @@ export class ChangeUsernameUseCase {
       });
     }
 
-    // Check username availability
     const exists = await this.userRepository.usernameExists(newUsername);
     if (exists) {
       throw new BadRequestException({
@@ -42,7 +40,6 @@ export class ChangeUsernameUseCase {
       });
     }
 
-    // Check last username change
     const lastChange = await this.usernameHistoryRepository.getLastUsernameChange(userId);
     if (lastChange && !user.canUpdateUsername(lastChange.nextUsernameUpdate, 60)) {
       const nextDate = lastChange.nextUsernameUpdate.toLocaleDateString();

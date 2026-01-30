@@ -29,9 +29,7 @@ export class GetAgencyInfoUseCase {
       throw new NotFoundException(t('agencyNotFound', language));
     }
 
-    // if (agencyInfo.logo) {
-    //   agencyInfo.logo = agencyInfo.logo || null;
-    // }
+   
 
     return agencyInfo;
   }

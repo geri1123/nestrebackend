@@ -235,4 +235,5 @@ fullnamerequired:"Full Name is required",
 messagesendsuccessfully:"Message successfully sent",
 productOwnerNotFound:"Product owner not found",
 emailSendFailed:"Failed to send email",
+phoneformat:"Phone number must be in international format (e.g., +355691234567)",
 } as const

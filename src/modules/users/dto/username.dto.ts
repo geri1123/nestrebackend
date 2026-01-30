@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Length, Matches } from 'class-validator';
-import { t, SupportedLang } from '../../../locales';
 import { Transform } from 'class-transformer';
 
 
@@ -16,4 +15,3 @@ import { Transform } from 'class-transformer';
 
 
 
-// export type UsernameDto = InstanceType<ReturnType<typeof UsernameDtoFactory>>;

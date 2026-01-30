@@ -45,9 +45,7 @@ export class ProductListMapper {
     };
   }
 
-  /**
-   * Convert an array of database products to list item DTOs
-   */
+ 
   static toDtoArray(products: any[]): ProductListItemDto[] {
     return products.map((product) => this.toDto(product));
   }

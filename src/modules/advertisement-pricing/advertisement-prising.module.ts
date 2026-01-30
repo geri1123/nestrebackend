@@ -1,8 +1,4 @@
 import { Module } from "@nestjs/common";
-
-
-
-
 import { AdvertisementPricingRepository } from "./infrastructure/persistence/advertisement-pricing.repository";
 import { ADVERTISEMENT_PRICING_REPO } from "./domain/repositories/advertisement-pricing.repository.interface";
 import { UpdatePricingUseCase } from "./application/use-cases/update-pricing.use-case";

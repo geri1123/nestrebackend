@@ -40,7 +40,6 @@ export class TransferMoneyUseCase {
       senderWallet.withdraw(amount);
       receiverWallet.topup(amount);
 
-      // 3️⃣ Transactional update
       await this.prisma.$transaction(async (tx) => {
         // Update balances
         await this.walletRepo.updateWalletBalanceTx(tx, senderWallet.id, senderWallet.getBalance());

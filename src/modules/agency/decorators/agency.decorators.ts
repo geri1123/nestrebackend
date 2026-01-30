@@ -24,9 +24,7 @@ import { AgencyDetailResponse } from '../responses/agency-detail.response.js';
 // Tags
 export const ApiAgencyTags = () => applyDecorators(ApiTags('Agencies'));
 
-// ---------------------------------------------------------
 // GET PAGINATED AGENCIES (PUBLIC)
-// ---------------------------------------------------------
 export const ApiGetPaginatedAgencies = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get paginated list of agencies (Public)' }),
@@ -44,9 +42,8 @@ export const ApiGetPaginatedAgencies = () =>
   );
 
 
-// ---------------------------------------------------------
+
 // GET AGENCY INFO (PRIVATE)
-// ---------------------------------------------------------
 export const ApiGetAgencyInfoPrivate = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get agency information (Private - Owner/Agent only)' }),
@@ -57,9 +54,7 @@ export const ApiGetAgencyInfoPrivate = () =>
     ApiUnauthorizedResponse(),
     
   );
-// ---------------------------------------------------------
 // GET AGENCY DETAIL (PUBLIC)
-// ---------------------------------------------------------
 export const ApiGetAgencyInfoPublic = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get agency details (Public)' }),
@@ -74,9 +69,8 @@ export const ApiGetAgencyInfoPublic = () =>
       description: 'Agency details retrieved successfully'
     })
   );
-// ---------------------------------------------------------
 // UPDATE AGENCY FIELDS
-// ---------------------------------------------------------
+
 export const ApiUpdateAgencyFields = () =>
   applyDecorators(
     HttpCode(HttpStatus.OK),
@@ -94,9 +88,7 @@ export const ApiUpdateAgencyFields = () =>
     
   );
 
-// ---------------------------------------------------------
 // UPLOAD AGENCY LOGO
-// ---------------------------------------------------------
 export const ApiUploadAgencyLogo = () =>
   applyDecorators(
     HttpCode(HttpStatus.OK),
@@ -133,9 +125,7 @@ export const ApiUploadAgencyLogo = () =>
     
   );
 
-// ---------------------------------------------------------
 // DELETE AGENCY LOGO
-// ---------------------------------------------------------
 export const ApiDeleteAgencyLogo = () =>
   applyDecorators(
     HttpCode(HttpStatus.OK),
@@ -157,9 +147,7 @@ export const ApiDeleteAgencyLogo = () =>
   
   );
 
-// ---------------------------------------------------------
 // CREATE AGENCY
-// ---------------------------------------------------------
 export const ApiCreateAgency = () =>
   applyDecorators(
     HttpCode(HttpStatus.CREATED),

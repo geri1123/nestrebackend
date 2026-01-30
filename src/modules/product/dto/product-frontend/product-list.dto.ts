@@ -175,9 +175,9 @@ export class ProductListItemDto {
   totalClicks: number;
 }
 
-/**
- * DTO for paginated product list response
- */
+
+ // DTO for paginated product list response
+ 
 export class ProductListResponseDto {
   @ApiProperty({ 
     type: [ProductListItemDto],

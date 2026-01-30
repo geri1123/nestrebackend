@@ -28,7 +28,6 @@ export class UpdateUserProfileUseCase {
     // Verify user exists
     const user = await this.getUserProfile.execute(userId, language);
 
-    // Update domain entity
     user.updateProfile({
       firstName: data.firstName,
       lastName: data.lastName,
@@ -36,7 +35,6 @@ export class UpdateUserProfileUseCase {
       phone: data.phone,
     });
 
-    // Persist changes
     const updateFields: any = {};
     if (data.firstName !== undefined) updateFields.first_name = data.firstName;
     if (data.lastName !== undefined) updateFields.last_name = data.lastName;

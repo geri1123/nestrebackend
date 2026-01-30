@@ -28,7 +28,7 @@ export class UserStatusGuard implements CanActivate {
 
     
   if (role === user_role.agent && req.agencyId) {
-  // use existing data, no DB call
+  
   if (req.agentStatus !== agencyagent_status.active) {
     throw new ForbiddenException(t('agentInactive', lang));
   }

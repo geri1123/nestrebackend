@@ -19,7 +19,6 @@ import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.mod
 @Module({
   imports:[  CommonModule ,  CloudinaryModule],
   providers: [
-    // Repository implementation bound to interface
     {
      provide:PRODUCT_IMAGE_REPO ,
       useClass: ProductImageRepository,

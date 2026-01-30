@@ -53,34 +53,6 @@ export class AgencyRequestsController {
   
 
 
-// @Patch('registration-requests/:id/status')
-// @UseGuards(UserStatusGuard)
-// @Roles('agent', 'agency_owner')
-//  @Permissions('canApproveRequests') 
-// async updateRegistrationRequestStatus(
-//   @Req() req: RequestWithUser,
-//   @Param('id', ParseIntPipe) requestId: number,
-//   @Body() body: Record<string, any>,
-// ) {
-//   const language = req.language || 'al';
-//   const userId = req.userId;
-  
-//   const dto = plainToInstance(UpdateRequestStatusDto, body);
-//   const errors = await validate(dto);
-//   if (errors.length > 0) throwValidationErrors(errors, language);
-//   if (body.action === 'approved' && !body.roleInAgency) {
-//     throw new BadRequestException(t('roleInAgencyRequired', language));
-//   }
-
-  
-//    return await this.updateAgencyRequestStatus.execute(
-//       requestId,
-//       req.agencyId!,
-//       userId,
-//       dto,
-//       language
-//     );
-// }
 
 
 @Patch('registration-requests/:id/status')

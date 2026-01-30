@@ -22,8 +22,3 @@ export class ResetPasswordDto {
   repeatPassword: string;
 }
 
-// export type ResetPasswordDto = {
-//   token: string;
-//   newPassword: string;
-//   repeatPassword: string;
-// };

@@ -26,7 +26,7 @@ export class SearchProductRepository implements ISearchProductRepository {
       language,
       isProtectedRoute,
     );
-    console.log('🔎 WHERE CONDITIONS:', JSON.stringify(whereConditions, null, 2));
+    console.log(' WHERE CONDITIONS:', JSON.stringify(whereConditions, null, 2));
 
     const secondaryOrderBy: any[] = [];
     if (filters.sortBy && filters.sortBy !== 'most_clicks') {

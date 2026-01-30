@@ -5,7 +5,7 @@ import { SupportedLang, t } from '../../../../locales';
 
 @Injectable()
 export class SaveProductUseCase {
-  constructor( @Inject('ISavedProductRepository') // Add this decorator
+  constructor( @Inject('ISavedProductRepository') 
     private readonly repository: ISavedProductRepository,) {}
 
   async execute(userId: number, productId: number, language: SupportedLang): Promise<SavedProductEntity> {

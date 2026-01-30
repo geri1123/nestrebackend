@@ -11,7 +11,7 @@ export function t(
   key: TranslationKey,
   lang: SupportedLang = 'al' 
 ) {
-  // fallback if key doesn't exist
+
   if (!translations[lang][key]) return translations['al'][key] || key;
   return translations[lang][key];
 }

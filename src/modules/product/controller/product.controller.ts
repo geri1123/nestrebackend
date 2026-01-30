@@ -137,12 +137,11 @@ export class SearchProductsController {
 async getRelatedProducts(
   @Param('id') id: number,
   @Req() req: RequestWithLang,
-  @Query('limit') limit = '6',
+  @Query('limit') limit = '4',
 ) {
   const language = req.language;
   const limitValue = Math.min(Math.max(1, parseInt(limit, 10) || 6), 12);
 
-  // First get the product to know its category/subcategory
   const productResult = await this.getProductByIdUseCase.execute(
     id,
     language,

@@ -46,7 +46,7 @@ import { CACHE_KEYV } from './cache.constants';
       inject: [AppConfigService],
       useFactory: async (config: AppConfigService) => {
         const keyv = new Keyv({
-          store: new KeyvRedis(config.redisUrl) as any, // Just the URL, no extra config
+          store: new KeyvRedis(config.redisUrl) as any, 
         });
 
         keyv.on('error', err => {

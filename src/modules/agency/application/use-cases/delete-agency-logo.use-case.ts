@@ -26,7 +26,6 @@ export class DeleteAgencyLogoUseCase {
       });
     }
 
-    // Delete from storage
     try {
       await oldImagePath;
     } catch (error) {

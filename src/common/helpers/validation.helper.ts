@@ -108,6 +108,7 @@ case 'repeatPasswordRequired':return t('repeatPasswordRequired', lang);
 //contact form
 case 'fullnamerequired' :return t("fullnamerequired" , lang);
 case 'messagerequired':return t("messagerequired" , lang);
+case 'phoneformat':return t("phoneformat", lang);
 default: return code;
   }
 }

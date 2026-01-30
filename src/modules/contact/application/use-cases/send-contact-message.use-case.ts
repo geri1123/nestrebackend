@@ -33,7 +33,9 @@ const productImage = product.image?.[0]?.imageUrl ?? '';
     const contactMessage = {
       senderName: dto.name,
       senderEmail: dto.email,
+    
       message: dto.message,
+ phone:dto.phone,
       productId: dto.productId,
       productName: productTitle,
       productPrice,
@@ -47,7 +49,9 @@ const productImage = product.image?.[0]?.imageUrl ?? '';
       senderName:  dto.name ?? '',
       senderEmail: dto.email ?? '',
       recipientEmail: recipientEmail,
+     
       message: dto.message,
+phone:dto.phone ??'',
       productName: productTitle,
       productPrice,
       productCategory,

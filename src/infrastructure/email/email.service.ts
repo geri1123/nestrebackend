@@ -93,6 +93,7 @@ async sendAgentRejectedEmail(to: string, name: string) {
     senderEmail: string;
     recipientEmail: string;
     message: string;
+    phone:string;
     productName: string;
     productPrice: number;
     productCategory: string;
@@ -104,6 +105,7 @@ async sendAgentRejectedEmail(to: string, name: string) {
       senderEmail,
       recipientEmail,
       message,
+      phone,
       productName,
       productPrice,
       productCategory,
@@ -117,6 +119,7 @@ async sendAgentRejectedEmail(to: string, name: string) {
       senderName,
       senderEmail,
       message,
+      phone,
       productName,
       productPrice,
       productCategory,

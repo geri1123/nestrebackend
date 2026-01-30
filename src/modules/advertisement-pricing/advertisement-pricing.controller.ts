@@ -1,7 +1,6 @@
 
-import { Controller, Get, Patch, Param, Body, Post } from "@nestjs/common";
+import { Controller, Get, Param} from "@nestjs/common";
 
-import { CreatePricingDto } from "./dto/create-pricing.dto";
 import { GetAllPricingUseCase } from "./application/use-cases/get-all-pricing.use-case";
 import { GetPricingUseCase } from "./application/use-cases/get-pricing.use-case";
 import { UpdatePricingUseCase } from "./application/use-cases/update-pricing.use-case";
@@ -29,16 +28,5 @@ export class AdvertisementPricingController {
     return this.getPricing.execute(type);
   }
 
-  // @Patch(":type")
-  // async update(
-  //   @Param("type") type: string,
-  //   @Body() body: { price?: number; duration?: number; discount?: number; isActive?: boolean }
-  // ) {
-  //   return this.updatePricing.execute(type as any, body);
-  // }
 
-  // @Post()
-// async create(@Body() dto: CreatePricingDto) {
-  // return this.createPricing.execute(dto);
-// }
 }

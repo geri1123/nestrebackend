@@ -2,7 +2,6 @@ import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { SupportedLang, t } from '../../../../locales';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { Agency } from '../../domain/entities/agency.entity';
-import { error } from 'node:console';
 
 @Injectable()
 export class GetAgencyByPublicCodeUseCase {

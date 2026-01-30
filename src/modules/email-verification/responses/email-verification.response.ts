@@ -12,9 +12,9 @@ import {
 } from '../../../common/swagger/response.helper.ts';
 
 export class EmailVerificationSwagger {
-  // ---------------------------------
+ 
   // GET /auth/verify-email
-  // ---------------------------------
+
   static VerifyEmail() {
     return applyDecorators(
       ApiOperation({ summary: 'Verify user email using verification token' }),
@@ -34,9 +34,9 @@ export class EmailVerificationSwagger {
     );
   }
 
-  // ---------------------------------
+ 
   // POST /auth/resend-verification
-  // ---------------------------------
+
   static ResendVerificationEmail() {
     return applyDecorators(
       ApiOperation({ summary: 'Resend verification email' }),

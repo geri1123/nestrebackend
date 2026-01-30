@@ -7,7 +7,7 @@ createWallet(userId: number, currency:string ): Promise<WalletDomainEntity>
     tx: Prisma.TransactionClient, 
     walletId: string,
     newBalance: number
-  ): Promise<void>; // we don’t return Wallet anymore because domain entity handles logic
+  ): Promise<void>; 
 
   getWalletByUser(userId: number): Promise<WalletDomainEntity | null>;
 

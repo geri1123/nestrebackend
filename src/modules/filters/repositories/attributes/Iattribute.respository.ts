@@ -10,7 +10,7 @@ export interface IAttributeRepo {
     language?: LanguageCode
   ): Promise<any>;
   
-  // Shto këto dy metoda të reja
+
   getAttributeById(attributeId: number): Promise<{ 
     id: number; 
     inputType: string;
@@ -26,13 +26,3 @@ export interface IAttributeRepo {
   } | null>;
 }
 
-// import { LanguageCode } from '@prisma/client';
-// export const ATTRIBUTE_REPO = Symbol('ATTRIBUTE_REPO');
-
-// export interface IAttributeRepo {
-//  getValidAttributeIdsBySubcategory(subcategoryId: number): Promise<number[]>
-//   getAttributesBySubcategoryId(
-//     subcategoryId: number,
-//     language?: LanguageCode
-//   ): Promise<any>; 
-// }

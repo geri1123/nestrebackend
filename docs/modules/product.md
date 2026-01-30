@@ -1,8 +1,5 @@
 # Product Module — Documentation
 
-Version: 1.0  
-Date: 2026-01-06
-
 ## Overview
 
 The Product Module implements product (listing) CRUD, search, presentation (frontend DTOs), and related use-cases for the Real Estate platform. Main responsibilities:

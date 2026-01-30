@@ -41,6 +41,8 @@ Service used for **automated cleanup jobs**
 
 Method:
 deleteInactiveUnverifiedUsersBefore(date: Date): Promise<number>
+
+
 Behavior:
 - Fetch users who:
   - have **not verified email**

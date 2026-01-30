@@ -18,6 +18,6 @@ The cache layer provides a Redis-backed application cache used to:
 
 ## Location
 
-infrastructure/cache/app-cache.module.ts
+infrastructure/cache/cache.module.ts
 infrastructure/cache/cache.service.ts
 infrastructure/cache/cache.constants.ts

@@ -237,4 +237,5 @@ fullnamerequired:"Emri i plotë është i detyrueshëm",
 messagesendsuccessfully:"Mesazhi u dërgua me sukses",
 productOwnerNotFound:"Pronari i produktit nuk u gjet",
 emailSendFailed:"Dështoi dërgimi i email-it",
+phoneformat:"Numri i telefonit duhet të jetë në format ndërkombëtar (p.sh. +355691234567)",
 } as const

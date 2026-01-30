@@ -18,7 +18,6 @@ import { FiltersModule } from '../filters/filters.module';
 FiltersModule,
     ],
   providers: [
-    // Repository implementations bound to interfaces
     {
       provide: PRODUCT_ATTRIBUTE_VALUE_REPO,
       useClass: ProductAttributeValueRepository,

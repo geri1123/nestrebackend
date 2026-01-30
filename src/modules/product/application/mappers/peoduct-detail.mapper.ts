@@ -13,7 +13,6 @@ export class ProductDetailMapper {
         new Date(ad.endDate) > new Date()
     );
 
-    // Map attributes with inputType and valueCode
     const attributes: ProductAttributeDto[] = product.productattributevalue?.map((attr: any) => {
       const translatedValue = attr.attribute_values?.attributeValueTranslations?.[0]?.name;
       const valueCode = attr.attribute_values?.value_code;

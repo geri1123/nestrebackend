@@ -23,18 +23,16 @@ export class GetSavedProductsUseCase {
   try {
     const [count, savedProducts] = await Promise.all([
       this.repository.countByUser(userId),
-      this.repository.findByUserPaginated(userId, language as any, skip, limit), // Cast if needed
+      this.repository.findByUserPaginated(userId, language as any, skip, limit), 
     ]);
 
     const products: SavedProductDto[] = savedProducts.map((saved: any) => {
-      // Safely handle images
       const images = Array.isArray(saved.product?.productimage) 
         ? saved.product.productimage.map((img: any) => ({
             imageUrl: img?.imageUrl ?? null,
           }))
         : [];
 
-      // Safely get translation names
       const categoryTranslations = saved.product?.subcategory?.category?.categorytranslation;
       const categoryName = Array.isArray(categoryTranslations) && categoryTranslations.length > 0
         ? categoryTranslations[0].name

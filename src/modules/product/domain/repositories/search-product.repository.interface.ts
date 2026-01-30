@@ -1,4 +1,3 @@
-// modules/product/domain/repositories/search-product.repository.interface.ts
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
 import { SupportedLang } from '../../../../locales';
 export const SEARCH_PRODUCT_REPO = Symbol('SEARCH_PRODUCT_REPO');

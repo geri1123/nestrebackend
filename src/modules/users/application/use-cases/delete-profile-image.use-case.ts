@@ -22,10 +22,8 @@ export class DeleteProfileImageUseCase {
   ) {}
 
   async execute(userId: number, lang: SupportedLang): Promise<void> {
-    // Load domain user
     const user = await this.getUserProfile.execute(userId, lang);
 
-    //  Guard
     if (!user.hasProfileImage() || !user.profileImgPublicId) {
       throw new BadRequestException({
         success: false,
@@ -33,14 +31,12 @@ export class DeleteProfileImageUseCase {
       });
     }
 
-    // Delete from Cloudinary using public_id
     try {
       await this.cloudinary.deleteFile(user.profileImgPublicId);
     } catch (err) {
       console.warn(' Failed deleting Cloudinary image', err);
     }
 
-    //  Update domain + DB
     user.removeProfileImage();
     await this.userRepo.deleteProfileImage(userId);
   }

@@ -41,8 +41,7 @@ export class UpdateAgencyRequestStatusUseCase {
         userLastName: request.user?.lastName,
       });
 
-      // Validate agency ownership
-      console.log('Step 2: Validating agency ownership...');
+      console.log('Validating agency ownership...');
       if (request.agencyId !== agencyId) {
         throw new ForbiddenException({
           success: false,
@@ -52,7 +51,6 @@ export class UpdateAgencyRequestStatusUseCase {
       }
       console.log('Agency validation passed');
 
-      // Handle approval
       if (dto.action === 'approved') {
         console.log('Step 3: Processing approval...');
         if (!dto.roleInAgency) {

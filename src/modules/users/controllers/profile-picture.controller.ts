@@ -78,13 +78,11 @@ export class ProfilePictureController {
       console.error('Error message:', error?.message);
       console.error('Error stack:', error?.stack);
       
-      // Re-throw known HTTP exceptions
       if (error instanceof BadRequestException || 
           error instanceof UnauthorizedException) {
         throw error;
       }
       
-      // For any other error, throw Internal Server Error with details
       throw new InternalServerErrorException({
         success: false,
         message: 'Internal server error',

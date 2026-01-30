@@ -16,7 +16,3 @@ async execute(data: CreateAgentDomainData, tx?: Prisma.TransactionClient) {
   return this.agentRepo.createAgencyAgent(data, tx);
 }
 }
-
-// async execute(data: CreateAgentDomainData) {
-  //   return this.agentRepo.createAgencyAgent(data);
-  // }

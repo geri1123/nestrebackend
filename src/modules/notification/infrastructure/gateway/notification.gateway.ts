@@ -45,10 +45,10 @@ export class NotificationGateway
   afterInit() {
     this.logger.log('Notification WebSocket Gateway initialized');
     
-    // Pass server instance to socket service
+    
     this.socketService.setServer(this.server);
 
-    // Start heartbeat
+    // Start 
     this.heartbeatInterval = setInterval(() => {
       this.socketService.sendHeartbeat();
     }, 30000);

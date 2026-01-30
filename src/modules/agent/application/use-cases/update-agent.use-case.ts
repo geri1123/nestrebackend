@@ -46,7 +46,6 @@ export class UpdateAgentUseCase {
     language: SupportedLang,
     user: BaseUserInfo,
   ) {
-    // 1) validate dto
     const errors = await validate(dto);
     if (errors.length > 0) {
       throwValidationErrors(errors, language);

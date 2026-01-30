@@ -2,15 +2,18 @@ export const contactMessageTemplate = (
   name: string,
   email: string,
   message: string,
+  phone:string,
   productName: string,
   productPrice: number,
   productCategory: string,
   productListingType: string,
-  productImageUrl?: string, // optional
+  productImageUrl?: string,
 ): string => `
   <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333;">
     <h2>New Contact Message from ${name}</h2>
     <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+
     <p><strong>Message:</strong> ${message}</p>
     <hr/>
     <h3>Product Details</h3>

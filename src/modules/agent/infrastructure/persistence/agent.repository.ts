@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-  agencyagent,
+  
   agencyagent_role_in_agency,
   agencyagent_status,
   Prisma,
@@ -95,22 +95,6 @@ async getAgentAuthContext(userId: number): Promise<{
     return result ? AgentMapper.toDomain(result) : null;
   }
 
-  // async createAgencyAgent(data: CreateAgentDomainData): Promise<AgentEntity> {
-  //   const created = await this.prisma.agencyagent.create({
-  //     data: {
-  //       agency_id: data.agencyId,
-  //       agent_id: data.agentId,
-  //       added_by: data.addedBy ?? null,
-  //       id_card_number: data.idCardNumber ?? null,
-  //       role_in_agency: data.roleInAgency as any,
-  //       commission_rate: data.commissionRate ?? null,
-  //       start_date: new Date(),
-  //       status: data.status as any,
-  //     },
-  //   });
-
-  //   return AgentMapper.toDomain(created);
-  // }
 async createAgencyAgent(
   data: CreateAgentDomainData,
   tx?: Prisma.TransactionClient,

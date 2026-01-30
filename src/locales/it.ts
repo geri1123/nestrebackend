@@ -230,4 +230,5 @@ fullnamerequired:"Il nome completo è obbligatorio" ,
 messagesendsuccessfully:"Messaggio inviato con successo",
 productOwnerNotFound:"Proprietario del prodotto non trovato",
 emailSendFailed:"Invio dell'email fallito",
+phoneformat:"Il numero di telefono deve essere in formato internazionale (ad es. +355691234567)",
  } as const

@@ -11,7 +11,7 @@ export class WalletDomainEntity {
     public readonly currency: string
   ) {}
 
-  // Business rules live here!
+
   
   canWithdraw(amount: number): boolean {
     return this.balance >= amount && amount > 0;

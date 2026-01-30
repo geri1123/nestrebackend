@@ -4,7 +4,7 @@ export class AttributeValueDto {
   @ApiProperty({ example: 4 })
   id: number;
 
-  @ApiProperty({ example: '2-rooms' })  //Canonical code
+  @ApiProperty({ example: '2-rooms' })  
   value_code: string;
 
   @ApiProperty({ example: '2 Dhoma' })
