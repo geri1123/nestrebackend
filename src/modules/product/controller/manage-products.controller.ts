@@ -93,14 +93,13 @@ export class ManageProductController {
     const errors = await validate(dto);
     if (errors.length > 0) throwValidationErrors(errors, language);
 
-    return this.updateProductUseCase.execute(
-      Number(id),
-      dto,
-      userId,
-      // agencyId!,
-      language,
-      images
-    );
+   return this.updateProductUseCase.execute({
+  productId: Number(id),
+  dto,
+  userId,
+  language,
+  images,
+});
   }
 
   @Get('dashboard/products')

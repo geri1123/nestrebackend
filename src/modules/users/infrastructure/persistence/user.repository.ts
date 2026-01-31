@@ -44,7 +44,7 @@ export class UserRepository implements IUserDomainRepository {
         id: true,
         username: true,
         email: true,
-        password: true,
+        // password: true,
         status: true,
         role: true,
         email_verified: true,

@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
+import { PRODUCT_REPO,type IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { Product } from '../../domain/entities/product.entity';
 import { UpdateProductDto } from '../../dto/update-product.dto';
 import { SupportedLang, t } from '../../../../locales';
@@ -8,10 +8,18 @@ import { UploadProductImagesUseCase } from '../../../product-image/application/u
 import { DeleteProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/delete-product-attributes.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
 
+interface UpdateProductParams {
+  productId: number;
+  dto: UpdateProductDto;
+  userId: number;
+  language: SupportedLang;
+  images?: Express.Multer.File[];
+}
+
 @Injectable()
 export class UpdateProductUseCase {
   constructor(
-     @Inject(PRODUCT_REPO)
+    @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
     private readonly deleteImagesUseCase: DeleteProductImagesByProductIdUseCase,
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,
@@ -19,14 +27,13 @@ export class UpdateProductUseCase {
     private readonly createAttributesUseCase: CreateProductAttributeValuesUseCase,
   ) {}
 
-  async execute(
-    productId: number,
-    dto: UpdateProductDto,
-    userId: number,
-    language: SupportedLang,
-    images?: Express.Multer.File[],
-    // agencyId:number,
-  ) {
+  async execute({
+    productId,
+    dto,
+    userId,
+    language,
+    images,
+  }: UpdateProductParams) {
     const product = await this.productRepository.findById(productId);
     if (!product) {
       throw new NotFoundException({
@@ -49,32 +56,37 @@ export class UpdateProductUseCase {
 
     const updatedProduct = await this.productRepository.update(productId, updateData);
 
-    if (dto.attributes?.length) {
+    // 🔹 Attributes
+    if (Array.isArray(dto.attributes) && dto.attributes.length > 0) {
       await this.deleteAttributesUseCase.execute(productId);
       await this.createAttributesUseCase.execute(
         productId,
         product.subcategoryId,
         dto.attributes,
-        language
+        language,
       );
     }
 
+    //  Images
     let imagesResponse: { id: number; imageUrl: string }[] = [];
-    if (images?.length) {
+
+    if (Array.isArray(images) && images.length > 0) {
       await this.deleteImagesUseCase.execute(productId);
-      const uploadedImages = await this.uploadImagesUseCase.execute(
-        images,
-        productId,
-        userId,
-        language
-      );
+
+      const uploadedImages =
+        (await this.uploadImagesUseCase.execute(
+          images,
+          productId,
+          userId,
+          language,
+        )) ?? [];
 
       imagesResponse = uploadedImages
+        .filter(img => img?.imageUrl)
         .map(img => ({
           id: img.id,
-          imageUrl: img.imageUrl,
-        }))
-        .filter(img => img.imageUrl !== null) as { id: number; imageUrl: string }[];
+          imageUrl: img.imageUrl!,
+        }));
     }
 
     return {

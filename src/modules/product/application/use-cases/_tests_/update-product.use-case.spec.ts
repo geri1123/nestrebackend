@@ -15,6 +15,8 @@ describe('UpdateProductUseCase', () => {
   const createAttributes = { execute: jest.fn() } as any;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+
     useCase = new UpdateProductUseCase(
       repo,
       deleteImages,
@@ -28,60 +30,52 @@ describe('UpdateProductUseCase', () => {
     repo.findById.mockResolvedValue(null);
 
     await expect(
-      useCase.execute(1, {} as any, 10, undefined, 'en'),
+      useCase.execute({
+        productId: 1,
+        dto: {} as any,
+        userId: 10,
+        language: 'en',
+      }),
     ).rejects.toThrow(NotFoundException);
   });
 
   it('should update product successfully', async () => {
-    repo.findById.mockResolvedValue({
-      id: 1,
-      subcategoryId: 2,
-    });
-
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
     repo.update.mockResolvedValue({
       toResponse: () => ({ id: 1, title: 'Updated' }),
     });
 
-    const result = await useCase.execute(
-      1,
-      { title: 'Updated' } as any,
-      10,
-      undefined,
-      'en',
-    );
+    const result = await useCase.execute({
+      productId: 1,
+      dto: { title: 'Updated' } as any,
+      userId: 10,
+      language: 'en',
+    });
 
     expect(repo.update).toHaveBeenCalled();
     expect(result.success).toBe(true);
+    expect(result.product.images).toEqual([]);
   });
 
   it('should delete and recreate attributes when provided', async () => {
-    repo.findById.mockResolvedValue({
-      id: 1,
-      subcategoryId: 2,
-    });
-
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
     repo.update.mockResolvedValue({
       toResponse: () => ({ id: 1 }),
     });
 
-    await useCase.execute(
-      1,
-      { attributes: [{ id: 1, value: 'x' }] } as any,
-      10,
-      undefined,
-      'en',
-    );
+    await useCase.execute({
+      productId: 1,
+      dto: { attributes: [{ id: 1, value: 'x' }] } as any,
+      userId: 10,
+      language: 'en',
+    });
 
     expect(deleteAttributes.execute).toHaveBeenCalledWith(1);
     expect(createAttributes.execute).toHaveBeenCalled();
   });
 
   it('should delete and upload images when images are provided', async () => {
-    repo.findById.mockResolvedValue({
-      id: 1,
-      subcategoryId: 2,
-    });
-
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
     repo.update.mockResolvedValue({
       toResponse: () => ({ id: 1 }),
     });
@@ -90,14 +84,13 @@ describe('UpdateProductUseCase', () => {
       { id: 1, imageUrl: 'img.png' },
     ]);
 
-    const result = await useCase.execute(
-      1,
-      {} as any,
-      10,
-      undefined,
-      'en',
-      [{} as any],
-    );
+    const result = await useCase.execute({
+      productId: 1,
+      dto: {} as any,
+      userId: 10,
+      language: 'en',
+      images: [{} as any],
+    });
 
     expect(deleteImages.execute).toHaveBeenCalledWith(1);
     expect(uploadImages.execute).toHaveBeenCalled();
