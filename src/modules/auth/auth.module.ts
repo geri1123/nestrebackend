@@ -14,6 +14,7 @@ import { AuthCookieService } from './infrastructure/services/auth-cookie.service
 import { GoogleLoginUseCase } from './application/use-cases/google-login.use-case';
 import { GoogleAuthService } from './infrastructure/services/google-auth.service';
 import { SharedAuthModule } from '../../infrastructure/auth/modules/shared-auth.module';
+import { AuthContextModule } from '../../infrastructure/auth/modules/auth-context.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SharedAuthModule } from '../../infrastructure/auth/modules/shared-auth.
     AgentModule,
     RegistrationRequestModule,
     AppCacheModule,
+    AuthContextModule,
   ],
   providers: [
     GoogleAuthService,

@@ -18,8 +18,11 @@ import { ApiProductsMostClickResponse } from '../decorators/most-clicks.decorato
 import { GetRelatedProductsUseCase } from '../application/use-cases/get-related.use-case';
 import { ApiGetRelatedProducts } from '../decorators/related-products.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 @ApiTags('Products')
+@SkipThrottle()
 @Controller('products')
+  
 export class SearchProductsController {
   constructor(
     private readonly searchProductsUseCase: SearchProductsUseCase,
@@ -32,6 +35,7 @@ export class SearchProductsController {
   ) {}
 
   @Public()
+
   @Get('search')
   @ApiSearchProducts()
   async searchAll(

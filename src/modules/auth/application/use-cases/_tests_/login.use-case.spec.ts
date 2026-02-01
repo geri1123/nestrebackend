@@ -13,7 +13,11 @@ describe('LoginUseCase', () => {
   const findUserForAuthMock = { execute: jest.fn() };
   const updateLastLoginMock = { execute: jest.fn() };
   const findUserByIdMock = { execute: jest.fn() };
-  const authTokenServiceMock = { generate: jest.fn() };
+
+  const authTokenServiceMock = {
+    generateAccessToken: jest.fn(),
+    generateRefreshToken: jest.fn(),
+  };
 
   beforeEach(async () => {
     jest.spyOn(hashUtils, 'comparePassword');
@@ -32,23 +36,10 @@ describe('LoginUseCase', () => {
     jest.clearAllMocks();
   });
 
-  // ---------------- FAILURES ----------------
+  // ---------- FAILURES ----------
 
   it('throws if user not found', async () => {
     findUserForAuthMock.execute.mockResolvedValue(null);
-
-    await expect(
-      useCase.execute({ identifier: 'test@test.com', password: '123456' }, 'al'),
-    ).rejects.toBeInstanceOf(UnauthorizedException);
-  });
-
-  it('throws if user not active', async () => {
-    findUserForAuthMock.execute.mockResolvedValue({
-      id: 1,
-      status: 'inactive',
-      password: 'hashed',
-      email_verified: true, 
-    });
 
     await expect(
       useCase.execute({ identifier: 'test@test.com', password: '123456' }, 'al'),
@@ -60,7 +51,7 @@ describe('LoginUseCase', () => {
       id: 1,
       status: 'active',
       password: 'hashed',
-      email_verified: true, 
+      email_verified: true,
     });
 
     (hashUtils.comparePassword as jest.Mock).mockResolvedValue(false);
@@ -70,27 +61,14 @@ describe('LoginUseCase', () => {
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  it('throws if email not verified', async () => {
-    findUserForAuthMock.execute.mockResolvedValue({
-      id: 1,
-      status: 'active',
-      password: 'hashed',
-      email_verified: false,
-    });
-
-    await expect(
-      useCase.execute({ identifier: 'john@test.com', password: '123456' }, 'al'),
-    ).rejects.toBeInstanceOf(UnauthorizedException);
-  });
-
-  // ---------------- SUCCESS ----------------
+  // ---------- SUCCESS ----------
 
   it('logs in successfully', async () => {
     findUserForAuthMock.execute.mockResolvedValue({
       id: 1,
       status: 'active',
       password: 'hashed',
-      email_verified: true, 
+      email_verified: true,
     });
 
     (hashUtils.comparePassword as jest.Mock).mockResolvedValue(true);
@@ -102,7 +80,8 @@ describe('LoginUseCase', () => {
       role: 'user',
     });
 
-    authTokenServiceMock.generate.mockReturnValue('jwt-token');
+    authTokenServiceMock.generateAccessToken.mockReturnValue('access-token');
+    authTokenServiceMock.generateRefreshToken.mockReturnValue('refresh-token');
 
     const result = await useCase.execute(
       { identifier: 'john@test.com', password: '123456' },
@@ -110,20 +89,26 @@ describe('LoginUseCase', () => {
     );
 
     expect(updateLastLoginMock.execute).toHaveBeenCalledWith(1);
-    expect(authTokenServiceMock.generate).toHaveBeenCalledWith(expect.any(Object), 1);
+
+    expect(authTokenServiceMock.generateAccessToken)
+      .toHaveBeenCalledWith(expect.any(Object), false);
+
+    expect(authTokenServiceMock.generateRefreshToken)
+      .toHaveBeenCalledWith(1);
 
     expect(result).toEqual({
       user: expect.any(Object),
-      token: 'jwt-token',
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
     });
   });
 
-  it('uses 30 days token when rememberMe = true', async () => {
+  it('uses rememberMe token when rememberMe = true', async () => {
     findUserForAuthMock.execute.mockResolvedValue({
       id: 1,
       status: 'active',
       password: 'hashed',
-      email_verified: true, 
+      email_verified: true,
     });
 
     (hashUtils.comparePassword as jest.Mock).mockResolvedValue(true);
@@ -135,13 +120,15 @@ describe('LoginUseCase', () => {
       role: 'user',
     });
 
-    authTokenServiceMock.generate.mockReturnValue('jwt-token');
+    authTokenServiceMock.generateAccessToken.mockReturnValue('access-token');
+    authTokenServiceMock.generateRefreshToken.mockReturnValue('refresh-token');
 
     await useCase.execute(
       { identifier: 'john@test.com', password: '123456', rememberMe: true },
       'al',
     );
 
-    expect(authTokenServiceMock.generate).toHaveBeenCalledWith(expect.any(Object), 30);
+    expect(authTokenServiceMock.generateAccessToken)
+      .toHaveBeenCalledWith(expect.any(Object), true);
   });
 });

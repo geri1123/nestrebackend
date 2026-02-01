@@ -1,70 +1,63 @@
+
 import {
   Injectable,
   ExecutionContext,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerRequest } from '@nestjs/throttler';
+import { Reflector } from '@nestjs/core';
 import { t } from '../../locales';
 import { RequestWithUser } from '../types/request-with-user.interface';
 
 @Injectable()
-export class CustomThrottlerGuard extends ThrottlerGuard {
-  
-  protected async getTracker(req: any): Promise<string> {
-    if (req.userId) return `user-${req.userId}`;
-    return req.ip;
-  }
+export class CustomThrottlerGuard {
+  private readonly hits = new Map<string, number[]>();
 
-  protected getRequestResponse(context: ExecutionContext) {
-    const http = context.switchToHttp();
-    return {
-      req: http.getRequest<RequestWithUser>(),
-      res: http.getResponse(),
-    };
-  }
+  constructor(private readonly reflector: Reflector) {}
 
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest<RequestWithUser>();
+    const handler = context.getHandler();
+    const classRef = context.getClass();
 
-  protected async handleRequest(
-    requestProps: ThrottlerRequest
-  ): Promise<boolean> {
-    const { context, limit, ttl, throttler, blockDuration } = requestProps;
-    
-   
-    const { req } = this.getRequestResponse(context);
-    const tracker = await this.getTracker(req);
-    
-    // Get storage record
-    const { totalHits } = await this.storageService.increment(
-      tracker,
-      ttl,
-      limit,
-      blockDuration,
-      throttler.name || 'default'
+    const ttl = this.reflector.getAllAndOverride<number>(
+      'THROTTLER:TTLdefault',
+      [handler, classRef],
+    );
+    const limit = this.reflector.getAllAndOverride<number>(
+      'THROTTLER:LIMITdefault',
+      [handler, classRef],
     );
 
-    // Check if limit exceeded
-    if (totalHits > limit) {
-      await this.throwThrottlingException(context);
+   
+    if (ttl == null || limit == null) return true;
+
+    const tracker = await this.getTracker(req);
+    const key = `${tracker}:${req.url}`;
+    const now = Date.now();
+    const windowMs = ttl * 1000;
+
+    const timestamps = (this.hits.get(key) ?? []).filter((ts) => now - ts < windowMs);
+
+    if (timestamps.length >= limit) {
+      const lang = req.language || 'al';
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          message: t('tooManyRequests', lang),
+          error: 'Too Many Requests',
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
+
+    timestamps.push(now);
+    this.hits.set(key, timestamps);
 
     return true;
   }
 
- 
-  protected async throwThrottlingException(
-    context: ExecutionContext
-  ): Promise<void> {
-    const { req } = this.getRequestResponse(context);
-    const lang = req.language || 'al';
-
-    throw new HttpException(
-      {
-        statusCode: HttpStatus.TOO_MANY_REQUESTS,
-        message: t('tooManyRequests', lang),
-        error: 'Too Many Requests',
-      },
-      HttpStatus.TOO_MANY_REQUESTS,
-    );
+  protected async getTracker(req: any): Promise<string> {
+    return req.userId ? `user-${req.userId}` : req.ip;
   }
 }

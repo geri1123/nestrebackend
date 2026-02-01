@@ -1,5 +1,5 @@
+
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from '../../dto/login.dto';
 import { SupportedLang, t } from '../../../../locales';
 import { comparePassword } from '../../../../common/utils/hash';
@@ -20,41 +20,38 @@ export class LoginUseCase {
   async execute(dto: LoginDto, lang: SupportedLang = 'al') {
     const { identifier, password, rememberMe } = dto;
 
+    // ── Credential lookup 
     const authUser = await this.findUserForAuthUseCase.execute(identifier);
     if (!authUser) {
-      throw new UnauthorizedException({ 
-        message: t('invalidCredentials', lang) 
-      });
+      throw new UnauthorizedException({ message: t('invalidCredentials', lang) });
     }
 
     const isMatch = await comparePassword(password, authUser.password);
     if (!isMatch) {
-      throw new UnauthorizedException({ 
-        message: t('invalidCredentials', lang) 
-      });
+      throw new UnauthorizedException({ message: t('invalidCredentials', lang) });
     }
 
-    // Check if email is verified first
     if (!authUser.email_verified) {
-      throw new UnauthorizedException({ 
+      throw new UnauthorizedException({
         message: t('emailNotVerified', lang),
-        code: 'EMAIL_NOT_VERIFIED' 
+        code:    'EMAIL_NOT_VERIFIED',
       });
     }
 
-    // Then check if account is active
     if (authUser.status !== 'active') {
-      throw new UnauthorizedException({ 
+      throw new UnauthorizedException({
         message: t('accountNotActive', lang),
-        code: 'ACCOUNT_NOT_ACTIVE'
+        code:    'ACCOUNT_NOT_ACTIVE',
       });
     }
 
-    const user = await this.findUserByIdUseCase.execute(authUser.id, lang);
+    // ── Issue tokens 
+    const user         = await this.findUserByIdUseCase.execute(authUser.id, lang);
+    const accessToken  = this.authTokenService.generateAccessToken(user, rememberMe ?? false);
+    const refreshToken = this.authTokenService.generateRefreshToken(user.id);
+
     await this.updateLastLoginUseCase.execute(authUser.id);
 
-    const token = this.authTokenService.generate(user, rememberMe ? 30 : 1);
-    return { user, token };
+    return { user, accessToken, refreshToken };
   }
 }
-

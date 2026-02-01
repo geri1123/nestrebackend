@@ -6,7 +6,6 @@ import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { AppConfigModule } from './infrastructure/config/config.module';
 import { LanguageMiddleware } from './middlewares/language.middleware';
 import { AuthModule } from './modules/auth/auth.module';
-import { ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
 import { FiltersModule } from './modules/filters/filters.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt-auth.guard';
@@ -39,18 +38,14 @@ import { SharedAuthModule } from './infrastructure/auth/modules/shared-auth.modu
 import { AuthContextService } from './infrastructure/auth/services/auth-context.service';
 import { AuthContextModule } from './infrastructure/auth/modules/auth-context.module';
 import { ContactModule } from './modules/contact/contact.module';
-
+import { ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
 @Module({
   imports: [
+ ThrottlerModule.forRoot({
+      throttlers: [{ limit: 100, ttl: 60 }], 
+    }),
         SharedAuthModule, 
-
-  ThrottlerModule.forRoot({
-  throttlers: [
-    {
-         limit: 10, ttl: 1 
-    },
-  ],
-}),
+ 
  ScheduleModule.forRoot(),  
  CronJobsModule,
     WalletModule,
@@ -82,14 +77,9 @@ SharedAuthModule,
   ],
   controllers: [AppController],
   providers: [
-    //  AuthContextService, 
+   
     AppService,
-  {
-    provide:APP_GUARD,
-    useClass:CustomThrottlerGuard
-  }
-  
-    ,
+  { provide: APP_GUARD, useClass: CustomThrottlerGuard },
       {
     provide: APP_GUARD,
     useClass: JwtAuthGuard, 
