@@ -73,11 +73,17 @@ describe('LoginUseCase', () => {
 
     (hashUtils.comparePassword as jest.Mock).mockResolvedValue(true);
 
+    // MOCK the returned user including methods used in LoginUseCase
     findUserByIdMock.execute.mockResolvedValue({
       id: 1,
       username: 'john',
       email: 'john@test.com',
       role: 'user',
+      emailVerified: true,
+      canLogin: () => true,
+      isPending: () => false,
+      isInactive: () => false,
+      isSuspended: () => false,
     });
 
     authTokenServiceMock.generateAccessToken.mockReturnValue('access-token');
@@ -118,6 +124,11 @@ describe('LoginUseCase', () => {
       username: 'john',
       email: 'john@test.com',
       role: 'user',
+      emailVerified: true,
+      canLogin: () => true,
+      isPending: () => false,
+      isInactive: () => false,
+      isSuspended: () => false,
     });
 
     authTokenServiceMock.generateAccessToken.mockReturnValue('access-token');

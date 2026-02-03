@@ -10,12 +10,12 @@ export class GetPaginatedAgenciesUseCase {
     private readonly agencyRepository: IAgencyDomainRepository,
   ) {}
 
-  async execute(page: number = 1, limit: number = 12): Promise<PaginatedAgenciesResponse>  {
+  async execute(page: number = 1, limit: number = 12 , search?: string): Promise<PaginatedAgenciesResponse>  {
     const skip = (page - 1) * limit;
 
     const [agencies, total] = await Promise.all([
-      this.agencyRepository.getAllAgencies(skip, limit),
-      this.agencyRepository.countAgencies(),
+      this.agencyRepository.getAllAgencies(skip, limit, search),
+      this.agencyRepository.countAgencies(search),
     ]);
 
     return {

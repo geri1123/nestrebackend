@@ -75,6 +75,8 @@ agentUpdatedSuccessfully: "Agent updated successfully.",
   noAgencyIdInRequest: "No agency ID found in registration request.",
   noRegistrationRequest: "No registration request found for this agent.",
      //login,registration
+     accountPending:  'Your account is pending approval.',
+     accountInactive: 'Your account is inactive.',
      registrationSuccess: "Registration successful. Please verify your email.",
     loginSuccess: "Login successful",
      invalidCredentials: "Invalid credentials",

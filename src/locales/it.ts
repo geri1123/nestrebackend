@@ -75,6 +75,8 @@ sameUsername: "Il nuovo nome utente non può essere uguale al nome utente attual
   noAgencyIdInRequest: "Nessun ID agenzia trovato nella richiesta di registrazione.",
   noRegistrationRequest: "Nessuna richiesta di registrazione trovata per questo agente.",
       //login,registration
+      accountInactive: 'Il tuo account è inattivo.',
+      accountPending:  'Il tuo account è in attesa di approvazione.',
       registrationSuccess: "Registrazione completata. Si prega di verificare la tua email.",
     loginSuccess: "Accesso riuscito",
     invalidCredentials: "Credenziali non valide",

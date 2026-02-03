@@ -4,13 +4,15 @@ import { UsersModule } from '../../../modules/users/users.module';
 import { AgentModule } from '../../../modules/agent/agent.module';
 import { AgencyModule } from '../../../modules/agency/agency.module';
 import { AuthContextService } from '../services/auth-context.service';
+import { AppCacheModule } from '../../cache/cache.module';
 
 @Module({
   imports: [
     SharedAuthModule,
     UsersModule,
-    AgentModule,
-    AgencyModule,
+    AppCacheModule,
+    // AgentModule,
+    // AgencyModule,
   ],
   providers: [AuthContextService],
   exports: [AuthContextService],

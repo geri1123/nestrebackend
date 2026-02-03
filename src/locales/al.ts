@@ -106,6 +106,8 @@ phoneMaxLength: "Numri i telefonit nuk duhet të ketë më shumë se 15 shifra",
 phoneInvalidChars: "Numri i telefonit përmban karaktere të pavlefshme",
     atLeastOneFieldRequired: "Duhet të jepni të paktën një fushë",
        //login
+       accountPending:  'Llogaria juaj është në pritje të miratimit.',
+       accountInactive: 'Llogaria juaj është joaktive.',
     //email
     emailMustBeString:"Email duhet të jetë një tekst",
      emailVerified: "Email-i u verifikua me sukses.",

@@ -5,21 +5,21 @@ import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch,
 
 import { Roles } from "../../../common/decorators/roles.decorator";
 import type { RequestWithUser } from "../../../common/types/request-with-user.interface";
-import { SupportedLang, t } from "../../../locales";
+import {  t } from "../../../locales";
 import { UpdateRequestStatusDto } from "../dto/agency-request.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { throwValidationErrors } from "../../../common/helpers/validation.helper";
-import { PermissionsGuard } from "../../../common/guard/permissions.guard";
 import { Permissions } from "../../../common/decorators/permissions.decorator";
-import { UserStatusGuard } from "../../../common/guard/status.guard";
 import { GetAgencyRequestsUseCase } from "../application/use-cases/get-agency-requests.use-case";
 import { UpdateAgencyRequestStatusUseCase } from "../application/use-cases/update-agency-request-status.use-case";
 import { ApiAgencyRequestsDecorators } from "../decorators/agency-requests.decorator";
+import { RequireAgencyContext } from "../../../common/decorators/require-agency-context.decorator";
+import { PermissionsGuard } from "../../../common/guard/permissions.guard";
+import { AgencyContextGuard } from "../../../common/guard/agency-context.guard";
+import { RolesGuard } from "../../../common/guard/role-guard";
 
-
-
-@UseGuards(PermissionsGuard)
+@UseGuards(AgencyContextGuard, RolesGuard, PermissionsGuard)
 @Controller('agencies')
 
 export class AgencyRequestsController {
@@ -27,10 +27,11 @@ export class AgencyRequestsController {
 
 
     
-  @Get('registration-requests')
-  @UseGuards(UserStatusGuard)
-  @Roles('agent', 'agency_owner')
-  @Permissions('canApproveRequests') 
+ 
+@RequireAgencyContext()
+@Get('registration-requests')
+@Roles('agent', 'agency_owner')
+@Permissions('can_approve_requests')
   @ApiAgencyRequestsDecorators.GetRegistrationRequests()
   async getRegistrationRequests(
     @Req() req: RequestWithUser,
@@ -38,14 +39,12 @@ export class AgencyRequestsController {
 
     @Query('status') status?: string,
   ) {
-    if (!req.agencyId) {
-      throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-    }
+ 
 
   
 
    return this.getAgencyRequests.execute(
-      req.agencyId,
+      req.agencyId!,
       Number(page),
       status as any,
     );
@@ -55,10 +54,10 @@ export class AgencyRequestsController {
 
 
 
+@RequireAgencyContext()  
 @Patch('registration-requests/:id/status')
-@UseGuards(UserStatusGuard)
 @Roles('agent', 'agency_owner')
-@Permissions('canApproveRequests') 
+@Permissions("can_approve_requests")
 @ApiAgencyRequestsDecorators.UpdateRequestStatus()
 async updateRegistrationRequestStatus(
   @Req() req: RequestWithUser,

@@ -4,7 +4,6 @@ import { AgentRepository } from './infrastructure/persistence/agent.repository';
 import { AgentPermissionRepository } from './infrastructure/persistence/agent-permision.repository';
 import { GetAgentsUseCase } from './application/use-cases/get-agents.use-case';
 import { UpdateAgentUseCase } from './application/use-cases/update-agent.use-case';
-import { AgencyModule } from '../agency/agency.module';
 import { NotificationModule } from '../notification/notification.module';
 import { AGENT_REPOSITORY_TOKENS } from './domain/repositories/agent.repository.tokens';
 import { GetSingleAgentInAgencyUseCase } from './application/use-cases/find-agent-in-agency.use-case';
@@ -20,12 +19,16 @@ import { GetAgentAuthContextUseCase } from './application/use-cases/get-agent-au
 import { GetAgentMeUseCase } from './application/use-cases/get-agent-me.use-case';
 import { GetAgentByIdInAgencyUseCase } from './application/use-cases/get-agent-in-agency.use-case';
 import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
+import { CountAgentsInAgencyUseCase } from './application/use-cases/count-agents-in-agency.use-case';
 
 @Module({
-  imports: [ NotificationModule ,PrismaModule, AgencyModule],
+  imports: [
+    NotificationModule,
+    PrismaModule,
+    // REMOVED: AgencyModule (to break circular dependency)
+  ],
   controllers: [AgentController],
   providers: [
-    
     AgentRepository,
     GetAgencyIdForAgentUseCase,
     GetSingleAgentInAgencyUseCase,
@@ -37,10 +40,11 @@ import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
     CreateAgentUseCase,
     GetAgentAuthContextUseCase,
     UpdateAgentPermissionsUseCase,
-   GetAgentPermissionsUseCase,
-   GetAgentMeUseCase ,
-   GetAgentByIdInAgencyUseCase,
-   {
+    GetAgentPermissionsUseCase,
+    GetAgentMeUseCase,
+    GetAgentByIdInAgencyUseCase,
+    CountAgentsInAgencyUseCase,
+    {
       provide: AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,
       useClass: AgentRepository,
     },
@@ -48,13 +52,12 @@ import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
       provide: AGENT_REPOSITORY_TOKENS.AGENT_PERMISSION_REPOSITORY,
       useClass: AgentPermissionRepository,
     },
-
     GetAgentsUseCase,
     UpdateAgentUseCase,
   ],
   exports: [
-       GetAgentAuthContextUseCase,
-  GetSingleAgentInAgencyUseCase,
+    GetAgentAuthContextUseCase,
+    GetSingleAgentInAgencyUseCase,
     GetAgentsUseCase,
     UpdateAgentUseCase,
     GetAgencyIdForAgentUseCase,
@@ -63,6 +66,7 @@ import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
     FindExistingAgentUseCase,
     AddAgentPermissionsUseCase,
     CreateAgentUseCase,
+    CountAgentsInAgencyUseCase
   ],
 })
 export class AgentModule {}

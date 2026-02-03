@@ -1,13 +1,12 @@
 import { ForbiddenException } from '@nestjs/common';
-import { AgentBelongsToAgencyGuard } from '../AgentBelongsToAgency.guard';
+import { AgentBelongsToAgencyGuard } from '../agent-belongs-to-agency.guard';
 import { GetAgentByIdUseCase } from '../../../modules/agent/application/use-cases/get-agent-by-id.use-case';
+import { ModuleRef } from '@nestjs/core';
 
 describe('AgentBelongsToAgencyGuard', () => {
   let guard: AgentBelongsToAgencyGuard;
-
-  const getAgentByIdMock = {
-    execute: jest.fn(),
-  };
+  let getAgentByIdMock: any;
+  let moduleRefMock: any;
 
   const mockContext = (req: any) =>
     ({
@@ -17,9 +16,15 @@ describe('AgentBelongsToAgencyGuard', () => {
     } as any);
 
   beforeEach(() => {
-    guard = new AgentBelongsToAgencyGuard(
-      getAgentByIdMock as unknown as GetAgentByIdUseCase,
-    );
+    getAgentByIdMock = {
+      execute: jest.fn(),
+    };
+
+    moduleRefMock = {
+      get: jest.fn().mockReturnValue(getAgentByIdMock),
+    };
+
+    guard = new AgentBelongsToAgencyGuard(moduleRefMock as unknown as ModuleRef);
     jest.clearAllMocks();
   });
 
@@ -38,6 +43,7 @@ describe('AgentBelongsToAgencyGuard', () => {
     const result = await guard.canActivate(mockContext(req));
 
     expect(result).toBe(true);
+    expect(moduleRefMock.get).toHaveBeenCalledWith(GetAgentByIdUseCase, { strict: false });
     expect(getAgentByIdMock.execute).toHaveBeenCalledWith(1, 'al');
   });
 
@@ -53,8 +59,6 @@ describe('AgentBelongsToAgencyGuard', () => {
       language: 'al',
     };
 
-    await expect(
-      guard.canActivate(mockContext(req)),
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(guard.canActivate(mockContext(req))).rejects.toBeInstanceOf(ForbiddenException);
   });
 });

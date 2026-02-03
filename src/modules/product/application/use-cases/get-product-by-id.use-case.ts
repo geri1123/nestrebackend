@@ -6,6 +6,7 @@ import { RequestWithUser } from '../../../../common/types/request-with-user.inte
 import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
 import { ProductDetailResponseDto } from '../../dto/product-frontend/product-detail.dto';
 import { ProductDetailMapper } from '../mappers/peoduct-detail.mapper';
+import { product_status, user_role } from '@prisma/client';
 
 @Injectable()
 export class GetProductByIdUseCase {
@@ -32,18 +33,18 @@ export class GetProductByIdUseCase {
     const totalClicks = productClicks.reduce((sum, c) => sum + c.count, 0);
 
     // Check status and permissions
-    if (product.status !== 'active') {
+    if (product.status !== product_status.active) {
       if (!isProtectedRoute) {
         return { product: null };
       }
 
       const isOwner = req?.userId === product.userId;
       const isAgencyOwner = 
-        req?.user?.role === 'agency_owner' && 
+        req?.user?.role === user_role.agency_owner && 
         req?.agencyId === product.agencyId;
       const canAgentSee = 
-        req?.user?.role === 'agent' && 
-        req?.agentPermissions?.canViewAllPosts;
+        req?.user?.role === user_role.agent && 
+        req?.agentPermissions?.can_view_all_posts;
 
       if (!isOwner && !isAgencyOwner && !canAgentSee) {
         return { product: null };

@@ -25,8 +25,8 @@ import { SearchFiltersHelper } from '../application/helpers/search-filters.helpe
 import { t } from '../../../locales';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
-import { ProductOwnershipAndPermissionGuard } from '../../../common/guard/product-ownership.guard';
-import { UserStatusGuard } from '../../../common/guard/status.guard';
+import { ProductOwnershipGuard } from '../../../common/guard/product-ownership.guard';
+// import { StatusGuard } from '../../../common/guard/status.guard';
 import { ApiCreateProduct } from '../decorators/create-product.decorator';
 import { ApiDashboardProducts } from '../decorators/dashboard-products.decorator';
 import { ApiUpdateProduct } from '../decorators/update-product.decorator';
@@ -41,7 +41,7 @@ export class ManageProductController {
     private readonly searchFiltersHelper: SearchFiltersHelper
   ) {}
 
-  @UseGuards(UserStatusGuard)
+  // @UseGuards(StatusGuard)
   @Post('add')
   @ApiCreateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
@@ -69,7 +69,7 @@ export class ManageProductController {
     return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
   }
 
-  @UseGuards(ProductOwnershipAndPermissionGuard, UserStatusGuard)
+  @UseGuards(ProductOwnershipGuard)
   @Patch('update/:id')
   @ApiUpdateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
@@ -123,7 +123,7 @@ export class ManageProductController {
 
       filters.agencyId = req.agencyId;
 
-      if (req.user.role === 'agent' && !req.agentPermissions?.canViewAllPosts) {
+      if (req.user.role === 'agent' && !req.agentPermissions?.can_view_all_posts) {
         filters.status = 'active';
       } else if (rawQuery.status) {
         filters.status = rawQuery.status;
@@ -134,7 +134,7 @@ export class ManageProductController {
     const isProtectedRoute =
       view === 'mine' ||
       (view === 'agency' &&
-        (req.user?.role === 'agency_owner' || req.agentPermissions?.canViewAllPosts));
+        (req.user?.role === 'agency_owner' || req.agentPermissions?.can_view_all_posts));
 
     return this.searchProductsUseCase.execute(filters, language, isProtectedRoute);
   }

@@ -31,12 +31,13 @@ import { ProductImageModule } from '../product-image/product-image.module';
 
 import { ProductAttributeValueModule } from '../product-attribute/product-attribute.module';
 import { FindProductByIdUseCase } from './application/use-cases/find-product-by-id.use-case';
-import { ProductOwnershipAndPermissionGuard } from '../../common/guard/product-ownership.guard';
+
 import { CommonModule } from '../../common/common.module';
 import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
 import { GetMostClickedProductsUseCase } from './application/use-cases/get-most-clicked-products.use-case';
 import { ProductSearchQueryBuilder } from './infrastructure/search/product-search-query.builder';
 import { SearchFiltersResolver } from './infrastructure/search/search-filters-resolver.service';
+import { ProductOwnershipGuard } from '../../common/guard/product-ownership.guard';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
@@ -61,7 +62,7 @@ SoftAuthModule,
     },
     ProductSearchQueryBuilder,
     SearchFiltersResolver,
-ProductOwnershipAndPermissionGuard,
+ProductOwnershipGuard,
     // Use Cases
     GetRelatedProductsUseCase,
     FindProductByIdUseCase,

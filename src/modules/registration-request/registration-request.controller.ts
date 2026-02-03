@@ -1,12 +1,12 @@
-import { Controller, Param, ParseIntPipe, Post, Req, UnauthorizedException } from "@nestjs/common";
+import { Controller, Param, ParseIntPipe, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
 
 import { Roles } from "../../common/decorators/roles.decorator";
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
 import { SendQuickRequestUseCase } from "./application/use-cases/send-quick-request.use-case";
-import { ApiAcceptedResponse } from "@nestjs/swagger";
 import { ApiSendQuickRequest } from "./decorators/registration-request.decorators";
-
+import { RolesGuard } from "../../common/guard/role-guard";
+@UseGuards(RolesGuard)
 @Controller('registration-request')
 
 export class RegistrationRequestController{
@@ -17,6 +17,7 @@ export class RegistrationRequestController{
     }
 
     @Roles('user')
+    @UseGuards(RolesGuard)
     @ApiSendQuickRequest()
 @Post('quick-request/:agencyId')
 async sendQuickRequest(

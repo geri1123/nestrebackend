@@ -1,10 +1,5 @@
-// src/modules/agency/agency.module.ts
 import { Module } from '@nestjs/common';
-
-// Infrastructure
 import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
-
-// Repository token & interface
 import { AgencyRepository } from './infrastructure/persistence/agency.repository';
 
 // Use-cases
@@ -17,11 +12,6 @@ import { GetAgencyByIdUseCase } from './application/use-cases/get-agency-by-id.u
 import { GetAgencyInfoUseCase } from './application/use-cases/get-agency-info.use-case';
 import { RegisterAgencyFromUserUseCase } from './application/use-cases/register-agency-from-user.use-case';
 import { GetAgencyWithOwnerByIdUseCase } from './application/use-cases/get-agency-with-owner-byid.use-case';
-// Controller
-import { AgencyController } from './controllers/agency.controller';
-
-// Extra utils
-import { UsersModule } from '../users/users.module';
 import { GetAgencyByOwnerUseCase } from './application/use-cases/get-agency-by-owner.use-case';
 import { GetAgencyByPublicCodeUseCase } from './application/use-cases/check-public-code.use-case';
 import { DeleteAgencyByOwnerUseCase } from './application/use-cases/delete-agency-by-owner.use-case';
@@ -31,19 +21,30 @@ import { CheckLicenseExistsUseCase } from './application/use-cases/check-license
 import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/validate-agency-before-register.use-case';
 import { AGENCY_REPO } from './domain/repositories/agency.repository.interface';
 import { CommonModule } from '../../common/common.module';
+
+// Controller
+import { AgencyController } from './controllers/agency.controller';
+
+// Extra utils
+import { UsersModule } from '../users/users.module';
+
 @Module({
-  imports: [PrismaModule, UsersModule ,CommonModule],
+  imports: [
+    PrismaModule, 
+    UsersModule,
+    CommonModule
+  ],
 
   controllers: [AgencyController],
 
   providers: [
     // REPOSITORY
     {
-      provide:AGENCY_REPO,
+      provide: AGENCY_REPO,
       useClass: AgencyRepository,
     },
 
-    // USE-CASES
+    // USE-CASES (all the use cases)
     ValidateAgencyBeforeRegisterUseCase,
     DeleteAgencyByOwnerUseCase,
     GetAgencyByOwnerUseCase,
@@ -55,16 +56,15 @@ import { CommonModule } from '../../common/common.module';
     GetAgencyByIdUseCase,
     GetAgencyInfoUseCase,
     RegisterAgencyFromUserUseCase,
-GetAgencyByPublicCodeUseCase,
-GetAgencyWithOwnerByIdUseCase,
-ActivateAgencyByOwnerUseCase,
-CheckAgencyNameExistsUseCase,
-CheckLicenseExistsUseCase,
-    
-
+    GetAgencyByPublicCodeUseCase,
+    GetAgencyWithOwnerByIdUseCase,
+    ActivateAgencyByOwnerUseCase,
+    CheckAgencyNameExistsUseCase,
+    CheckLicenseExistsUseCase,
   ],
 
   exports: [
+    // Export use cases that other modules need
     DeleteAgencyByOwnerUseCase,
     CreateAgencyUseCase,
     GetAgencyByIdUseCase,
@@ -75,10 +75,9 @@ CheckLicenseExistsUseCase,
     GetAgencyWithOwnerByIdUseCase,
     ActivateAgencyByOwnerUseCase,
     CheckAgencyNameExistsUseCase,
-CheckLicenseExistsUseCase,
-GetAgencyByOwnerUseCase,
-
-AGENCY_REPO
+    CheckLicenseExistsUseCase,
+    GetAgencyByOwnerUseCase,
+    AGENCY_REPO
   ],
 })
 export class AgencyModule {}

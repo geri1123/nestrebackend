@@ -39,6 +39,8 @@ import { AuthContextService } from './infrastructure/auth/services/auth-context.
 import { AuthContextModule } from './infrastructure/auth/modules/auth-context.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
+import { GuardsModule } from './common/guard/guards.module';
+import { AgencyContextGuard } from './common/guard/agency-context.guard';
 @Module({
   imports: [
  ThrottlerModule.forRoot({
@@ -74,6 +76,7 @@ SharedAuthModule,
     AgentModule, 
     AdvertisementPricingModule,
     ContactModule,
+    GuardsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -84,15 +87,8 @@ SharedAuthModule,
     provide: APP_GUARD,
     useClass: JwtAuthGuard, 
   },
-
-  {
-    provide: APP_GUARD,
-    useClass: RolesGuard, 
-  },
-  {
-    provide: APP_GUARD,
-    useClass: PermissionsGuard,
-  },
+  // { provide: APP_GUARD, useClass: AgencyContextGuard },
+ 
 
   ],
 })
@@ -103,3 +99,11 @@ export class AppModule {
       .forRoutes({ path: '*', method: RequestMethod.ALL }); 
   }
 }
+ // {
+  //   provide: APP_GUARD,
+  //   useClass: RolesGuard, 
+  // },
+  // {
+  //   provide: APP_GUARD,
+  //   useClass: PermissionsGuard,
+  // },

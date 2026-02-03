@@ -1,51 +1,41 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
-import { RequestWithUser } from '../types/request-with-user.interface';
 
 
-import { t, SupportedLang } from '../../locales';
-import { GetAgencyByIdUseCase } from '../../modules/agency/application/use-cases/get-agency-by-id.use-case';
-import { agency_status, agencyagent_status, user_role, user_status } from '@prisma/client';
+// import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+// import { RequestWithUser } from '../types/request-with-user.interface';
+// import { t, SupportedLang } from '../../locales';
+// import { user_role, user_status, agencyagent_status, agency_status } from '@prisma/client';
 
-@Injectable()
-export class UserStatusGuard implements CanActivate {
-  constructor(
-    private readonly getAgencyById: GetAgencyByIdUseCase,
-    
-  ) {}
+// @Injectable()
+// export class StatusGuard implements CanActivate {
+//   canActivate(context: ExecutionContext): boolean {
+//     const req = context.switchToHttp().getRequest<RequestWithUser>();
+//     const lang: SupportedLang = req.language || 'al';
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest<RequestWithUser>();
-    const lang: SupportedLang = req.language || 'al';
+//     if (!req.user) return true;
 
-    if (!req.user) return true; 
+//     // Check user suspension
+//     if (req.user.status === user_status.suspended) {
+//       throw new ForbiddenException(t('accountSuspended', lang));
+//     }
 
-    const { role, status } = req.user;
+//     // Check agent status (requires AgencyContextGuard to run first)
+//     if (req.user.role === user_role.agent) {
+//       if (req.agentStatus !== agencyagent_status.active) {
+//         throw new ForbiddenException(t('agentInactive', lang));
+//       }
 
-   
-    if (status ===user_status.suspended) {
-      throw new ForbiddenException(t('accountSuspended', lang));
-    }
+//       if (req.agencyStatus === agency_status.suspended) {
+//         throw new ForbiddenException(t('agencySuspended', lang));
+//       }
+//     }
 
-    
-  if (role === user_role.agent && req.agencyId) {
-  
-  if (req.agentStatus !== agencyagent_status.active) {
-    throw new ForbiddenException(t('agentInactive', lang));
-  }
+//     // Check agency owner status
+//     if (req.user.role === user_role.agency_owner) {
+//       if (req.agencyStatus === agency_status.suspended) {
+//         throw new ForbiddenException(t('agencySuspended', lang));
+//       }
+//     }
 
-  const agency = await this.getAgencyById.execute(req.agencyId, lang );
-  if (!agency || agency.status === agency_status.suspended) {
-    throw new ForbiddenException(t('agencySuspended', lang));
-  }
-}
-    //  Agency owner-specific
-    if (role === user_role.agency_owner && req.agencyId) {
-      const agency = await this.getAgencyById.execute(req.agencyId, lang );
-      if (!agency || agency.status === agency_status.suspended) {
-        throw new ForbiddenException(t('agencySuspended', lang));
-      }
-    }
-
-    return true;
-  }
-}
+//     return true;
+//   }
+// }

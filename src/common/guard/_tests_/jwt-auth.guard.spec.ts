@@ -1,82 +1,73 @@
-import { UnauthorizedException } from '@nestjs/common';
 import { JwtAuthGuard } from '../jwt-auth.guard';
+import { AuthContextService } from '../../../infrastructure/auth/services/auth-context.service';
+import { Reflector } from '@nestjs/core';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
-
-  const authContextServiceMock = {
-    extractToken: jest.fn(),
-    authenticate: jest.fn(),
-  };
-
-  const reflectorMock = {
-    getAllAndOverride: jest.fn(),
-  };
+  let authContextService: AuthContextService;
+  let reflector: Reflector;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    guard = new JwtAuthGuard(
-      authContextServiceMock as any,
-      reflectorMock as any,
-    );
+    authContextService = {
+      extractToken: jest.fn(),
+      authenticate: jest.fn(),
+    } as unknown as AuthContextService;
+
+    reflector = {
+      getAllAndOverride: jest.fn(),
+    } as unknown as Reflector;
+
+    guard = new JwtAuthGuard(authContextService, reflector);
   });
 
-  it('allows public route', async () => {
-    reflectorMock.getAllAndOverride.mockReturnValue(true);
+  // Helper to mock ExecutionContext
+  const mockExecutionContext = (req: any) => ({
+    switchToHttp: () => ({ getRequest: () => req }),
+    getHandler: () => {},
+    getClass: () => {},
+  } as unknown as any);
 
-    const result = await guard.canActivate({
-      getHandler: jest.fn(),
-      getClass: jest.fn(),
-      switchToHttp: () => ({ getRequest: () => ({}) }),
-    } as any);
+  it('should allow access if route is public', async () => {
+    (reflector.getAllAndOverride as jest.Mock).mockReturnValue(true);
 
+    const req = {};
+    const result = await guard.canActivate(mockExecutionContext(req));
     expect(result).toBe(true);
-    expect(authContextServiceMock.extractToken).not.toHaveBeenCalled();
-    expect(authContextServiceMock.authenticate).not.toHaveBeenCalled();
   });
 
-  it('throws if no token', async () => {
-    reflectorMock.getAllAndOverride.mockReturnValue(false);
+  it('should throw UnauthorizedException if token is missing', async () => {
+    (reflector.getAllAndOverride as jest.Mock).mockReturnValue(false);
+    (authContextService.extractToken as jest.Mock).mockReturnValue(null);
 
-    authContextServiceMock.extractToken.mockReturnValue(null);
-
-    const ctx = {
-      getHandler: jest.fn(),
-      getClass: jest.fn(),
-      switchToHttp: () => ({ getRequest: () => ({ language: 'al', headers: {}, cookies: {} }) }),
-    } as any;
-
-    await expect(guard.canActivate(ctx)).rejects.toBeInstanceOf(UnauthorizedException);
+    const req = { language: 'al' };
+    await expect(guard.canActivate(mockExecutionContext(req))).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(authContextService.extractToken).toHaveBeenCalledWith(req);
   });
 
-  it('attaches auth context to request when token is valid', async () => {
-    reflectorMock.getAllAndOverride.mockReturnValue(false);
-
-    authContextServiceMock.extractToken.mockReturnValue('token123');
-    authContextServiceMock.authenticate.mockResolvedValue({
-      user: { id: 1, role: 'agent' },
+  it('should set user and userId on request if token is valid', async () => {
+    (reflector.getAllAndOverride as jest.Mock).mockReturnValue(false);
+    (authContextService.extractToken as jest.Mock).mockReturnValue('validToken');
+    (authContextService.authenticate as jest.Mock).mockResolvedValue({
+      user: { id: 1, username: 'john' },
       userId: 1,
-      agencyId: 10,
-      agencyAgentId: 99,
-      agentPermissions: { canEditOthersPost: true },
-      agentStatus: 'active',
     });
 
-    const req: any = { language: 'al', headers: {}, cookies: {} };
-
-    const ctx = {
-      getHandler: jest.fn(),
-      getClass: jest.fn(),
-      switchToHttp: () => ({ getRequest: () => req }),
-    } as any;
-
-    const result = await guard.canActivate(ctx);
+    const req: any = { language: 'al' };
+    const result = await guard.canActivate(mockExecutionContext(req));
 
     expect(result).toBe(true);
+    expect(req.user).toEqual({ id: 1, username: 'john' });
     expect(req.userId).toBe(1);
-    expect(req.agencyId).toBe(10);
-    expect(req.agencyAgentId).toBe(99);
-    expect(req.agentPermissions).toEqual({ canEditOthersPost: true });
-    expect(req.agentStatus).toBe('active');
+    expect(authContextService.authenticate).toHaveBeenCalledWith('validToken', 'al');
+  });
+
+  it('should throw UnauthorizedException if token is invalid', async () => {
+    (reflector.getAllAndOverride as jest.Mock).mockReturnValue(false);
+    (authContextService.extractToken as jest.Mock).mockReturnValue('invalidToken');
+    (authContextService.authenticate as jest.Mock).mockRejectedValue(new Error('JWT expired'));
+
+    const req: any = { language: 'al' };
+    await expect(guard.canActivate(mockExecutionContext(req))).rejects.toBeInstanceOf(UnauthorizedException);
   });
 });

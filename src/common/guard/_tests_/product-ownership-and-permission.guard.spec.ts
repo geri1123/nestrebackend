@@ -1,14 +1,13 @@
 import { ForbiddenException } from '@nestjs/common';
-import { ProductOwnershipAndPermissionGuard } from '../product-ownership.guard';
+import { ProductOwnershipGuard } from '../product-ownership.guard';
 import { GetProductForPermissionUseCase } from '../../../modules/product/application/use-cases/get-product-for-permission.use-case';
 import { user_role } from '@prisma/client';
+import { ModuleRef } from '@nestjs/core';
 
-describe('ProductOwnershipAndPermissionGuard', () => {
-  let guard: ProductOwnershipAndPermissionGuard;
-
-  const getProductMock = {
-    execute: jest.fn(),
-  };
+describe('ProductOwnershipGuard', () => {
+  let guard: ProductOwnershipGuard;
+  let getProductMock: any;
+  let moduleRefMock: any;
 
   const mockContext = (req: any) =>
     ({
@@ -18,9 +17,15 @@ describe('ProductOwnershipAndPermissionGuard', () => {
     } as any);
 
   beforeEach(() => {
-    guard = new ProductOwnershipAndPermissionGuard(
-      getProductMock as unknown as GetProductForPermissionUseCase,
-    );
+    getProductMock = {
+      execute: jest.fn(),
+    };
+
+    moduleRefMock = {
+      get: jest.fn().mockReturnValue(getProductMock),
+    };
+
+    guard = new ProductOwnershipGuard(moduleRefMock as unknown as ModuleRef);
     jest.clearAllMocks();
   });
 
@@ -64,7 +69,7 @@ describe('ProductOwnershipAndPermissionGuard', () => {
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
-      agentPermissions: { canEditOthersPost: false },
+      agentPermissions: { can_edit_own_post: false },
     };
 
     await expect(guard.canActivate(mockContext(req))).resolves.toBe(true);
@@ -80,7 +85,7 @@ describe('ProductOwnershipAndPermissionGuard', () => {
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
-      agentPermissions: { canEditOthersPost: true },
+      agentPermissions: { can_edit_own_post: true },
     };
 
     await expect(guard.canActivate(mockContext(req))).resolves.toBe(true);

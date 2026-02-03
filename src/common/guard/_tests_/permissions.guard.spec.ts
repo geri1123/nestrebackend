@@ -3,7 +3,6 @@ import { PermissionsGuard } from '../permissions.guard';
 import { Reflector } from '@nestjs/core';
 import { user_role } from '@prisma/client';
 import { PERMISSIONS_KEY } from '../../decorators/permissions.decorator';
-import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
 
 describe('PermissionsGuard', () => {
   let guard: PermissionsGuard;
@@ -23,44 +22,43 @@ describe('PermissionsGuard', () => {
     } as any);
 
   beforeEach(() => {
-    reflector = reflectorMock as any;
+    reflector = reflectorMock as unknown as Reflector;
     guard = new PermissionsGuard(reflector);
     jest.clearAllMocks();
   });
 
-  it('allows public route', async () => {
-    reflectorMock.getAllAndOverride.mockImplementation((key) =>
-      key === IS_PUBLIC_KEY ? true : null,
-    );
+  it('allows access if no permissions are required', () => {
+    reflectorMock.getAllAndOverride.mockReturnValue(undefined);
 
-    const result = await guard.canActivate(
-      mockContext({ language: 'al' }),
-    );
-
-    expect(result).toBe(true);
-  });
-
-  it('allows agency_owner regardless of permissions', async () => {
-    reflectorMock.getAllAndOverride.mockImplementation((key) =>
-      key === PERMISSIONS_KEY ? ['can_edit'] : false,
-    );
-
-    const result = await guard.canActivate(
-      mockContext({
-        language: 'al',
-        user: { role: 'agency_owner' },
-      }),
+    const result = guard.canActivate(
+      mockContext({ user: { role: user_role.agent } }),
     );
 
     expect(result).toBe(true);
   });
 
-  it('denies agent without required permission', async () => {
-    reflectorMock.getAllAndOverride.mockImplementation((key) =>
-      key === PERMISSIONS_KEY ? ['can_edit'] : false,
+  it('allows agency_owner regardless of permissions', () => {
+    reflectorMock.getAllAndOverride.mockReturnValue(['can_edit']);
+
+    const result = guard.canActivate(
+      mockContext({ user: { role: user_role.agency_owner } }),
     );
 
-    await expect(
+    expect(result).toBe(true);
+  });
+
+  it('denies access if no user is present', () => {
+    reflectorMock.getAllAndOverride.mockReturnValue(['can_edit']);
+
+    expect(() =>
+      guard.canActivate(mockContext({ language: 'al' })),
+    ).toThrow(ForbiddenException);
+  });
+
+  it('denies agent without required permission', () => {
+    reflectorMock.getAllAndOverride.mockReturnValue(['can_edit']);
+
+    expect(() =>
       guard.canActivate(
         mockContext({
           language: 'al',
@@ -69,6 +67,36 @@ describe('PermissionsGuard', () => {
           agentPermissions: { can_edit: false },
         }),
       ),
-    ).rejects.toBeInstanceOf(ForbiddenException);
+    ).toThrow(ForbiddenException);
+  });
+
+  it('allows agent with all required permissions', () => {
+    reflectorMock.getAllAndOverride.mockReturnValue(['can_edit', 'can_delete']);
+
+    const result = guard.canActivate(
+      mockContext({
+        language: 'al',
+        user: { role: user_role.agent },
+        agencyAgentId: 1,
+        agentPermissions: { can_edit: true, can_delete: true },
+      }),
+    );
+
+    expect(result).toBe(true);
+  });
+
+  it('denies agent if missing one of multiple permissions', () => {
+    reflectorMock.getAllAndOverride.mockReturnValue(['can_edit', 'can_delete']);
+
+    expect(() =>
+      guard.canActivate(
+        mockContext({
+          language: 'al',
+          user: { role: user_role.agent },
+          agencyAgentId: 1,
+          agentPermissions: { can_edit: true, can_delete: false },
+        }),
+      ),
+    ).toThrow(ForbiddenException);
   });
 });

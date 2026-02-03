@@ -6,6 +6,7 @@ export class User {
     public readonly id: number,
     public username: string,
     public readonly email: string,
+    
     public firstName: string | null,
     public lastName: string | null,
     public aboutMe: string | null,
@@ -59,9 +60,26 @@ export class User {
 
   /* ---------- DOMAIN RULES ---------- */
 
-  isActive(): boolean {
-    return this.status === 'active' && this.emailVerified;
-  }
+ isActive(): boolean {
+  return this.status === 'active' && this.emailVerified;
+}
+
+isPending(): boolean {
+  return this.status === 'pending';
+}
+
+isSuspended(): boolean {
+  return this.status === 'suspended';
+}
+
+isInactive(): boolean {
+  return this.status === 'inactive';
+}
+
+canLogin(): boolean {
+  // Only active users with verified email can login
+  return this.isActive();
+}
 
   canUpdateUsername(lastChangeDate: Date | null, daysLimit = 60): boolean {
     if (!lastChangeDate) return true;

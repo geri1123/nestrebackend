@@ -30,23 +30,34 @@ export class LoginUseCase {
     if (!isMatch) {
       throw new UnauthorizedException({ message: t('invalidCredentials', lang) });
     }
+const user = await this.findUserByIdUseCase.execute(authUser.id, lang);
+  if (!user.emailVerified) {
+  throw new UnauthorizedException({
+    message: t('emailNotVerified', lang),
+    code: 'EMAIL_NOT_VERIFIED',
+  });
+}
 
-    if (!authUser.email_verified) {
-      throw new UnauthorizedException({
-        message: t('emailNotVerified', lang),
-        code:    'EMAIL_NOT_VERIFIED',
-      });
-    }
+if (!user.canLogin()) {
+  if (user.isPending()) {
+    throw new UnauthorizedException({
+      message: t('accountPending', lang),
+    
+    });
+  } else if (user.isInactive()) {
+    throw new UnauthorizedException({
+      message: t('accountInactive', lang),
+     
+    });
+  } else if (user.isSuspended()) {
+    throw new UnauthorizedException({
+      message: t('accountSuspended', lang),
+    
+    });
+  }
+}
 
-    if (authUser.status !== 'active') {
-      throw new UnauthorizedException({
-        message: t('accountNotActive', lang),
-        code:    'ACCOUNT_NOT_ACTIVE',
-      });
-    }
-
-    // ── Issue tokens 
-    const user         = await this.findUserByIdUseCase.execute(authUser.id, lang);
+   
     const accessToken  = this.authTokenService.generateAccessToken(user, rememberMe ?? false);
     const refreshToken = this.authTokenService.generateRefreshToken(user.id);
 

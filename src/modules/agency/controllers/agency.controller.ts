@@ -11,6 +11,7 @@ import {
   Req,
   UnauthorizedException,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 
@@ -37,6 +38,10 @@ import { RegisterAgencyFromUserUseCase } from '../application/use-cases/register
 import { ApiCreateAgency, ApiDeleteAgencyLogo, ApiGetAgencyInfoPrivate, ApiGetAgencyInfoPublic, ApiGetPaginatedAgencies, ApiUpdateAgencyFields, ApiUploadAgencyLogo } from '../decorators/agency.decorators';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import { validate } from 'class-validator';
+import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
+import { RolesGuard } from '../../../common/guard/role-guard';
+import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
+import { user_role } from '@prisma/client';
 
 @Controller('agencies')
 export class AgencyController {
@@ -54,13 +59,18 @@ export class AgencyController {
   @Public()
   @ApiGetPaginatedAgencies()
   @Get()
-  async getAllAgencies(@Query('page') page = 1) {
-    return this.getPaginatedAgencies.execute(Number(page), 12);
+  async getAllAgencies(@Query('page') page = 1, @Query('search') search?: string) {
+    return this.getPaginatedAgencies.execute(Number(page), 12, search);
   }
 
   // PRIVATE AGENCY INFO
-  @Roles('agency_owner', 'agent')
+   @RequireAgencyContext()
+    @Roles('agency_owner', 'agent')
+  @UseGuards(AgencyContextGuard , RolesGuard)
+ 
+ 
   @ApiGetAgencyInfoPrivate()
+
   @Get('agencyinfo')
   async getAgencyInfoPrivate(@Req() req: RequestWithUser) {
     if (!req.agencyId) {
@@ -90,7 +100,10 @@ export class AgencyController {
   }
 
   // UPDATE FIELDS
-  @Roles('agency_owner')
+  @RequireAgencyContext()              
+@Roles('agency_owner')         
+@UseGuards(AgencyContextGuard, RolesGuard)
+  
   @Patch('update-fields')
   @ApiUpdateAgencyFields()
   async updateFields(
@@ -115,7 +128,10 @@ export class AgencyController {
   }
 
   // UPLOAD LOGO
-  @Roles('agency_owner')
+  @RequireAgencyContext()
+
+  @Roles("agency_owner")
+  @UseGuards(AgencyContextGuard , RolesGuard)
   @Patch('upload-logo')
   @ApiUploadAgencyLogo()
   @UseInterceptors(FileInterceptor('file'))
@@ -141,6 +157,8 @@ export class AgencyController {
   }
 
   // DELETE LOGO
+  @RequireAgencyContext()
+  @UseGuards(AgencyContextGuard , RolesGuard)
   @Roles('agency_owner')
   @Delete('logo')
   @ApiDeleteAgencyLogo()
@@ -158,7 +176,9 @@ export class AgencyController {
   }
 
   // CREATE AGENCY
+  
   @Roles('user')
+  @UseGuards(RolesGuard)
   @Post('create-agency')
   @ApiCreateAgency()
   async createAgency(

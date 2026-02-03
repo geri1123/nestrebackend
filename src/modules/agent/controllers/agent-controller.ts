@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { type RequestWithLang } from '../../../middlewares/language.middleware';
 import { type RequestWithUser } from '../../../common/types/request-with-user.interface';
-import { UserStatusGuard } from '../../../common/guard/status.guard';
+// import { StatusGuard } from '../../../common/guard/status.guard';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { Permissions } from '../../../common/decorators/permissions.decorator';
 import { FilterAgentsDto } from '../dto/filter-agents.dto';
@@ -21,11 +21,16 @@ import { plainToInstance } from 'class-transformer';
 import { t } from '../../../locales';
 import { GetAgentsUseCase } from '../application/use-cases/get-agents.use-case';
 import { UpdateAgentUseCase } from '../application/use-cases/update-agent.use-case';
-import { AgentBelongsToAgencyGuard } from '../../../common/guard/AgentBelongsToAgency.guard';
 import { agencyagent_status } from '@prisma/client';
 import { GetAgentMeUseCase } from '../application/use-cases/get-agent-me.use-case';
 import { GetAgentByIdInAgencyUseCase } from '../application/use-cases/get-agent-in-agency.use-case';
 import { ApiAgentDecorators } from '../decorators/agent.decorator';
+import { RolesGuard } from '../../../common/guard/role-guard';
+import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
+import { PermissionsGuard } from '../../../common/guard/permissions.guard';
+import { AgentBelongsToAgencyGuard } from '../../../common/guard/agent-belongs-to-agency.guard';
+import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
+
 
 @Controller('agents')
 export class AgentController {
@@ -53,9 +58,12 @@ async getPublicAgents(
     false,
     agencyagent_status.active,
   );
-}
-  @UseGuards(UserStatusGuard)
-  @Roles('agency_owner', 'agent')
+} 
+
+@RequireAgencyContext()
+@Roles('agency_owner', 'agent')
+  @UseGuards(AgencyContextGuard, RolesGuard)
+ 
   @ApiAgentDecorators.GetPrivateAgents()
   @Get('dashboard')
   async getPrivateAgents(
@@ -77,10 +85,12 @@ async getPublicAgents(
     );
   }
 
- 
+  @RequireAgencyContext()
   @Patch('update/:id')
-@Permissions('canManageAgents')
-@UseGuards(UserStatusGuard, AgentBelongsToAgencyGuard)
+ 
+  @UseGuards(AgencyContextGuard, PermissionsGuard, AgentBelongsToAgencyGuard)
+@Permissions('can_manage_agents')
+  
 @ApiAgentDecorators.UpdateAgent()
 async updateAgencyAgents(
   @Param('id') idParam: string,
@@ -123,9 +133,11 @@ async updateAgencyAgents(
   }
 }
 
-@UseGuards(UserStatusGuard)
-@Roles('agent', 'agency_owner')
 @ApiAgentDecorators.GetAgentMe()
+@RequireAgencyContext()
+@Roles('agent', 'agency_owner')
+ @UseGuards(AgencyContextGuard, RolesGuard)
+
 @Get('me')
 async getAgentMe(@Req() req: RequestWithUser) {
   if (!req.userId) {
@@ -137,8 +149,9 @@ async getAgentMe(@Req() req: RequestWithUser) {
 
 
 
-@UseGuards(UserStatusGuard)
+@RequireAgencyContext()
 @Roles('agent', 'agency_owner')
+ @UseGuards(AgencyContextGuard, RolesGuard)
 @Get(':id')
 @ApiAgentDecorators.GetAgentById()
 async getAgentById(

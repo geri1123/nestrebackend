@@ -104,21 +104,67 @@ export class AgencyRepository implements IAgencyDomainRepository {
     };
   }
 
-  async getAllAgencies(skip: number, limit: number): Promise<any[]> {
-    return this.prisma.agency.findMany({
-      where: { status: agency_status.active },
-      orderBy: { created_at: 'desc' },
-      skip,
-      take: limit,
-    });
-  }
+  // async getAllAgencies(skip: number, limit: number): Promise<any[]> {
+  //   return this.prisma.agency.findMany({
+  //     where: { status: agency_status.active },
+  //     orderBy: { created_at: 'desc' },
+  //     skip,
+  //     take: limit,
+  //   });
+  // }
 
-  async countAgencies(): Promise<number> {
-    return this.prisma.agency.count({
-      where: { status: agency_status.active },
-    });
-  }
+  // async countAgencies(): Promise<number> {
+  //   return this.prisma.agency.count({
+  //     where: { status: agency_status.active },
+  //   });
+  // }
+async getAllAgencies(
+  skip: number,
+  limit: number,
+  search?: string,
+): Promise<any[]> {
+  const words =
+    search && search.trim().length >= 3
+      ? search.trim().split(/\s+/)
+      : undefined;
 
+  return this.prisma.agency.findMany({
+    where: {
+      status: agency_status.active,
+      ...(words && {
+        AND: words.map(word => ({
+          OR: [
+            { agency_name: { contains: word } },
+            { address: { contains: word } },
+          ],
+        })),
+      }),
+    },
+    orderBy: { created_at: 'desc' },
+    skip,
+    take: limit,
+  });
+}
+async countAgencies(search?: string): Promise<number> {
+  const words =
+    search && search.trim().length >= 3
+      ? search.trim().split(/\s+/)
+      : undefined;
+
+  return this.prisma.agency.count({
+    where: {
+      status: agency_status.active,
+      ...(words && {
+        AND: words.map(word => ({
+          OR: [
+            { agency_name: { contains: word } },
+            { address: { contains: word } },
+          ],
+        })),
+      }),
+    },
+  });
+}
   // VALIDATION METHODS
 
   async agencyNameExists(name: string): Promise<boolean> {

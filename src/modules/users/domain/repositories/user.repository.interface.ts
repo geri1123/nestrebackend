@@ -26,16 +26,26 @@ deleteById(userId: number): Promise<void>;
  findByIdWithPassword(userId: number): Promise<{
     id: number;
     password: string;} | null>;
-    
- findByIdentifierForAuth(identifier: string): Promise<{
-    id: number;
-    password: string;
-    status: string;
-    role: string;
-    username: string;
-    email: string;
-    email_verified  : boolean;
-  } | null>;
+    findByIdentifierForAuth(
+  identifier: string
+): Promise<{
+  id: number;
+  password: string;
+  email: string;
+  username: string;
+  status: string;
+  role: string;
+  email_verified: boolean;
+} | null>;
+//  findByIdentifierForAuth(identifier: string): Promise<{
+//     id: number;
+//     password: string;
+//     status: string;
+//     role: string;
+//     username: string;
+//     email: string;
+//     email_verified  : boolean;
+//   } | null>;
   updatePassword(userId: number, newPassword: string): Promise<void>;
   findByIdentifierForVerification(identifier: string): Promise<{
   id: number;
