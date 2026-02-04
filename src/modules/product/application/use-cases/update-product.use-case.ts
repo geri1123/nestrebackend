@@ -7,13 +7,13 @@ import { DeleteProductImagesByProductIdUseCase } from '../../../product-image/ap
 import { UploadProductImagesUseCase } from '../../../product-image/application/use-cases/upload-product-images.use-case';
 import { DeleteProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/delete-product-attributes.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
-
+type MulterFile = Express.Multer.File;
 interface UpdateProductParams {
   productId: number;
   dto: UpdateProductDto;
   userId: number;
   language: SupportedLang;
-  images?: Express.Multer.File[];
+   images?: MulterFile[];
 }
 
 @Injectable()
@@ -56,7 +56,7 @@ export class UpdateProductUseCase {
 
     const updatedProduct = await this.productRepository.update(productId, updateData);
 
-    // 🔹 Attributes
+    //  Attributes
     if (Array.isArray(dto.attributes) && dto.attributes.length > 0) {
       await this.deleteAttributesUseCase.execute(productId);
       await this.createAttributesUseCase.execute(

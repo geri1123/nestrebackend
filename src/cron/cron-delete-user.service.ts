@@ -10,7 +10,8 @@ export class DeleteInactiveUsersCron {
   constructor(private readonly cleanUpService:UserCleanupService) {}
 
   
-@Cron('*/10 * * * *')
+// @Cron('*/10 * * * *')
+@Cron('*/5 * * * *')
 async handleCron() {
   try {
     const twoWeeksAgo = new Date();
@@ -19,7 +20,7 @@ async handleCron() {
     const deletedCount = await this.cleanUpService.deleteInactiveUnverifiedUsersBefore(twoWeeksAgo);
     this.logger.log(`Deleted ${deletedCount} inactive unverified users.`);
   } catch (error) {
-    this.logger.error('DeleteInactiveUsersCron failed:', error);
+    this.logger.error('DeleteInactiveUsersCron failed:', error.message);
   }
 }
 }

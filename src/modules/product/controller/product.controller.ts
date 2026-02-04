@@ -1,5 +1,5 @@
 
-import { Controller, Get, Query, Param, Req, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Query, Param, Req, NotFoundException, UseGuards } from '@nestjs/common';
 import { SearchProductsUseCase } from '../application/use-cases/search-products.use-case';
 import { GetProductByIdUseCase } from '../application/use-cases/get-product-by-id.use-case';
 import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
@@ -19,6 +19,8 @@ import { GetRelatedProductsUseCase } from '../application/use-cases/get-related.
 import { ApiGetRelatedProducts } from '../decorators/related-products.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
+import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
 @ApiTags('Products')
 @SkipThrottle()
 @Controller('products')
@@ -108,7 +110,8 @@ export class SearchProductsController {
 
     return product;
   }
-
+@RequireAgencyContext()
+@UseGuards(AgencyContextGuard)
   @Get('protected/:id')
   @ApiGetProtectedProduct()
   async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) {

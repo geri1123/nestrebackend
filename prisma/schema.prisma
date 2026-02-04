@@ -159,7 +159,7 @@ model notificationtranslation {
   id             Int          @id @default(autoincrement())
   notificationId Int
   languageCode   LanguageCode
-  message        String
+   message        String       @db.Text
   notification   notification @relation(fields: [notificationId], references: [id], onDelete: Cascade, map: "NotificationTranslation_notificationId_fkey")
 
   @@index([notificationId], map: "NotificationTranslation_notificationId_fkey")

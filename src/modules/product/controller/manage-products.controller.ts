@@ -14,6 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateProductUseCase } from '../application/use-cases/create-product.use-case';
@@ -26,11 +27,17 @@ import { t } from '../../../locales';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { ProductOwnershipGuard } from '../../../common/guard/product-ownership.guard';
-// import { StatusGuard } from '../../../common/guard/status.guard';
 import { ApiCreateProduct } from '../decorators/create-product.decorator';
 import { ApiDashboardProducts } from '../decorators/dashboard-products.decorator';
 import { ApiUpdateProduct } from '../decorators/update-product.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
+import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
+import { PermissionsGuard } from '../../../common/guard/permissions.guard';
+import { permission } from 'node:process';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
+
+type MulterFile = Express.Multer.File;
+
 @ApiTags('Products')
 @Controller('products')
 export class ManageProductController {
@@ -40,14 +47,14 @@ export class ManageProductController {
     private readonly searchProductsUseCase: SearchProductsUseCase,
     private readonly searchFiltersHelper: SearchFiltersHelper
   ) {}
-
-  // @UseGuards(StatusGuard)
+@RequireAgencyContext()
+@UseGuards(AgencyContextGuard)
   @Post('add')
   @ApiCreateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
   async createProduct(
     @Body() body: Record<string, any>,
-    @UploadedFiles() images: Express.Multer.File[],
+    @UploadedFiles() images: MulterFile[],
     @Req() req: RequestWithUser
   ) {
     const language = req.language;
@@ -69,21 +76,20 @@ export class ManageProductController {
     return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
   }
 
-  @UseGuards(ProductOwnershipGuard)
+    @RequireAgencyContext()
+
+  @UseGuards(AgencyContextGuard, ProductOwnershipGuard)
   @Patch('update/:id')
   @ApiUpdateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
   async updateProduct(
     @Param('id') id: string,
     @Body() body: Record<string, any>,
-        // @Body() dto:UpdateProductDto,
-
-    @UploadedFiles() images: Express.Multer.File[],
+    @UploadedFiles() images: MulterFile[],
     @Req() req: RequestWithUser
   ) {
     const language = req.language;
     const userId = req.userId;
-    const agencyId = req.agencyId;
 
     if (!userId) {
       throw new UnauthorizedException(t('userNotAuthenticated', language));
@@ -93,15 +99,16 @@ export class ManageProductController {
     const errors = await validate(dto);
     if (errors.length > 0) throwValidationErrors(errors, language);
 
-   return this.updateProductUseCase.execute({
-  productId: Number(id),
-  dto,
-  userId,
-  language,
-  images,
-});
+    return this.updateProductUseCase.execute({
+      productId: Number(id),
+      dto,
+      userId,
+      language,
+      images,
+    });
   }
-
+@RequireAgencyContext()
+@UseGuards(AgencyContextGuard)
   @Get('dashboard/products')
   @ApiDashboardProducts()
   async getDashboardProducts(
@@ -114,7 +121,6 @@ export class ManageProductController {
     const filters = this.searchFiltersHelper.parse(rawQuery, page);
 
     if (view === 'mine') {
-      // Show own products
       filters.userId = req.userId;
     } else if (view === 'agency') {
       if (!req.agencyId || (req.user?.role !== 'agent' && req.user?.role !== 'agency_owner')) {
@@ -130,7 +136,6 @@ export class ManageProductController {
       }
     }
 
-    //  if route is "protected"
     const isProtectedRoute =
       view === 'mine' ||
       (view === 'agency' &&

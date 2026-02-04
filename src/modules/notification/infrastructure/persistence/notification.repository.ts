@@ -22,7 +22,7 @@ export class NotificationRepository implements INotificationRepository {
           create: data.translations.map((translation) => ({
             languageCode: translation.languageCode,
           
-            message: translation.message,
+               message: translation.message.substring(0, 500), 
           })),
         },
       },

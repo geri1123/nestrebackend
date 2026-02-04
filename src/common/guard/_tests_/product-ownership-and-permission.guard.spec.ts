@@ -69,7 +69,7 @@ describe('ProductOwnershipGuard', () => {
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
-      agentPermissions: { can_edit_own_post: false },
+      agentPermissions: { can_edit_others_post: false },
     };
 
     await expect(guard.canActivate(mockContext(req))).resolves.toBe(true);
@@ -85,7 +85,7 @@ describe('ProductOwnershipGuard', () => {
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
-      agentPermissions: { can_edit_own_post: true },
+      agentPermissions: { can_edit_others_post: true },
     };
 
     await expect(guard.canActivate(mockContext(req))).resolves.toBe(true);
