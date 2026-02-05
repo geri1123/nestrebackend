@@ -14,21 +14,22 @@ export class GetPaginatedAgenciesUseCase {
     const skip = (page - 1) * limit;
 
     const [agencies, total] = await Promise.all([
-      this.agencyRepository.getAllAgencies(skip, limit, search),
+      this.agencyRepository.getAllAgenciesPaginated(skip, limit, search),
       this.agencyRepository.countAgencies(search),
     ]);
 
     return {
-      total,
-      page,
-      limit,
-      agencies: agencies.map(a => ({
-        id: a.id,
-        name: a.agency_name,
-        logo: a.logo ? a.logo : null,
-        address: a.address,
-        created_at: a.created_at.toLocaleDateString('en-GB'),
-      })),
-    };
+  total,
+  page,
+  limit,
+  agencies: agencies.map(agency => ({
+    id: agency.id,
+    name: agency.agency_name,
+    logo: agency.logo,
+    address: agency.address,
+    public_code: agency.public_code,
+    created_at: agency.created_at.toISOString(),
+  })),
+};
   }
 }

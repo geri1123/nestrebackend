@@ -13,9 +13,10 @@ export class AgencyListItemResponse {
     nullable: true 
   })
   logo: string | null;
-
+  @ApiProperty({ example: 'ABCD1234', description: 'Agency public code', nullable: true })
+ public_code: string | null;
   @ApiProperty({ example: 'Rruga e Kavajës 120, Tirana', description: 'Agency address' })
-  address: string;
+  address: string | null;
 
   @ApiProperty({ example: '10/12/2025', description: 'Creation date (formatted)' })
   created_at: string;

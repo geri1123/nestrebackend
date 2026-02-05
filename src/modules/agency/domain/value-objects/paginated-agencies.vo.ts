@@ -6,7 +6,8 @@ export interface PaginatedAgenciesVO {
     id: number;
     name: string;
     logo: string | null;
-    address: string;
+    address: string | null;
+    public_code: string | null;
     created_at: string;
   }[];
 }

@@ -104,28 +104,49 @@ export class AgencyRepository implements IAgencyDomainRepository {
     };
   }
 
-  // async getAllAgencies(skip: number, limit: number): Promise<any[]> {
-  //   return this.prisma.agency.findMany({
-  //     where: { status: agency_status.active },
-  //     orderBy: { created_at: 'desc' },
-  //     skip,
-  //     take: limit,
-  //   });
-  // }
+  
+// async getAllAgencies(
+//   skip: number,
+//   limit: number,
+//   search?: string,
+// ): Promise<any[]> {
+//   const words =
+//     search && search.trim().length >= 3
+//       ? search.trim().split(/\s+/)
+//       : undefined;
 
-  // async countAgencies(): Promise<number> {
-  //   return this.prisma.agency.count({
-  //     where: { status: agency_status.active },
-  //   });
-  // }
-async getAllAgencies(
+//   return this.prisma.agency.findMany({
+//     where: {
+//       status: agency_status.active,
+//       ...(words && {
+//         AND: words.map(word => ({
+//           OR: [
+//             { agency_name: { contains: word } },
+//             { address: { contains: word } },
+//           ],
+//         })),
+//       }),
+//     },
+//     orderBy: { created_at: 'desc' },
+//     skip,
+//     take: limit,
+//   });
+// }
+async getAllAgenciesPaginated(
   skip: number,
   limit: number,
   search?: string,
-): Promise<any[]> {
+): Promise<{
+  id: number;
+  agency_name: string;
+  logo: string | null;
+  address: string | null;
+  public_code: string | null;
+  created_at: Date;
+}[]> {
   const words =
     search && search.trim().length >= 3
-      ? search.trim().split(/\s+/)
+      ? search.trim().toLowerCase().split(/\s+/)
       : undefined;
 
   return this.prisma.agency.findMany({
@@ -134,11 +155,27 @@ async getAllAgencies(
       ...(words && {
         AND: words.map(word => ({
           OR: [
-            { agency_name: { contains: word } },
-            { address: { contains: word } },
+            { 
+              agency_name: { 
+                contains: word,
+              } 
+            },
+            { 
+              address: { 
+                contains: word,
+              } 
+            },
           ],
         })),
       }),
+    },
+    select: {
+      id: true,
+      agency_name: true,
+      logo: true,
+      address: true,
+      public_code: true,
+      created_at: true,
     },
     orderBy: { created_at: 'desc' },
     skip,

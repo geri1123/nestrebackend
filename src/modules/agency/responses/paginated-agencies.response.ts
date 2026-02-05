@@ -10,7 +10,7 @@ export class PaginatedAgenciesResponse {
 
   @ApiProperty({ example: 12, description: 'Items per page' })
   limit: number;
-
+ 
   @ApiProperty({ 
     type: [AgencyListItemResponse],
     description: 'List of agencies' 

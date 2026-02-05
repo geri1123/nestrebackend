@@ -15,7 +15,19 @@ export interface IAgencyDomainRepository {
     logo: string | null; 
     logoPublicId: string | null; 
   } | null>;
-  getAllAgencies(skip: number, limit: number, search?: string): Promise<any[]>;
+  // getAllAgencies(skip: number, limit: number, search?: string): Promise<any[]>;
+  getAllAgenciesPaginated(
+  skip: number,
+  limit: number,
+  search?: string,
+): Promise<{
+  id: number;
+  agency_name: string;
+  logo: string | null;
+  address: string | null;
+  public_code: string | null;
+  created_at: Date;
+}[]>;
   countAgencies(search?: string): Promise<number>;
   getAgencyWithOwnerById(id: number): Promise<{
     id: number;
