@@ -1,56 +1,15 @@
 
-// import { Injectable } from '@nestjs/common';
-// import { JwtService } from '@nestjs/jwt';
-// import { AppConfigService } from '../../config/config.service';
-// export interface CustomJwtPayload {
-//   userId: number;
-//   username: string;
-//   email: string;
-//   role: string;
-// }
-
-// @Injectable()
-// export class AuthTokenService {
-//   constructor(
-//     private readonly jwtService: JwtService,
-//     private readonly configService: AppConfigService,
-//   ) {}
-
-//   generate(user: any, expiresInDays = 1): string {
-//     const payload: CustomJwtPayload = {
-//       userId: Number(user.id),
-//       username: String(user.username),
-//       email: String(user.email),
-//       role: String(user.role),
-//     };
-
-//     const expiresInSeconds = expiresInDays * 24 * 60 * 60;
-
-//     return this.jwtService.sign(payload, {
-//       secret: this.configService.jwtSecret,
-//       expiresIn: expiresInSeconds,
-//     });
-//   }
-
-//   verify(token: string): CustomJwtPayload {
-//     return this.jwtService.verify<CustomJwtPayload>(token, {
-//       secret: this.configService.jwtSecret,
-//     });
-//   }
-// }
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '../../config/config.service';
 
 export interface CustomJwtPayload {
   userId: number;
-  // username: string;
-  // email: string;
-  // role: string;
-  jti: string; // unique token identifier for revocation 
+ 
+  jti: string; 
 }
 
-// ── Strict, immutable expiry windows
+
 const TOKEN_EXPIRY = {
   ACCESS_SHORT: 6 * 60 * 60,            // 6 h
   ACCESS_REMEMBER: 3 * 24 * 60 * 60,  // 3 d
@@ -74,9 +33,7 @@ export class AuthTokenService {
 
     const payload: CustomJwtPayload = {
       userId: Number(user.id),
-      // username: String(user.username),
-      // email:    String(user.email),
-      // role:     String(user.role),
+   
       jti:      this.generateJti(),
     };
 
@@ -110,7 +67,7 @@ export class AuthTokenService {
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers 
   private generateJti(): string {
    
     return require('crypto').randomBytes(16).toString('hex');

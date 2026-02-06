@@ -38,8 +38,8 @@ import { RegisterAgencyFromUserUseCase } from '../application/use-cases/register
 import { ApiCreateAgency, ApiDeleteAgencyLogo, ApiGetAgencyInfoPrivate, ApiGetAgencyInfoPublic, ApiGetPaginatedAgencies, ApiUpdateAgencyFields, ApiUploadAgencyLogo } from '../decorators/agency.decorators';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import { validate } from 'class-validator';
-import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
-import { RolesGuard } from '../../../common/guard/role-guard';
+import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
+import { RolesGuard } from '../../../infrastructure/auth/guard/role-guard';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { user_role } from '@prisma/client';
 

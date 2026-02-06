@@ -2,7 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { PermissionsGuard } from '../permissions.guard';
 import { Reflector } from '@nestjs/core';
 import { user_role } from '@prisma/client';
-import { PERMISSIONS_KEY } from '../../decorators/permissions.decorator';
+import { PERMISSIONS_KEY } from '../../../../common/decorators/permissions.decorator';
 
 describe('PermissionsGuard', () => {
   let guard: PermissionsGuard;

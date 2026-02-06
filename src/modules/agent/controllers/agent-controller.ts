@@ -25,10 +25,10 @@ import { agencyagent_status } from '@prisma/client';
 import { GetAgentMeUseCase } from '../application/use-cases/get-agent-me.use-case';
 import { GetAgentByIdInAgencyUseCase } from '../application/use-cases/get-agent-in-agency.use-case';
 import { ApiAgentDecorators } from '../decorators/agent.decorator';
-import { RolesGuard } from '../../../common/guard/role-guard';
-import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
-import { PermissionsGuard } from '../../../common/guard/permissions.guard';
-import { AgentBelongsToAgencyGuard } from '../../../common/guard/agent-belongs-to-agency.guard';
+import { RolesGuard } from '../../../infrastructure/auth/guard/role-guard';
+import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
+import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions.guard';
+import { AgentBelongsToAgencyGuard } from '../../../infrastructure/auth/guard/agent-belongs-to-agency.guard';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 
 

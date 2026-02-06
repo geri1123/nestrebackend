@@ -15,9 +15,9 @@ import { GetAgencyRequestsUseCase } from "../application/use-cases/get-agency-re
 import { UpdateAgencyRequestStatusUseCase } from "../application/use-cases/update-agency-request-status.use-case";
 import { ApiAgencyRequestsDecorators } from "../decorators/agency-requests.decorator";
 import { RequireAgencyContext } from "../../../common/decorators/require-agency-context.decorator";
-import { PermissionsGuard } from "../../../common/guard/permissions.guard";
-import { AgencyContextGuard } from "../../../common/guard/agency-context.guard";
-import { RolesGuard } from "../../../common/guard/role-guard";
+import { PermissionsGuard } from "../../../infrastructure/auth/guard/permissions.guard";
+import { AgencyContextGuard } from "../../../infrastructure/auth/guard/agency-context.guard";
+import { RolesGuard } from "../../../infrastructure/auth/guard/role-guard";
 
 @UseGuards(AgencyContextGuard, RolesGuard, PermissionsGuard)
 @Controller('agencies')

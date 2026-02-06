@@ -20,7 +20,7 @@ import { ApiGetRelatedProducts } from '../decorators/related-products.decorator'
 import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
-import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
+import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
 @ApiTags('Products')
 @SkipThrottle()
 @Controller('products')

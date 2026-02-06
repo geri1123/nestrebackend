@@ -1,5 +1,5 @@
 import { JwtAuthGuard } from '../jwt-auth.guard';
-import { AuthContextService } from '../../../infrastructure/auth/services/auth-context.service';
+import { AuthContextService } from '../../services/auth-context.service';
 import { Reflector } from '@nestjs/core';
 import { UnauthorizedException } from '@nestjs/common';
 

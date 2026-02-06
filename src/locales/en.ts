@@ -14,6 +14,7 @@ export const en = {
     notificationDeletedSuccessfully: 'Notification deleted successfully',
 notificationMarkedAsRead: 'Notification marked as read',
 amountMustBePositive: "Amount must be positive",
+agentTerminated:"Agent terminated",
 usernameRequired: "Username is required.",
 sameUsername: "The new username cannot be the same as the current username.",
     usernameChangedSuccessfully: "Username changed successfully.",

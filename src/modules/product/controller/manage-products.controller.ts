@@ -26,13 +26,13 @@ import { SearchFiltersHelper } from '../application/helpers/search-filters.helpe
 import { t } from '../../../locales';
 import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
-import { ProductOwnershipGuard } from '../../../common/guard/product-ownership.guard';
+import { ProductOwnershipGuard } from '../../../infrastructure/auth/guard/product-ownership.guard';
 import { ApiCreateProduct } from '../decorators/create-product.decorator';
 import { ApiDashboardProducts } from '../decorators/dashboard-products.decorator';
 import { ApiUpdateProduct } from '../decorators/update-product.decorator';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
-import { AgencyContextGuard } from '../../../common/guard/agency-context.guard';
-import { PermissionsGuard } from '../../../common/guard/permissions.guard';
+import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
+import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions.guard';
 import { permission } from 'node:process';
 import { Permissions } from '../../../common/decorators/permissions.decorator';
 

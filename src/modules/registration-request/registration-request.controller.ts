@@ -5,7 +5,7 @@ import {type RequestWithUser } from "../../common/types/request-with-user.interf
 import { t } from "../../locales";
 import { SendQuickRequestUseCase } from "./application/use-cases/send-quick-request.use-case";
 import { ApiSendQuickRequest } from "./decorators/registration-request.decorators";
-import { RolesGuard } from "../../common/guard/role-guard";
+import { RolesGuard } from "../../infrastructure/auth/guard/role-guard";
 @UseGuards(RolesGuard)
 @Controller('registration-request')
 

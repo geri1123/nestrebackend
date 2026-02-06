@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RequestWithUser } from '../types/request-with-user.interface';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { t, SupportedLang } from '../../locales';
-import { AuthContextService } from '../../infrastructure/auth/services/auth-context.service';
+import { RequestWithUser } from '../../../common/types/request-with-user.interface';
+import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
+import { t, SupportedLang } from '../../../locales';
+import { AuthContextService } from '../services/auth-context.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -18,6 +18,7 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Check if route is public
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -27,14 +28,15 @@ export class JwtAuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
     const lang: SupportedLang = req.language || 'al';
 
+    // Extract and validate token
     const token = this.authContextService.extractToken(req);
     if (!token) {
       throw new UnauthorizedException(t('noTokenProvided', lang));
     }
 
     try {
+      // Authenticate and attach user to request
       const authContext = await this.authContextService.authenticate(token, lang);
-
       req.user = authContext.user;
       req.userId = authContext.userId;
       return true;
@@ -42,11 +44,12 @@ export class JwtAuthGuard implements CanActivate {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      console.error(error);
+      console.error('JWT Auth Error:', error);
       throw new UnauthorizedException(t('invalidOrExpiredToken', lang));
     }
   }
 }
+
 // import {
 //   Injectable,
 //   CanActivate,
@@ -54,10 +57,10 @@ export class JwtAuthGuard implements CanActivate {
 //   UnauthorizedException,
 // } from '@nestjs/common';
 // import { Reflector } from '@nestjs/core';
-// import { RequestWithUser } from '../types/request-with-user.interface';
-// import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-// import { t, SupportedLang } from '../../locales';
-// import { AuthContextService } from '../../infrastructure/auth/services/auth-context.service';
+// import { RequestWithUser } from '../../../common/types/request-with-user.interface';
+// import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
+// import { t, SupportedLang } from '../../../locales';
+// import { AuthContextService } from '../services/auth-context.service';
 
 // @Injectable()
 // export class JwtAuthGuard implements CanActivate {
@@ -86,11 +89,6 @@ export class JwtAuthGuard implements CanActivate {
 
 //       req.user = authContext.user;
 //       req.userId = authContext.userId;
-//       req.agencyId = authContext.agencyId;
-//       req.agencyAgentId = authContext.agencyAgentId;
-//       req.agentPermissions = authContext.agentPermissions;
-//       req.agentStatus = authContext.agentStatus;
-
 //       return true;
 //     } catch (error) {
 //       if (error instanceof UnauthorizedException) {

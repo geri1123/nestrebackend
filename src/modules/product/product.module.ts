@@ -37,7 +37,7 @@ import { SoftAuthModule } from '../../common/soft-auth/soft-auth.module';
 import { GetMostClickedProductsUseCase } from './application/use-cases/get-most-clicked-products.use-case';
 import { ProductSearchQueryBuilder } from './infrastructure/search/product-search-query.builder';
 import { SearchFiltersResolver } from './infrastructure/search/search-filters-resolver.service';
-import { ProductOwnershipGuard } from '../../common/guard/product-ownership.guard';
+import { ProductOwnershipGuard } from '../../infrastructure/auth/guard/product-ownership.guard';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
