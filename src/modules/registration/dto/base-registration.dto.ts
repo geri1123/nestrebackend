@@ -16,37 +16,37 @@ export class BaseRegistrationDto {
 @IsString({ message: "usernameMustBeString" })
 @MinLength(4, { message: "usernameLength" })
 @Matches(/^\S+(?:\S+)*$/, { message: "usernameNoSpaces" })
-username: string;
+username!: string;
 
   @ApiProperty({ example: 'user@example.com' })
 @IsNotEmpty({ message: 'emailRequired' })
   // @Transform(({ value }) => value?.trim())
   
   @IsEmail({}, { message: 'emailInvalid' })
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'P@ssword123' })
   @IsNotEmpty({ message: 'passwordRequired' })   
   @MinLength(8, { message: 'passwordMin' })
   @Matches(/^\S+$/, { message: 'passwordNoSpaces' })
-  password: string;
+  password!: string;
 
   @ApiProperty({ example: 'P@ssword123' })
   @IsNotEmpty({ message: 'repeatPasswordRequired' })
   @Match('password', { message: 'passwordsMismatch' })
-  repeatPassword: string;
+  repeatPassword!: string;
 
   @ApiProperty({ example: 'John' })
   @Transform(({ value }) => value?.trim())
   @IsNotEmpty({ message: 'firstNameRequired' })
-  first_name: string;
+  first_name!: string;
 
   @ApiProperty({ example: 'Doe' })
   @Transform(({ value }) => value?.trim())
   @IsNotEmpty({ message: 'lastNameRequired' })
-  last_name: string;
+  last_name!: string;
 
   @ApiProperty({ example: true })
   @Equals(true, { message: 'termsRequired' })
-  terms_accepted: boolean;
+  terms_accepted!: boolean;
 }

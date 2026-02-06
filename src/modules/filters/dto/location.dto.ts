@@ -3,38 +3,38 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class CountryDto {
   @ApiProperty({ example: 4 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'Albania' })
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: "AL" })
-  code: string;
+  code!: string;
 }
 
 export class CityDto {  
   @ApiProperty({ example: 1 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: "Tirana" })
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 2 })
-  countryId: number;
+  countryId!: number;
 }
 
 export class CountriesResponseDto {
   @ApiProperty({ example: true })
-  success: boolean;
+  success!: boolean;
 
   @ApiProperty({ type: [CountryDto] })
-  countries: CountryDto[];
+  countries!: CountryDto[];
 }
 
 export class CitiesResponseDto {
   @ApiProperty({ example: true })
-  success: boolean;
+  success!: boolean;
 
   @ApiProperty({ type: [CityDto] })
-  cities: CityDto[];
+  cities!: CityDto[];
 }

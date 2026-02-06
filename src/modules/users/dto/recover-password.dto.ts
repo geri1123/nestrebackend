@@ -6,5 +6,5 @@ export class RecoverPasswordDto {
   @IsString({ message: 'emailMustBeString' })
   @IsEmail({}, { message: 'emailInvalid' })
   @IsNotEmpty({ message: 'emailRequired' })
-  email: string;
+  email!: string;
 }

@@ -4,10 +4,10 @@ import { NavbarUser } from '../domain/value-objects/navbar-user.vo';
 
 export class NavbarProfileResponse {
   @ApiProperty({ example: 'oturoo1' })
-  username: string;
+  username!: string;
 
   @ApiProperty({ example: 'mbnbDSDFwqedwDAa@AllFreeMail.net' })
-  email: string;
+  email!: string;
 
    @ApiProperty({
     type: String,
@@ -15,16 +15,16 @@ export class NavbarProfileResponse {
     example:
       'https://res.cloudinary.com/.../profile-images/120/image.png',
   })
-  profileImgUrl: string | null;
+  profileImgUrl!: string | null;
 
   @ApiProperty({
     example: 'Dec 15, 2025, 21:17',
     nullable: true,
   })
-  lastLogin: string | null;
+  lastLogin!: string | null;
 
   @ApiProperty({ example: 'agency_owner' })
-  role: string;
+  role!: string;
 
   static fromDomain(user: NavbarUser): NavbarProfileResponse {
     return {

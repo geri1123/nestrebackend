@@ -3,15 +3,15 @@ import { IsEnum, IsNumber, IsOptional, IsBoolean, Min } from "class-validator";
 
 export class CreatePricingDto {
   @IsEnum(advertisement_type)
-  adType: advertisement_type;
+  adType!: advertisement_type;
 
   @IsNumber()
   @Min(0)
-  price: number;
+  price!: number;
 
   @IsNumber()
   @Min(1)
-  duration: number;
+  duration!: number;
 
   @IsOptional()
   @IsNumber()

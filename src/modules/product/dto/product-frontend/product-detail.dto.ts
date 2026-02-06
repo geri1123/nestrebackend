@@ -10,7 +10,7 @@ export class ProductDetailImageDto {
     nullable: true,
     description: 'Public URL of the product image'
   })
-  imageUrl: string | null;
+  imageUrl!: string | null;
 }
 
 //attribute dto
@@ -19,45 +19,45 @@ export class ProductAttributeDto {
     example: 1,
     description: 'Attribute ID'
   })
-  attributeId: number;
+  attributeId!: number;
 
   @ApiProperty({ 
     example: 'Bedrooms',
     description: 'Attribute name'
   })
-  attributeName: string;
+  attributeName!: string;
 
   @ApiProperty({ 
     example: 'select',
     description: 'Input type for the attribute (text, number, select, checkbox, etc.)'
   })
-  inputType: string;
+  inputType!: string;
 
   @ApiProperty({ 
     example: 3,
     description: 'Attribute value ID'
   })
-  attributeValueId: number;
+  attributeValueId!: number;
 
   @ApiProperty({ 
     example: '3',
     description: 'Attribute value (translated)'
   })
-  attributeValue: string;
+  attributeValue!: string;
 
   @ApiProperty({ 
     example: '3',
     description: 'Raw value code from database'
   })
-  valueCode: string;
+  valueCode!: string;
 }
 
 export class RelatedDataDto {
   @ApiProperty({ example: 5 })
-  subcategoryId: number;
+  subcategoryId!: number;
 
   @ApiProperty({ example: 2 })
-  categoryId: number;
+  categoryId!: number;
 }
 
  // DTO for user information in product detail
@@ -67,35 +67,35 @@ export class ProductDetailUserDto {
     example: 'john_doe',
     description: 'Username of the product owner' 
   })
-  username: string;
+  username!: string;
 
   @ApiProperty({ 
     example: 'john@example.com',
     nullable: true,
     description: 'User email address'
   })
-  email: string | null;
+  email!: string | null;
 
   @ApiProperty({ 
     example: 'John',
     nullable: true,
     description: 'User first name'
   })
-  first_name: string | null;
+  first_name!: string | null;
 
   @ApiProperty({ 
     example: 'Doe',
     nullable: true,
     description: 'User last name'
   })
-  last_name: string | null;
+  last_name!: string | null;
 
   @ApiProperty({ 
     example: '+355 68 123 4567',
     nullable: true,
     description: 'User phone number'
   })
-  phone: string | null;
+  phone!: string | null;
 
   @ApiProperty({ 
     example: 'agent',
@@ -103,7 +103,7 @@ export class ProductDetailUserDto {
     nullable: true,
     description: 'User role'
   })
-  role: user_role;
+  role!: user_role;
 
   @ApiProperty({ 
     example: 'active',
@@ -111,7 +111,7 @@ export class ProductDetailUserDto {
     nullable: true,
     description: 'User account status'
   })
-  status: user_status;
+  status!: user_status;
 }
 //
 
@@ -123,41 +123,46 @@ export class ProductDetailAgencyDto {
     example: 'Prime Real Estate',
     description: 'Name of the real estate agency'
   })
-  agency_name: string;
+  agency_name!: string;
 
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/logo.webp', 
     nullable: true,
     description: 'Public URL of the agency logo'
   })
-  logo: string | null;
+  logo!: string | null;
 
   @ApiProperty({ 
     example: '123 Main Street, Tirana',
     nullable: true,
     description: 'Agency address'
   })
-  address: string | null;
+  address!: string | null;
 
   @ApiProperty({ 
     example: 'active',
     nullable: true,
     description: 'Agency status'
   })
-  status: string | null;
+  status!: string | null;
 
   @ApiProperty({ 
     example: '+355 4 123 4567',
     nullable: true,
     description: 'Agency phone number'
   })
-  phone: string | null;
-
+  phone!: string | null;
+@ApiProperty({
+  example:'3h4h432', 
+  nullable:false,
+  description:'public code for agencies'
+})
+public_code!:string;
   @ApiProperty({ 
     example: '2020-01-15T10:00:00.000Z',
     description: 'Agency creation date'
   })
-  created_at: Date;
+  created_at!: Date;
 }
 
 
@@ -168,34 +173,34 @@ export class ProductDetailAdvertisementDto {
     example: 42,
     description: 'Advertisement ID'
   })
-  id: number;
+  id!: number;
 
   @ApiProperty({ 
     example: 'premium',
     enum: ['cheap', 'normal', 'premium'],
     description: 'Type of advertisement'
   })
-  adType: advertisement_type;
+  adType!: advertisement_type;
 
   @ApiProperty({ 
     example: 'active',
     enum: ['active', 'inactive', 'expired', 'pending'],
     description: 'Current status of the advertisement'
   })
-  status: advertisement_status;
+  status!: advertisement_status;
 
   @ApiProperty({ 
     example: '2025-12-01T10:00:00.000Z',
     description: 'Advertisement start date'
   })
-  startDate: string;
+  startDate!: string;
 
   @ApiProperty({ 
     example: '2025-12-31T23:59:59.000Z',
     nullable: true,
     description: 'Advertisement end date'
   })
-  endDate: string | null;
+  endDate!: string | null;
 }
 
 
@@ -206,145 +211,145 @@ export class ProductDetailDto {
     example: 132,
     description: 'Unique product ID'
   })
-  id: number;
+  id!: number;
 
   @ApiProperty({ 
     example: 'Beautiful apartment in city center',
     description: 'Product title'
   })
-  title: string;
+  title!: string;
 
   @ApiProperty({ 
     example: 120000,
     description: 'Product price in local currency'
   })
-  price: number;
+  price!: number;
 
   @ApiProperty({ 
     example: 'Tirana',
     description: 'City where the product is located'
   })
-  city: string;
+  city!: string;
 
   @ApiProperty({ 
     example: 'active',
     description: 'Product status'
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({ 
     example: '2025-10-09T13:00:49.118Z',
     description: 'Product creation timestamp'
   })
-  createdAt: string;
+  createdAt!: string;
 
   @ApiProperty({ 
     example: '2025-10-15T08:30:22.456Z',
     description: 'Product last update timestamp'
   })
-  updatedAt: string;
+  updatedAt!: string;
 
   @ApiProperty({ 
     example: 'Spacious 3-bedroom apartment with modern amenities...',
     nullable: true,
     description: 'Detailed product description'
   })
-  description: string | null;
+  description!: string | null;
 
   @ApiProperty({ 
     example: 'Rruga e Kavajes, Nr. 123',
     nullable: true,
     description: 'Street address of the property'
   })
-  streetAddress: string | null;
+  streetAddress!: string | null;
 
   @ApiProperty({ 
     example: 2020,
     nullable: true,
     description: 'Year the property was built'
   })
-  buildYear: number | null;
+  buildYear!: number | null;
 
   @ApiProperty({ 
     example: 100,
     nullable: true,
     description: 'Area of the product in square meters'
   })
-  area: number | null;
+  area!: number | null;
 
   @ApiProperty({ 
     type: [ProductDetailImageDto],
     description: 'Array of all product images'
   })
-  image: ProductDetailImageDto[];
+  image!: ProductDetailImageDto[];
 
   @ApiProperty({ 
     example: 'Residential',
     description: 'Category name in selected language'
   })
-  categoryName: string;
+  categoryName!: string;
 
   @ApiProperty({ 
     example: 'Apartment',
     description: 'Subcategory name in selected language'
   })
-  subcategoryName: string;
+  subcategoryName!: string;
 
   @ApiProperty({ 
     example: 'For Sale',
     description: 'Listing type name in selected language'
   })
-  listingTypeName: string;
+  listingTypeName!: string;
 
   @ApiProperty({ 
     example: 5,
     description: 'User ID of the product owner'
   })
-  userId: number;
+  userId!: number;
 
   @ApiProperty({ 
     example: 3,
     nullable: true,
     description: 'Agency ID if product belongs to an agency'
   })
-  agencyId: number | null;
+  agencyId!: number | null;
 
   @ApiProperty({ 
     type: ProductDetailUserDto,
     nullable: true,
     description: 'User information'
   })
-  user: ProductDetailUserDto | null;
+  user!: ProductDetailUserDto | null;
 
   @ApiProperty({ 
     type: ProductDetailAgencyDto,
     nullable: true,
     description: 'Agency information if product belongs to an agency'
   })
-  agency: ProductDetailAgencyDto | null;
+  agency!: ProductDetailAgencyDto | null;
 
   @ApiProperty({ 
     example: true,
     description: 'Whether the product has an active advertisement'
   })
-  isAdvertised: boolean;
+  isAdvertised!: boolean;
 
   @ApiProperty({ 
     type: ProductDetailAdvertisementDto,
     nullable: true,
     description: 'Active advertisement details if product is advertised'
   })
-  advertisement: ProductDetailAdvertisementDto | null;
+  advertisement!: ProductDetailAdvertisementDto | null;
   @ApiProperty({ 
     type: [ProductAttributeDto],
     description: 'Product attributes and their values'
   })
-  attributes: ProductAttributeDto[];
+  attributes!: ProductAttributeDto[];
   @ApiProperty({ 
     example: 245,
     description: 'Total number of clicks on this product'
   })
-  totalClicks: number;
+  totalClicks!: number;
 }
 
 
@@ -353,7 +358,7 @@ export class ProductDetailDto {
 
 export class ProductDetailResponseDto {
   @ApiProperty({ type: () => ProductDetailDto, nullable: true })
-  product: ProductDetailDto | null;
+  product!: ProductDetailDto | null;
 
   @ApiProperty({ type: () => RelatedDataDto, nullable: true })
   relatedData?: RelatedDataDto;

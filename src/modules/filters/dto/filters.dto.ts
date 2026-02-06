@@ -3,59 +3,59 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SubcategoryDto {
   @ApiProperty({ example: 1 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'Shtepi private' })
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'house', nullable: true })  
-  slug: string | null;
+  slug!: string | null;
 
   @ApiProperty({ example: 1 })
-  categoryId: number;
+  categoryId!: number;
 
   @ApiProperty({ example: 61 })
-  productCount: number;
+  productCount!: number;
 }
 
 export class CategoryDto {
   @ApiProperty({ example: 1 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'Residenciale' })
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'residential', nullable: true })  
-  slug: string | null;
+  slug!: string | null;
 
   @ApiProperty({ example: 68 })
-  productCount: number;
+  productCount!: number;
 
   @ApiProperty({ type: [SubcategoryDto] })
-  subcategories: SubcategoryDto[];
+  subcategories!: SubcategoryDto[];
 }
 
 export class ListingTypeDto {
   @ApiProperty({ example: 1 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'Ne shitje' })
-  name: string;
+  name!: string;
 
   @ApiProperty({ example: 'for-sale', nullable: true }) 
-  slug: string | null;
+  slug!: string | null;
 
   @ApiProperty({ example: 38 })
-  productCount: number;
+  productCount!: number;
 }
 
 export class FiltersResponseDto {
   @ApiProperty({ example: true })
-  success: boolean;
+  success!: boolean;
 
   @ApiProperty({ type: [CategoryDto] })
-  categories: CategoryDto[];
+  categories!: CategoryDto[];
 
   @ApiProperty({ type: [ListingTypeDto] })
-  listingTypes: ListingTypeDto[];
+  listingTypes!: ListingTypeDto[];
 }

@@ -6,22 +6,22 @@ import { User } from '../domain/entities/user.entity';
 
 export class UserProfileResponse {
   @ApiProperty({ example: 120 })
-  id: number;
+  id!: number;
 
   @ApiProperty({ example: 'gerise222' })
-  username: string;
+  username!: string;
 
   @ApiProperty({ example: 'user@email.com' })
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'John', nullable: true })
-  firstName: string | null;
+  firstName!: string | null;
 
   @ApiProperty({ example: 'Doe', nullable: true })
-  lastName: string | null;
+  lastName!: string | null;
 
   @ApiProperty({ example: 'About me...', nullable: true })
-  aboutMe: string | null;
+  aboutMe!: string | null;
 
   @ApiProperty({
     type: String,
@@ -29,39 +29,39 @@ export class UserProfileResponse {
     example:
       'https://res.cloudinary.com/.../profile-images/120/image.png',
   })
-  profileImgUrl: string | null;
+  profileImgUrl!: string | null;
 
   @ApiProperty({
     type: String,
     nullable: true,
     example: 'profile-images/120/image',
   })
-  profileImgPublicId: string | null;
+  profileImgPublicId!: string | null;
 
   @ApiProperty({
     type: String,
     nullable: true,
     example: '+355691234567',
   })
-  phone: string | null;
+  phone!: string | null;
 
   @ApiProperty({ example: 'agency_owner' })
-  role: string;
+  role!: string;
 
   @ApiProperty({ example: 'active' })
-  status: string;
+  status!: string;
 
   @ApiProperty({ example: true })
-  emailVerified: boolean;
+  emailVerified!: boolean;
 
   @ApiProperty({ example: 'Dec 04, 2025, 18:18' })
-  createdAt: string;
+  createdAt!: string;
 
   @ApiProperty({ example: 'Dec 15, 2025, 21:54', nullable: true })
-  updatedAt: string | null;
+  updatedAt!: string | null;
 
   @ApiProperty({ example: 'Dec 15, 2025, 21:17', nullable: true })
-  lastLogin: string | null;
+  lastLogin!: string | null;
 
 
   static fromDomain(user: User): UserProfileResponse {

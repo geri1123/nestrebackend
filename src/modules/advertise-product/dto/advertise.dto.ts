@@ -8,7 +8,7 @@ export class AdvertiseDto {
     description: 'ID of the product to advertise',
   })
   @IsInt()
-  productId: number;
+  productId!: number;
 
   @ApiPropertyOptional({
     enum: advertisement_type,

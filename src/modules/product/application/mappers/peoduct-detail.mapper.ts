@@ -65,6 +65,7 @@ export class ProductDetailMapper {
             logo: product.agency.logo ?? null,
             address: product.agency.address ?? null,
             status: product.agency.status ?? null,
+            public_code:product.agency.public_code ?? null,
             phone: product.agency.phone ?? null,
             created_at: product.agency.created_at,
           }

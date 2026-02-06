@@ -3,5 +3,5 @@ import { ProductListItemDto } from './product-list.dto';
 
 export class MostClickedProductsResponseDto {
   @ApiProperty({ type: () => [ProductListItemDto] })
-  products: ProductListItemDto[];
+  products!: ProductListItemDto[];
 }

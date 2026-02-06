@@ -6,7 +6,7 @@ import { AdvertiseProductModule } from '../modules/advertise-product/advertise-p
 import { CleanupModule } from '../modules/cleanup/cleanup.module';
 
 @Module({
-    imports: [CleanupModule, AdvertiseProductModule],          
+    imports: [CleanupModule],          
   providers: [DeleteInactiveUsersCron , UpdateExpiredAdvertisementCron],
 })
 export class CronJobsModule {}

@@ -10,7 +10,7 @@ import { Transform } from 'class-transformer';
     @Transform(({ value }) => value?.trim())
     
     @Matches(/^[a-zA-Z0-9_]+$/, { message: 'usernamePatternError' })
-    username: string;
+    username!: string;
   }
 
 

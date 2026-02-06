@@ -10,7 +10,7 @@ export class AgentMeResponse {
       profileImg: null,
     },
   })
-  user: {
+  user!: {
     id: number;
     username: string;
     firstName: string | null;
@@ -28,7 +28,7 @@ export class AgentMeResponse {
       endDate: '2025-12-31T23:59:59.000Z',
     },
   })
-  agent: {
+  agent!: {
     agencyAgentId: number;
     roleInAgency: string;
     status: string;
@@ -44,7 +44,7 @@ export class AgentMeResponse {
       logo: null,
     },
   })
-  agency: {
+  agency!: {
     id: number;
     name: string;
     logo: string | null;
@@ -61,7 +61,7 @@ export class AgentMeResponse {
     },
     nullable: true,
   })
-  permissions:
+  permissions!:
     | {
         canEditOwnPost: boolean;
         canEditOthersPost: boolean;

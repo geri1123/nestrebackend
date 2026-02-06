@@ -10,7 +10,7 @@ export class ProductListImageDto {
     nullable: true,
     description: 'Public URL of the product image'
   })
-  imageUrl: string | null;
+  imageUrl!: string | null;
 }
 
 
@@ -21,7 +21,7 @@ export class ProductListUserDto {
     example: 'john_doe',
     description: 'Username of the product owner' 
   })
-  username: string;
+  username!: string;
 }
 
 // DTO for agency information in product list
@@ -31,14 +31,14 @@ export class ProductListAgencyDto {
     example: 'Prime Real Estate',
     description: 'Name of the real estate agency'
   })
-  agency_name: string;
+  agency_name!: string;
 
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/logo.webp', 
     nullable: true,
     description: 'Public URL of the agency logo'
   })
-  logo: string | null;
+  logo!: string | null;
 }
 
 
@@ -49,14 +49,14 @@ export class ProductListAdvertisementDto {
     example: 42,
     description: 'Advertisement ID'
   })
-  id: number;
+  id!: number;
 
   @ApiProperty({ 
     example: 'active',
     enum: ['active', 'inactive', 'expired', 'pending'],
     description: 'Current status of the advertisement'
   })
-  status: advertisement_status;
+  status!: advertisement_status;
 }
 
  // DTO for individual product in list view
@@ -66,113 +66,113 @@ export class ProductListItemDto {
     example: 132,
     description: 'Unique product ID'
   })
-  id: number;
+  id!: number;
 
   @ApiProperty({ 
     example: 'Beautiful apartment in city center',
     description: 'Product title'
   })
-  title: string;
+  title!: string;
 
   @ApiProperty({ 
     example: 120000,
     description: 'Product price in local currency'
   })
-  price: number;
+  price!: number;
 
   @ApiProperty({ 
     example: 'Tirana',
     description: 'City where the product is located'
   })
-  city: string;
+  city!: string;
 
   @ApiProperty({ 
     example: 'active',
     description: 'Product status'
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({ 
     example: '2025-10-09T13:00:49.118Z',
     description: 'Product creation timestamp'
   })
-  createdAt: string;
+  createdAt!: string;
 
   @ApiProperty({ 
     type: [ProductListImageDto],
     description: 'Array of product images (max 2 for list view)'
   })
-  image: ProductListImageDto[];
+  image!: ProductListImageDto[];
 
   @ApiProperty({ 
     example: 'Residential',
     description: 'Category name in selected language'
   })
-  categoryName: string;
+  categoryName!: string;
 
   @ApiProperty({ 
     example: 'Apartment',
     description: 'Subcategory name in selected language'
   })
-  subcategoryName: string;
+  subcategoryName!: string;
 
   @ApiProperty({ 
     example: 'For Sale',
     description: 'Listing type name in selected language'
   })
-  listingTypeName: string;
+  listingTypeName!: string;
 
   @ApiProperty({ 
     example: 100,
     nullable: true,
     description: 'Area of the product in square meters'
   })
-  area: number | null;
+  area!: number | null;
 
   @ApiProperty({ 
     example: 5,
     description: 'User ID of the product owner'
   })
-  userId: number;
+  userId!: number;
 
   @ApiProperty({ 
     example: 3,
     nullable: true,
     description: 'Agency ID if product belongs to an agency'
   })
-  agencyId: number | null;
+  agencyId!: number | null;
 
   @ApiProperty({ 
     type: ProductListUserDto,
     description: 'User information'
   })
-  user: ProductListUserDto;
+  user!: ProductListUserDto;
 
   @ApiProperty({ 
     type: ProductListAgencyDto,
     nullable: true,
     description: 'Agency information if product belongs to an agency'
   })
-  agency: ProductListAgencyDto | null;
+  agency!: ProductListAgencyDto | null;
 
   @ApiProperty({ 
     example: true,
     description: 'Whether the product has an active advertisement'
   })
-  isAdvertised: boolean;
+  isAdvertised!: boolean;
 
   @ApiProperty({ 
     type: ProductListAdvertisementDto,
     nullable: true,
     description: 'Active advertisement details if product is advertised'
   })
-  advertisement: ProductListAdvertisementDto | null;
+  advertisement!: ProductListAdvertisementDto | null;
 
   @ApiProperty({ 
     example: 245,
     description: 'Total number of clicks on this product'
   })
-  totalClicks: number;
+  totalClicks!: number;
 }
 
 
@@ -183,23 +183,23 @@ export class ProductListResponseDto {
     type: [ProductListItemDto],
     description: 'Array of products matching the search criteria'
   })
-  products: ProductListItemDto[];
+  products!: ProductListItemDto[];
 
   @ApiProperty({ 
     example: 48,
     description: 'Total number of products matching the filters'
   })
-  totalCount: number;
+  totalCount!: number;
 
   @ApiProperty({ 
     example: 1,
     description: 'Current page number'
   })
-  currentPage: number;
+  currentPage!: number;
 
   @ApiProperty({ 
     example: 4,
     description: 'Total number of pages available'
   })
-  totalPages: number;
+  totalPages!: number;
 }

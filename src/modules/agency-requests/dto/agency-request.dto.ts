@@ -21,7 +21,7 @@ export class UpdateRequestStatusDto {
   @IsIn(['approved', 'rejected'], {
     message: 'action must be either approved or rejected',
   })
-  action: 'approved' | 'rejected';
+  action!: 'approved' | 'rejected';
 
   @ApiPropertyOptional({
     enum: agencyagent_role_in_agency,

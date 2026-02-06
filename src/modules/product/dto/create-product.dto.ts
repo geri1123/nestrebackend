@@ -14,7 +14,7 @@ import {
 export class ProductAttributeValueDto {
   @IsInt({ message: 'Attribute ID must be an integer' })
   @IsNotEmpty({ message: 'Attribute ID is required' })
-  attributeId: number;
+  attributeId!: number;
 
   @IsOptional() 
   @IsInt({ message: 'Attribute Value ID must be an integer' })
@@ -24,29 +24,29 @@ export class ProductAttributeValueDto {
 export class CreateProductDto {
   @IsString({ message: 'title' })
   @IsNotEmpty({ message: 'title' })
-  title: string;
+  title!: string;
 
   @Type(() => Number)
   @IsNumber({}, { message: 'price' })
   @Min(0, { message: 'pricePositive' })
   @IsNotEmpty({ message: 'price' })
-  price: number;
+  price!: number;
 
   @Type(() => Number)
   @IsInt({ message: 'cityId' }) 
   @Min(1, { message: 'cityId' })
   @IsNotEmpty({ message: 'cityId' })
-  cityId: number;
+  cityId!: number;
 
   @Type(() => Number)
   @IsInt({ message: 'subcategoryId' })  
   @IsNotEmpty({ message: 'subcategoryId' })
-  subcategoryId: number;
+  subcategoryId!: number;
 
   @Type(() => Number)
   @IsInt({ message: "listingTypeId" })  
   @IsNotEmpty({ message: 'listingTypeId' })
-  listingTypeId: number;
+  listingTypeId!: number;
 
   @IsOptional()
   @IsString()

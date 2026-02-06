@@ -11,10 +11,10 @@ import {
 
 export class ProductAttributeValueDto {
   @IsNumber({}, { message: 'Attribute ID must be a number' })
-  attributeId: number;
+  attributeId!: number;
 
   @IsNumber({}, { message: 'Attribute Value ID must be a number' })
-  attributeValueId: number;
+  attributeValueId!: number;
 }
 
 export class UpdateProductDto {

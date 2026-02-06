@@ -9,7 +9,7 @@ export class NotificationTranslationDto {
     example: "en",
   })
   @IsEnum(["en", "al", "it"])
-  languageCode: SupportedLang;
+  languageCode!: SupportedLang;
 
   @ApiProperty({
     description: "The notification message in this language",
@@ -17,5 +17,5 @@ export class NotificationTranslationDto {
   })
   @IsString()
   @IsNotEmpty()
-  message: string;
+  message!: string;
 }

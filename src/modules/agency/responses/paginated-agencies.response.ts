@@ -3,17 +3,18 @@ import { AgencyListItemResponse } from './agency-list-item.response';
 
 export class PaginatedAgenciesResponse {
   @ApiProperty({ example: 7, description: 'Total number of agencies' })
-  total: number;
-
+  total!: number;
+@ApiProperty({example:2 , description:"total pages "})
+total_pages!:number;
   @ApiProperty({ example: 1, description: 'Current page number' })
-  page: number;
+  page!: number;
 
   @ApiProperty({ example: 12, description: 'Items per page' })
-  limit: number;
+  limit!: number;
  
   @ApiProperty({ 
     type: [AgencyListItemResponse],
     description: 'List of agencies' 
   })
-  agencies: AgencyListItemResponse[];
+  agencies!: AgencyListItemResponse[];
 }

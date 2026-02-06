@@ -17,14 +17,15 @@ export class GetPaginatedAgenciesUseCase {
       this.agencyRepository.getAllAgenciesPaginated(skip, limit, search),
       this.agencyRepository.countAgencies(search),
     ]);
-
+const total_pages = Math.ceil(total / limit);
     return {
   total,
+  total_pages,
   page,
   limit,
   agencies: agencies.map(agency => ({
     id: agency.id,
-    name: agency.agency_name,
+    agency_name: agency.agency_name,
     logo: agency.logo,
     address: agency.address,
     public_code: agency.public_code,

@@ -1,26 +1,25 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { UserCleanupService } from '../modules/cleanup/service/user-clean-up.service';
-
+import { CleanupService } from '../modules/cleanup/service/clean-up.service';
 @Injectable()
 export class DeleteInactiveUsersCron {
   private readonly logger = new Logger(DeleteInactiveUsersCron.name);
 
-  constructor(private readonly cleanUpService:UserCleanupService) {}
+  constructor(private readonly cleanUpService:CleanupService) {}
 
   
-// @Cron('*/10 * * * *')
+// @Cron('*/10 * * * * *')
 @Cron('*/5 * * * *')
-async handleCron() {
+async handleUserCleanup() {
   try {
     const twoWeeksAgo = new Date();
     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
     const deletedCount = await this.cleanUpService.deleteInactiveUnverifiedUsersBefore(twoWeeksAgo);
     this.logger.log(`Deleted ${deletedCount} inactive unverified users.`);
-  } catch (error) {
-    this.logger.error('DeleteInactiveUsersCron failed:', error.message);
+  } catch (error: any) {
+    this.logger.error('Failed to delete inactive unverified users:', error);
   }
 }
 }

@@ -10,5 +10,5 @@ import { SupportedLang, t } from '../../../locales';
   
   @IsString()
   @IsNotEmpty({ message:'emailrequired'})
-  identifier: string;
+  identifier!: string;
 }

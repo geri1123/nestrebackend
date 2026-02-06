@@ -12,14 +12,14 @@ export class LoginDto {
   })
   @IsString({ message: 'identifierRequired' })
   @IsNotEmpty({ message: 'identifierRequired' })
-  identifier: string;
+  identifier!: string;
 @ApiProperty({
     example: 'StrongPass123!',
     description: 'Password for login',
   })
   @IsString({ message: 'passwordRequired' })
   @IsNotEmpty({ message: 'passwordRequired' })
-  password: string;
+  password!: string;
  @ApiProperty({
     example: false,
     description: 'Remember login for 30 days',

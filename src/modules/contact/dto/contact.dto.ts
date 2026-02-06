@@ -9,7 +9,7 @@ export class CreateContactDto {
 
   @ApiProperty({ required: true })
   @IsNumber()
-  productId: number;
+  productId!: number;
 
 @ApiProperty({ required: false, description: 'Phone number with country code (e.g., +355691234567)', example: '+355691234567' })
   @IsOptional()
@@ -32,5 +32,5 @@ export class CreateContactDto {
 
   @ApiProperty({ required: true, description: 'Message content' })
   @IsNotEmpty({ message: "Message is required" })
-  message: string;
+  message!: string;
 }

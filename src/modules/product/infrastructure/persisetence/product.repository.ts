@@ -172,6 +172,7 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
           logo: true,
           address: true,
           phone: true,
+          public_code:true,
           created_at: true,
           status: true,
         },

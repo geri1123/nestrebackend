@@ -9,7 +9,7 @@ export class FindUserByIdUseCase {
     private readonly userRepo: IUserDomainRepository
   ) {}
 
-  async execute(userId: number, lang: SupportedLang) {
+  async execute(userId: number, lang?: SupportedLang) {
     const user = await this.userRepo.findById(userId);
     if (!user)
       throw new NotFoundException({ success: false, message: t('userNotFound', lang) });

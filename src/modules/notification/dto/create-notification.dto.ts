@@ -9,7 +9,7 @@ export class CreateNotificationDto {
     example: 123,
   })
   @IsNumber()
-  userId: number;
+  userId!: number;
 
   @ApiProperty({
     description: "Type/category of the notification",
@@ -17,7 +17,7 @@ export class CreateNotificationDto {
   })
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type!: string;
 
   @ApiProperty({
     description: "Notification messages in multiple languages",
@@ -26,5 +26,5 @@ export class CreateNotificationDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => NotificationTranslationDto)
-  translations: NotificationTranslationDto[];
+  translations!: NotificationTranslationDto[];
 }
