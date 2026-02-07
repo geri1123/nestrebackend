@@ -8,10 +8,11 @@ import { AdvertiseProductUseCase } from "./application/use-cases/advertise-produ
 import { ExpireProductAdsUseCase } from "./application/use-cases/expired-addvertisement.use-cace";
 import { ADVERTISE_REPO } from "./domain/repositories/Iporiduct-advertisement.repository";
 import { AdvertisementPricingModule } from "../advertisement-pricing/advertisement-prising.module";
+import { NotificationModule } from "../notification/notification.module";
 
 
 @Module({
-    imports:[ProductModule , WalletModule , AdvertisementPricingModule],
+    imports:[ProductModule , WalletModule , AdvertisementPricingModule , NotificationModule],
     providers:[
         {
     provide: ADVERTISE_REPO,

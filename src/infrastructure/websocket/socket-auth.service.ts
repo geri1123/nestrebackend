@@ -53,7 +53,7 @@ export class SocketAuthService {
       }
 
       return { userId: decoded.userId };
-    } catch (error) {
+    } catch (error:any) {
       this.logger.warn(`Token verification failed: ${error.message}`);
       return null;
     }

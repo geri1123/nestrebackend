@@ -94,19 +94,27 @@ async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
 
   const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
   await this.emailService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
-const translations =
-  this.notificationTemplateService.getAllTranslations(
-    'agency_confirm_agent',
-    {},
-  );
-  await this.notificationService.sendNotification({
+await this.notificationService.sendNotification({
   userId: request.userId,
   type: 'agency_confirm_agent',
-  translations,
+  // translations will be auto-generated since we don't provide them
   metadata: {
     agencyId,
     approvedBy,
   },
+  // const translations =
+//   this.notificationTemplateService.getAllTranslations(
+//     'agency_confirm_agent',
+//     {},
+//   );
+//   await this.notificationService.sendNotification({
+//   userId: request.userId,
+//   type: 'agency_confirm_agent',
+//   translations,
+//   metadata: {
+//     agencyId,
+//     approvedBy,
+//   },
 });
   return agent;
 }

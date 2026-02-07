@@ -126,12 +126,17 @@ export class VerifyEmailUseCase {
 
     const agency = await this.getAgencyWithOwner.execute(agencyId, lang);
 
-    const translations = this.templates.getAllTranslations('agent_email_confirmed', user);
+await this.notifications.sendNotification({
+  userId: agency.owner_user_id,
+  type: 'agent_email_confirmed',
+  templateData: user, 
+});
+    // const translations = this.templates.getAllTranslations('agent_email_confirmed', user);
 
-    await this.notifications.sendNotification({
-      userId: agency.owner_user_id,
-      type: 'agent_email_confirmed',
-      translations,
-    });
+    // await this.notifications.sendNotification({
+    //   userId: agency.owner_user_id,
+    //   type: 'agent_email_confirmed',
+    //   translations,
+    // });
   }
 }

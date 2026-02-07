@@ -13,11 +13,16 @@ export interface IProductAdvertisementRepository {
     walletTxId?: string
   ): Promise<Advertisement>;
 
- 
+  findExpiredAds(now: Date): Promise<Array<{ 
+    id: number; 
+    userId: number; 
+    productId: number; 
+  }>>;
   updateStatus(
     adId: number,
     status: "active" | "inactive" | "expired" | "pending"
   ): Promise<ProductAdvertisement>;
+
 
 
   getActiveAd(productId: number): Promise<ProductAdvertisement | null>;

@@ -79,13 +79,11 @@ export class UpdateAgencyRequestStatusUseCase {
       } 
       // Handle rejection
       else if (dto.action === "rejected") {
-        console.log('Step 3: Processing rejection...');
         await this.rejectRequest.execute(request);
         console.log('Rejection completed successfully');
       }
 
       // Update request status
-      console.log('Step 4: Updating request status...');
       await this.updateRequestStatus.execute({
         requestId,
         status: dto.action,
@@ -104,7 +102,7 @@ export class UpdateAgencyRequestStatusUseCase {
         success: true,
         message,
       };
-    } catch (error) {
+    } catch (error:any) {
       console.error('=== ERROR in UpdateAgencyRequestStatusUseCase ===');
       console.error('Error name:', error.name);
       console.error('Error message:', error.message);

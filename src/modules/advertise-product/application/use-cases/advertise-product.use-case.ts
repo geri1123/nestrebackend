@@ -72,7 +72,7 @@ export class AdvertiseProductUseCase {
           transactionId
         );
       });
-    } catch (error) {
+    } catch (error:any) {
       if (error.message === "Insufficient balance") {
         throw new BadRequestException(t("insufficientBalance", language));
       }

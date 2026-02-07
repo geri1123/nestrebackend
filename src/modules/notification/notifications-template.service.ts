@@ -38,14 +38,15 @@ export class NotificationTemplateService {
   [LanguageCode.it]: (data) =>
     `${data.username} vuole unirsi alla vostra agenzia.`,
 },
-   agent_updated_by_agent: {
-  [LanguageCode.al]: (data) =>
-    `${data.updatedByName} ka përditësuar informacionet tuaj: ${data.changesText}.`,
-  [LanguageCode.en]: (data) =>
-    `${data.updatedByName} has updated your information: ${data.changesText}.`,
-  [LanguageCode.it]: (data) =>
-    `${data.updatedByName} ha aggiornato le tue informazioni: ${data.changesText}.`,
+ advertisement_expire: {
+  [LanguageCode.al]: (data) => 
+    `Ka përfunduar reklamimi për produktin me id ${data.productId}.`,
+  [LanguageCode.en]: (data) => 
+    `The advertisement for product with id ${data.productId} has expired.`,
+  [LanguageCode.it]: (data) => 
+    `La pubblicità per il prodotto con id ${data.productId} è scaduta.`,
 }
+
   };
 
 

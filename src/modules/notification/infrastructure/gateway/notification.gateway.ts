@@ -30,10 +30,10 @@ export class NotificationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy
 {
   @WebSocketServer()
-  server: Server<ClientToServerEvents, ServerToClientEvents>;
+  server!: Server<ClientToServerEvents, ServerToClientEvents>; // ✅ Add !
 
   private readonly logger = new Logger(NotificationGateway.name);
-  private heartbeatInterval: NodeJS.Timeout;
+  private heartbeatInterval!: NodeJS.Timeout; // ✅ Add !
 
   constructor(
     private readonly authService: SocketAuthService,
@@ -45,10 +45,9 @@ export class NotificationGateway
   afterInit() {
     this.logger.log('Notification WebSocket Gateway initialized');
     
-    
     this.socketService.setServer(this.server);
 
-    // Start 
+    // Start heartbeat
     this.heartbeatInterval = setInterval(() => {
       this.socketService.sendHeartbeat();
     }, 30000);
@@ -135,8 +134,7 @@ export class NotificationGateway
   }
 
   // Expose connection service methods for use cases
-  
-    isUserOnline(userId: number): boolean {
+  isUserOnline(userId: number): boolean {
     return this.connectionService.isUserOnline(userId);
   }
 
@@ -144,7 +142,6 @@ export class NotificationGateway
     return this.connectionService.getUserConnectionCount(userId);
   }
 
- 
   getConnectedUserIds(): number[] {
     return this.connectionService.getConnectedUserIds();
   }

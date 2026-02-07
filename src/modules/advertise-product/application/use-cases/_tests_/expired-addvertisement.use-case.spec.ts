@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExpireProductAdsUseCase } from '../expired-addvertisement.use-cace';
 import { ADVERTISE_REPO, IProductAdvertisementRepository } from '../../../domain/repositories/Iporiduct-advertisement.repository';
+import { NotificationService } from '../../../../notification/notification.service';
 
 describe('ExpireProductAdsUseCase', () => {
   let useCase: ExpireProductAdsUseCase;
   let adRepo: jest.Mocked<IProductAdvertisementRepository>;
+  let notificationService: jest.Mocked<NotificationService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -13,9 +15,16 @@ describe('ExpireProductAdsUseCase', () => {
         {
           provide: ADVERTISE_REPO,
           useValue: {
+            findExpiredAds: jest.fn(), 
             expireAds: jest.fn(),
             getActiveAd: jest.fn(),
             createAdvertisementTx: jest.fn(),
+          },
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            sendNotification: jest.fn(),
           },
         },
       ],
@@ -23,6 +32,7 @@ describe('ExpireProductAdsUseCase', () => {
 
     useCase = module.get<ExpireProductAdsUseCase>(ExpireProductAdsUseCase);
     adRepo = module.get(ADVERTISE_REPO);
+    notificationService = module.get(NotificationService);
   });
 
   afterEach(() => {
@@ -33,53 +43,42 @@ describe('ExpireProductAdsUseCase', () => {
     expect(useCase).toBeDefined();
   });
 
-  it('should expire ads past their end date', async () => {
-    const mockDate = new Date('2024-12-21T10:00:00Z');
-    jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
+  it('should expire ads and send notifications', async () => {
+    const mockExpiredAds = [
+      { id: 1, userId: 10, productId: 100 },
+      { id: 2, userId: 20, productId: 200 },
+    ];
 
-    adRepo.expireAds.mockResolvedValue(3);
-
-    const result = await useCase.execute();
-
-    expect(adRepo.expireAds).toHaveBeenCalledWith(mockDate);
-    expect(result).toBe(3);
-
-    jest.restoreAllMocks();
-  });
-
-  it('should return count of expired ads', async () => {
-    adRepo.expireAds.mockResolvedValue(5);
+    adRepo.findExpiredAds.mockResolvedValue(mockExpiredAds);
+    adRepo.expireAds.mockResolvedValue(2);
+    notificationService.sendNotification.mockResolvedValue({} as any);
 
     const result = await useCase.execute();
 
-    expect(result).toBe(5);
+    expect(adRepo.findExpiredAds).toHaveBeenCalledWith(expect.any(Date));
+    expect(adRepo.expireAds).toHaveBeenCalledWith(expect.any(Date));
+    expect(notificationService.sendNotification).toHaveBeenCalledTimes(2);
+    expect(notificationService.sendNotification).toHaveBeenCalledWith({
+      userId: 10,
+      type: 'advertisement_expire',
+      templateData: { productId: 100 },
+      metadata: { productId: 100, advertisementId: 1 },
+    });
+    expect(result).toBe(2);
   });
 
   it('should return 0 when no ads to expire', async () => {
+    adRepo.findExpiredAds.mockResolvedValue([]);
     adRepo.expireAds.mockResolvedValue(0);
 
     const result = await useCase.execute();
 
     expect(result).toBe(0);
-    expect(adRepo.expireAds).toHaveBeenCalledWith(expect.any(Date));
-  });
-
-  it('should pass current date to repository', async () => {
-    const beforeCall = Date.now();
-    
-    adRepo.expireAds.mockResolvedValue(2);
-
-    await useCase.execute();
-
-    const afterCall = Date.now();
-    const passedDate = adRepo.expireAds.mock.calls[0][0] as Date;
-
-    expect(passedDate.getTime()).toBeGreaterThanOrEqual(beforeCall);
-    expect(passedDate.getTime()).toBeLessThanOrEqual(afterCall);
+    expect(notificationService.sendNotification).not.toHaveBeenCalled();
   });
 
   it('should handle repository errors', async () => {
-    adRepo.expireAds.mockRejectedValue(new Error('Database error'));
+    adRepo.findExpiredAds.mockRejectedValue(new Error('Database error'));
 
     await expect(useCase.execute()).rejects.toThrow('Database error');
   });

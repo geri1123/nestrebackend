@@ -32,14 +32,19 @@ export class SendQuickRequestUseCase {
     });
 
     await this.repo.create(entity);
+await this.notificationService.sendNotification({
+  userId: agency.owner_user_id,
+  type: "user_send_request",
+  templateData: { username }, // Translations will be auto-generated from this
+  metadata: { username }, 
+});
+    // const translations = this.templateService.getAllTranslations("user_send_request", { username });
 
-    const translations = this.templateService.getAllTranslations("user_send_request", { username });
-
-    await this.notificationService.sendNotification({
-      userId: agency.owner_user_id,
-      type: "user_send_request",
-      translations,
-      metadata: { username }, 
-    });
+    // await this.notificationService.sendNotification({
+    //   userId: agency.owner_user_id,
+    //   type: "user_send_request",
+    //   translations,
+    //   metadata: { username }, 
+    // });
   }
 }

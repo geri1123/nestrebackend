@@ -52,9 +52,10 @@ import { ContactModule } from './modules/contact/contact.module';
 import { CleanupModule } from './modules/cleanup/cleanup.module';
 
 // Jobs
-import { CronJobsModule } from './cron/cron.module';
+// import { CronJobsModule } from './cron/cron.module';
 import { AgencyContextGuard } from './infrastructure/auth/guard/agency-context.guard';
 import { AgencyContextModule } from './infrastructure/auth/modules/agency-context.module';
+import { QueueModule } from './infrastructure/queue/queue.module';
 
 @Module({
   imports: [
@@ -67,26 +68,22 @@ import { AgencyContextModule } from './infrastructure/auth/modules/agency-contex
     ScheduleModule.forRoot(),
     AppConfigModule,
 
-    // ========================================
+   
     // INFRASTRUCTURE
-    // ========================================
+    
     PrismaModule,
     DatabaseModule,
     CloudinaryModule,
 
-    // ========================================
-    // AUTH INFRASTRUCTURE (Order matters!)
-    // ========================================
+ 
     SharedAuthModule,  
     
-    AuthContextModule,  // 2. Auth context (user authentication)
+    AuthContextModule,  
     AgencyContextModule,
        
-    GuardsModule,          // 3. Guards (depends on context modules)
+    GuardsModule,         
 
-    // ========================================
     // BUSINESS DOMAIN MODULES
-    // ========================================
     
     // User & Auth
     AuthModule,
@@ -108,19 +105,17 @@ import { AgencyContextModule } from './infrastructure/auth/modules/agency-contex
     AdvertiseProductModule,
     AdvertisementPricingModule,
 
-    // ========================================
     // FEATURE MODULES
-    // ========================================
     NotificationModule,
     FiltersModule,
     WalletModule,
     ContactModule,
+    QueueModule,
     CleanupModule,
 
-    // ========================================
     // BACKGROUND JOBS
-    // ========================================
-    CronJobsModule,
+    // CronJobsModule,
+  
   ],
 
   controllers: [AppController],
@@ -128,28 +123,23 @@ import { AgencyContextModule } from './infrastructure/auth/modules/agency-contex
   providers: [
     AppService,
     
-    // ========================================
     // GLOBAL GUARDS (Order matters!)
-    // ========================================
-    // 1. Rate limiting (first line of defense)
+  
     {
       provide: APP_GUARD,
       useClass: CustomThrottlerGuard,
     },
     
-    // 2. Authentication (verify JWT token)
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
     
-    // Note: Role and Permission guards are applied via decorators,
-    // not globally, for better control over route-level authorization
+    
   ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    // Apply language detection middleware to all routes
     consumer
       .apply(LanguageMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });
