@@ -28,6 +28,8 @@ const total_pages = Math.ceil(total / limit);
     agency_name: agency.agency_name,
     logo: agency.logo,
     address: agency.address,
+    phone:agency.phone,
+    agencyEmail:agency.agency_email,
     public_code: agency.public_code,
     created_at: agency.created_at.toISOString(),
   })),

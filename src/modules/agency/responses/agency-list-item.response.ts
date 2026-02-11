@@ -13,6 +13,10 @@ export class AgencyListItemResponse {
     nullable: true 
   })
   logo!: string | null;
+   @ApiProperty({example:"example@email.com " , description:'agency email'})
+ agencyEmail!:string | null;
+  @ApiProperty({example:'+35569.....' , description:"agency phone nr"})
+ phone!:string|null;
   @ApiProperty({ example: 'ABCD1234', description: 'Agency public code', nullable: true })
  public_code!: string | null;
   @ApiProperty({ example: 'Rruga e Kavajës 120, Tirana', description: 'Agency address' })

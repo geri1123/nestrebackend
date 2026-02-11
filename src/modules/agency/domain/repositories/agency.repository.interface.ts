@@ -25,6 +25,8 @@ export interface IAgencyDomainRepository {
   agency_name: string;
   logo: string | null;
   address: string | null;
+  phone:string | null;
+  agency_email:string |null;
   public_code: string | null;
   created_at: Date;
 }[]>;

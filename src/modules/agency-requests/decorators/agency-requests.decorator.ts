@@ -2,6 +2,7 @@ import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -12,6 +13,7 @@ import {
   ApiUnauthorizedResponse,
 } from '../../../common/swagger/response.helper.ts';
 import { UpdateRequestStatusDto } from '../dto/agency-request.dto';
+import { PaginatedRegistrationRequestResponseDto } from '../dto/paginated-registration-request-response.dto.js';
 
 export const ApiAgencyRequestsDecorators = {
   UpdateRequestStatus: () =>
@@ -41,13 +43,13 @@ export const ApiAgencyRequestsDecorators = {
       }),
       ApiUnauthorizedResponse(),
     ),
-     GetRegistrationRequests: () =>
+
+   GetRegistrationRequests: () =>
     applyDecorators(
       ApiBearerAuth(),
       ApiOperation({
         summary: 'Get agency registration requests',
-        description:
-          'Returns paginated registration requests for the current agency.',
+        description: 'Returns paginated registration requests for the current agency.',
       }),
       ApiQuery({
         name: 'page',
@@ -61,38 +63,9 @@ export const ApiAgencyRequestsDecorators = {
         example: 'under_review',
         description: 'Filter by request status',
       }),
-      ApiSuccessResponse('Registration requests retrieved successfully', {
-        page: 1,
-        limit: 12,
-        total: 2,
-        totalPages: 1,
-        requests: [
-          {
-            id: 3,
-            userId: 4,
-            agencyId: 1,
-            requestType: 'agent_license_verification',
-            status: 'approved',
-            requestedRole: 'agent',
-            createdAt: '2025-12-17T16:43:08.995Z',
-            reviewedBy: 2,
-            reviewedNotes: 'Approved after review',
-            reviewedAt: '2025-12-17T17:28:53.344Z',
-          },
-          {
-            id: 2,
-            userId: 1,
-            agencyId: 1,
-            requestType: 'agent_license_verification',
-            status: 'under_review',
-            requestedRole: 'agent',
-            createdAt: '2025-12-17T15:47:07.093Z',
-            reviewedBy: null,
-            reviewedNotes: null,
-            reviewedAt: null,
-          },
-        ],
+      ApiOkResponse({
+        description: 'Registration requests retrieved successfully',
+        type: PaginatedRegistrationRequestResponseDto, 
       }),
-      ApiUnauthorizedResponse(),
     ),
 };

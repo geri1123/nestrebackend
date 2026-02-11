@@ -206,6 +206,7 @@ async getNavbarUser(userId: number): Promise<NavbarUser | null> {
       email: true,
       profile_img_url: true,
       last_login: true,
+      created_at:true,
       role: true,
     },
   });
@@ -216,6 +217,7 @@ async getNavbarUser(userId: number): Promise<NavbarUser | null> {
         user.email,
         user.profile_img_url,
         user.last_login,
+        user.created_at,
         user.role,
       )
     : null;

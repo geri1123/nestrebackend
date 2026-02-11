@@ -56,9 +56,16 @@ export class ProfileController {
       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
     }
 
-    const profile = await this.getNavbarUserUseCase.execute(req.userId, req.language);
+   const navbarUser=await this.getNavbarUserUseCase.execute(req.userId, req.language);
 
-    return  NavbarProfileResponse.fromDomain(profile) ;
+     return {
+    username: navbarUser.username,
+    email: navbarUser.email,
+    profileImgUrl: navbarUser.profileImg,
+    lastLogin: navbarUser.lastLogin ,
+    createdAt:navbarUser.createdAt,
+    role: navbarUser.role,
+  };
   }
 
   @Patch('update')

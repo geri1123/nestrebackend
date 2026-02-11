@@ -137,10 +137,12 @@ async getAllAgenciesPaginated(
   limit: number,
   search?: string,
 ): Promise<{
-  id: number;
+ id: number;
   agency_name: string;
   logo: string | null;
   address: string | null;
+  phone: string | null;
+  agency_email: string | null;
   public_code: string | null;
   created_at: Date;
 }[]> {
@@ -170,10 +172,12 @@ async getAllAgenciesPaginated(
       }),
     },
     select: {
-      id: true,
+       id: true,
       agency_name: true,
       logo: true,
       address: true,
+      phone: true,           
+      agency_email: true,    
       public_code: true,
       created_at: true,
     },

@@ -73,10 +73,7 @@ export class ProfilePictureController {
       return response;
 
     } catch (error) {
-      console.error(' CONTROLLER ERROR:', error);
-      console.error('Error name:', error?.name);
-      console.error('Error message:', error?.message);
-      console.error('Error stack:', error?.stack);
+   
       
       if (error instanceof BadRequestException || 
           error instanceof UnauthorizedException) {
@@ -86,7 +83,7 @@ export class ProfilePictureController {
       throw new InternalServerErrorException({
         success: false,
         message: 'Internal server error',
-        error: error?.message || 'Unknown error',
+         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -122,7 +119,7 @@ export class ProfilePictureController {
       throw new InternalServerErrorException({
         success: false,
         message: 'Internal server error',
-        error: error?.message || 'Unknown error',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

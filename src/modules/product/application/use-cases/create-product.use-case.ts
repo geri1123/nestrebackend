@@ -68,12 +68,12 @@ export class CreateProductUseCase {
           images: uploadedImages,
         },
       };
-    } catch (error) {
+    } catch (error ) {
       console.error('Error creating product:', error);
       throw new BadRequestException({
         success: false,
         message: t('failedCreatingProduct', language),
-        errors: error?.errors || { general: [t('failedCreatingProduct', language)] },
+        errors:  { general: [t('failedCreatingProduct', language)] },
       });
     }
   }

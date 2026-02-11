@@ -30,7 +30,8 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   data.user.first_name,  
   data.user.last_name,   
   data.user.role,
-  data.user.status
+  data.user.status,
+  data.user.username,
 ) : undefined
     );
   }
@@ -105,6 +106,17 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
       orderBy: { created_at: "desc" },
       skip,
       take,
+        include: {
+    user: {
+      select: {
+        email: true,
+        first_name: true,
+        last_name: true,
+        username: true,  
+       
+      },
+    },
+  },
     });
 
     return results.map(r => this.mapToEntity(r));

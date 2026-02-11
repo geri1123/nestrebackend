@@ -14,12 +14,12 @@ import { RegistrationRequestController } from "./registration-request.controller
 import { FindRequestByIdUseCase } from "./application/use-cases/find-req-by-id.use-case";
 import { DeleteRegistrationRequestsByUserUseCase } from "./application/use-cases/delete-requests-by-user.use-case";
 import { FindRequestsByUserIdUseCase } from "./application/use-cases/find-requests-by-user-id.use-case";
-import { PrismaModule } from "../../infrastructure/prisma/prisma.module";
 import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { GetRequestCountUseCase } from "./application/use-cases/get-request-count.use-case";
+import { UsersModule } from "../users/users.module";
 
 @Module({
-  imports: [NotificationModule, AgencyModule, AgentModule ],
+  imports: [NotificationModule, AgencyModule, AgentModule ,UsersModule],
   controllers: [RegistrationRequestController],
   providers: [
     {

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { formatDate } from '../../../common/utils/date';
-import { NavbarUser } from '../domain/value-objects/navbar-user.vo';
+
 
 export class NavbarProfileResponse {
   @ApiProperty({ example: 'oturoo1' })
@@ -22,17 +21,11 @@ export class NavbarProfileResponse {
     nullable: true,
   })
   lastLogin!: string | null;
-
+@ApiProperty({example:"Dec 15, 2025, 21:17"})
+createdAt!:string;
   @ApiProperty({ example: 'agency_owner' })
   role!: string;
 
-  static fromDomain(user: NavbarUser): NavbarProfileResponse {
-    return {
-      username: user.username,
-      email: user.email,
-      profileImgUrl: user.profileImg,
-      lastLogin: user.lastLogin ? formatDate(user.lastLogin) : null,
-      role: user.role,
-    };
-  }
+  
+  
 }
