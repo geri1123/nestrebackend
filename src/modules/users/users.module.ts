@@ -33,6 +33,8 @@ import { DeleteProfileImageUseCase } from './application/use-cases/delete-profil
 import { UploadProfileImageUseCase } from './application/use-cases/update-profile-image.use-case';
 import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
+import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [  EmailModule, AppCacheModule , CommonModule  , CloudinaryModule],
   controllers: [ProfileController , PasswordController , ProfilePictureController],
@@ -46,7 +48,7 @@ import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.mod
       provide:USERNAME_REPO,
       useClass: UsernameHistoryRepository,
     },
-    
+    EventEmitterModule,
     // Use Case providers
     FindUnverifiedUsersUseCase,
     UpdateUserFieldsUseCase,
@@ -66,6 +68,7 @@ import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.mod
   UserRepository,
   FindUserForAuthUseCase,
   DeleteProfileImageUseCase,
+   UserCacheInvalidationListener
   ],
   exports: [
 USER_REPO, 

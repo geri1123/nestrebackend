@@ -1,6 +1,5 @@
-import { AuthContextService, AuthContext } from '../auth-context.service';
-
 import { UnauthorizedException } from '@nestjs/common';
+import { AuthContextService, AuthContext } from '../auth-context.service';
 import { user_role, user_status } from '@prisma/client';
 
 describe('AuthContextService', () => {
@@ -13,14 +12,17 @@ describe('AuthContextService', () => {
   const mockUser = {
     id: 1,
     username: 'john',
+    email: 'john@test.com',
     role: user_role.user,
     status: user_status.active,
     emailVerified: true,
+    profileImgUrl: null,
+    createdAt: new Date(),
   };
 
   beforeEach(() => {
     authTokenServiceMock = { verifyAccessToken: jest.fn().mockReturnValue({ userId: 1 }) };
-    getUserProfileMock = { execute: jest.fn().mockResolvedValue(mockUser) };
+    getUserProfileMock = { execute: jest.fn().mockResolvedValue({ user: mockUser }) };
     userRepositoryMock = { updateFields: jest.fn().mockResolvedValue(null) };
     cacheServiceMock = { get: jest.fn(), set: jest.fn(), delete: jest.fn() };
 
@@ -61,10 +63,15 @@ describe('AuthContextService', () => {
 
     it('fetches user and sets cache if no cached context', async () => {
       cacheServiceMock.get.mockResolvedValue(null);
+
       const context = await service.buildAuthContext(1, 'en');
 
-      expect(getUserProfileMock.execute).toHaveBeenCalledWith(1);
-      expect(cacheServiceMock.set).toHaveBeenCalled();
+      expect(getUserProfileMock.execute).toHaveBeenCalledWith(1, 'en');
+      expect(cacheServiceMock.set).toHaveBeenCalledWith(
+        'ctx:1',
+        expect.objectContaining({ userId: 1 }),
+        expect.any(Number)
+      );
       expect(context.userId).toBe(mockUser.id);
       expect(context.user.username).toBe(mockUser.username);
     });
@@ -87,7 +94,7 @@ describe('AuthContextService', () => {
   describe('updateLastActive', () => {
     it('calls userRepository.updateFields', async () => {
       await service.updateLastActive(1);
-      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(1, expect.any(Object));
+      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(1, expect.objectContaining({ last_active: expect.any(Date) }));
     });
   });
 
@@ -96,10 +103,11 @@ describe('AuthContextService', () => {
       cacheServiceMock.get.mockResolvedValue(null);
 
       const context = await service.authenticate('token123', 'en');
+
       expect(authTokenServiceMock.verifyAccessToken).toHaveBeenCalledWith('token123');
-      expect(getUserProfileMock.execute).toHaveBeenCalledWith(1);
+      expect(getUserProfileMock.execute).toHaveBeenCalledWith(1, 'en');
       expect(context.userId).toBe(mockUser.id);
-      expect(userRepositoryMock.updateFields).toHaveBeenCalled(); // last active
+      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(1, expect.objectContaining({ last_active: expect.any(Date) }));
     });
   });
 });

@@ -1,136 +1,85 @@
-import { ForbiddenException } from '@nestjs/common';
 import { AgencyContextGuard } from '../agency-context.guard';
-import { AgencyContextService } from '../../services/agency-context.service';
 import { Reflector } from '@nestjs/core';
+import { AgencyContextOrchestrator } from '../../services/agency-context-orchestrator.service';
+import { ForbiddenException } from '@nestjs/common';
 import { user_role, user_status } from '@prisma/client';
-import { REQUIRE_AGENCY_CONTEXT } from '../../../../common/decorators/require-agency-context.decorator';
 
 describe('AgencyContextGuard', () => {
   let guard: AgencyContextGuard;
-  let agencyContextService: jest.Mocked<AgencyContextService>;
-  let reflector: jest.Mocked<Reflector>;
-
-  const mockContext = (req: any, requireAgencyContext = true) => {
-    reflector.getAllAndOverride.mockReturnValue(requireAgencyContext);
-
-    return {
-      switchToHttp: () => ({
-        getRequest: () => req,
-      }),
-      getHandler: jest.fn(),
-      getClass: jest.fn(),
-    } as any;
-  };
+  let reflector: any;
+  let orchestrator: any;
 
   beforeEach(() => {
-    agencyContextService = {
-      loadAgencyContext: jest.fn(),
-      checkAgencyAndAgentStatus: jest.fn(),
-    } as any;
-
-    reflector = {
-      getAllAndOverride: jest.fn(),
-    } as any;
-
-    guard = new AgencyContextGuard(reflector, agencyContextService);
-
-    jest.clearAllMocks();
-  });
-
-  // --------------------------------------------------
-  // Suspended user
-  // --------------------------------------------------
-  it('throws ForbiddenException if user is suspended', async () => {
-    const req = {
-      user: { id: 1, role: user_role.agent, status: user_status.suspended },
-      language: 'al',
+    reflector = { getAllAndOverride: jest.fn() };
+    orchestrator = {
+      loadContext: jest.fn(),
+      validateStatus: jest.fn(),
     };
 
-    await expect(
-      guard.canActivate(mockContext(req)),
-    ).rejects.toThrow(ForbiddenException);
+    guard = new AgencyContextGuard(reflector, orchestrator);
   });
 
-  // --------------------------------------------------
-  // Already loaded context
-  // --------------------------------------------------
-  it('does not reload context if agencyId already exists', async () => {
-    const req = {
-      user: { id: 1, role: user_role.agent, status: user_status.active },
-      agencyId: 100,
-      language: 'al',
-    };
+ const createContext = (user?: any) => {
+  const req: any = { user, language: 'en' };
+  return {
+    switchToHttp: () => ({ getRequest: () => req }),
+    getHandler: jest.fn(),
+    getClass: jest.fn(),
+  } as any;
+};
 
-    await expect(
-      guard.canActivate(mockContext(req)),
-    ).resolves.toBe(true);
-
-    expect(agencyContextService.loadAgencyContext).not.toHaveBeenCalled();
-    expect(agencyContextService.checkAgencyAndAgentStatus).toHaveBeenCalled();
+  it('allows if no user', async () => {
+    reflector.getAllAndOverride.mockReturnValue(true);
+    const context = createContext();
+    await expect(guard.canActivate(context)).resolves.toBe(true);
+    expect(orchestrator.loadContext).not.toHaveBeenCalled();
   });
 
-  // --------------------------------------------------
-  // Route does NOT require agency context
-  // --------------------------------------------------
-  it('returns true when decorator is missing', async () => {
-    const req = {
-      user: { id: 1, role: user_role.agent, status: user_status.active },
-      language: 'al',
-    };
-
-    await expect(
-      guard.canActivate(mockContext(req, false)),
-    ).resolves.toBe(true);
-
-    expect(agencyContextService.loadAgencyContext).not.toHaveBeenCalled();
+  it('throws if user is suspended', async () => {
+    const context = createContext({ status: user_status.suspended });
+    await expect(guard.canActivate(context)).rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  // --------------------------------------------------
-  // Agent role
-  // --------------------------------------------------
-  it('loads agency context for agent when required', async () => {
-    const req = {
-      user: { id: 1, role: user_role.agent, status: user_status.active },
-      language: 'al',
-    };
+  it('does not load context if already loaded', async () => {
+    const context = createContext({ role: user_role.agent, status: user_status.active, id: 1 });
+    const req = context.switchToHttp().getRequest();
+    req.agencyId = 1;
 
-    await expect(
-      guard.canActivate(mockContext(req)),
-    ).resolves.toBe(true);
+    reflector.getAllAndOverride.mockReturnValue(true);
 
-    expect(agencyContextService.loadAgencyContext).toHaveBeenCalledWith(
-      req,
-      'al',
-    );
-    expect(agencyContextService.checkAgencyAndAgentStatus).toHaveBeenCalled();
+    await expect(guard.canActivate(context)).resolves.toBe(true);
+    expect(orchestrator.loadContext).not.toHaveBeenCalled();
+    expect(orchestrator.validateStatus).toHaveBeenCalledWith(req, 'en');
   });
 
-  // --------------------------------------------------
-  // Agency owner role
-  // --------------------------------------------------
-  it('loads agency context for agency owner', async () => {
-    const req = {
-      user: { id: 2, role: user_role.agency_owner, status: user_status.active },
-      language: 'al',
-    };
+  it('loads context if not loaded and role requires it', async () => {
+    const context = createContext({ role: user_role.agent, status: user_status.active, id: 1 });
+    reflector.getAllAndOverride.mockReturnValue(true);
 
-    await expect(
-      guard.canActivate(mockContext(req)),
-    ).resolves.toBe(true);
+    await expect(guard.canActivate(context)).resolves.toBe(true);
 
-    expect(agencyContextService.loadAgencyContext).toHaveBeenCalled();
+    const req = context.switchToHttp().getRequest();
+    expect(orchestrator.loadContext).toHaveBeenCalledWith(req, 'en');
+    expect(orchestrator.validateStatus).toHaveBeenCalledWith(req, 'en');
   });
 
-  // --------------------------------------------------
-  // No user
-  // --------------------------------------------------
-  it('returns true if no user is present', async () => {
-    const req = { language: 'al' };
+  it('does not load context if role does not require it', async () => {
+    const context = createContext({ role: user_role.user, status: user_status.active, id: 1 });
+    reflector.getAllAndOverride.mockReturnValue(true);
 
-    await expect(
-      guard.canActivate(mockContext(req)),
-    ).resolves.toBe(true);
+    await expect(guard.canActivate(context)).resolves.toBe(true);
+    const req = context.switchToHttp().getRequest();
+    expect(orchestrator.loadContext).not.toHaveBeenCalled();
+    expect(orchestrator.validateStatus).not.toHaveBeenCalled();
+  });
 
-    expect(agencyContextService.loadAgencyContext).not.toHaveBeenCalled();
+  it('does not load context if requireAgencyContext is false', async () => {
+    const context = createContext({ role: user_role.agent, status: user_status.active, id: 1 });
+    reflector.getAllAndOverride.mockReturnValue(false);
+
+    await expect(guard.canActivate(context)).resolves.toBe(true);
+    const req = context.switchToHttp().getRequest();
+    expect(orchestrator.loadContext).not.toHaveBeenCalled();
+    expect(orchestrator.validateStatus).not.toHaveBeenCalled();
   });
 });

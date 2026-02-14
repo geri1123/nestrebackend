@@ -60,7 +60,10 @@ async getAgentAuthContext(userId: number): Promise<{
   agencyId: number;
   agencyAgentId: number;
   roleInAgency: agencyagent_role_in_agency;
+  commissionRate:number | null;
   status: agencyagent_status;
+   startDate: Date | null;
+  updatedAt: Date | null;
   permissions: AgentPermissionEntity | null;
 } | null> {
   const record = await this.prisma.agencyagent.findFirst({
@@ -75,6 +78,9 @@ async getAgentAuthContext(userId: number): Promise<{
     agencyAgentId: record.id,
     roleInAgency: record.role_in_agency,
     status: record.status,
+    commissionRate:record.commission_rate ? record.commission_rate.toNumber() :null ,
+    startDate:record.start_date ? record.start_date : null,
+    updatedAt:record.updated_at ?record.updated_at: null,
     permissions: record.permission
       ? AgentMapper.toPermissionDomain(record.permission)
       : null,

@@ -5,7 +5,7 @@ import { SupportedLang } from '../../locales';
 
 import { AgentPermissionEntity } from '../../modules/agent/domain/entities/agent-permission.entity';
 
-import { agency_status, agencyagent_status } from '@prisma/client';
+import { agency_status, agencyagent_role_in_agency, agencyagent_status } from '@prisma/client';
 import { AuthUser } from '../../infrastructure/auth/types/auth-user.interface';
 import { AgentPermissions } from './permision.type';
 
@@ -20,4 +20,5 @@ user?:AuthUser;
  agentPermissions?: AgentPermissions | null;
   agentStatus?:agencyagent_status;
   agencyStatus?: agency_status;
+  isAgencyOwner?:boolean ;
 }

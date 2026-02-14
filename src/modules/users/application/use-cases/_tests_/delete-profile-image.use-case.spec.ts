@@ -5,6 +5,7 @@ describe('DeleteProfileImageUseCase', () => {
   let useCase: DeleteProfileImageUseCase;
 
   const userRepo = {
+    findById: jest.fn(),
     deleteProfileImage: jest.fn(),
   } as any;
 
@@ -13,7 +14,7 @@ describe('DeleteProfileImageUseCase', () => {
   } as any;
 
   const getUserProfile = {
-    execute: jest.fn(),
+    execute: jest.fn(), // not used in this case, can be left as is
   } as any;
 
   const userWithImage = {
@@ -38,19 +39,36 @@ describe('DeleteProfileImageUseCase', () => {
   });
 
   it('should throw BadRequestException if user has no profile image', async () => {
-    getUserProfile.execute.mockResolvedValue(userWithoutImage);
+    userRepo.findById.mockResolvedValue(userWithoutImage);
 
-    await expect(
-      useCase.execute(1, 'en'),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute(1, 'en')).rejects.toThrow(BadRequestException);
 
     expect(cloudinary.deleteFile).not.toHaveBeenCalled();
     expect(userRepo.deleteProfileImage).not.toHaveBeenCalled();
   });
 
   it('should delete profile image from cloudinary and DB when image exists', async () => {
-    getUserProfile.execute.mockResolvedValue(userWithImage);
+    userRepo.findById.mockResolvedValue(userWithImage);
     cloudinary.deleteFile.mockResolvedValue(undefined);
+
+    await useCase.execute(1, 'en');
+
+    expect(cloudinary.deleteFile).toHaveBeenCalledWith('public-id-1');
+    expect(userRepo.deleteProfileImage).toHaveBeenCalledWith(1);
+    expect(userWithImage.removeProfileImage).toHaveBeenCalled();
+  });
+
+  it('should throw BadRequestException if user does not exist', async () => {
+    userRepo.findById.mockResolvedValue(null);
+
+    await expect(useCase.execute(999, 'en')).rejects.toThrow(BadRequestException);
+    expect(cloudinary.deleteFile).not.toHaveBeenCalled();
+    expect(userRepo.deleteProfileImage).not.toHaveBeenCalled();
+  });
+
+  it('should catch Cloudinary errors but still delete DB entry', async () => {
+    userRepo.findById.mockResolvedValue(userWithImage);
+    cloudinary.deleteFile.mockRejectedValue(new Error('Cloud error'));
 
     await useCase.execute(1, 'en');
 

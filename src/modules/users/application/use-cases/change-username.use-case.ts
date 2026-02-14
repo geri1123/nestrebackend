@@ -1,8 +1,10 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
-import {USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
-import { GetUserProfileUseCase } from './get-user-profile.use-case';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
+import { USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
 import { t, SupportedLang } from '../../../../locales';
+import { UserUpdatedEvent } from '../../events/user-updated.event';
+import { FindUserByIdUseCase } from './find-user-by-id.use-case'; // <-- use entity
 
 @Injectable()
 export class ChangeUsernameUseCase {
@@ -12,7 +14,9 @@ export class ChangeUsernameUseCase {
 
     @Inject(USERNAME_REPO)
     private readonly usernameHistoryRepository: IUsernameHistoryDomainRepository,
-    private readonly getUserProfile: GetUserProfileUseCase,
+    
+    private readonly findUserById: FindUserByIdUseCase, // <-- use entity, not DTO
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(
@@ -20,8 +24,8 @@ export class ChangeUsernameUseCase {
     newUsername: string,
     language: SupportedLang = 'al',
   ): Promise<{ success: boolean; message: string }> {
-    // Get user
-    const user = await this.getUserProfile.execute(userId, language);
+    // Get the actual User entity
+    const user = await this.findUserById.execute(userId, language);
 
     if (user.username === newUsername) {
       throw new BadRequestException({
@@ -64,7 +68,13 @@ export class ChangeUsernameUseCase {
 
     // Update username
     await this.userRepository.updateUsername(userId, newUsername);
-
+    
+    // Emit event to invalidate cache
+    this.eventEmitter.emit(
+      'user.updated',
+      new UserUpdatedEvent(userId, { username: newUsername }),
+    );
+    
     return {
       success: true,
       message: t('usernameChangedSuccessfully', language),

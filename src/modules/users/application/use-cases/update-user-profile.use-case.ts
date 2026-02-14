@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
-import { GetUserProfileUseCase } from './get-user-profile.use-case';
+import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { t, SupportedLang } from '../../../../locales';
-import { USERS_REPOSITORY_TOKENS } from '../../domain/repositories/user.repository.tokens';
 
 export interface UpdateProfileData {
   firstName?: string;
@@ -14,10 +12,8 @@ export interface UpdateProfileData {
 @Injectable()
 export class UpdateUserProfileUseCase {
   constructor(
-      @Inject(USER_REPO)
-  
-             private readonly userRepository: IUserDomainRepository,
-    private readonly getUserProfile: GetUserProfileUseCase,
+    @Inject(USER_REPO)
+    private readonly userRepository: IUserDomainRepository,
   ) {}
 
   async execute(
@@ -25,15 +21,8 @@ export class UpdateUserProfileUseCase {
     data: UpdateProfileData,
     language: SupportedLang = 'al',
   ): Promise<{ success: boolean; message: string }> {
-    // Verify user exists
-    const user = await this.getUserProfile.execute(userId, language);
-
-    user.updateProfile({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      aboutMe: data.aboutMe,
-      phone: data.phone,
-    });
+    const user = await this.userRepository.findById(userId);
+    if (!user) throw new Error(t('userNotFound', language));
 
     const updateFields: any = {};
     if (data.firstName !== undefined) updateFields.first_name = data.firstName;

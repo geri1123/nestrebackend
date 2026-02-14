@@ -51,11 +51,13 @@ import { EmailVerificationModule } from './modules/email-verification/email-veri
 import { ContactModule } from './modules/contact/contact.module';
 import { CleanupModule } from './modules/cleanup/cleanup.module';
 
-// Jobs
-// import { CronJobsModule } from './cron/cron.module';
+
 import { AgencyContextGuard } from './infrastructure/auth/guard/agency-context.guard';
 import { AgencyContextModule } from './infrastructure/auth/modules/agency-context.module';
 import { QueueModule } from './infrastructure/queue/queue.module';
+
+
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -64,6 +66,9 @@ import { QueueModule } from './infrastructure/queue/queue.module';
     // ========================================
     ThrottlerModule.forRoot({
       throttlers: [{ limit: 100, ttl: 60 }],
+    }),
+    EventEmitterModule.forRoot({
+      global: true, 
     }),
     ScheduleModule.forRoot(),
     AppConfigModule,

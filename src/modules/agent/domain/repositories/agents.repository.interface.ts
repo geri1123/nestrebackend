@@ -66,11 +66,15 @@ findByAgencyAndAgent(
 
   findExistingAgent(agentUserId: number): Promise<AgentEntity | null>;
 getAgentAuthContext(userId: number): Promise<{
-  agencyId: number;
-  agencyAgentId: number;
-  roleInAgency: agencyagent_role_in_agency;
-  status: agencyagent_status;
-  permissions: AgentPermissionEntity | null;
+    agencyId: number;
+    agencyAgentId: number;
+    roleInAgency: agencyagent_role_in_agency;
+    commissionRate:number | null;
+    status: agencyagent_status;
+    startDate:Date |null;
+    
+    updatedAt:Date | null;
+    permissions: AgentPermissionEntity | null;
 } | null>
   createAgencyAgent(data: CreateAgentDomainData ,tx?: Prisma.TransactionClient): Promise<AgentEntity>;
 

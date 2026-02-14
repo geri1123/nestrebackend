@@ -16,9 +16,9 @@ export class User {
     public readonly role: userRole,
     public readonly status: userStatus,
     public readonly emailVerified: boolean,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date | null,
-    public readonly lastLogin: Date | null,
+    public readonly createdAt: string,
+    public readonly updatedAt: string | null,
+    public readonly lastLogin: string | null,
   ) {}
 
   /* ---------- FACTORY ---------- */
@@ -35,9 +35,9 @@ export class User {
     role: string;
     status: string;
     email_verified: boolean;
-    created_at: Date;
-    updated_at: Date | null;
-    last_login: Date | null;
+    created_at: string;
+    updated_at: string | null;
+    last_login: string | null;
   }): User {
     return new User(
       props.id,

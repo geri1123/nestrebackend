@@ -29,18 +29,18 @@ describe('ProductOwnershipGuard', () => {
     can_delete_posts: false,
     can_manage_agents: false,
   };
+const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
+  id: 1,
+  username: 'testuser',
+  email: 'test@example.com',    
+  status: user_status.active,
+  role: user_role.user,
+  emailVerified: true,
+  profileImgUrl: null,
+  createdAt: new Date(),
+  ...overrides,
+});
 
-  // ✅ Use correct enum types for user
-  const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
-    id: 1,
-    username: 'testuser',
-    status: user_status.active,  // <- use enum, not string
-    emailVerified: true,
-    role: user_role.user,
-    ...overrides,
-  });
-
-  // ----- Agency Owner Tests -----
   it('denies agency_owner when product is from another agency', async () => {
     getProductMock.execute.mockResolvedValue({ agencyId: 2, userId: 99 } as any);
 

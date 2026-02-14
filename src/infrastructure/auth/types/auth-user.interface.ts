@@ -5,6 +5,9 @@ export interface AuthUser {
   id: number;
   username: string;
   role: userRole;
+  email:string;
   status: userStatus;
+  profileImgUrl:string | null;
   emailVerified: boolean;
+  createdAt:string;
 }

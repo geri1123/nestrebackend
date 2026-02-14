@@ -44,24 +44,27 @@ export class AuthContextService {
 
 
     // Fetch from database
-    const user = await this.getUserProfile.execute(userId);
-    if (!user) {
+    const profileData = await this.getUserProfile.execute(userId , lang);
+    if (!profileData) {
       throw new UnauthorizedException(t('userNotFound', lang));
     }
+ const { user } = profileData; 
 
     const authUser: AuthUser = {
       id: user.id,
       username: user.username,
+      email: user.email,
       role: user.role,
       status: user.status,
       emailVerified: user.emailVerified,
+      profileImgUrl: user.profileImgUrl ?? null,
+      createdAt: user.createdAt,
     };
 
     const context: AuthContext = {
       userId: user.id,
       user: authUser,
     };
-
     // Store in Redis with TTL
     await  this.cacheService.set(cacheKey, context, AUTH_CONTEXT_CACHE_TTL_MS);
  console.log('[Cache SET] Key:', cacheKey, 'Value:', context);

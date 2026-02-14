@@ -1,5 +1,8 @@
+import { Test } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { ChangeUsernameUseCase } from '../change-username.use-case';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FindUserByIdUseCase } from '../find-user-by-id.use-case';
 
 describe('ChangeUsernameUseCase', () => {
   let useCase: ChangeUsernameUseCase;
@@ -14,8 +17,12 @@ describe('ChangeUsernameUseCase', () => {
     saveUsernameChange: jest.fn(),
   } as any;
 
-  const getUserProfile = {
+  const findUserById = {
     execute: jest.fn(),
+  } as any;
+
+  const eventEmitter = {
+    emit: jest.fn(),
   } as any;
 
   const baseUser = {
@@ -29,12 +36,13 @@ describe('ChangeUsernameUseCase', () => {
     useCase = new ChangeUsernameUseCase(
       userRepo,
       usernameHistoryRepo,
-      getUserProfile,
+      findUserById,
+      eventEmitter,
     );
   });
 
   it('should throw if new username is the same as current', async () => {
-    getUserProfile.execute.mockResolvedValue(baseUser);
+    findUserById.execute.mockResolvedValue(baseUser);
 
     await expect(
       useCase.execute(1, 'oldname', 'en'),
@@ -42,7 +50,7 @@ describe('ChangeUsernameUseCase', () => {
   });
 
   it('should throw if username already exists', async () => {
-    getUserProfile.execute.mockResolvedValue(baseUser);
+    findUserById.execute.mockResolvedValue(baseUser);
     userRepo.usernameExists.mockResolvedValue(true);
 
     await expect(
@@ -51,7 +59,7 @@ describe('ChangeUsernameUseCase', () => {
   });
 
   it('should throw if cooldown has not passed', async () => {
-    getUserProfile.execute.mockResolvedValue({
+    findUserById.execute.mockResolvedValue({
       ...baseUser,
       canUpdateUsername: jest.fn(() => false),
     });
@@ -66,8 +74,8 @@ describe('ChangeUsernameUseCase', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('should save history and update username on success', async () => {
-    getUserProfile.execute.mockResolvedValue({
+  it('should save history, update username, and emit event on success', async () => {
+    findUserById.execute.mockResolvedValue({
       ...baseUser,
       canUpdateUsername: jest.fn(() => true),
     });
@@ -77,8 +85,21 @@ describe('ChangeUsernameUseCase', () => {
 
     const result = await useCase.execute(1, 'newname', 'en');
 
-    expect(usernameHistoryRepo.saveUsernameChange).toHaveBeenCalled();
+    expect(usernameHistoryRepo.saveUsernameChange).toHaveBeenCalledWith(
+      1,
+      'oldname',
+      'newname',
+      expect.any(Date),
+    );
+
     expect(userRepo.updateUsername).toHaveBeenCalledWith(1, 'newname');
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      'user.updated',
+      expect.objectContaining({ userId: 1 }),
+    );
+
     expect(result.success).toBe(true);
+    expect(result.message).toBeDefined();
   });
 });

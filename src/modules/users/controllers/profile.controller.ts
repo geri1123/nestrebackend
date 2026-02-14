@@ -38,36 +38,52 @@ export class ProfileController {
 
 
   @Get('me')
-  @ApiGetUserProfile()
-  async getUserinfo(@Req() req: RequestWithUser){
-    if (!req.userId){
-       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-    }
-    const me= await this.getUserProfile.execute(req.userId , req.language);
-
-    return  UserProfileResponse.fromDomain(me);  
-}
-    
-  
- @ApiGetNavbarProfile()
-  @Get('navbar')
-  async getProfile(@Req() req: RequestWithUser) {
-    if (!req.userId) {
-      throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-    }
-
-   const navbarUser=await this.getNavbarUserUseCase.execute(req.userId, req.language);
-
-     return {
-    username: navbarUser.username,
-    email: navbarUser.email,
-    profileImgUrl: navbarUser.profileImg,
-    lastLogin: navbarUser.lastLogin ,
-    createdAt:navbarUser.createdAt,
-    role: navbarUser.role,
-  };
+@ApiGetUserProfile()
+async getUserInfo(@Req() req: RequestWithUser) {
+  // Ensure user is authenticated
+  if (!req.userId) {
+    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
   }
 
+  // Fetch user profile
+  const userProfile = await this.getUserProfile.execute(req.userId, req.language);
+
+  // Transform domain to response DTO
+  return UserProfileResponse.fromDomain(userProfile);
+}
+  
+ @ApiGetNavbarProfile()
+  // @Get('navbar')
+  // async getProfile(@Req() req: RequestWithUser) {
+  //   if (!req.userId) {
+  //     throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+  //   }
+
+  //  const navbarUser=await this.getNavbarUserUseCase.execute(req.userId, req.language);
+
+  //    return {
+  //   username: navbarUser.username,
+  //   email: navbarUser.email,
+  //   profileImgUrl: navbarUser.profileImg,
+  //   lastLogin: navbarUser.lastLogin ,
+  //   createdAt:navbarUser.createdAt,
+  //   role: navbarUser.role,
+  // };
+  // }
+@Get('navbar')
+async getNavbar(@Req() req: RequestWithUser) {
+  if (!req.user) {
+    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+  }
+
+  return {
+    username: req.user.username,
+    email: req.user.email,
+    profileImgUrl: req.user.profileImgUrl,
+    createdAt: req.user.createdAt,
+    role: req.user.role,
+  };
+}
   @Patch('update')
   @ApiUpdateProfile()
   async updateProfile(@Req() req: RequestWithUser, @Body() data: Record<string, any>) {
