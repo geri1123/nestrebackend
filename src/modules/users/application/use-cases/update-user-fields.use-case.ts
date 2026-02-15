@@ -5,7 +5,7 @@ import {
   USER_REPO
 } from "../../domain/repositories/user.repository.interface";
 import { SupportedLang } from "../../../../locales";
-import { FindUserByIdUseCase } from "./find-user-by-id.use-case"; // ✅ use this instead
+import { FindUserByIdUseCase } from "./find-user-by-id.use-case";
 import { Prisma } from "@prisma/client";
 
 @Injectable()

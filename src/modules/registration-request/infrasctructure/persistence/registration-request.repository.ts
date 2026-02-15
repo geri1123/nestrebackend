@@ -32,7 +32,17 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   data.user.role,
   data.user.status,
   data.user.username,
-) : undefined
+) : undefined,
+  data.reviewedByUser
+      ? new RequestUserVO(
+          data.reviewedByUser.email,
+          undefined,
+          undefined,
+          data.reviewedByUser.role,
+          undefined,
+          data.reviewedByUser.username,
+        )
+      : undefined
     );
   }
 
@@ -91,37 +101,44 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   }
 
   async findByAgencyIdAndStatus(
-    agencyId: number,
-    status?: registrationrequest_status,
-    skip = 0,
-    take = 10
-  ): Promise<RegistrationRequestEntity[]> {
-    const results = await this.prisma.registrationrequest.findMany({
-      where: {
-        agency_id: agencyId,
-        ...(status
-          ? { status }
-          : { status: { not: "pending" } }),  
+  agencyId: number,
+  status?: registrationrequest_status,
+  skip = 0,
+  take = 10
+): Promise<RegistrationRequestEntity[]> {
+  const results = await this.prisma.registrationrequest.findMany({
+    where: {
+      agency_id: agencyId,
+      ...(status
+        ? { status }
+        : { status: { not: "pending" } }),  
+    },
+    orderBy: { created_at: "desc" },
+    skip,
+    take,
+    include: {
+      user: {
+        select: {
+          email: true,
+          first_name: true,
+          last_name: true,
+          username: true,
+          role: true,      
+          status: true,    
+        },
       },
-      orderBy: { created_at: "desc" },
-      skip,
-      take,
-        include: {
-    user: {
-      select: {
-        email: true,
-        first_name: true,
-        last_name: true,
-        username: true,  
-       
+      reviewedByUser: { 
+        select: {
+          email: true,
+          username: true,
+          role: true,
+        },
       },
     },
-  },
-    });
+  });
 
-    return results.map(r => this.mapToEntity(r));
-  }
-
+  return results.map(r => this.mapToEntity(r));
+}
   async countRequests(agencyId: number, status?: registrationrequest_status): Promise<number> {
     return this.prisma.registrationrequest.count({
       where: {

@@ -14,6 +14,7 @@ import { CloudinaryService } from '../../../../infrastructure/cloudinary/cloudin
 import { ImageUtilsService } from '../../../../common/utils/image-utils.service';
 import { SupportedLang, t } from '../../../../locales';
 import { CloudinaryUploadResult } from '../../../../infrastructure/cloudinary/types/cloudinary-upload.result';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UploadProfileImageUseCase {
@@ -24,6 +25,7 @@ export class UploadProfileImageUseCase {
     private readonly userRepo: IUserDomainRepository,
     private readonly cloudinary: CloudinaryService,
     private readonly imageUtils: ImageUtilsService,
+     private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(
@@ -98,7 +100,15 @@ export class UploadProfileImageUseCase {
         `Profile image upload completed successfully for user ${userId}`,
       );
 
-      
+      this.eventEmitter.emit(
+  'user.updated',
+  {
+    userId,
+    payload: {
+      profileImgUrl: uploadResult.url,
+    },
+  }
+);
       return {
         url: uploadResult.url,
         publicId: uploadResult.publicId,
