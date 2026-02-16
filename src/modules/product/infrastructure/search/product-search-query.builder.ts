@@ -43,7 +43,7 @@ export class ProductSearchQueryBuilder {
           : [Number(valueIds)];
 
         attributeConditions.push({
-          productattributevalue: {
+          productAttributeValue: { 
             some: {
               attributeId,
               attributeValueId: { in: valueArray },

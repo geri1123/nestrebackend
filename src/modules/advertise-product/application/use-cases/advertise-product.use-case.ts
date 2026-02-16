@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, ForbiddenException, Inject } from "@nestjs/common";
 
 import { SupportedLang , t } from "../../../../locales";
-import { advertisement_type, wallet_transaction_type } from "@prisma/client";
+import { AdvertisementType, WalletTransactionType } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import {ADVERTISE_REPO, type IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
 import { ChangeWalletBalanceUseCase } from "../../../wallet/application/use-cases/change-wallet-balance.use-case";
@@ -33,7 +33,7 @@ export class AdvertiseProductUseCase {
     return product;
   }
 
-  async execute(productId: number, adType: advertisement_type, userId: number, language: SupportedLang) {
+  async execute(productId: number, adType: AdvertisementType, userId: number, language: SupportedLang) {
     const product = await this.validate(productId, userId, language);
 
     
@@ -55,7 +55,7 @@ export class AdvertiseProductUseCase {
         const { transactionId } = await this.changeWalletBalanceUseCase.execute(
           {
             userId,
-            type: wallet_transaction_type.purchase,
+            type: WalletTransactionType.purchase,
             amount: finalPrice,
             language,
           },

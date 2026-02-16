@@ -1,5 +1,5 @@
 
-import { agency_status, Prisma } from '@prisma/client';
+import { AgencyStatus, Prisma } from '@prisma/client';
 import { Agency } from '../entities/agency.entity';
 import { AgencyInfoVO } from '../value-objects/agency-info.vo';
 
@@ -48,7 +48,7 @@ export interface IAgencyDomainRepository {
       license_number: string;
       address: string;
       owner_user_id: number;
-      status: agency_status;
+      status: AgencyStatus;
     },
     tx?: Prisma.TransactionClient
   ): Promise<number>;

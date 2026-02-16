@@ -1,7 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { PermissionsGuard } from '../permissions.guard';
 import { Reflector } from '@nestjs/core';
-import { user_role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { PERMISSIONS_KEY } from '../../../../common/decorators/permissions.decorator';
 
 describe('PermissionsGuard', () => {
@@ -31,7 +31,7 @@ describe('PermissionsGuard', () => {
     reflectorMock.getAllAndOverride.mockReturnValue(undefined);
 
     const result = guard.canActivate(
-      mockContext({ user: { role: user_role.agent } }),
+      mockContext({ user: { role: UserRole.agent } }),
     );
 
     expect(result).toBe(true);
@@ -41,7 +41,7 @@ describe('PermissionsGuard', () => {
     reflectorMock.getAllAndOverride.mockReturnValue(['can_edit']);
 
     const result = guard.canActivate(
-      mockContext({ user: { role: user_role.agency_owner } }),
+      mockContext({ user: { role: UserRole.agency_owner } }),
     );
 
     expect(result).toBe(true);
@@ -62,7 +62,7 @@ describe('PermissionsGuard', () => {
       guard.canActivate(
         mockContext({
           language: 'al',
-          user: { role: user_role.agent },
+          user: { role: UserRole.agent },
           agencyAgentId: 1,
           agentPermissions: { can_edit: false },
         }),
@@ -76,7 +76,7 @@ describe('PermissionsGuard', () => {
     const result = guard.canActivate(
       mockContext({
         language: 'al',
-        user: { role: user_role.agent },
+        user: { role: UserRole.agent },
         agencyAgentId: 1,
         agentPermissions: { can_edit: true, can_delete: true },
       }),
@@ -92,7 +92,7 @@ describe('PermissionsGuard', () => {
       guard.canActivate(
         mockContext({
           language: 'al',
-          user: { role: user_role.agent },
+          user: { role: UserRole.agent },
           agencyAgentId: 1,
           agentPermissions: { can_edit: true, can_delete: false },
         }),

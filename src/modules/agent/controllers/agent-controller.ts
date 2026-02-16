@@ -21,7 +21,7 @@ import { plainToInstance } from 'class-transformer';
 import { t } from '../../../locales';
 import { GetAgentsUseCase } from '../application/use-cases/get-agents.use-case';
 import { UpdateAgentUseCase } from '../application/use-cases/update-agent.use-case';
-import { agencyagent_status } from '@prisma/client';
+import { AgencyAgentStatus } from '@prisma/client';
 import { GetAgentMeUseCase } from '../application/use-cases/get-agent-me.use-case';
 import { GetAgentByIdInAgencyUseCase } from '../application/use-cases/get-agent-in-agency.use-case';
 import { ApiAgentDecorators } from '../decorators/agent.decorator';
@@ -56,7 +56,7 @@ async getPublicAgents(
     req.language,
     filters,
     false,
-    agencyagent_status.active,
+    AgencyAgentStatus.active,
   );
 } 
 

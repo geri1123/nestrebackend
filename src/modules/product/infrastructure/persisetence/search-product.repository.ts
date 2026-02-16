@@ -6,6 +6,7 @@ import { SupportedLang } from '../../../../locales';
 import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
 import { SearchFiltersResolver } from '../search/search-filters-resolver.service';
 import { ProductSearchQueryBuilder } from '../search/product-search-query.builder';
+
 @Injectable()
 export class SearchProductRepository implements ISearchProductRepository {
   constructor(
@@ -64,13 +65,13 @@ export class SearchProductRepository implements ISearchProductRepository {
         buildYear: true,
         area: true,
         agencyId: true,
-        productimage: { take: 2, select: { imageUrl: true } },
+        productImage: { take: 2, select: { imageUrl: true } },
         city: { select: { name: true } },
         subcategory: {
           select: {
             slug: true,
             categoryId: true,
-            subcategorytranslation: {
+            subcategoryTranslation: {
               where: { language },
               select: { name: true },
               take: 1,
@@ -78,7 +79,7 @@ export class SearchProductRepository implements ISearchProductRepository {
             category: {
               select: {
                 slug: true,
-                categorytranslation: {
+                categoryTranslation: {
                   where: { language },
                   select: { name: true },
                   take: 1,
@@ -87,17 +88,17 @@ export class SearchProductRepository implements ISearchProductRepository {
             },
           },
         },
-        listing_type: {
+        listingType: {
           select: {
             slug: true,
-            listing_type_translation: {
+            listingTypeTranslation: {
               where: { language },
               select: { name: true },
               take: 1,
             },
           },
         },
-        productattributevalue: {
+        productAttributeValue: {
           select: {
             attributes: {
               select: {
@@ -109,9 +110,9 @@ export class SearchProductRepository implements ISearchProductRepository {
                 },
               },
             },
-            attribute_values: {
+            attributeValues: {
               select: {
-                value_code: true,
+                valueCode: true,
                 attributeValueTranslations: {
                   where: { language },
                   select: { name: true },
@@ -125,8 +126,8 @@ export class SearchProductRepository implements ISearchProductRepository {
           select: {
             username: true,
             email: true,
-            first_name: true,
-            last_name: true,
+            firstName: true,
+            lastName: true,
             phone: true,
             role: true,
             status: true,
@@ -134,12 +135,12 @@ export class SearchProductRepository implements ISearchProductRepository {
         },
         agency: {
           select: {
-            agency_name: true,
+            agencyName: true,
             logo: true,
             address: true,
             status: true,
             phone: true,
-            created_at: true,
+            createdAt: true,
           },
         },
         advertisements: {

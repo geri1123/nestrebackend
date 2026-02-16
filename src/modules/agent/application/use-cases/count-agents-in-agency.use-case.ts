@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { AgentRepository } from "../../infrastructure/persistence/agent.repository";
 import { AgentStatus } from "../../domain/types/agent-status.type";
 import { AGENT_REPOSITORY_TOKENS } from "../../domain/repositories/agent.repository.tokens";
 import {type IAgentDomainRepository } from "../../domain/repositories/agents.repository.interface";

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateAgencyUseCase } from '../create-agency.use-case';
 import { AGENCY_REPO } from '../../../domain/repositories/agency.repository.interface';
-import { agency_status } from '@prisma/client';
+import { AgencyStatus } from '@prisma/client';
 import { BadRequestException } from '@nestjs/common';
 
 describe('CreateAgencyUseCase', () => {
@@ -32,7 +32,7 @@ describe('CreateAgencyUseCase', () => {
       useCase.execute(
         { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
         1,
-        agency_status.active,
+        AgencyStatus.active,
         'al',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
@@ -46,7 +46,7 @@ describe('CreateAgencyUseCase', () => {
       useCase.execute(
         { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
         1,
-        agency_status.active,
+        AgencyStatus.active,
         'al',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
@@ -60,7 +60,7 @@ describe('CreateAgencyUseCase', () => {
     const agencyId = await useCase.execute(
       { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
       1,
-      agency_status.active,
+      AgencyStatus.active,
       'al',
     );
 

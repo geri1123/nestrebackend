@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UpdatePricingUseCase } from '../update-pricing.use-case';
 import { ADVERTISEMENT_PRICING_REPO } from '../../../domain/repositories/advertisement-pricing.repository.interface';
 import { AdvertisementPricingEntity } from '../../../domain/entities/advertisement-pricing.entity';
-import { advertisement_type } from '@prisma/client';
+import { AdvertisementType } from '@prisma/client';
 
 describe('UpdatePricingUseCase', () => {
   let useCase: UpdatePricingUseCase;
@@ -48,9 +48,9 @@ describe('UpdatePricingUseCase', () => {
 
     mockRepo.update.mockResolvedValue(updated);
 
-    const result = await useCase.execute(advertisement_type.cheap, updateData);
+    const result = await useCase.execute(AdvertisementType.cheap, updateData);
 
-    expect(mockRepo.update).toHaveBeenCalledWith(advertisement_type.cheap, updateData);
+    expect(mockRepo.update).toHaveBeenCalledWith(AdvertisementType.cheap, updateData);
     expect(result).toEqual(updated);
   });
 
@@ -70,9 +70,9 @@ describe('UpdatePricingUseCase', () => {
 
     mockRepo.update.mockResolvedValue(updated);
 
-    const result = await useCase.execute(advertisement_type.normal, updateData);
+    const result = await useCase.execute(AdvertisementType.normal, updateData);
 
-    expect(mockRepo.update).toHaveBeenCalledWith(advertisement_type.normal, updateData);
+    expect(mockRepo.update).toHaveBeenCalledWith(AdvertisementType.normal, updateData);
     expect(result).toEqual(updated);
   });
 
@@ -92,9 +92,9 @@ describe('UpdatePricingUseCase', () => {
 
     mockRepo.update.mockResolvedValue(updated);
 
-    const result = await useCase.execute(advertisement_type.premium, updateData);
+    const result = await useCase.execute(AdvertisementType.premium, updateData);
 
-    expect(mockRepo.update).toHaveBeenCalledWith(advertisement_type.premium, updateData);
+    expect(mockRepo.update).toHaveBeenCalledWith(AdvertisementType.premium, updateData);
     expect(result.isActive).toBe(false);
   });
 });

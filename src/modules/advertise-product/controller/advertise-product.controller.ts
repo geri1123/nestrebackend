@@ -2,7 +2,7 @@ import { Body, Controller, Post, Req, UnauthorizedException } from "@nestjs/comm
 import { AdvertiseDto } from "../dto/advertise.dto";
 import { type RequestWithUser } from "../../../common/types/request-with-user.interface";
 import { t } from "../../../locales";
-import { advertisement_type } from "@prisma/client";
+import { AdvertisementType } from "@prisma/client";
 import { AdvertiseProductUseCase } from "../application/use-cases/advertise-product.use-case";
 import { ApiAdvertiseDecorators } from "../decorators/advertise.decorator";
 
@@ -16,7 +16,7 @@ export class AdvertiseProductController {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t("userNotAuthenticated", language));
 
-    await this.advertiseUsecase.execute(body.productId,  body.adType || advertisement_type.normal, userId, language);
+    await this.advertiseUsecase.execute(body.productId,  body.adType || AdvertisementType.normal, userId, language);
 
     return {
       success: true,

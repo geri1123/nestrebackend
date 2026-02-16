@@ -1,4 +1,4 @@
-import { advertisement_type } from "@prisma/client";
+import { AdvertisementType } from "@prisma/client";
 import { AdvertisementPricingEntity } from "../entities/advertisement-pricing.entity";
 export const ADVERTISEMENT_PRICING_REPO = Symbol("ADVERTISEMENT_PRICING_REPO");
 export interface UpdatePricingData {
@@ -8,14 +8,14 @@ export interface UpdatePricingData {
   isActive?: boolean;
 }
 export interface IAdvertisementPricingRepository {
-  getPricing(adType: advertisement_type): Promise<AdvertisementPricingEntity | null>;
+  getPricing(adType: AdvertisementType): Promise<AdvertisementPricingEntity | null>;
   getAll(): Promise<AdvertisementPricingEntity[]>;
 update(
-  adType: advertisement_type,
+  adType: AdvertisementType,
   data: UpdatePricingData
 ): Promise<AdvertisementPricingEntity>;
 create(data: {
-  adType: advertisement_type;
+  adType: AdvertisementType;
   price: number;
   duration: number;
   discount?: number;

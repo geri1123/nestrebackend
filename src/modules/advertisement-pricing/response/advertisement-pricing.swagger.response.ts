@@ -1,6 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { ApiSuccessResponse , ApiUnauthorizedResponse as ApiUnauthorizedErrorResponse } from '../../../common/swagger/response.helper.ts';
 
 export class AdvertisementPricingSwagger {
    static GetAllPricing() {

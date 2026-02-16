@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { agencyagent_status } from '@prisma/client';
+import { AgencyAgentStatus } from '@prisma/client';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export const AgentSortValues = [
@@ -33,9 +33,9 @@ export class FilterAgentsDto {
   @ApiPropertyOptional({
     description: 'Filter agents by their current status',
     example: 'active',
-    enum: agencyagent_status,
+    enum: AgencyAgentStatus,
   })
   @IsOptional()
-  @IsEnum(agencyagent_status, { message: 'statusInvalid' })
-  status?: agencyagent_status;
+  @IsEnum(AgencyAgentStatus, { message: 'statusInvalid' })
+  status?: AgencyAgentStatus;
 }

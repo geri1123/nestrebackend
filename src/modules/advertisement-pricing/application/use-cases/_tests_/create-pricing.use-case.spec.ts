@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { CreatePricingUseCase } from '../create-pricing.use-case';
 import { ADVERTISEMENT_PRICING_REPO } from '../../../domain/repositories/advertisement-pricing.repository.interface';
 import { AdvertisementPricingEntity } from '../../../domain/entities/advertisement-pricing.entity';
-import { advertisement_type } from '@prisma/client';
+import { AdvertisementType } from '@prisma/client';
 
 describe('CreatePricingUseCase', () => {
   let useCase: CreatePricingUseCase;
@@ -31,7 +31,7 @@ describe('CreatePricingUseCase', () => {
 
   it('should create pricing successfully when none exists', async () => {
     const dto = {
-      adType: advertisement_type.cheap,
+      adType: AdvertisementType.cheap,
       price: 100,
       duration: 30,
       discount: 10,
@@ -61,7 +61,7 @@ describe('CreatePricingUseCase', () => {
 
   it('should throw BadRequestException when pricing already exists', async () => {
     const dto = {
-      adType: advertisement_type.normal,
+      adType: AdvertisementType.normal,
       price: 100,
       duration: 30,
     };

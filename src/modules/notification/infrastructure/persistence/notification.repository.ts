@@ -18,7 +18,7 @@ export class NotificationRepository implements INotificationRepository {
         type: data.type,
         status: NotificationStatus.unread,
         metadata: data.metadata || {},
-        notificationtranslation: {
+        notificationTranslation: {
           create: data.translations.map((translation) => ({
             languageCode: translation.languageCode,
           
@@ -27,7 +27,7 @@ export class NotificationRepository implements INotificationRepository {
         },
       },
       include: {
-        notificationtranslation: true,
+        notificationTranslation: true,
       },
     });
   }
@@ -41,7 +41,7 @@ export class NotificationRepository implements INotificationRepository {
         ...(status && { status }),
       },
       include: {
-        notificationtranslation: languageCode
+        notificationTranslation: languageCode
           ? {
               where: {
               languageCode: languageCode,
@@ -101,7 +101,7 @@ export class NotificationRepository implements INotificationRepository {
     return this.prisma.notification.findUnique({
       where: { id: notificationId },
       include: {
-        notificationtranslation: true,
+        notificationTranslation: true,
       },
     });
   }

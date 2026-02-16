@@ -9,7 +9,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { agencyagent_role_in_agency } from '@prisma/client';
+import { AgencyAgentRoleInAgency } from '@prisma/client';
 
 export class UpdateRequestStatusDto {
   @ApiProperty({
@@ -24,15 +24,15 @@ export class UpdateRequestStatusDto {
   action!: 'approved' | 'rejected';
 
   @ApiPropertyOptional({
-    enum: agencyagent_role_in_agency,
-    example: agencyagent_role_in_agency.agent,
+    enum: AgencyAgentRoleInAgency,
+    example: AgencyAgentRoleInAgency.agent,
     description: 'Role assigned when request is approved',
   })
   @ValidateIf(o => o.action === 'approved')
-  @IsEnum(agencyagent_role_in_agency, {
+  @IsEnum(AgencyAgentRoleInAgency, {
     message: 'roleInAgencyRequired',
   })
-  roleInAgency?: agencyagent_role_in_agency;
+  roleInAgency?: AgencyAgentRoleInAgency;
 
   @ApiPropertyOptional({
     example: 10,

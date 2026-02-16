@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { t, SupportedLang } from '../../../../locales';
-import { agencyagent_role_in_agency, user_role } from '@prisma/client';
+import { AgencyAgentRoleInAgency, UserRole } from '@prisma/client';
 import { AgentContextService } from '../../../../infrastructure/auth/services/agent-context.service';
 import { AgencyOwnerContextService } from '../../../../infrastructure/auth/services/agency-owner-context.service';
 import { AgentStatus } from '../../../agent/domain/types/agent-status.type';
@@ -14,7 +14,7 @@ export interface UserProfileData {
   user: User;
   agentProfile?: {
     agencyAgentId: number;
-    roleInAgency: agencyagent_role_in_agency;
+    roleInAgency: AgencyAgentRoleInAgency;
     status: AgentStatus;
     commissionRate: number | null;
     startDate: Date | null;
@@ -65,42 +65,15 @@ export class GetUserProfileUseCase {
     const result: UserProfileData = { user };
 
     // Add agent profile if user is an agent
-    if (user.role === user_role.agent) {
+    if (user.role === UserRole.agent) {
       result.agentProfile = await this.agentContextService.getAgentProfileData(userId, language);
     }
 
     // Add agency if user is an agency owner
-    if (user.role === user_role.agency_owner) {
+    if (user.role === UserRole.agency_owner) {
       result.agency = await this.agencyOwnerContextService.getAgencyData(userId, language);
     }
 
     return result;
   }
 }
-// import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-// import {USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
-// import { User } from '../../domain/entities/user.entity';
-// import { t, SupportedLang } from '../../../../locales';
-// import { format } from 'path';
-
-// @Injectable()
-// export class GetUserProfileUseCase {
-//   constructor(  
-//         @Inject(USER_REPO)
-    
-//     private readonly userRepository: IUserDomainRepository,) {}
-
-//   async execute(userId: number, language: SupportedLang = 'al'): Promise<User> {
-//     const user = await this.userRepository.findById(userId);
-    
-//     if (!user) {
-//       throw new NotFoundException({
-//         success: false,
-//         message: t('validationFailed', language),
-//         errors: { user: [t('userNotFound', language)] },
-//       });
-//     }
- 
-//     return user;
-//   }
-// }

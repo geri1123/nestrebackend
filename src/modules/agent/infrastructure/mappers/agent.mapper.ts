@@ -1,7 +1,7 @@
 import {
-  agencyagent,
-  agencyagent_permission,
-  user,
+  AgencyAgent,
+  AgencyAgentPermission,
+  User,
 } from '@prisma/client';
 import { AgentEntity } from '../../domain/entities/agent.entity';
 import { AgentPermissionEntity } from '../../domain/entities/agent-permission.entity';
@@ -10,53 +10,53 @@ import { AgentRole } from '../../domain/types/agent-role.type';
 import { AgentUserProps ,AgentWithUserAndPermission} from '../../domain/repositories/agents.repository.interface';
 
 export class AgentMapper {
-  static toDomain(entity: agencyagent): AgentEntity {
+  static toDomain(entity: AgencyAgent): AgentEntity {
     return new AgentEntity(
       entity.id,
-      entity.agency_id,
-      entity.agent_id,
-      entity.role_in_agency as AgentRole,
-      entity.commission_rate !== null ? Number(entity.commission_rate) : null,
-      entity.start_date ?? null,
-      entity.end_date ?? null,
+      entity.agencyId,
+      entity.agentId,
+      entity.roleInAgency as AgentRole,
+      entity.commissionRate !== null ? Number(entity.commissionRate) : null,
+      entity.startDate ?? null,
+      entity.endDate ?? null,
       entity.status as AgentStatus,
-      entity.created_at,
-      entity.updated_at ?? null,
+      entity.createdAt,
+      entity.updatedAt ?? null,
     );
   }
 
- static toPermissionDomain(p: agencyagent_permission): AgentPermissionEntity {
+ static toPermissionDomain(p: AgencyAgentPermission): AgentPermissionEntity {
   return new AgentPermissionEntity(
     p.id,
-    p.agency_agent_id,
-    p.agency_id,
-    p.can_edit_own_post,
-    p.can_edit_others_post,
-    p.can_approve_requests,
-    p.can_view_all_posts,
-    p.can_delete_posts,
-    p.can_manage_agents,
-    p.created_at,
-    p.updated_at ?? null,
+    p.agencyAgentId,
+    p.agencyId,
+    p.canEditOwnPost,
+    p.canEditOthersPost,
+    p.canApproveRequests,
+    p.canViewAllPosts,
+    p.canDeletePosts,
+    p.canManageAgents,
+    p.createdAt,
+    p.updatedAt ?? null,
   );
 }
 
-  static toAgentUserProps(u: user): AgentUserProps {
+  static toAgentUserProps(u: User): AgentUserProps {
     return {
       id: u.id,
       username: u.username,
       email: u.email,
-      first_name: u.first_name ?? null,
-      last_name: u.last_name ?? null,
-      profile_img: u.profile_img_url ?? null,
+      first_name: u.firstName ?? null,
+      last_name: u.lastName?? null,
+      profile_img: u.profileImgUrl ?? null,
       status: u.status,
     };
   }
 
   static toAgentWithUserAndPermission(input: {
-    agencyagent: agencyagent;
-    agentUser: user | null;
-    permission: agencyagent_permission | null;
+    agencyagent: AgencyAgent;
+    agentUser: User | null;
+    permission: AgencyAgentPermission | null;
   }): AgentWithUserAndPermission {
   return {
   agent: this.toDomain(input.agencyagent),

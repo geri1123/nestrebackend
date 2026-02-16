@@ -1,7 +1,7 @@
 //fix this tomorrow with transaction
 
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { agencyagent_role_in_agency, agencyagent_status, user_role, user_status } from "@prisma/client";
+import { AgencyAgentRoleInAgency, AgencyAgentStatus, AgencyStatus, UserRole, UserStatus } from "@prisma/client";
 import { SupportedLang, t } from "../../../../locales";
 import { FindExistingAgentUseCase } from "../../../agent/application/use-cases/find-existing-agent.use-case";
 import { CreateAgentUseCase } from "../../../agent/application/use-cases/create-agent.use-case";
@@ -20,7 +20,7 @@ export interface ApproveRequestInput {
   request: RegistrationRequestEntity;
   agencyId: number;
   approvedBy: number;
-  roleInAgency: agencyagent_role_in_agency;
+  roleInAgency: AgencyAgentRoleInAgency;
   commissionRate?: number;
   permissions?: Record<string, any>;
 }
@@ -66,15 +66,15 @@ async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
       //  idCardNumber ,
         roleInAgency,
         commissionRate,
-        status: agencyagent_status.active,
+        status: AgencyAgentStatus.active,
       },
       tx
     );
 
     // Prepare user updates
     const updates: any = {};
-    if (request.user?.role !== user_role.agent) updates.role = user_role.agent;
-    if (request.user?.status !== user_status.active) updates.status = user_status.active;
+    if (request.user?.role !== UserRole.agent) updates.role = UserRole.agent;
+    if (request.user?.status !== UserStatus.active) updates.status = UserStatus.active;
 
     // Update user fields
     if (Object.keys(updates).length > 0) {

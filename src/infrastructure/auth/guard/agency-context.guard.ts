@@ -68,7 +68,7 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { Reflector } from '@nestjs/core';
 import { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { t, SupportedLang } from '../../../locales';
-import { user_role, user_status } from '@prisma/client';
+import { UserRole, UserStatus } from '@prisma/client';
 import { REQUIRE_AGENCY_CONTEXT } from '../../../common/decorators/require-agency-context.decorator';
 import { AgencyContextOrchestrator } from '../services/agency-context-orchestrator.service';
 
@@ -106,7 +106,7 @@ export class AgencyContextGuard implements CanActivate {
   }
 
   private checkUserSuspension(req: RequestWithUser, lang: SupportedLang): void {
-    if (req.user && req.user.status === user_status.suspended) {
+    if (req.user && req.user.status === UserStatus.suspended) {
       throw new ForbiddenException(t('accountSuspended', lang));
     }
   }
@@ -121,6 +121,6 @@ export class AgencyContextGuard implements CanActivate {
     if (!user) return false;
     if (!requireAgencyContext) return false;
     
-    return user.role === user_role.agent || user.role === user_role.agency_owner;
+    return user.role === UserRole.agent || user.role === UserRole.agency_owner;
   }
 }

@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 
-import { user_role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { AgencyContextOrchestrator } from '../agency-context-orchestrator.service';
 import { AgentContextService } from '../agent-context.service';
 import { AgencyOwnerContextService } from '../agency-owner-context.service';
@@ -34,14 +34,14 @@ describe('AgencyContextOrchestrator', () => {
 
   describe('loadContext', () => {
     it('calls agent service for agent user', async () => {
-      const req: any = { user: { role: user_role.agent, id: 1 } };
+      const req: any = { user: { role: UserRole.agent, id: 1 } };
       await orchestrator.loadContext(req, 'en');
       expect(agentService.loadAgentContext).toHaveBeenCalledWith(req, 'en');
       expect(agencyService.loadAgencyOwnerContext).not.toHaveBeenCalled();
     });
 
     it('calls agency service for agency_owner user', async () => {
-      const req: any = { user: { role: user_role.agency_owner, id: 1 } };
+      const req: any = { user: { role: UserRole.agency_owner, id: 1 } };
       await orchestrator.loadContext(req, 'en');
       expect(agencyService.loadAgencyOwnerContext).toHaveBeenCalledWith(req, 'en');
       expect(agentService.loadAgentContext).not.toHaveBeenCalled();
@@ -57,7 +57,7 @@ describe('AgencyContextOrchestrator', () => {
 
   describe('validateStatus', () => {
     it('calls agent validation for agent user', () => {
-      const req: any = { user: { role: user_role.agent } };
+      const req: any = { user: { role: UserRole.agent } };
       orchestrator.validateStatus(req, 'en');
       expect(agentService.validateAgentStatus).toHaveBeenCalledWith(req, 'en');
       expect(agentService.validateAgencyStatusForAgent).toHaveBeenCalledWith(req, 'en');
@@ -65,7 +65,7 @@ describe('AgencyContextOrchestrator', () => {
     });
 
     it('calls agency validation for agency_owner user', () => {
-      const req: any = { user: { role: user_role.agency_owner } };
+      const req: any = { user: { role: UserRole.agency_owner } };
       orchestrator.validateStatus(req, 'en');
       expect(agencyService.validateAgencyStatus).toHaveBeenCalledWith(req, 'en');
       expect(agentService.validateAgentStatus).not.toHaveBeenCalled();

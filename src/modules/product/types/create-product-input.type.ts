@@ -1,4 +1,4 @@
-import { product_status } from "@prisma/client";
+import { ProductStatus } from "@prisma/client";
 export type CreateProductInput = {
   title: string;
   price: number;
@@ -9,7 +9,7 @@ export type CreateProductInput = {
   streetAddress?: string;
   area?: number;
   buildYear?: number;
-  status?: product_status;
+  status?: ProductStatus;
   userId: number; 
   agencyId?: number;
 };

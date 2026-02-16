@@ -2,60 +2,55 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { IRegistrationRequestRepository } from "../../domain/repositories/registration-request.repository.interface";
 import { RegistrationRequestEntity } from "../../domain/entities/registration-request.entity";
-import { Prisma, registrationrequest_status } from "@prisma/client";
+import { Prisma, RegistrationRequestStatus } from "@prisma/client";
 import { RequestUserVO } from "../../domain/value-objects/request-user.vo";
 
 @Injectable()
 export class RegistrationRequestRepository implements IRegistrationRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-
   private mapToEntity(data: any): RegistrationRequestEntity {
     return new RegistrationRequestEntity(
       data.id,
-      data.user_id,
-      data.agency_id,
-      // data.agency_name,
-      // data.id_card_number,
-      data.request_type,
+      data.userId,
+      data.agencyId,
+      data.requestType,
       data.status,
-      data.requested_role,
-      data.created_at,
-      data.reviewed_by,
-      data.review_notes,
-      data.reviewed_at,
+      data.requestedRole,
+      data.createdAt,
+      data.reviewedBy,
+      data.reviewNotes,
+      data.reviewedAt,
       // Add user mapping here
-    data.user ? new RequestUserVO(
-  data.user.email,
-  data.user.first_name,  
-  data.user.last_name,   
-  data.user.role,
-  data.user.status,
-  data.user.username,
-) : undefined,
-  data.reviewedByUser
-      ? new RequestUserVO(
-          data.reviewedByUser.email,
-          undefined,
-          undefined,
-          data.reviewedByUser.role,
-          undefined,
-          data.reviewedByUser.username,
-        )
-      : undefined
+      data.user ? new RequestUserVO(
+        data.user.email,
+        data.user.firstName,  
+        data.user.lastName,   
+        data.user.role,
+        data.user.status,
+        data.user.username,
+      ) : undefined,
+      data.reviewedByUser
+        ? new RequestUserVO(
+            data.reviewedByUser.email,
+            undefined,
+            undefined,
+            data.reviewedByUser.role,
+            undefined,
+            data.reviewedByUser.username,
+          )
+        : undefined
     );
   }
 
-  async create(req: RegistrationRequestEntity,   tx?: Prisma.TransactionClient): Promise<number> {
+  async create(req: RegistrationRequestEntity, tx?: Prisma.TransactionClient): Promise<number> {
     const client = tx ?? this.prisma;
-    const result = await client.registrationrequest.create({
+    const result = await client.registrationRequest.create({
       data: {
-        user_id: req.userId,
-        agency_id: req.agencyId,
-        // agency_name: req.agencyName,
-        // id_card_number: req.idCardNumber,
-        request_type: req.requestType,
-        requested_role: req.requestedRole,
+        userId: req.userId,
+        agencyId: req.agencyId,
+        requestType: req.requestType,
+        requestedRole: req.requestedRole,
         status: req.status,
       },
       select: { id: true },
@@ -64,32 +59,24 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     return result.id;
   }
 
-  // async idCardExists(idCard: string): Promise<boolean> {
-  //   return !!(
-  //     await this.prisma.registrationrequest.findFirst({
-  //       where: { id_card_number: idCard },
-  //     })
-  //   );
-  // }
-
   async findByUserId(userId: number): Promise<RegistrationRequestEntity[]> {
-    const data = await this.prisma.registrationrequest.findMany({
-      where: { user_id: userId },
-      orderBy: { created_at: "desc" }
+    const data = await this.prisma.registrationRequest.findMany({
+      where: { userId: userId },
+      orderBy: { createdAt: "desc" }
     });
 
     return data.map(d => this.mapToEntity(d));
   }
 
   async findById(id: number): Promise<RegistrationRequestEntity | null> {
-    const result = await this.prisma.registrationrequest.findUnique({
+    const result = await this.prisma.registrationRequest.findUnique({
       where: { id },
       include: {
         user: {
           select: {
             email: true,
-            first_name: true,
-            last_name: true,
+            firstName: true,
+            lastName: true,
             role: true,
             status: true,
           },
@@ -101,104 +88,90 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
   }
 
   async findByAgencyIdAndStatus(
-  agencyId: number,
-  status?: registrationrequest_status,
-  skip = 0,
-  take = 10
-): Promise<RegistrationRequestEntity[]> {
-  const results = await this.prisma.registrationrequest.findMany({
-    where: {
-      agency_id: agencyId,
-      ...(status
-        ? { status }
-        : { status: { not: "pending" } }),  
-    },
-    orderBy: { created_at: "desc" },
-    skip,
-    take,
-    include: {
-      user: {
-        select: {
-          email: true,
-          first_name: true,
-          last_name: true,
-          username: true,
-          role: true,      
-          status: true,    
-        },
-      },
-      reviewedByUser: { 
-        select: {
-          email: true,
-          username: true,
-          role: true,
-        },
-      },
-    },
-  });
-
-  return results.map(r => this.mapToEntity(r));
-}
-  async countRequests(agencyId: number, status?: registrationrequest_status): Promise<number> {
-    return this.prisma.registrationrequest.count({
+    agencyId: number,
+    status?: RegistrationRequestStatus,
+    skip = 0,
+    take = 10
+  ): Promise<RegistrationRequestEntity[]> {
+    const results = await this.prisma.registrationRequest.findMany({
       where: {
-        agency_id: agencyId,
+        agencyId: agencyId,
+        ...(status
+          ? { status }
+          : { status: { not: "pending" } }),  
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take,
+      include: {
+        user: {
+          select: {
+            email: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            role: true,      
+            status: true,    
+          },
+        },
+        reviewedByUser: { 
+          select: {
+            email: true,
+            username: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    return results.map(r => this.mapToEntity(r));
+  }
+
+  async countRequests(agencyId: number, status?: RegistrationRequestStatus): Promise<number> {
+    return this.prisma.registrationRequest.count({
+      where: {
+        agencyId: agencyId,
         ...(status ? { status } : { NOT: { status: "pending" } }),
       },
     });
   }
 
-  // async setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null> {
-  //  const client =tx ?? this.prisma;
-  //   const last = await client.registrationrequest.findFirst({
-  //     where: { user_id: userId },
-  //     orderBy: { created_at: "desc" },
-  //   });
+  async setLatestUnderReview(
+    userId: number,
+    tx?: Prisma.TransactionClient
+  ): Promise<boolean> {
+    const client = tx ?? this.prisma;
 
-  //   if (!last) return null;
+    const last = await client.registrationRequest.findFirst({
+      where: { userId: userId },
+      orderBy: { createdAt: "desc" },
+    });
 
-  //   const updated = await this.prisma.registrationrequest.update({
-  //     where: { id: last.id },
-  //     data: { status: "under_review" },
-  //   });
+    if (!last) return false;
 
-  //   return this.mapToEntity(updated);
-  // }
-async setLatestUnderReview(
-  userId: number,
-  tx?: Prisma.TransactionClient
-): Promise<boolean> {
-  const client = tx ?? this.prisma;
+    await client.registrationRequest.update({
+      where: { id: last.id },
+      data: { status: "under_review" },
+    });
 
-  const last = await client.registrationrequest.findFirst({
-    where: { user_id: userId },
-    orderBy: { created_at: "desc" },
-  });
+    return true;
+  }
 
-  if (!last) return false;
-
-  await client.registrationrequest.update({
-    where: { id: last.id },
-    data: { status: "under_review" },
-  });
-
-  return true;
-}
   async updateStatus(
     id: number,
-    status: registrationrequest_status,
+    status: RegistrationRequestStatus,
     reviewedBy?: number,
     reviewNotes?: string,
     tx?: Prisma.TransactionClient
   ): Promise<RegistrationRequestEntity> {
-    const client =tx ?? this.prisma
-    const updated = await client.registrationrequest.update({
+    const client = tx ?? this.prisma;
+    const updated = await client.registrationRequest.update({
       where: { id },
       data: {
         status,
-        reviewed_by: reviewedBy || null,
-        review_notes: reviewNotes || null,
-        reviewed_at: new Date(),
+        reviewedBy: reviewedBy || null,
+        reviewNotes: reviewNotes || null,
+        reviewedAt: new Date(),
       },
     });
 
@@ -206,8 +179,8 @@ async setLatestUnderReview(
   }
 
   async deleteByUserId(userId: number): Promise<number> {
-    const result = await this.prisma.registrationrequest.deleteMany({
-      where: { user_id: userId },
+    const result = await this.prisma.registrationRequest.deleteMany({
+      where: { userId: userId },
     });
     return result.count;
   }

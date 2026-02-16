@@ -5,7 +5,7 @@ import { EmailService } from '../../../../infrastructure/email/email.service';
 import { CacheService } from '../../../../infrastructure/cache/cache.service';
 import { generateToken } from '../../../../common/utils/hash';
 import { SupportedLang, t } from '../../../../locales';
-import { Prisma, user_status } from '@prisma/client';
+import { Prisma, UserStatus } from '@prisma/client';
 
 export interface RegisterUserData {
   username: string;
@@ -64,7 +64,7 @@ export class RegisterUserUseCase {
         ...data,
         username: normalizedUsername,
         role,
-        status: user_status.pending,
+        status: UserStatus.pending,
       },
       tx
     );

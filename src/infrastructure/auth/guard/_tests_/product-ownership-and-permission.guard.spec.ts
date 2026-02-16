@@ -1,7 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ProductOwnershipGuard } from '../product-ownership.guard';
 import { GetProductForPermissionUseCase } from '../../../../modules/product/application/use-cases/get-product-for-permission.use-case';
-import { user_role, user_status } from '@prisma/client';
+import { UserRole, UserStatus } from '@prisma/client';
 import { RequestWithUser } from '../../../../common/types/request-with-user.interface';
 import { AgentPermissions } from '../../../../common/types/permision.type';
 
@@ -29,17 +29,18 @@ describe('ProductOwnershipGuard', () => {
     can_delete_posts: false,
     can_manage_agents: false,
   };
-const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
-  id: 1,
-  username: 'testuser',
-  email: 'test@example.com',    
-  status: user_status.active,
-  role: user_role.user,
-  emailVerified: true,
-  profileImgUrl: null,
-  createdAt: new Date(),
-  ...overrides,
-});
+
+  const createUser = (overrides?: Partial<RequestWithUser['user']>): RequestWithUser['user'] => ({
+    id: 1,
+    username: 'testuser',
+    email: 'test@example.com',    
+    status: UserStatus.active,
+    role: UserRole.user,
+    emailVerified: true,
+    profileImgUrl: null,
+    createdAt: new Date(),
+    ...overrides,
+  } as RequestWithUser['user']);
 
   it('denies agency_owner when product is from another agency', async () => {
     getProductMock.execute.mockResolvedValue({ agencyId: 2, userId: 99 } as any);
@@ -47,7 +48,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.agency_owner }),
+      user: createUser({ role: UserRole.agency_owner }),
       agencyId: 1,
       userId: 1,
     };
@@ -61,7 +62,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.agency_owner }),
+      user: createUser({ role: UserRole.agency_owner }),
       agencyId: 1,
       userId: 1,
     };
@@ -76,7 +77,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.agent }),
+      user: createUser({ role: UserRole.agent }),
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
@@ -92,7 +93,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.agent }),
+      user: createUser({ role: UserRole.agent }),
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
@@ -108,7 +109,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.agent }),
+      user: createUser({ role: UserRole.agent }),
       userId: 5,
       agencyId: 1,
       agencyAgentId: 123,
@@ -124,7 +125,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.agent }),
+      user: createUser({ role: UserRole.agent }),
       userId: 5,
       agencyId: 1,
     };
@@ -139,7 +140,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.user }),
+      user: createUser({ role: UserRole.user }),
       userId: 5,
     };
 
@@ -152,7 +153,7 @@ const createUser = (overrides?: Partial<RequestWithUser['user']>) => ({
     const req: Partial<RequestWithUser> = {
       params: { id: '10' },
       language: 'al',
-      user: createUser({ role: user_role.user }),
+      user: createUser({ role: UserRole.user }),
       userId: 5,
     };
 

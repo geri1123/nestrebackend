@@ -70,6 +70,7 @@ export class ProductRepository implements IProductRepository {
       updatedAt: product.updatedAt,
     });
   }
+
 async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
   return this.prisma.product.findUnique({
     where: { id },
@@ -87,18 +88,18 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       buildYear: true,
       subcategoryId: true,
       area: true,
-      productimage: { select: { imageUrl: true } },
+      productImage: { select: { imageUrl: true } },
       city: { select: { name: true } },
 
       
-      productattributevalue: {
+      productAttributeValue: {
         select: {
           id: true,
           attributeId: true,
           attributeValueId: true,
           attributes: {  
             select: {
-              inputType:true,
+              inputType: true,
               attributeTranslation: {  
                 where: { language },
                 select: { name: true },
@@ -106,9 +107,9 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
               },
             },
           },
-          attribute_values: {  
+          attributeValues: {  
             select: {
-              value_code:true,
+              valueCode: true,
               attributeValueTranslations: {  
                 where: { language },
                 select: { name: true },
@@ -123,7 +124,7 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
         select: {
           id: true,
           slug: true,
-          subcategorytranslation: {
+          subcategoryTranslation: {
             where: { language },
             select: { name: true },
             take: 1,
@@ -132,7 +133,7 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
             select: {
               id: true,
               slug: true,
-              categorytranslation: {
+              categoryTranslation: {
                 where: { language },
                 select: { name: true },
                 take: 1,
@@ -142,10 +143,10 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
         },
       },
 
-      listing_type: {
+      listingType: {
         select: {
           slug: true,
-          listing_type_translation: {
+          listingTypeTranslation: {
             where: { language },
             select: { name: true },
             take: 1,
@@ -157,9 +158,9 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
         select: {
           username: true,
           email: true,
-          first_name: true,
-          last_name: true,
-          profile_img_url: true,
+          firstName: true,
+          lastName: true,
+          profileImgUrl: true,
           phone: true,
           role: true,
           status: true,
@@ -168,12 +169,12 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
 
       agency: {
         select: {
-          agency_name: true,
+          agencyName: true,
           logo: true,
           address: true,
           phone: true,
-          public_code:true,
-          created_at: true,
+          publicCode: true,
+          createdAt: true,
           status: true,
         },
       },
@@ -197,6 +198,7 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
     },
   });
 }
+
   async findForPermissionCheck(id: number): Promise<{ id: number; userId: number | null; agencyId: number | null } | null> {
     return this.prisma.product.findUnique({
       where: { id },

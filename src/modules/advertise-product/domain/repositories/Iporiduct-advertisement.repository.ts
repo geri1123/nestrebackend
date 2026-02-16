@@ -1,4 +1,4 @@
-import { Prisma, ProductAdvertisement, advertisement_type } from "@prisma/client";
+import { Prisma, ProductAdvertisement, AdvertisementType } from "@prisma/client";
 import { Advertisement } from "../entities/advertisement.entity";
 export const ADVERTISE_REPO = Symbol('ADVERTISE_REPO');
 export interface IProductAdvertisementRepository {
@@ -7,7 +7,7 @@ export interface IProductAdvertisementRepository {
     tx: Prisma.TransactionClient,
     productId: number,
     userId: number,
-    adType?: advertisement_type,
+    adType?: AdvertisementType,
     startDate?: Date,
     endDate?: Date,
     walletTxId?: string

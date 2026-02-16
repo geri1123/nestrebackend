@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { agency_status } from '@prisma/client';
+import { AgencyStatus } from '@prisma/client';
 
 export class AgencyDetailResponse {
   @ApiProperty({ example: 1, description: 'Agency ID' })
@@ -24,10 +24,10 @@ export class AgencyDetailResponse {
 
   @ApiProperty({
     example: 'active',
-    enum: agency_status,
+    enum: AgencyStatus,
     description: 'Agency status',
   })
-  status!: agency_status;
+  status!: AgencyStatus;
 
   @ApiProperty({
     example: 'AG-2025-001',

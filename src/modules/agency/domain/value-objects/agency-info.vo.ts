@@ -1,4 +1,4 @@
-import { agency_status } from "@prisma/client";
+import { AgencyStatus } from "@prisma/client";
 
 export interface AgencyInfoVO {
   id: number;
@@ -6,7 +6,7 @@ export interface AgencyInfoVO {
   licenseNumber: string;
 
   address: string | null;
-  status: agency_status;
+  status: AgencyStatus;
   publicCode: string | null;
 
   agencyEmail: string | null;

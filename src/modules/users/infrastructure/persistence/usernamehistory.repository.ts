@@ -3,17 +3,26 @@ import { Injectable } from '@nestjs/common';
 import { IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
 import { UsernameHistory } from '../../domain/entities/username-history.entity';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
+
 @Injectable()
 export class UsernameHistoryRepository implements IUsernameHistoryDomainRepository {
   constructor(private prisma: PrismaService) {}
 
   async getLastUsernameChange(userId: number): Promise<UsernameHistory | null> {
-    const record = await this.prisma.usernamehistory.findFirst({
-      where: { user_id: userId },
-      orderBy: { next_username_update: 'desc' },
+    const record = await this.prisma.usernameHistory.findFirst({
+      where: { userId: userId },
+      orderBy: { nextUsernameUpdate: 'desc' },
     });
 
-    return record ? UsernameHistory.create(record) : null;
+    if (!record) return null;
+
+    return UsernameHistory.create({
+      id: record.id,
+      user_id: record.userId,
+      old_username: record.oldUsername,
+      new_username: record.newUsername,
+      next_username_update: record.nextUsernameUpdate,
+    });
   }
 
   async saveUsernameChange(
@@ -22,12 +31,12 @@ export class UsernameHistoryRepository implements IUsernameHistoryDomainReposito
     newUsername: string,
     nextUpdateDate: Date,
   ): Promise<void> {
-    await this.prisma.usernamehistory.create({
+    await this.prisma.usernameHistory.create({
       data: {
-        user_id: userId,
-        old_username: oldUsername,
-        new_username: newUsername,
-        next_username_update: nextUpdateDate,
+        userId: userId,
+        oldUsername: oldUsername,
+        newUsername: newUsername,
+        nextUsernameUpdate: nextUpdateDate,
       },
     });
   }

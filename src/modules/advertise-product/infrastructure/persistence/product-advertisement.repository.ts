@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
-import { Prisma, ProductAdvertisement, advertisement_type } from "@prisma/client";
+import { Prisma, ProductAdvertisement, AdvertisementType } from "@prisma/client";
 import { IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
 import { Advertisement } from "../../domain/entities/advertisement.entity";
 
@@ -12,7 +12,7 @@ export class ProductAdvertisementRepository implements IProductAdvertisementRepo
   tx: Prisma.TransactionClient, 
   productId: number,
   userId: number,
-  adType: advertisement_type = "normal",
+  adType: AdvertisementType = "normal",
   startDate?: Date,
   endDate?: Date,
   walletTxId?: string

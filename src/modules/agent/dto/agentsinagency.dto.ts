@@ -1,4 +1,4 @@
-import { agencyagent_role_in_agency, agencyagent_status } from '@prisma/client';
+import { AgencyAgentRoleInAgency, AgencyAgentStatus } from '@prisma/client';
 
 export class AgentUserDto {
   id!: number;
@@ -31,11 +31,11 @@ export class AgentDto {
   agent_id!: number;
   added_by!: number | null;
   id_card_number!: string | null;
-  role_in_agency!: agencyagent_role_in_agency;
+  role_in_agency!: AgencyAgentRoleInAgency;
   commission_rate!: number | null;
   start_date!: Date | null;
   end_dat!: Date | null;
-  status!: agencyagent_status;
+  status!: AgencyAgentStatus;
   created_at!: Date;
   updated_at!: Date | null;
   agentUser?: AgentUserDto;
@@ -55,8 +55,8 @@ export class AgentUserForFrontEndDto {
 
 export class AgentForFrontEndDto {
   id!: number;
-  role_in_agency!: agencyagent_role_in_agency;
-  status!: agencyagent_status;
+  role_in_agency!: AgencyAgentRoleInAgency;
+  status!: AgencyAgentStatus;
   created_at!: string | null;
   agentUser!: AgentUserForFrontEndDto | null;
 }

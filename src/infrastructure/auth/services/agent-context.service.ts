@@ -3,7 +3,7 @@ import { GetAgentAuthContextUseCase } from '../../../modules/agent/application/u
 import { GetAgencyByIdUseCase } from '../../../modules/agency/application/use-cases/get-agency-by-id.use-case';
 import { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { t, SupportedLang } from '../../../locales';
-import { agencyagent_status, agency_status } from '@prisma/client';
+import { AgencyAgentStatus, AgencyStatus } from '@prisma/client';
 import { mapAgentPermissions } from '../../../common/helpers/permissions.helper';
 
 @Injectable()
@@ -59,21 +59,21 @@ async getAgentProfileData(userId: number, lang: SupportedLang) {
   validateAgentStatus(req: RequestWithUser, lang: SupportedLang): void {
     if (!req.agentStatus) return;
 
-    if (req.agentStatus === agencyagent_status.inactive) {
+    if (req.agentStatus === AgencyAgentStatus.inactive) {
       throw new ForbiddenException(t('agentInactive', lang));
     }
 
-    if (req.agentStatus === agencyagent_status.terminated) {
+    if (req.agentStatus === AgencyAgentStatus.terminated) {
       throw new ForbiddenException(t('agentTerminated', lang));
     }
   }
 
   validateAgencyStatusForAgent(req: RequestWithUser, lang: SupportedLang): void {
-    if (req.agencyStatus === agency_status.suspended) {
+    if (req.agencyStatus === AgencyStatus.suspended) {
       throw new ForbiddenException(t('agencySuspended', lang));
     }
 
-    if (req.agencyStatus === agency_status.inactive) {
+    if (req.agencyStatus === AgencyStatus.inactive) {
       throw new ForbiddenException(t('agencyInactive', lang));
     }
   }

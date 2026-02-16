@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { advertisement_status, advertisement_type, user_role, user_status } from '@prisma/client';
+import { AdvertisementStatus, AdvertisementType, UserRole, UserStatus } from '@prisma/client';
+import { advertisementType } from '../../../advertise-product/domain/types/advertisement.type';
 
 
  // DTO for product images in detail view
@@ -68,7 +69,11 @@ export class ProductDetailUserDto {
     description: 'Username of the product owner' 
   })
   username!: string;
-
+   @ApiProperty({ 
+    example: 'userprofile.example.jpg',
+    description: 'profile url of product owner' 
+  })
+profileImgUrl!:string | null;
   @ApiProperty({ 
     example: 'john@example.com',
     nullable: true,
@@ -81,14 +86,14 @@ export class ProductDetailUserDto {
     nullable: true,
     description: 'User first name'
   })
-  first_name!: string | null;
+  firstName!: string | null;
 
   @ApiProperty({ 
     example: 'Doe',
     nullable: true,
     description: 'User last name'
   })
-  last_name!: string | null;
+  lastName!: string | null;
 
   @ApiProperty({ 
     example: '+355 68 123 4567',
@@ -103,7 +108,7 @@ export class ProductDetailUserDto {
     nullable: true,
     description: 'User role'
   })
-  role!: user_role;
+  role!: UserRole;
 
   @ApiProperty({ 
     example: 'active',
@@ -111,7 +116,7 @@ export class ProductDetailUserDto {
     nullable: true,
     description: 'User account status'
   })
-  status!: user_status;
+  status!: UserStatus;
 }
 //
 
@@ -123,7 +128,7 @@ export class ProductDetailAgencyDto {
     example: 'Prime Real Estate',
     description: 'Name of the real estate agency'
   })
-  agency_name!: string;
+  agencyName!: string;
 
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/logo.webp', 
@@ -157,12 +162,12 @@ export class ProductDetailAgencyDto {
   nullable:false,
   description:'public code for agencies'
 })
-public_code!:string;
+publicCode!:string;
   @ApiProperty({ 
     example: '2020-01-15T10:00:00.000Z',
     description: 'Agency creation date'
   })
-  created_at!: Date;
+  createdAt!: Date;
 }
 
 
@@ -180,14 +185,14 @@ export class ProductDetailAdvertisementDto {
     enum: ['cheap', 'normal', 'premium'],
     description: 'Type of advertisement'
   })
-  adType!: advertisement_type;
+  adType!: AdvertisementType;
 
   @ApiProperty({ 
     example: 'active',
     enum: ['active', 'inactive', 'expired', 'pending'],
     description: 'Current status of the advertisement'
   })
-  status!: advertisement_status;
+  status!: AdvertisementType;
 
   @ApiProperty({ 
     example: '2025-12-01T10:00:00.000Z',

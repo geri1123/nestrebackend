@@ -5,7 +5,7 @@ export class PaginatedAgenciesResponse {
   @ApiProperty({ example: 7, description: 'Total number of agencies' })
   total!: number;
 @ApiProperty({example:2 , description:"total pages "})
-total_pages!:number;
+totalPages!:number;
   @ApiProperty({ example: 1, description: 'Current page number' })
   page!: number;
 

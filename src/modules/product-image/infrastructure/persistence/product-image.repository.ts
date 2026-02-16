@@ -8,7 +8,7 @@ export class ProductImageRepository implements IProductImageRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(image: ProductImage): Promise<ProductImage> {
-    const created = await this.prisma.productimage.create({
+    const created = await this.prisma.productImage.create({
       data: {
         productId: image.productId,
         userId: image.userId,
@@ -27,7 +27,7 @@ export class ProductImageRepository implements IProductImageRepository {
   }
 
   async findByProductId(productId: number): Promise<ProductImage[]> {
-    const images = await this.prisma.productimage.findMany({
+    const images = await this.prisma.productImage.findMany({
       where: { productId },
     });
 
@@ -43,13 +43,13 @@ export class ProductImageRepository implements IProductImageRepository {
   }
 
   async deleteByProductId(productId: number): Promise<void> {
-    await this.prisma.productimage.deleteMany({
+    await this.prisma.productImage.deleteMany({
       where: { productId },
     });
   }
 
   async delete(id: number): Promise<void> {
-    await this.prisma.productimage.delete({
+    await this.prisma.productImage.delete({
       where: { id },
     });
   }

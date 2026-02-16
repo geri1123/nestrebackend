@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { ApproveAgencyRequestUseCase } from '../approve-agency-request.use-case';
 import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
-import { agencyagent_status, user_role, user_status } from '@prisma/client';
+import { AgencyAgentStatus, UserRole, UserStatus } from '@prisma/client';
 
 describe('ApproveAgencyRequestUseCase', () => {
   let useCase: ApproveAgencyRequestUseCase;
@@ -56,8 +56,8 @@ describe('ApproveAgencyRequestUseCase', () => {
     getUser.execute.mockResolvedValue({
       id: 1,
       emailVerified: true,
-      role: user_role.user,
-      status: user_status.inactive,
+      role: UserRole.user,
+      status: UserStatus.inactive,
       email: 'test@mail.com',
     });
 
@@ -65,7 +65,7 @@ describe('ApproveAgencyRequestUseCase', () => {
 
     createAgent.execute.mockResolvedValue({
       id: 100,
-      status: agencyagent_status.active,
+      status: AgencyAgentStatus.active,
     });
 
     const result = await useCase.execute({

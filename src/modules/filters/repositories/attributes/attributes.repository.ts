@@ -1,5 +1,3 @@
-
-
 import { LanguageCode } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { IAttributeRepo } from "./Iattribute.respository";
@@ -36,7 +34,7 @@ export class AttributeRepo implements IAttributeRepo {
         values: {
           select: {
             id: true,
-            value_code: true,
+            valueCode: true,
             attributeValueTranslations: {
               where: { language },
               select: { 
@@ -55,13 +53,12 @@ export class AttributeRepo implements IAttributeRepo {
       name: attr.attributeTranslation[0]?.name ?? "No translation",
       values: attr.values.map(v => ({
         id: v.id,
-        value_code: v.value_code,  
+        valueCode: v.valueCode,  // Map camelCase to snake_case
         name: v.attributeValueTranslations[0]?.name ?? "No translation",
       })),
     }));
   }
 
-  
   async getAttributeById(attributeId: number) {
     return await this.prisma.attribute.findUnique({
       where: { id: attributeId },
@@ -73,17 +70,23 @@ export class AttributeRepo implements IAttributeRepo {
     });
   }
 
- 
   async getAttributeValueByCode(attributeId: number, valueCode: string) {
-    return await this.prisma.attribute_value.findFirst({
-      where: {
-        attribute_id: attributeId,
-        value_code: valueCode
-      },
-      select: {
-        id: true,
-        value_code: true
-      }
-    });
-  }
+  const result = await this.prisma.attributeValue.findFirst({
+    where: {
+      attributeId,
+      valueCode,
+    },
+    select: {
+      id: true,
+      valueCode: true,
+    },
+  });
+
+  if (!result) return null;
+
+  return {
+    id: result.id,
+    valueCode: result.valueCode, 
+  };
+}
 }

@@ -2,11 +2,8 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 import { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { SupportedLang, t } from '../../../locales';
 import { GetProductForPermissionUseCase } from '../../../modules/product/application/use-cases/get-product-for-permission.use-case';
-import { user_role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 
-/**
- * Guard to verify product ownership and permissions
- */
 @Injectable()
 export class ProductOwnershipGuard implements CanActivate {
   constructor(private readonly getProductForPermission: GetProductForPermissionUseCase) {}
@@ -18,23 +15,18 @@ export class ProductOwnershipGuard implements CanActivate {
 
     const product = await this.getProductForPermission.execute(productId, lang);
 
-    // Agency owner can edit products in their agency
-    if (req.user?.role === user_role.agency_owner) {
+    if (req.user?.role === UserRole.agency_owner) {
       return this.validateAgencyOwnerAccess(req, product, lang);
     }
 
-    // Agent can edit their own or others' products (with permission)
-    if (req.user?.role === user_role.agent) {
+    if (req.user?.role === UserRole.agent) {
       return this.validateAgentAccess(req, product, lang);
     }
 
-    // Regular user can only edit their own products
     return this.validateRegularUserAccess(req, product, lang);
   }
 
-  /**
-   * Validate agency owner access
-   */
+  
   private validateAgencyOwnerAccess(
     req: RequestWithUser,
     product: any,
@@ -46,9 +38,7 @@ export class ProductOwnershipGuard implements CanActivate {
     return true;
   }
 
-  /**
-   * Validate agent access
-   */
+  
   private validateAgentAccess(
     req: RequestWithUser,
     product: any,
@@ -58,12 +48,10 @@ export class ProductOwnershipGuard implements CanActivate {
       throw new ForbiddenException(t('noAgency', lang));
     }
 
-    // Agent can edit their own products
     if (product.userId === req.userId) {
       return true;
     }
 
-    // Agent can edit other agents' products in same agency (with permission)
     if (product.agencyId === req.agencyId) {
       if (req.agentPermissions?.can_edit_others_post) {
         return true;
@@ -74,9 +62,6 @@ export class ProductOwnershipGuard implements CanActivate {
     throw new ForbiddenException(t('cannotEditOthersProduct', lang));
   }
 
-  /**
-   * Validate regular user access
-   */
   private validateRegularUserAccess(
     req: RequestWithUser,
     product: any,

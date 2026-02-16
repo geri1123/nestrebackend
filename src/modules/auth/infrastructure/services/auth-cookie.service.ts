@@ -1,35 +1,7 @@
-// import { Injectable } from "@nestjs/common";
-// import { Response } from "express";
-
-// @Injectable()
-// export class AuthCookieService {
-//   private readonly cookieOptions = {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === "production",
-//     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-//     path: "/",
-//   } as const;
-
-//   setAuthCookie(res: Response, token: string, rememberMe: boolean) {
-//     const maxAge = rememberMe
-//       ? 30 * 24 * 60 * 60 * 1000
-//       : 24 * 60 * 60 * 1000;
-
-//     res.cookie("token", token, {
-//       ...this.cookieOptions,
-//       maxAge,
-//     });
-//   }
-
-//   clearAuthCookie(res: Response) {
-//     res.clearCookie("token", this.cookieOptions);
-//   }
-// }
 
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 
-// Expiry windows must mirror auth-token.service.ts exactly
 const COOKIE_MAX_AGE = {
  ACCESS_SHORT:    6  * 60 * 60 * 1000,      // 6 h  (ms)
   ACCESS_REMEMBER: 3  * 24 * 60 * 60 * 1000, // 3 d
@@ -76,7 +48,6 @@ export class AuthCookieService {
     });
   }
 
-  // ── Convenience: clear everything 
   clearAllCookies(res: Response): void {
     this.clearAccessCookie(res);
     this.clearRefreshCookie(res);

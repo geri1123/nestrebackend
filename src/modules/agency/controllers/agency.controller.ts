@@ -41,7 +41,6 @@ import { validate } from 'class-validator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
 import { RolesGuard } from '../../../infrastructure/auth/guard/role-guard';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
-import { user_role } from '@prisma/client';
 
 @Controller('agencies')
 export class AgencyController {

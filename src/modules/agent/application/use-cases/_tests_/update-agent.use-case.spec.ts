@@ -4,7 +4,7 @@ import { AGENT_REPOSITORY_TOKENS } from '../../../domain/repositories/agent.repo
 import { NotificationService } from '../../../../notification/notification.service';
 import { NotificationTemplateService } from '../../../../notification/notifications-template.service';
 import { NotFoundException } from '@nestjs/common';
-import { agencyagent_role_in_agency, agencyagent_status } from '@prisma/client';
+import { AgencyAgentRoleInAgency, AgencyAgentStatus } from '@prisma/client';
 import * as classValidator from 'class-validator';
 
 // Mock class-validator
@@ -44,9 +44,9 @@ describe('UpdateAgentUseCase', () => {
     id: 10,
     agentUserId: 100,
     agencyId: 5,
-    role_in_agency: 'agent' as agencyagent_role_in_agency,
+    role_in_agency: 'agent' as AgencyAgentRoleInAgency,
     commission_rate: 5,
-    status: 'active' as agencyagent_status,
+    status: 'active' as AgencyAgentStatus,
     end_date: null,
   };
 
@@ -91,7 +91,7 @@ describe('UpdateAgentUseCase', () => {
       agentRepo.findById.mockResolvedValue(null);
 
       const dto = {
-        role_in_agency: 'senior_agent' as agencyagent_role_in_agency,
+        role_in_agency: 'senior_agent' as AgencyAgentRoleInAgency,
       };
 
       await expect(
@@ -110,9 +110,9 @@ describe('UpdateAgentUseCase', () => {
 
       // DTO with same values as existing agent
       const dto = {
-        role_in_agency: 'agent' as agencyagent_role_in_agency,
+        role_in_agency: 'agent' as AgencyAgentRoleInAgency,
         commission_rate: 5,
-        status: 'active' as agencyagent_status,
+        status: 'active' as AgencyAgentStatus,
       };
 
       const result = await useCase.execute(10, 5, dto, 'al', mockUser);
@@ -130,7 +130,7 @@ describe('UpdateAgentUseCase', () => {
 
       const updatedAgent = {
         ...mockExistingAgent,
-        role_in_agency: 'senior_agent' as agencyagent_role_in_agency,
+        role_in_agency: 'senior_agent' as AgencyAgentRoleInAgency,
       };
 
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
@@ -141,7 +141,7 @@ describe('UpdateAgentUseCase', () => {
       });
 
       const dto = {
-        role_in_agency: 'senior_agent' as agencyagent_role_in_agency,
+        role_in_agency: 'senior_agent' as AgencyAgentRoleInAgency,
       };
 
       const result = await useCase.execute(10, 5, dto, 'al', mockUser);
@@ -203,14 +203,14 @@ describe('UpdateAgentUseCase', () => {
 
       const updatedAgent = {
         ...mockExistingAgent,
-        status: 'inactive' as agencyagent_status,
+        status: 'inactive' as AgencyAgentStatus,
       };
 
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
       notificationTemplateService.getAllTranslations.mockReturnValue({});
 
       const dto = {
-        status: 'inactive' as agencyagent_status,
+        status: 'inactive' as AgencyAgentStatus,
       };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);
@@ -308,18 +308,18 @@ describe('UpdateAgentUseCase', () => {
 
       const updatedAgent = {
         ...mockExistingAgent,
-        role_in_agency: 'team_lead' as agencyagent_role_in_agency,
+        role_in_agency: 'team_lead' as AgencyAgentRoleInAgency,
         commission_rate: 15,
-        status: 'inactive' as agencyagent_status,
+        status: 'inactive' as AgencyAgentStatus,
       };
 
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
       notificationTemplateService.getAllTranslations.mockReturnValue({});
 
       const dto = {
-        role_in_agency: 'team_lead' as agencyagent_role_in_agency,
+        role_in_agency: 'team_lead' as AgencyAgentRoleInAgency,
         commission_rate: 15,
-        status: 'inactive' as agencyagent_status,
+        status: 'inactive' as AgencyAgentStatus,
       };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);

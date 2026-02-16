@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { SupportedLang } from '../../../locales';
-import { user_role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { AgentContextService } from './agent-context.service';
 import { AgencyOwnerContextService } from './agency-owner-context.service';
 
@@ -16,9 +16,9 @@ export class AgencyContextOrchestrator {
     const { user } = req;
     if (!user) return;
 
-    if (user.role === user_role.agent) {
+    if (user.role === UserRole.agent) {
       await this.agentContextService.loadAgentContext(req, lang);
-    } else if (user.role === user_role.agency_owner) {
+    } else if (user.role === UserRole.agency_owner) {
       await this.agencyOwnerContextService.loadAgencyOwnerContext(req, lang);
     }
   }
@@ -26,12 +26,12 @@ export class AgencyContextOrchestrator {
   validateStatus(req: RequestWithUser, lang: SupportedLang): void {
     if (!req.user) return;
 
-    if (req.user.role === user_role.agent) {
+    if (req.user.role === UserRole.agent) {
       this.agentContextService.validateAgentStatus(req, lang);
       this.agentContextService.validateAgencyStatusForAgent(req, lang);
     }
 
-    if (req.user.role === user_role.agency_owner) {
+    if (req.user.role === UserRole.agency_owner) {
       this.agencyOwnerContextService.validateAgencyStatus(req, lang);
     }
   }

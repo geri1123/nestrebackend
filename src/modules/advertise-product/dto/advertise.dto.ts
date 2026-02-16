@@ -1,5 +1,5 @@
 import { IsInt, IsEnum, IsOptional } from "class-validator";
-import { advertisement_type } from "@prisma/client";
+import { AdvertisementType } from "@prisma/client";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class AdvertiseDto {
@@ -11,11 +11,11 @@ export class AdvertiseDto {
   productId!: number;
 
   @ApiPropertyOptional({
-    enum: advertisement_type,
-    example: advertisement_type.normal,
+    enum: AdvertisementType,
+    example: AdvertisementType.normal,
     description: 'Advertisement type (default: normal)',
   })
-  @IsEnum(advertisement_type)
+  @IsEnum(AdvertisementType)
   @IsOptional()
-  adType?: advertisement_type = advertisement_type.normal;
+  adType?: AdvertisementType = AdvertisementType.normal;
 }

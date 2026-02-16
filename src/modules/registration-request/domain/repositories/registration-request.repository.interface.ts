@@ -1,4 +1,4 @@
-import { Prisma, registrationrequest_status } from "@prisma/client";
+import { Prisma, RegistrationRequestStatus } from "@prisma/client";
 import { RegistrationRequestEntity } from "../entities/registration-request.entity";
 
 
@@ -12,7 +12,7 @@ export interface IRegistrationRequestRepository {
 
   findByAgencyIdAndStatus(
     agencyId: number,
-    status?: registrationrequest_status,
+    status?: RegistrationRequestStatus,
     skip?: number,
     take?: number
   ): Promise<RegistrationRequestEntity[]>;
@@ -26,12 +26,12 @@ export interface IRegistrationRequestRepository {
 
   updateStatus(
     id: number,
-    status: registrationrequest_status,
+    status: RegistrationRequestStatus,
     reviewedBy?: number,
     reviewNotes?: string,
      tx?: Prisma.TransactionClient
   ): Promise<RegistrationRequestEntity>;
 
-  countRequests(agencyId: number, status?: registrationrequest_status): Promise<number>;
+  countRequests(agencyId: number, status?: RegistrationRequestStatus): Promise<number>;
    deleteByUserId(userId: number): Promise<number>;
 }

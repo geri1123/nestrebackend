@@ -1,6 +1,5 @@
 import { RegistrationRequestRequestType } from "../types/registrationrequest-request.type";
 import { registrationrequest_status } from "../types/registration-request-status.type";
-import { registrationrequest_requested_role } from "@prisma/client";
 import { RegistrationRequestRequestRole } from "../types/registrationrequest-requested-role.type";
 import { RequestUserVO } from "../value-objects/request-user.vo";
 

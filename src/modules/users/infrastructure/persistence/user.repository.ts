@@ -12,30 +12,48 @@ export class UserRepository implements IUserDomainRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(userId: number): Promise<User | null> {
-  const user = await this.prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      email: true,
-      username: true,
-      role: true,
-      first_name: true,
-      last_name: true,
-      about_me: true,
-      profile_img_url: true,
-      profile_img_public_id: true,
-      phone: true,
-      status: true,
-      email_verified: true,
-      last_login: true,
-      created_at: true,
-      updated_at: true,
-    },
-  });
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        aboutMe: true,
+        profileImgUrl: true,
+        profileImgPublicId: true,
+        phone: true,
+        status: true,
+        emailVerified: true,
+        lastLogin: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-  return user ? User.create(user as any) : null;
-}
+    if (!user) return null;
 
+    // Map camelCase to snake_case for entity
+    return User.create({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      about_me: user.aboutMe,
+      profile_img_url: user.profileImgUrl,
+      profile_img_public_id: user.profileImgPublicId,
+      phone: user.phone,
+      status: user.status,
+      email_verified: user.emailVerified,
+      last_login: user.lastLogin?.toISOString() ?? null,
+      created_at: user.createdAt.toISOString(),
+      updated_at: user.updatedAt?.toISOString() ?? null,
+    } as any);
+  }
 
   async findByIdentifier(identifier: string): Promise<User | null> {
     const user = await this.prisma.user.findFirst({
@@ -44,23 +62,41 @@ export class UserRepository implements IUserDomainRepository {
         id: true,
         username: true,
         email: true,
-        // password: true,
         status: true,
         role: true,
-        email_verified: true,
-        first_name: true,
-        last_name: true,
-        about_me: true,
-          profile_img_url: true,
-      profile_img_public_id: true,
+        emailVerified: true,
+        firstName: true,
+        lastName: true,
+        aboutMe: true,
+        profileImgUrl: true,
+        profileImgPublicId: true,
         phone: true,
-        last_login: true,
-        created_at: true,
-        updated_at: true,
+        lastLogin: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    return user ? User.create(user as any) : null;
+    if (!user) return null;
+
+    // Map camelCase to snake_case for entity
+    return User.create({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      email_verified: user.emailVerified,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      about_me: user.aboutMe,
+      profile_img_url: user.profileImgUrl,
+      profile_img_public_id: user.profileImgPublicId,
+      phone: user.phone,
+      last_login: user.lastLogin?.toISOString() ?? null,
+      created_at: user.createdAt.toISOString(),
+      updated_at: user.updatedAt?.toISOString() ?? null,
+    } as any);
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -70,22 +106,41 @@ export class UserRepository implements IUserDomainRepository {
         id: true,
         email: true,
         username: true,
-        first_name: true,
-        last_name: true,
-        email_verified: true,
+        firstName: true,
+        lastName: true,
+        emailVerified: true,
         status: true,
         role: true,
-        about_me: true,
-       profile_img_url: true,
-      profile_img_public_id: true,
+        aboutMe: true,
+        profileImgUrl: true,
+        profileImgPublicId: true,
         phone: true,
-        last_login: true,
-        created_at: true,
-        updated_at: true,
+        lastLogin: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    return user ? User.create(user as any) : null;
+    if (!user) return null;
+
+    // Map camelCase to snake_case for entity
+    return User.create({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      email_verified: user.emailVerified,
+      status: user.status,
+      role: user.role,
+      about_me: user.aboutMe,
+      profile_img_url: user.profileImgUrl,
+      profile_img_public_id: user.profileImgPublicId,
+      phone: user.phone,
+      last_login: user.lastLogin?.toISOString() ?? null,
+      created_at: user.createdAt.toISOString(),
+      updated_at: user.updatedAt?.toISOString() ?? null,
+    } as any);
   }
 
   async usernameExists(username: string): Promise<boolean> {
@@ -106,7 +161,7 @@ export class UserRepository implements IUserDomainRepository {
 
   async create(
     data: CreateUserData,
-   tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient
   ): Promise<number> {
     const client = tx ?? this.prisma;
     const hashedPassword = await hashPassword(data.password);
@@ -115,171 +170,202 @@ export class UserRepository implements IUserDomainRepository {
         username: data.username,
         email: data.email,
         password: hashedPassword,
-        first_name: data.first_name,
-        last_name: data.last_name,
+        firstName: data.first_name,
+        lastName: data.last_name,
         role: data.role,
         status: data.status as any,
-        email_verified: data.email_verified ?? false,
-      google_user: data.google_user ?? false,     
-      google_id: data.google_id ?? null,  
-        
+        emailVerified: data.email_verified ?? false,
+        googleUser: data.google_user ?? false,     
+        googleId: data.google_id ?? null,  
       },
     });
     return result.id;
   }
-async updateFields(
-  userId: number,
-  fields: Partial<UpdateUserFields>,
-  tx?: Prisma.TransactionClient
-): Promise<void> {
-  const client = tx ?? this.prisma;
 
-  const filtered = Object.fromEntries(
-    Object.entries(fields).filter(([_, val]) => val !== undefined),
-  );
+  async updateFields(
+    userId: number,
+    fields: Partial<UpdateUserFields>,
+    tx?: Prisma.TransactionClient
+  ): Promise<void> {
+    const client = tx ?? this.prisma;
 
-  if (Object.keys(filtered).length === 0) return;
+    // Map snake_case to camelCase for Prisma
+    const prismaFields: any = {};
+    
+    if (fields.first_name !== undefined) prismaFields.firstName = fields.first_name;
+    if (fields.last_name !== undefined) prismaFields.lastName = fields.last_name;
+    if (fields.about_me !== undefined) prismaFields.aboutMe = fields.about_me;
+    if (fields.phone !== undefined) prismaFields.phone = fields.phone;
+    if (fields.password !== undefined) prismaFields.password = fields.password;
+    if (fields.status !== undefined) prismaFields.status = fields.status;
+    if (fields.role !== undefined) prismaFields.role = fields.role;
+    if (fields.last_active !== undefined) prismaFields.lastActive = fields.last_active;
+    if (fields.last_login !== undefined) prismaFields.lastLogin = fields.last_login;
+    if (fields.profile_img !== undefined) prismaFields.profileImgUrl = fields.profile_img;
 
-  filtered.updated_at = new Date();
+    if (Object.keys(prismaFields).length === 0) return;
 
-  await client.user.update({
-    where: { id: userId },
-    data: filtered,
-  });
-}
-  // async updateFields(userId: number, fields: Partial<UpdateUserFields>): Promise<void> {
-  //   const filtered = Object.fromEntries(
-  //     Object.entries(fields).filter(([_, val]) => val !== undefined),
-  //   ) as Partial<UpdateUserFields>;
+    prismaFields.updatedAt = new Date();
 
-  //   if (Object.keys(filtered).length === 0) return;
-
-  //   (filtered as any).updated_at = new Date();
-  //   await this.prisma.user.update({ where: { id: userId }, data: filtered });
-  // }
+    await client.user.update({
+      where: { id: userId },
+      data: prismaFields,
+    });
+  }
 
   async updateUsername(userId: number, newUsername: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { username: newUsername, updated_at: new Date() },
+      data: { username: newUsername, updatedAt: new Date() },
     });
   }
 
   async updateProfileImage(
-  userId: number,
-  imageUrl: string,
-  publicId: string,
-): Promise<void> {
-  await this.prisma.user.update({
-    where: { id: userId },
-    data: {
-      profile_img_url: imageUrl,
-      profile_img_public_id: publicId,
-      updated_at: new Date(),
-    },
-  });
-}
-
-async deleteProfileImage(userId: number): Promise<void> {
-  await this.prisma.user.update({
-    where: { id: userId },
-    data: {
-      profile_img_url: null,
-      profile_img_public_id: null,
-      updated_at: new Date(),
-    },
-  });
-}
-  async verifyEmail(userId: number, emailVerified: boolean, status: string , tx?:Prisma.TransactionClient): Promise<void> {
-    const client =tx ?? this.prisma;
-    await client.user.update({
+    userId: number,
+    imageUrl: string,
+    publicId: string,
+  ): Promise<void> {
+    await this.prisma.user.update({
       where: { id: userId },
-      data: { email_verified: emailVerified, status: status as any, updated_at: new Date() },
+      data: {
+        profileImgUrl: imageUrl,
+        profileImgPublicId: publicId,
+        updatedAt: new Date(),
+      },
     });
   }
 
-async getNavbarUser(userId: number): Promise<NavbarUser | null> {
-  const user = await this.prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      username: true,
-      email: true,
-      profile_img_url: true,
-      last_login: true,
-      created_at:true,
-      role: true,
-    },
-  });
+  async deleteProfileImage(userId: number): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        profileImgUrl: null,
+        profileImgPublicId: null,
+        updatedAt: new Date(),
+      },
+    });
+  }
 
-  return user
-    ? new NavbarUser(
-        user.username,
-        user.email,
-        user.profile_img_url,
-        user.last_login,
-        user.created_at,
-        user.role,
-      )
-    : null;
-}
-    async findUnverifiedBefore(date: Date) {
+  async verifyEmail(userId: number, emailVerified: boolean, status: string, tx?: Prisma.TransactionClient): Promise<void> {
+    const client = tx ?? this.prisma;
+    await client.user.update({
+      where: { id: userId },
+      data: { emailVerified: emailVerified, status: status as any, updatedAt: new Date() },
+    });
+  }
+
+  async getNavbarUser(userId: number): Promise<NavbarUser | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        username: true,
+        email: true,
+        profileImgUrl: true,
+        lastLogin: true,
+        createdAt: true,
+        role: true,
+      },
+    });
+
+    return user
+      ? new NavbarUser(
+          user.username,
+          user.email,
+          user.profileImgUrl,
+          user.lastLogin,
+          user.createdAt,
+          user.role,
+        )
+      : null;
+  }
+
+  async findUnverifiedBefore(date: Date) {
     return this.prisma.user.findMany({
-      where: { email_verified: false, created_at: { lt: date } },
+      where: { emailVerified: false, createdAt: { lt: date } },
       select: { id: true },
     });
   }
-async deleteById(userId: number): Promise<void> {
-  await this.prisma.user.delete({ where: { id: userId } });
-}
-async findByIdentifierForAuth(identifier: string) {
-  return this.prisma.user.findFirst({
-    where: {
-      OR: [{ email: identifier }, { username: identifier }]
-    },
-    select: {
-      id: true,
-      password: true,
-      status: true,
-      role: true,
-      username: true,
-      email: true,
-      email_verified: true,
-    }
-  });
-};
-async findByIdWithPassword(userId: number) {
-  return this.prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      password: true,
-    },
-  });
-};
-async updatePassword(userId: number, newPassword: string): Promise<void> {
-  const hashed = await hashPassword(newPassword);
 
-  await this.prisma.user.update({
-    where: { id: userId },
-    data: {
-      password: hashed,
-      updated_at: new Date(),
-    },
-  });
-};
-async findByIdentifierForVerification(identifier: string) {
-  return this.prisma.user.findFirst({
-    where: {
-      OR: [{ email: identifier }, { username: identifier }],
-    },
-    select: {
-      id: true,
-      email: true,
-      first_name: true,
-      role: true,
-      status: true,
-      email_verified: true,
-    },
-  });
-}
+  async deleteById(userId: number): Promise<void> {
+    await this.prisma.user.delete({ where: { id: userId } });
+  }
+
+  async findByIdentifierForAuth(identifier: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { username: identifier }]
+      },
+      select: {
+        id: true,
+        password: true,
+        status: true,
+        role: true,
+        username: true,
+        email: true,
+        emailVerified: true,
+      }
+    });
+
+    if (!user) return null;
+
+    // Map camelCase to snake_case for interface
+    return {
+      id: user.id,
+      password: user.password,
+      status: user.status,
+      role: user.role,
+      username: user.username,
+      email: user.email,
+      email_verified: user.emailVerified,
+    };
+  }
+
+  async findByIdWithPassword(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        password: true,
+      },
+    });
+  }
+
+  async updatePassword(userId: number, newPassword: string): Promise<void> {
+    const hashed = await hashPassword(newPassword);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashed,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async findByIdentifierForVerification(identifier: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { username: identifier }],
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        role: true,
+        status: true,
+        emailVerified: true,
+      },
+    });
+
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      email: user.email,
+      first_name: user.firstName,
+      role: user.role,
+      status: user.status,
+      email_verified: user.emailVerified,
+    };
+  }
 }

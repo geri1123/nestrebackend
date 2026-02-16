@@ -4,7 +4,7 @@ import { Body, Controller, Get, Post, Query, Req, UnauthorizedException } from "
 
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
-import { wallet_transaction_type } from "@prisma/client";
+import { WalletTransactionType } from "@prisma/client";
 import { TopUpDto } from "./dto/topup.dto";
 
 import { CreateWalletUseCase } from "./application/use-cases/crreate-wallet.use-case";
@@ -61,11 +61,11 @@ export class WalletController {
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
     const amount = body.amount;
-    const type = wallet_transaction_type.topup;
+    const type = WalletTransactionType.topup;
 
     const result = await this.changeBalanceUseCase.execute({
       userId,
-      type: wallet_transaction_type.topup,
+      type: WalletTransactionType.topup,
       amount,
       language,
     });

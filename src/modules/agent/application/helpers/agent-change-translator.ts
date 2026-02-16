@@ -1,5 +1,5 @@
 import { SupportedLang } from "../../../../locales";
-import { agencyagent_role_in_agency, agencyagent_status } from "@prisma/client";
+import { AgencyAgentRoleInAgency, AgencyAgentStatus } from "@prisma/client";
 import { UpdateAgentsDto } from "../../dto/update-agents.dto";
 
 // Field translations
@@ -32,14 +32,14 @@ const fieldTranslations = {
 };
 
 // Role translations
-const roleTranslations: Record<agencyagent_role_in_agency, Record<SupportedLang, string>> = {
+const roleTranslations: Record<AgencyAgentRoleInAgency, Record<SupportedLang, string>> = {
   agent: { en: "agent", al: "agjent", it: "agente" },
   senior_agent: { en: "senior agent", al: "agjent i lartë", it: "agente senior" },
   team_lead: { en: "team lead", al: "udhëheqës i ekipit", it: "capo squadra" },
 };
 
 // Status translations
-const statusTranslations: Record<agencyagent_status, Record<SupportedLang, string>> = {
+const statusTranslations: Record<AgencyAgentStatus, Record<SupportedLang, string>> = {
   active: { en: "active", al: "aktiv", it: "attivo" },
   terminated: { en: "terminated", al: "përfunduar", it: "terminato" },
   inactive: { en: "inactive", al: "jo aktiv", it: "inattivo" },

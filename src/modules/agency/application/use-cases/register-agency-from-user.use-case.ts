@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { agency_status, user_role } from '@prisma/client';
+import { AgencyStatus, UserRole } from '@prisma/client';
 import { CreateAgencyUseCase , CreateAgencyData } from './create-agency.use-case';
 import { UpdateUserProfileUseCase } from '../../../users/application/use-cases/update-user-profile.use-case';
 import { SupportedLang } from '../../../../locales';
@@ -29,7 +29,7 @@ export class RegisterAgencyFromUserUseCase {
       const agencyId = await this.createAgency.execute(
         data,
         userId,
-        agency_status.active,
+        AgencyStatus.active,
         language,
         tx,
       );
@@ -37,7 +37,7 @@ export class RegisterAgencyFromUserUseCase {
      
       await this.userRepository.updateFields(
         userId,
-        { role: user_role.agency_owner },
+        { role: UserRole.agency_owner },
         tx,
       );
 

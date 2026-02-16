@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { REG_REQ_TOKEN } from "../../domain/repositories/reg-req.repository.token";
 import {type IRegistrationRequestRepository } from "../../domain/repositories/registration-request.repository.interface";
-import { registrationrequest_status } from "@prisma/client";
+import { RegistrationRequestStatus } from "@prisma/client";
 import { RegistrationRequestResponseDto } from "../../dto/registration-request-response.dto";
 @Injectable()
 export class GetRequestsUseCase {
@@ -14,7 +14,7 @@ export class GetRequestsUseCase {
     agencyId: number,
     page: number,
     take: number,
-    status?: registrationrequest_status
+    status?: RegistrationRequestStatus
   ) {
     // fetch entities from repo
     const entities = await this.repo.findByAgencyIdAndStatus(

@@ -15,8 +15,8 @@ import { NotificationService } from '../../../notification/notification.service'
 import { NotificationTemplateService } from '../../../notification/notifications-template.service';
 
 import {
-  agencyagent_role_in_agency,
-  agencyagent_status,
+  AgencyAgentRoleInAgency,
+  AgencyAgentStatus,
 } from '@prisma/client';
 import { hasAgentChanges, translateAgentChanges } from '../helpers/agent-change-translator';
 import { AGENT_REPOSITORY_TOKENS } from '../../domain/repositories/agent.repository.tokens';
@@ -69,10 +69,10 @@ export class UpdateAgentUseCase {
     }
 
     const dataToUpdate: Partial<{
-      role_in_agency: agencyagent_role_in_agency;
+      role_in_agency: AgencyAgentRoleInAgency;
       commission_rate: number;
       end_date: Date;
-      status: agencyagent_status;
+      status: AgencyAgentStatus;
     }> = {
       ...(dto.role_in_agency !== undefined && {
         role_in_agency: dto.role_in_agency,

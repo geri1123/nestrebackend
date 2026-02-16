@@ -1,9 +1,9 @@
-import { advertisement_type } from "@prisma/client";
+import { AdvertisementType } from "@prisma/client";
 import { IsEnum, IsNumber, IsOptional, IsBoolean, Min } from "class-validator";
 
 export class CreatePricingDto {
-  @IsEnum(advertisement_type)
-  adType!: advertisement_type;
+  @IsEnum(AdvertisementType)
+  adType!: AdvertisementType;
 
   @IsNumber()
   @Min(0)

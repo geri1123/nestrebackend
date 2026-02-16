@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { IAdvertisementPricingRepository, UpdatePricingData } from "../../domain/repositories/advertisement-pricing.repository.interface";
-import { advertisement_type } from "@prisma/client";
+import { AdvertisementType } from "@prisma/client";
 import { AdvertisementPricingEntity } from "../../domain/entities/advertisement-pricing.entity";
 
 @Injectable()
@@ -9,7 +9,7 @@ export class AdvertisementPricingRepository implements IAdvertisementPricingRepo
 
   constructor(private prisma: PrismaService) {}
 
-  async getPricing(adType: advertisement_type) {
+  async getPricing(adType: AdvertisementType) {
     const data = await this.prisma.advertisementPricing.findUnique({
       where: { adType },
     });
@@ -35,7 +35,7 @@ export class AdvertisementPricingRepository implements IAdvertisementPricingRepo
   }
 
   async update(
-  adType: advertisement_type,
+  adType: AdvertisementType,
   data: UpdatePricingData
 ): Promise<AdvertisementPricingEntity>{
     const updated = await this.prisma.advertisementPricing.update({
@@ -55,7 +55,7 @@ export class AdvertisementPricingRepository implements IAdvertisementPricingRepo
     );
   }
   async create(data: {
-  adType: advertisement_type;
+  adType: AdvertisementType;
   price: number;
   duration: number;
   discount?: number;

@@ -1,17 +1,17 @@
-import { agencyagent_role_in_agency, agencyagent_status } from '@prisma/client';
+import { AgencyAgentRoleInAgency, AgencyAgentStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateAgentsDto {
   @ApiPropertyOptional({
-    enum: agencyagent_role_in_agency,
+    enum: AgencyAgentRoleInAgency,
     example: 'agent',
     description: 'Role of the agent in the agency',
   })
   @IsOptional()
-  @IsEnum(agencyagent_role_in_agency, { message: 'roleInAgencyRequired' })
-  role_in_agency?: agencyagent_role_in_agency;
+  @IsEnum(AgencyAgentRoleInAgency, { message: 'roleInAgencyRequired' })
+  role_in_agency?: AgencyAgentRoleInAgency;
 
   @ApiPropertyOptional({
     example: 10,
@@ -32,13 +32,13 @@ export class UpdateAgentsDto {
   end_date?: string;
 
   @ApiPropertyOptional({
-    enum: agencyagent_status,
+    enum: AgencyAgentStatus,
     example: 'active',
     description: 'Agent status',
   })
   @IsOptional()
-  @IsEnum(agencyagent_status, { message: 'statusInvalid' })
-  status?: agencyagent_status;
+  @IsEnum(AgencyAgentStatus, { message: 'statusInvalid' })
+  status?: AgencyAgentStatus;
 
   @ApiPropertyOptional({
     example: {

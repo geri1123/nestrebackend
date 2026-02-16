@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { RegistrationRequestEntity } from "../domain/entities/registration-request.entity";
-import { 
-  registrationrequest_status, 
-  registrationrequest_requested_role,
-  registrationrequest_request_type,
-  user_role,
-  user_status 
-} from '@prisma/client';
+import { RegistrationRequestRequestedRole, RegistrationRequestRequestType, RegistrationRequestStatus, UserRole, UserStatus } from '@prisma/client';
 
 export class RegistrationRequestResponseDto {
   @ApiProperty({ example: 1 })
@@ -19,26 +13,26 @@ export class RegistrationRequestResponseDto {
   agencyId: number | null;
 
   @ApiProperty({ 
-    enum: registrationrequest_status,
-    example: registrationrequest_status.pending,
+    enum: RegistrationRequestStatus,
+    example: RegistrationRequestStatus.pending,
     description: 'Current status of the registration request'
   })
-  status: registrationrequest_status;
+  status: RegistrationRequestStatus;
 
   @ApiProperty({ 
-    enum: registrationrequest_request_type,
-    example: registrationrequest_request_type.agent_license_verification,
+    enum: RegistrationRequestRequestType,
+    example: RegistrationRequestRequestType.agent_license_verification,
     description: 'Type of registration request'
   })
-  requestType: registrationrequest_request_type;
+  requestType: RegistrationRequestRequestType;
 
   @ApiProperty({ 
-    enum: registrationrequest_requested_role,
-    example: registrationrequest_requested_role.senior_agent,
+    enum: RegistrationRequestRequestedRole,
+    example: RegistrationRequestRequestedRole.senior_agent,
     description: 'The role being requested by the user',
     nullable: true
   })
-  requestedRole: registrationrequest_requested_role | null;
+  requestedRole: RegistrationRequestRequestedRole | null;
 
   @ApiProperty({ required: false, example: '2026-02-11T20:26:10.794Z' })
   createdAt?: Date;
@@ -52,7 +46,6 @@ export class RegistrationRequestResponseDto {
   @ApiProperty({ nullable: true, required: false, example: '2026-02-12T16:17:45.464Z' })
   reviewedAt?: Date | null;
 
-  // ✅ Requester (user) info
   @ApiProperty({ required: false, example: 'John' })
   firstName?: string;
 
@@ -66,20 +59,20 @@ export class RegistrationRequestResponseDto {
   username?: string;
 
   @ApiProperty({ 
-    enum: user_role,
+    enum: UserRole,
     required: false,
-    example: user_role.user,
+    example: UserRole.user,
     description: 'Current role of the user'
   })
-  role?: user_role;
+  role?: UserRole;
 
   @ApiProperty({ 
-    enum: user_status,
+    enum: UserStatus,
     required: false,
-    example: user_status.active,
+    example: UserStatus.active,
     description: 'Current status of the user account'
   })
-  userStatus?: user_status;
+  userStatus?: UserStatus;
 
   @ApiProperty({ required: false, example: 'jane@example.com' })
   reviewerEmail?: string;
@@ -88,12 +81,12 @@ export class RegistrationRequestResponseDto {
   reviewerUsername?: string;
 
   @ApiProperty({ 
-    enum: user_role,
+    enum: UserRole,
     required: false,
-    example: user_role.agency_owner,
+    example: UserRole.agency_owner,
     description: 'Role of the person who reviewed the request'
   })
-  reviewerRole?: user_role;
+  reviewerRole?: UserRole;
 
   constructor(entity: RegistrationRequestEntity) {
     this.id = entity.id!;

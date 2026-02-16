@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { GetAgencyByOwnerUseCase } from '../../../modules/agency/application/use-cases/get-agency-by-owner.use-case';
 import { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { SupportedLang, t } from '../../../locales';
-import { agency_status } from '@prisma/client';
+import { AgencyStatus } from '@prisma/client';
 import { ForbiddenException } from '@nestjs/common';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class AgencyOwnerContextService {
   }
 
   validateAgencyStatus(req: RequestWithUser, lang: SupportedLang): void {
-    if (req.agencyStatus === agency_status.suspended) {
+    if (req.agencyStatus === AgencyStatus.suspended) {
       throw new ForbiddenException(t('agencySuspended', lang));
     }
   }

@@ -1,8 +1,9 @@
-import { city, country } from '@prisma/client';
+import { City, Country } from "@prisma/client";
+
 export const LOCATION_REPO = Symbol('LOCATION_REPO');
 
 export interface ILocationRepository{
-  getAllCountries(): Promise<country[]>;
+  getAllCountries(): Promise<Country[]>;
 
-  getCitiesByCountry(countryCode: string): Promise<city[]>;
+  getCitiesByCountry(countryCode: string): Promise<City[]>;
 }

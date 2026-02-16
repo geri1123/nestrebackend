@@ -2,7 +2,7 @@ import { AgencyContextGuard } from '../agency-context.guard';
 import { Reflector } from '@nestjs/core';
 import { AgencyContextOrchestrator } from '../../services/agency-context-orchestrator.service';
 import { ForbiddenException } from '@nestjs/common';
-import { user_role, user_status } from '@prisma/client';
+import { UserRole, UserStatus } from '@prisma/client';
 
 describe('AgencyContextGuard', () => {
   let guard: AgencyContextGuard;
@@ -36,12 +36,12 @@ describe('AgencyContextGuard', () => {
   });
 
   it('throws if user is suspended', async () => {
-    const context = createContext({ status: user_status.suspended });
+    const context = createContext({ status: UserStatus.suspended });
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('does not load context if already loaded', async () => {
-    const context = createContext({ role: user_role.agent, status: user_status.active, id: 1 });
+    const context = createContext({ role: UserRole.agent, status: UserStatus.active, id: 1 });
     const req = context.switchToHttp().getRequest();
     req.agencyId = 1;
 
@@ -53,7 +53,7 @@ describe('AgencyContextGuard', () => {
   });
 
   it('loads context if not loaded and role requires it', async () => {
-    const context = createContext({ role: user_role.agent, status: user_status.active, id: 1 });
+    const context = createContext({ role: UserRole.agent, status: UserStatus.active, id: 1 });
     reflector.getAllAndOverride.mockReturnValue(true);
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
@@ -64,7 +64,7 @@ describe('AgencyContextGuard', () => {
   });
 
   it('does not load context if role does not require it', async () => {
-    const context = createContext({ role: user_role.user, status: user_status.active, id: 1 });
+    const context = createContext({ role: UserRole.user, status: UserStatus.active, id: 1 });
     reflector.getAllAndOverride.mockReturnValue(true);
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
@@ -74,7 +74,7 @@ describe('AgencyContextGuard', () => {
   });
 
   it('does not load context if requireAgencyContext is false', async () => {
-    const context = createContext({ role: user_role.agent, status: user_status.active, id: 1 });
+    const context = createContext({ role: UserRole.agent, status: UserStatus.active, id: 1 });
     reflector.getAllAndOverride.mockReturnValue(false);
 
     await expect(guard.canActivate(context)).resolves.toBe(true);

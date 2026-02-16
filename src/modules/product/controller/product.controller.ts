@@ -9,7 +9,7 @@ import type { RequestWithLang } from '../../../middlewares/language.middleware';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { ProductClicksService } from '../../product-clicks/product-clicks.service';
 import { SoftAuthService } from '../../../common/soft-auth/soft-auth.service';
-import { product_status } from '@prisma/client';
+import { ProductStatus } from '@prisma/client';
 import { ApiSearchAgencyProducts, ApiSearchAgentProducts, ApiSearchProducts } from '../decorators/search-product.decorator';
 import { ApiGetProtectedProduct, ApiGetPublicProduct } from '../decorators/product-detail.decorator';
 import { SearchFiltersDto } from '../dto/product-filters.dto';
@@ -83,7 +83,7 @@ export class SearchProductsController {
     const filters = this.searchFiltersHelper.parse(req.query, page);
 
     filters.userId = agentId;
-    filters.status = product_status.active;
+    filters.status = ProductStatus.active;
 
     return this.searchProductsUseCase.execute(filters, language, false);
   }

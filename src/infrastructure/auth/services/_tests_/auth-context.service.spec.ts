@@ -1,6 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { AuthContextService, AuthContext } from '../auth-context.service';
-import { user_role, user_status } from '@prisma/client';
+import { UserRole, UserStatus } from '@prisma/client';
 
 describe('AuthContextService', () => {
   let service: AuthContextService;
@@ -13,11 +13,11 @@ describe('AuthContextService', () => {
     id: 1,
     username: 'john',
     email: 'john@test.com',
-    role: user_role.user,
-    status: user_status.active,
+    role: UserRole.user,
+    status: UserStatus.active,
     emailVerified: true,
     profileImgUrl: null,
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   };
 
   beforeEach(() => {

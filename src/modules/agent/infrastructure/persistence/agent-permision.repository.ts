@@ -17,8 +17,8 @@ export class AgentPermissionRepository
 
     const client = tx ?? this.prisma;
 
-    const result = await client.agencyagent_permission.findUnique({
-      where: { agency_agent_id: agencyAgentId },
+    const result = await client.agencyAgentPermission.findUnique({
+      where: { agencyAgentId: agencyAgentId },
     });
 
     return result ? AgentMapper.toPermissionDomain(result) : null;
@@ -33,36 +33,43 @@ export class AgentPermissionRepository
     
     const client = tx ?? this.prisma;
 
-    const created = await client.agencyagent_permission.create({
+    const created = await client.agencyAgentPermission.create({
       data: {
-        agency_agent_id: agencyAgentId,
-        agency_id: agencyId,
-        can_edit_own_post: permissions.can_edit_own_post ?? true,
-        can_edit_others_post: permissions.can_edit_others_post ?? false,
-        can_approve_requests: permissions.can_approve_requests ?? false,
-        can_view_all_posts: permissions.can_view_all_posts ?? false,
-        can_delete_posts: permissions.can_delete_posts ?? false,
-        can_manage_agents: permissions.can_manage_agents ?? false,
+        agencyAgentId: agencyAgentId,
+        agencyId: agencyId,
+        canEditOwnPost: permissions.can_edit_own_post ?? true,
+        canEditOthersPost: permissions.can_edit_others_post ?? false,
+        canApproveRequests: permissions.can_approve_requests ?? false,
+        canViewAllPosts: permissions.can_view_all_posts ?? false,
+        canDeletePosts: permissions.can_delete_posts ?? false,
+        canManageAgents: permissions.can_manage_agents ?? false,
       },
     });
 
     return AgentMapper.toPermissionDomain(created);
   }
 
-  async updatePermissions(
-    agencyAgentId: number,
-    permissions: AgentPermissionUpdateInput,
-    tx?: Prisma.TransactionClient,
-  ): Promise<AgentPermissionEntity> {
+async updatePermissions(
+  agencyAgentId: number,
+  permissions: AgentPermissionUpdateInput,
+  tx?: Prisma.TransactionClient,
+): Promise<AgentPermissionEntity> {
 
-    const client = tx ?? this.prisma;
+  const client = tx ?? this.prisma;
 
-    const updated = await client.agencyagent_permission.update({
-      where: { agency_agent_id: agencyAgentId },
-      data: { ...permissions },
-    });
+  const updated = await client.agencyAgentPermission.update({
+    where: { agencyAgentId: agencyAgentId },
+    data: {
+      canEditOwnPost: permissions.can_edit_own_post,
+      canEditOthersPost: permissions.can_edit_others_post,
+      canApproveRequests: permissions.can_approve_requests,
+      canViewAllPosts: permissions.can_view_all_posts,
+      canDeletePosts: permissions.can_delete_posts,
+      canManageAgents: permissions.can_manage_agents,
+    },
+  });
 
-    return AgentMapper.toPermissionDomain(updated);
-  }
+  return AgentMapper.toPermissionDomain(updated);
+}
 
 }

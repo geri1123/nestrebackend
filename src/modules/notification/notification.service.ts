@@ -21,47 +21,20 @@ export class NotificationService {
     private readonly notificationTemplateService: NotificationTemplateService
   ) {}
 
-  // async sendNotification(data: NotificationData) {
-  //   try {
-  //     // Create notification in database
-  //     const notification = await this.notificationRepo.createNotification(data);
-
-  //     // Send real-time notification via WebSocket only if user is online
-  //     if (this.notificationGateway.isUserOnline(data.userId)) {
-  //       this.notificationSocket.sendNotificationToUser(data.userId, {
-  //         id: notification.id,
-  //         type: notification.type,
-  //         status: notification.status,
-  //         translations: notification.notificationtranslation,
-  //         createdAt: notification.createdAt,
-  //       });
-
-  //       const unreadCount = await this.countUnreadNotifications(data.userId);
-  //       this.notificationSocket.sendUnreadCountUpdate(data.userId, unreadCount);
-  //     }
-
-  //     return notification;
-  //   } catch (error) {
-  //     console.error('Failed to send real-time notification:', error);
-  //     throw error;
-  //   }
-  // }
  async sendNotification(data: Omit<NotificationData, 'translations'> & { 
     translations?: NotificationData['translations'];
-    templateData?: any; // Optional data for template rendering
+    templateData?: any; 
   }) {
     try {
-      // Auto-generate translations if not provided
       const translations = data.translations ?? 
         this.notificationTemplateService.getAllTranslations(data.type, data.templateData ?? {});
 
-      // Create notification in database
+      
       const notification = await this.notificationRepo.createNotification({
         ...data,
         translations,
       });
 
-      // Send real-time notification via WebSocket only if user is online
       if (this.notificationGateway.isUserOnline(data.userId)) {
         this.notificationSocket.sendNotificationToUser(data.userId, {
           id: notification.id,

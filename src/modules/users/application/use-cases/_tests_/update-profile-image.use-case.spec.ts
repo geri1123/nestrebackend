@@ -27,14 +27,17 @@ describe('UploadProfileImageUseCase', () => {
     profileImgPublicId: null,
     updateProfileImage: jest.fn(),
   };
-
+const eventEmitter = {
+  emit: jest.fn(),
+} as any;
   beforeEach(() => {
     jest.clearAllMocks();
-    useCase = new UploadProfileImageUseCase(
-      userRepo,
-      cloudinary,
-      imageUtils,
-    );
+  useCase = new UploadProfileImageUseCase(
+  userRepo,
+  cloudinary,
+  imageUtils,
+  eventEmitter,
+);
   });
 
   it('should throw NotFoundException if user does not exist', async () => {

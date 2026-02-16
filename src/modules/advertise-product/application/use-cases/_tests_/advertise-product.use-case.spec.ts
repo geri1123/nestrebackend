@@ -6,7 +6,7 @@ import { ChangeWalletBalanceUseCase } from '../../../../wallet/application/use-c
 import { FindProductByIdUseCase } from '../../../../product/application/use-cases/find-product-by-id.use-case';
 import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
 import { GetPricingUseCase } from '../../../../advertisement-pricing/application/use-cases/get-pricing.use-case';
-import { advertisement_type, wallet_transaction_type } from '@prisma/client';
+import { AdvertisementType, WalletTransactionType } from '@prisma/client';
 
 describe('AdvertiseProductUseCase', () => {
   let useCase: AdvertiseProductUseCase;
@@ -25,7 +25,7 @@ describe('AdvertiseProductUseCase', () => {
 
   const mockPricing = {
     id: 1,
-    type: advertisement_type.normal,
+    type: AdvertisementType.normal,
     price: 10,
     duration: 14,
     discount: null,
@@ -88,7 +88,7 @@ describe('AdvertiseProductUseCase', () => {
       findProduct.execute.mockResolvedValue(null as any);
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow(BadRequestException);
 
       expect(findProduct.execute).toHaveBeenCalledWith(1, 'en');
@@ -98,7 +98,7 @@ describe('AdvertiseProductUseCase', () => {
       findProduct.execute.mockResolvedValue({ ...mockProduct, userId: 999 } as any);
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow(ForbiddenException);
     });
 
@@ -106,7 +106,7 @@ describe('AdvertiseProductUseCase', () => {
       findProduct.execute.mockResolvedValue({ ...mockProduct, status: 'inactive' } as any);
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -115,7 +115,7 @@ describe('AdvertiseProductUseCase', () => {
       adRepo.getActiveAd.mockResolvedValue({ id: 1, productId: 1 } as any);
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow(BadRequestException);
 
       expect(adRepo.getActiveAd).toHaveBeenCalledWith(1);
@@ -127,10 +127,10 @@ describe('AdvertiseProductUseCase', () => {
       getPricingUseCase.execute.mockResolvedValue({ ...mockPricing, isActive: false } as any);
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow(BadRequestException);
 
-      expect(getPricingUseCase.execute).toHaveBeenCalledWith(advertisement_type.normal);
+      expect(getPricingUseCase.execute).toHaveBeenCalledWith(AdvertisementType.normal);
     });
   });
 
@@ -151,12 +151,12 @@ describe('AdvertiseProductUseCase', () => {
       changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
       adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
 
-      await useCase.execute(1, advertisement_type.normal, 100, 'en');
+      await useCase.execute(1, AdvertisementType.normal, 100, 'en');
 
       expect(changeWalletBalanceUseCase.execute).toHaveBeenCalledWith(
         {
           userId: 100,
-          type: wallet_transaction_type.purchase,
+          type: WalletTransactionType.purchase,
           amount: 10,
           language: 'en',
         },
@@ -178,12 +178,12 @@ describe('AdvertiseProductUseCase', () => {
       changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
       adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
 
-      await useCase.execute(1, advertisement_type.normal, 100, 'en');
+      await useCase.execute(1, AdvertisementType.normal, 100, 'en');
 
       expect(changeWalletBalanceUseCase.execute).toHaveBeenCalledWith(
         {
           userId: 100,
-          type: wallet_transaction_type.purchase,
+          type: WalletTransactionType.purchase,
           amount: 8,
           language: 'en',
         },
@@ -206,7 +206,7 @@ describe('AdvertiseProductUseCase', () => {
         id: 1,
         productId: 1,
         userId: 100,
-        type: advertisement_type.normal,
+        type: AdvertisementType.normal,
       };
 
       prisma.$transaction.mockImplementation(async (callback: any) => {
@@ -219,13 +219,13 @@ describe('AdvertiseProductUseCase', () => {
       
       adRepo.createAdvertisementTx.mockResolvedValue(mockAd as any);
 
-      const result = await useCase.execute(1, advertisement_type.normal, 100, 'en');
+      const result = await useCase.execute(1, AdvertisementType.normal, 100, 'en');
 
       expect(prisma.$transaction).toHaveBeenCalled();
       expect(changeWalletBalanceUseCase.execute).toHaveBeenCalledWith(
         {
           userId: 100,
-          type: wallet_transaction_type.purchase,
+          type: WalletTransactionType.purchase,
           amount: 10,
           language: 'en',
         },
@@ -236,7 +236,7 @@ describe('AdvertiseProductUseCase', () => {
         mockTx,
         1,
         100,
-        advertisement_type.normal,
+        AdvertisementType.normal,
         expect.any(Date),
         expect.any(Date),
         mockTransactionId
@@ -259,7 +259,7 @@ describe('AdvertiseProductUseCase', () => {
       adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
 
       const beforeExecution = Date.now();
-      await useCase.execute(1, advertisement_type.normal, 100, 'en');
+      await useCase.execute(1, AdvertisementType.normal, 100, 'en');
       const afterExecution = Date.now();
 
       const createAdCall = adRepo.createAdvertisementTx.mock.calls[0];
@@ -284,7 +284,7 @@ describe('AdvertiseProductUseCase', () => {
       );
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -304,7 +304,7 @@ describe('AdvertiseProductUseCase', () => {
       );
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow('Database error');
 
       expect(prisma.$transaction).toHaveBeenCalled();
@@ -320,7 +320,7 @@ describe('AdvertiseProductUseCase', () => {
       );
 
       await expect(
-        useCase.execute(1, advertisement_type.normal, 100, 'en')
+        useCase.execute(1, AdvertisementType.normal, 100, 'en')
       ).rejects.toThrow('Some other error');
     });
   });
@@ -331,7 +331,7 @@ describe('AdvertiseProductUseCase', () => {
       adRepo.getActiveAd.mockResolvedValue(null);
       getPricingUseCase.execute.mockResolvedValue({
         id: 3,
-        type: advertisement_type.premium,
+        type: AdvertisementType.premium,
         price: 20,
         duration: 30,
         discount: 0.15,
@@ -349,15 +349,15 @@ describe('AdvertiseProductUseCase', () => {
       
       adRepo.createAdvertisementTx.mockResolvedValue({ 
         id: 2,
-        type: advertisement_type.premium 
+        type: AdvertisementType.premium 
       } as any);
 
-      await useCase.execute(1, advertisement_type.premium, 100, 'en');
+      await useCase.execute(1, AdvertisementType.premium, 100, 'en');
 
       expect(changeWalletBalanceUseCase.execute).toHaveBeenCalledWith(
         {
           userId: 100,
-          type: wallet_transaction_type.purchase,
+          type: WalletTransactionType.purchase,
           amount: 17,
           language: 'en',
         },

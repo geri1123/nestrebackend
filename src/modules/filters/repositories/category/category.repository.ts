@@ -2,19 +2,18 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { ICatRepository } from "./Icategory.repository";
 import { LanguageCode } from "@prisma/client";
-import { product_status } from "@prisma/client";
+import { ProductStatus } from "@prisma/client";
 
 @Injectable()
 export class CategoryRepository implements ICatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Get category structure WITHOUT counts (for caching)
   async getAllCategories(language: LanguageCode) {
     return this.prisma.category.findMany({
       select: {
         id: true,
         slug: true,
-        categorytranslation: {
+        categoryTranslation: {
           where: { language },
           select: { 
             name: true
@@ -25,7 +24,7 @@ export class CategoryRepository implements ICatRepository {
             id: true,
             categoryId: true,
             slug: true,  
-            subcategorytranslation: {
+            subcategoryTranslation: {
               where: { language },
               select: { 
                 name: true
@@ -38,8 +37,7 @@ export class CategoryRepository implements ICatRepository {
     });
   }
 
-  // Get ONLY counts (fresh, not cached)
-  async getCategoryCounts(status: product_status = product_status.active) {
+  async getCategoryCounts(status: ProductStatus = ProductStatus.active) {
     const subcategories = await this.prisma.subcategory.findMany({
       select: {
         id: true,
@@ -54,7 +52,6 @@ export class CategoryRepository implements ICatRepository {
       },
     });
 
-    // Build maps for O(1) lookup
     const subcategoryCountMap: Record<number, number> = {};
     const categoryCountMap: Record<number, number> = {};
 

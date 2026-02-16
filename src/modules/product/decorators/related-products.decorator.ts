@@ -1,9 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { ProductListItemDto } from '../dto/product-frontend/product-list.dto';
-class RelatedProductsResponseDto {
-  products: ProductListItemDto[];
-}
 
 export const RELATED_PRODUCTS_EXAMPLE = {
   products: [

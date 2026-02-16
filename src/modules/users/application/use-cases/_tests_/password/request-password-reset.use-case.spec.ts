@@ -61,7 +61,7 @@ describe('RequestPasswordResetUseCase', () => {
       'user',
       'active',
       true,
-      new Date(),
+      new Date().toISOString(),
       null,
       null,
     );
@@ -111,7 +111,7 @@ describe('RequestPasswordResetUseCase', () => {
       'user',
       'inactive',
       true,
-      new Date(),
+      new Date().toISOString(),
       null,
       null,
     );

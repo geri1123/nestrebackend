@@ -3,7 +3,7 @@ import { AgentContextService } from '../agent-context.service';
 import { GetAgentAuthContextUseCase } from '../../../../modules/agent/application/use-cases/get-agent-auth-context.use-case';
 import { GetAgencyByIdUseCase } from '../../../../modules/agency/application/use-cases/get-agency-by-id.use-case';
 import { ForbiddenException } from '@nestjs/common';
-import { agencyagent_status, agency_status } from '@prisma/client';
+import { AgencyAgentStatus, AgencyStatus } from '@prisma/client';
 
 describe('AgentContextService', () => {
   let service: AgentContextService;
@@ -14,7 +14,7 @@ describe('AgentContextService', () => {
     agencyAgentId: 10,
     agencyId: 1,
     roleInAgency: 'agent',
-    status: agencyagent_status.active,
+    status: AgencyAgentStatus.active,
     commissionRate: 15,
     startDate: new Date('2026-01-01'),
     updatedAt: new Date('2026-02-01'),
@@ -34,7 +34,7 @@ describe('AgentContextService', () => {
     agencyEmail: 'prime@example.com',
     logo: null,
     website: null,
-    status: agency_status.active,
+    status: AgencyStatus.active,
   };
 
   beforeEach(async () => {
@@ -80,7 +80,7 @@ describe('AgentContextService', () => {
       await service.loadAgentContext(req, 'en');
 
       expect(req.agencyId).toBe(1);
-      expect(req.agencyStatus).toBe(agency_status.active);
+      expect(req.agencyStatus).toBe(AgencyStatus.active);
       expect(req.agencyAgentId).toBe(mockAgentContext.agencyAgentId);
       expect(req.agentPermissions.can_edit_own_post).toBe(true);
       expect(req.agentStatus).toBe(mockAgentContext.status);
@@ -96,34 +96,34 @@ describe('AgentContextService', () => {
 
   describe('validateAgentStatus', () => {
     it('does not throw for active status', () => {
-      const req: any = { agentStatus: agencyagent_status.active };
+      const req: any = { agentStatus: AgencyAgentStatus.active };
       expect(() => service.validateAgentStatus(req, 'en')).not.toThrow();
     });
 
     it('throws ForbiddenException for inactive status', () => {
-      const req: any = { agentStatus: agencyagent_status.inactive };
+      const req: any = { agentStatus: AgencyAgentStatus.inactive };
       expect(() => service.validateAgentStatus(req, 'en')).toThrow(ForbiddenException);
     });
 
     it('throws ForbiddenException for terminated status', () => {
-      const req: any = { agentStatus: agencyagent_status.terminated };
+      const req: any = { agentStatus: AgencyAgentStatus.terminated };
       expect(() => service.validateAgentStatus(req, 'en')).toThrow(ForbiddenException);
     });
   });
 
   describe('validateAgencyStatusForAgent', () => {
     it('does not throw for active status', () => {
-      const req: any = { agencyStatus: agency_status.active };
+      const req: any = { agencyStatus: AgencyStatus.active };
       expect(() => service.validateAgencyStatusForAgent(req, 'en')).not.toThrow();
     });
 
     it('throws ForbiddenException for suspended status', () => {
-      const req: any = { agencyStatus: agency_status.suspended };
+      const req: any = { agencyStatus: AgencyStatus.suspended };
       expect(() => service.validateAgencyStatusForAgent(req, 'en')).toThrow(ForbiddenException);
     });
 
     it('throws ForbiddenException for inactive status', () => {
-      const req: any = { agencyStatus: agency_status.inactive };
+      const req: any = { agencyStatus: AgencyStatus.inactive };
       expect(() => service.validateAgencyStatusForAgent(req, 'en')).toThrow(ForbiddenException);
     });
   });

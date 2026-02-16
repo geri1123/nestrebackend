@@ -39,7 +39,7 @@ describe('FindUserByIdUseCase', () => {
       'user',
       'active',
       true,
-      new Date(),
+      new Date().toISOString(),
       null,
       null,
     );

@@ -10,7 +10,7 @@ export class ProductAttributeValueRepository implements IProductAttributeValueRe
   constructor(private prisma: PrismaService) {}
 
   async create(attributeValue: ProductAttributeValue): Promise<ProductAttributeValue> {
-    const created = await this.prisma.productattributevalue.create({
+    const created = await this.prisma.productAttributeValue.create({
       data: {
         productId: attributeValue.productId,
         attributeId: attributeValue.attributeId,
@@ -25,54 +25,30 @@ export class ProductAttributeValueRepository implements IProductAttributeValueRe
       attributeValueId: created.attributeValueId,
     });
   }
+async createMultiple(
+  productId: number,
+  attributes: { attributeId: number; attributeValueId: number }[]
+): Promise<void> {
+  if (!attributes || attributes.length === 0) return;
 
-  async createMultiple(
-    productId: number,
-    attributes: { attributeId: number; attributeValueId: number }[],
-    language: SupportedLang
-  ): Promise<void> {
-    if (!attributes || attributes.length === 0) return;
-
-    const promises = attributes.map(attr =>
-      this.prisma.productattributevalue.create({
-        data: {
-          productId,
-          attributeId: attr.attributeId,
-          attributeValueId: attr.attributeValueId,
-        },
-      })
-    );
-
-    try {
-      await Promise.all(promises);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new BadRequestException({
-          success: false,
-          message: t('validationFailed', language),
-          errors: {
-            attributeValue: [t('duplicateAttributeValue', language)],
-          },
-        });
-      }
-
-      throw new BadRequestException({
-        success: false,
-        message: t('somethingWentWrong', language),
-        errors: { general: [error.message] },
-      });
-    }
-  }
-
+  await this.prisma.productAttributeValue.createMany({
+    data: attributes.map(attr => ({
+      productId,
+      attributeId: attr.attributeId,
+      attributeValueId: attr.attributeValueId,
+    })),
+    skipDuplicates: true, 
+  });
+}
   async deleteByProductId(productId: number): Promise<{ count: number }> {
-    const result = await this.prisma.productattributevalue.deleteMany({
+    const result = await this.prisma.productAttributeValue.deleteMany({
       where: { productId },
     });
     return result;
   }
 
   async findByProductId(productId: number): Promise<ProductAttributeValue[]> {
-    const attributes = await this.prisma.productattributevalue.findMany({
+    const attributes = await this.prisma.productAttributeValue.findMany({
       where: { productId },
     });
 

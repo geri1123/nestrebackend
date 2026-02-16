@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { REG_REQ_TOKEN } from "../../domain/repositories/reg-req.repository.token";
 import {type IRegistrationRequestRepository } from "../../domain/repositories/registration-request.repository.interface";
-import { registrationrequest_status } from "@prisma/client";
+import { RegistrationRequestStatus } from "@prisma/client";
 export interface UpdateRequestStatusInput {
   requestId: number;
-  status: registrationrequest_status;
+  status: RegistrationRequestStatus;
   reviewedBy?: number;
   reviewNotes?: string;
 }

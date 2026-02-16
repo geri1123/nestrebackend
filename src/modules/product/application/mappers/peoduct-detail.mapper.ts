@@ -2,7 +2,7 @@ import { ProductDetailDto, ProductDetailImageDto, ProductAttributeDto } from "..
 
 export class ProductDetailMapper {
   static toDto(product: any, totalClicks: number = 0): ProductDetailDto {
-    const images: ProductDetailImageDto[] = product.productimage.map((img: any) => ({
+    const images: ProductDetailImageDto[] = product.productImage.map((img: any) => ({
       imageUrl: img.imageUrl ?? null,
     }));
 
@@ -13,9 +13,9 @@ export class ProductDetailMapper {
         new Date(ad.endDate) > new Date()
     );
 
-    const attributes: ProductAttributeDto[] = product.productattributevalue?.map((attr: any) => {
-      const translatedValue = attr.attribute_values?.attributeValueTranslations?.[0]?.name;
-      const valueCode = attr.attribute_values?.value_code;
+    const attributes: ProductAttributeDto[] = product.productAttributeValue?.map((attr: any) => {
+      const translatedValue = attr.attributeValues?.attributeValueTranslations?.[0]?.name;
+      const valueCode = attr.attributeValues?.valueCode;
       
       return {
         attributeId: attr.attributeId,
@@ -41,19 +41,20 @@ export class ProductDetailMapper {
       area: product.area ?? null,
       image: images,
       categoryName:
-        product.subcategory?.category?.categorytranslation?.[0]?.name ?? 'No Category',
+        product.subcategory?.category?.categoryTranslation?.[0]?.name ?? 'No Category',
       subcategoryName:
-        product.subcategory?.subcategorytranslation?.[0]?.name ?? 'No Subcategory',
+        product.subcategory?.subcategoryTranslation?.[0]?.name ?? 'No Subcategory',
       listingTypeName:
-        product.listing_type?.listing_type_translation?.[0]?.name ?? 'No Listing Type',
+        product.listingType?.listingTypeTranslation?.[0]?.name ?? 'No Listing Type',
       userId: product.userId,
       agencyId: product.agencyId ?? null,
       user: product.user
         ? {
             username: product.user.username,
+            profileImgUrl:product.user.profileImgUrl,
             email: product.user.email ?? null,
-            first_name: product.user.first_name ?? null,
-            last_name: product.user.last_name ?? null,
+            firstName: product.user.firstName ?? null,
+            lastName: product.user.lastName ?? null,
             phone: product.user.phone ?? null,
             role: product.user.role,
             status: product.user.status,
@@ -61,13 +62,13 @@ export class ProductDetailMapper {
         : null,
       agency: product.agency
         ? {
-            agency_name: product.agency.agency_name,
+            agencyName: product.agency.agencyName,
             logo: product.agency.logo ?? null,
             address: product.agency.address ?? null,
             status: product.agency.status ?? null,
-            public_code:product.agency.public_code ?? null,
+            publicCode: product.agency.publicCode ?? null,
             phone: product.agency.phone ?? null,
-            created_at: product.agency.created_at,
+            createdAt: product.agency.createdAt,
           }
         : null,
       isAdvertised: !!activeAd,

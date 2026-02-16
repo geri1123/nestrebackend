@@ -2,7 +2,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { SupportedLang } from '../../locales';
-import { product_status } from '@prisma/client';
+import { ProductStatus } from '@prisma/client';
 import { AttributeDto } from './dto/attribute.dto';
 import { CityDto, CountryDto } from './dto/location.dto';
 import { CacheService } from '../../infrastructure/cache/cache.service';
@@ -63,7 +63,7 @@ export class FiltersService {
   // Main method: combine cached structure + fresh counts
   async getCategories(
     lang: SupportedLang = 'al',
-    status: product_status = product_status.active,
+    status: ProductStatus = ProductStatus.active,
   ): Promise<CategoryDto[]> {
     try {
       const structure = await this.getCategoryStructure(lang);
@@ -85,42 +85,40 @@ export class FiltersService {
       throw err;
     }
   }
-
-  private mapCategoriesWithCounts(
-    categories: any[],
-    subcategoryCountMap: Record<number, number>,
-    categoryCountMap: Record<number, number>,
-  ): CategoryDto[] {
-    return (categories ?? []).map((category) => {
-      const subcategories = (category.subcategory ?? []).map((subcat) => {
-        const [translation] = subcat.subcategorytranslation ?? [];
-
-        return {
-          id: subcat.id,
-          name: translation?.name ?? 'No translation',
-          slug: subcat.slug,
-          categoryId: subcat.categoryId,
-          productCount: subcategoryCountMap[subcat.id] ?? 0, //  Fresh count
-        };
-      });
-
-      const [translation] = category.categorytranslation ?? [];
+private mapCategoriesWithCounts(
+  categories: any[],
+  subcategoryCountMap: Record<number, number>,
+  categoryCountMap: Record<number, number>,
+): CategoryDto[] {
+  return (categories ?? []).map((category) => {
+    const subcategories = (category.subcategory ?? []).map((subcat) => {
+      const [translation] = subcat.subcategoryTranslation ?? [];
 
       return {
-        id: category.id,
+        id: subcat.id,
         name: translation?.name ?? 'No translation',
-        slug: category.slug,
-        productCount: categoryCountMap[category.id] ?? 0, 
-        subcategories,
+        slug: subcat.slug,
+        categoryId: subcat.categoryId,
+        productCount: subcategoryCountMap[subcat.id] ?? 0,
       };
     });
-  }
 
+    const [translation] = category.categoryTranslation ?? [];
+
+    return {
+      id: category.id,
+      name: translation?.name ?? 'No translation',
+      slug: category.slug,
+      productCount: categoryCountMap[category.id] ?? 0,
+      subcategories,
+    };
+  });
+}
  
 
   async getListingTypes(
     lang: SupportedLang = 'al',
-    status: product_status = product_status.active,
+    status: ProductStatus = ProductStatus.active,
   ) {
     const cacheKey = `listingTypes:structure:${lang}`;
     let listingTypes = await this.cacheService.get<any[]>(cacheKey);
@@ -158,7 +156,7 @@ export class FiltersService {
 
   async getFilters(
     lang: SupportedLang = 'al',
-    status: product_status = product_status.active,
+    status: ProductStatus = ProductStatus.active,
   ) {
     const [categories, listingTypes] = await Promise.all([
       this.getCategories(lang, status),
@@ -173,7 +171,8 @@ export class FiltersService {
     subcategoryId: number,
     lang: SupportedLang = 'al',
   ): Promise<AttributeDto[]> {
-    const cacheKey = `attributes:${subcategoryId}:${lang}`;
+   const cacheKey = `attributes:v2:${subcategoryId}:${lang}`;
+
 
     let attributes = await this.cacheService.get<AttributeDto[]>(cacheKey);
 
@@ -202,7 +201,6 @@ export class FiltersService {
         `[DB EMPTY] No attributes found for subcategory ${subcategoryId} (${lang})`,
       );
     }
-
     return attributes ?? [];
   }
 

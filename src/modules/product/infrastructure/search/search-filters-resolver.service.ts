@@ -85,7 +85,7 @@ export class SearchFiltersResolver {
     // LISTING TYPE
     if (normalizedListingType && !result.listingTypeId) {
       try {
-        const listingType = await this.prisma.listing_type.findFirst({
+        const listingType = await this.prisma.listingType.findFirst({
           where: { slug: normalizedListingType },
         });
 
@@ -146,12 +146,12 @@ export class SearchFiltersResolver {
 
           console.log(` Looking for value codes: [${valueCodeArray.join(', ')}]`);
 
-          const attributeValues = await this.prisma.attribute_value.findMany({
+          const attributeValues = await this.prisma.attributeValue.findMany({
             where: {
-              attribute_id: attribute.id,
-              value_code: { in: valueCodeArray },
+              attributeId: attribute.id,
+              valueCode: { in: valueCodeArray },
             },
-            select: { id: true, value_code: true },
+            select: { id: true, valueCode: true },
           });
 
           if (attributeValues.length > 0) {
@@ -162,7 +162,7 @@ export class SearchFiltersResolver {
             ];
             console.log(
               `Found ${attributeValues.length} values: ${attributeValues
-                .map((av) => av.value_code)
+                .map((av) => av.valueCode)
                 .join(', ')}`,
             );
           } else {
@@ -194,4 +194,3 @@ export class SearchFiltersResolver {
     return result;
   }
 }
-

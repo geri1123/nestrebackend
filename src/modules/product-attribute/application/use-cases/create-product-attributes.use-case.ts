@@ -1,6 +1,5 @@
-
-
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import {PRODUCT_ATTRIBUTE_VALUE_REPO, type IProductAttributeValueRepository } from '../../domain/repositories/product-attribute.repository.interface';
 import { SupportedLang, t } from '../../../../locales';
 import { ATTRIBUTE_REPO, type IAttributeRepo } from '../../../filters/repositories/attributes/Iattribute.respository';
@@ -79,10 +78,31 @@ export class CreateProductAttributeValuesUseCase {
       }
     }
 
-    await this.productAttributeValueRepository.createMultiple(
-      productId, 
-      processedAttributes, 
-      language
-    );
+    // Handle database errors here in the use case
+    try {
+      await this.productAttributeValueRepository.createMultiple(
+        productId, 
+        processedAttributes
+      );
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new BadRequestException({
+          success: false,
+          message: t('validationFailed', language),
+          errors: {
+            attributeValue: [t('duplicateAttributeValue', language)],
+          },
+        });
+      }
+
+      // Type guard for Error objects
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      throw new BadRequestException({
+        success: false,
+        message: t('somethingWentWrong', language),
+        errors: { general: [errorMessage] },
+      });
+    }
   }
 }

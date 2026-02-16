@@ -1,11 +1,11 @@
-import { wallet_transaction_type, WalletTransaction, Prisma } from "@prisma/client";
+import { WalletTransactionType, WalletTransaction, Prisma } from "@prisma/client";
 
 export interface IWalletTransactionRepository {
  
   createTransactionTx(
     tx: Prisma.TransactionClient, 
     walletId: string,
-    type: wallet_transaction_type,
+    type: WalletTransactionType,
     amount: number,
     balanceAfter: number,
     description?: string

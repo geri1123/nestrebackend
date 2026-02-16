@@ -22,7 +22,7 @@ export interface IAttributeRepo {
     valueCode: string
   ): Promise<{ 
     id: number; 
-    value_code: string;
+    valueCode: string;
   } | null>;
 }
 

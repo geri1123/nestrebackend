@@ -1,63 +1,4 @@
-// import { Inject, Injectable } from '@nestjs/common';
-// import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
-// import { GoogleAuthService } from '../../infrastructure/services/google-auth.service';
-// import { generateUsername } from '../../../../common/utils/generate-username';
-// import { AuthTokenService } from '../../../../infrastructure/auth/services/auth-token.service';
-// import { AuthCookieService } from '../../infrastructure/services/auth-cookie.service';
-// import { Response } from 'express';
-// import { user_role, user_status } from '@prisma/client';
 
-// @Injectable()
-// export class GoogleLoginUseCase {
-//   constructor(
-//     private readonly googleAuth: GoogleAuthService,
-//     @Inject(USER_REPO)
-//     private readonly users: IUserDomainRepository,
-//     private readonly authToken: AuthTokenService,
-//     private readonly cookie: AuthCookieService,
-//   ) {}
-
-//   async execute(idToken: string, res: Response) {
-//     const googleUser = await this.googleAuth.verify(idToken);
-
-    
-//     const existing = await this.users.findByEmail(googleUser.email);
-//     let userId: number;
-
-//     if (existing) {
-//       userId = existing.id;
-//     } else {
-    
-//       let username = googleUser.email.split('@')[0];
-
-//       if (await this.users.usernameExists(username)) {
-//         username = generateUsername(username);
-//       }
-
-     
-//       userId = await this.users.create({
-//         email: googleUser.email,
-//         username,
-//         password: '', 
-//         first_name: googleUser.firstName,
-//         last_name: googleUser.lastName,
-//         role: user_role.user, 
-//         status: user_status.active,
-//            email_verified: true,       
-//       google_user: true,            
-//       google_id: googleUser.id, 
-      
-//       });
-//     }
-
-//     const user = await this.users.findById(userId);
-
-//     const token = this.authToken.generate(user, 30); 
-//     this.cookie.setAuthCookie(res, token, true);
-
-//     return { success: true, user };
-//   }
-// }
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
 import { GoogleAuthService } from '../../infrastructure/services/google-auth.service';
@@ -65,7 +6,7 @@ import { generateUsername } from '../../../../common/utils/generate-username';
 import { AuthTokenService } from '../../../../infrastructure/auth/services/auth-token.service';
 import { AuthCookieService } from '../../infrastructure/services/auth-cookie.service';
 import { Response } from 'express';
-import { user_role, user_status } from '@prisma/client';
+import { UserRole, UserStatus } from '@prisma/client';
 
 @Injectable()
 export class GoogleLoginUseCase {
@@ -101,8 +42,8 @@ export class GoogleLoginUseCase {
         password: '', 
         first_name: googleUser.firstName,
         last_name: googleUser.lastName,
-        role: user_role.user, 
-        status: user_status.active,
+        role: UserRole.user, 
+        status: UserStatus.active,
            email_verified: true,       
       google_user: true,            
       google_id: googleUser.id, 

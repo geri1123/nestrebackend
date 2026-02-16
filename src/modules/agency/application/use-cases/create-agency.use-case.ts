@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
-import { agency_status, Prisma } from '@prisma/client';
+import { AgencyStatus, Prisma } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
 
@@ -21,7 +21,7 @@ export class CreateAgencyUseCase {
   async execute(
     data: CreateAgencyData,
     ownerUserId: number,
-    status: agency_status,
+    status: AgencyStatus,
     lang: SupportedLang = 'al',
     tx?: Prisma.TransactionClient 
   ): Promise<number> {

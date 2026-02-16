@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { advertisement_type } from "@prisma/client";
+import { AdvertisementType } from "@prisma/client";
 import { ADVERTISEMENT_PRICING_REPO,type IAdvertisementPricingRepository } from "../../domain/repositories/advertisement-pricing.repository.interface";
 
 @Injectable()
@@ -10,7 +10,7 @@ export class UpdatePricingUseCase {
   ) {}
 
   async execute(
-    adType: advertisement_type,
+    adType: AdvertisementType,
     data: { price?: number; duration?: number; discount?: number; isActive?: boolean }
   ) {
     return this.repo.update(adType, data);

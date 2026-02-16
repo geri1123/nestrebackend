@@ -5,7 +5,7 @@ import { CreateAgencyUseCase } from '../../../../agency/application/use-cases/cr
 import { ValidateAgencyBeforeRegisterUseCase } from '../../../../agency/application/use-cases/validate-agency-before-register.use-case';
 import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
 import { RegisterAgencyOwnerDto } from '../../../dto/register-agency-owner.dto';
-import { agency_status } from '@prisma/client';
+import { AgencyStatus } from '@prisma/client';
 
 describe('RegisterAgencyOwnerUseCase', () => {
   let useCase: RegisterAgencyOwnerUseCase;
@@ -110,7 +110,7 @@ describe('RegisterAgencyOwnerUseCase', () => {
         address: 'Tirana',
       },
       1,
-      agency_status.inactive,
+      AgencyStatus.inactive,
       'al',
       expect.anything(),
     );

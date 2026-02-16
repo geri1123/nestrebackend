@@ -30,18 +30,18 @@ describe('GetProductByIdUseCase', () => {
     buildYear: 2020,
     area: 100,
     subcategoryId: 1,
-    productimage: [],
-    productattributevalue: [],
+    productImage: [], // ✅ Correct property name
+    productAttributeValue: [],
     advertisements: [],
     city: { name: 'Tirana' },
     subcategory: {
       id: 1,
-      subcategorytranslation: [{ name: 'Apartment' }],
-      category: { id: 1, categorytranslation: [{ name: 'Residential' }] },
+      subcategoryTranslation: [{ name: 'Apartment' }],
+      category: { id: 1, categoryTranslation: [{ name: 'Residential' }] },
     },
     listing_type: { listing_type_translation: [{ name: 'For Sale' }] },
     user: { username: 'testuser', role: 'user', status: 'active' },
-    agency: { agency_name: 'Test Agency', status: 'active' },
+    agency: { agencyName: 'Test Agency', status: 'active' },
   };
 
   it('returns null if product not found', async () => {

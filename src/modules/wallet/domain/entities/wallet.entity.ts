@@ -1,5 +1,5 @@
 
-import { Wallet, wallet_transaction_type } from "@prisma/client";
+import { Wallet } from "@prisma/client";
 
 export class WalletDomainEntity {
   constructor(

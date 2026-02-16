@@ -3,7 +3,7 @@ import { RegisterAgencyFromUserUseCase } from '../register-agency-from-user.use-
 import { CreateAgencyUseCase } from '../create-agency.use-case';
 import { USER_REPO } from '../../../../users/domain/repositories/user.repository.interface';
 import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
-import { user_role } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 
 describe('RegisterAgencyFromUserUseCase', () => {
   let useCase: RegisterAgencyFromUserUseCase;
@@ -47,7 +47,7 @@ describe('RegisterAgencyFromUserUseCase', () => {
     expect(createAgencyMock.execute).toHaveBeenCalled();
     expect(userRepoMock.updateFields).toHaveBeenCalledWith(
       5,
-      { role: user_role.agency_owner },
+      { role: UserRole.agency_owner },
       expect.anything(),
     );
     expect(result.agencyId).toBe(15);

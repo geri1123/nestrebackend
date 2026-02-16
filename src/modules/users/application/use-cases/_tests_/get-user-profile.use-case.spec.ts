@@ -51,7 +51,7 @@ describe('GetUserProfileUseCase', () => {
       'user',
       'active',
       true,
-      new Date(),
+      new Date().toISOString(),
       null,
       null,
     );
@@ -81,7 +81,7 @@ describe('GetUserProfileUseCase', () => {
       'agent',
       'active',
       true,
-      new Date(),
+      new Date().toISOString(),
       null,
       null,
     );
@@ -135,7 +135,7 @@ describe('GetUserProfileUseCase', () => {
       'agency_owner',
       'active',
       true,
-      new Date(),
+      new Date().toISOString(),
       null,
       null,
     );

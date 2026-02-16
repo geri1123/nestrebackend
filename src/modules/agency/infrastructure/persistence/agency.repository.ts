@@ -3,7 +3,7 @@ import { PrismaService } from '../../../../infrastructure/prisma/prisma.service'
 import { IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { Agency } from '../../domain/entities/agency.entity';
 import { AgencyInfoVO } from '../../domain/value-objects/agency-info.vo';
-import { agency_status, Prisma } from '@prisma/client';
+import { AgencyStatus, Prisma } from '@prisma/client';
 import { generatePublicCode } from '../../../../common/utils/hash';
 
 @Injectable()
@@ -22,26 +22,35 @@ export class AgencyRepository implements IAgencyDomainRepository {
     agency_name: string;
     owner_user_id: number;
   } | null> {
-    return this.prisma.agency.findUnique({
+    const result = await this.prisma.agency.findUnique({
       where: { id },
       select: {
         id: true,
-        agency_name: true,
-        owner_user_id: true,
+        agencyName: true,
+        ownerUserId: true,
       },
     });
+
+    if (!result) return null;
+
+    // Map camelCase to snake_case
+    return {
+      id: result.id,
+      agency_name: result.agencyName,
+      owner_user_id: result.ownerUserId,
+    };
   }
 
   async findByOwnerUserId(ownerUserId: number): Promise<Agency | null> {
     const data = await this.prisma.agency.findFirst({
-      where: { owner_user_id: ownerUserId },
+      where: { ownerUserId: ownerUserId },
     });
     return data ? this.mapToEntity(data) : null;
   }
 
   async findByPublicCode(publicCode: string): Promise<Agency | null> {
     const data = await this.prisma.agency.findUnique({
-      where: { public_code: publicCode },
+      where: { publicCode: publicCode },
     });
     return data ? this.mapToEntity(data) : null;
   }
@@ -53,8 +62,8 @@ export class AgencyRepository implements IAgencyDomainRepository {
         user: {
           select: {
             username: true,
-            first_name: true,
-            last_name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -65,25 +74,24 @@ export class AgencyRepository implements IAgencyDomainRepository {
 
     return {
       id: agency.id,
-      agencyName: agency.agency_name,
-      licenseNumber: agency.license_number,
+      agencyName: agency.agencyName,
+      licenseNumber: agency.licenseNumber,
       address: agency.address,
       status: agency.status,
-      publicCode: agency.public_code,
-      agencyEmail: agency.agency_email,
+      publicCode: agency.publicCode,
+      agencyEmail: agency.agencyEmail,
       phone: agency.phone,
       website: agency.website,
       logo: agency.logo,
-      ownerUserId: agency.owner_user_id,
+      ownerUserId: agency.ownerUserId,
       ownerName: agency.user
-        ? `${agency.user.first_name} ${agency.user.last_name}`
+        ? `${agency.user.firstName} ${agency.user.lastName}`
         : undefined,
       ownerEmail: agency.user?.email ?? undefined,
-      createdAt: agency.created_at,
+      createdAt: agency.createdAt,
     };
   }
 
-  
   async findLogoById(agencyId: number): Promise<{ 
     logo: string | null; 
     logoPublicId: string | null; 
@@ -92,7 +100,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       where: { id: agencyId },
       select: { 
         logo: true,
-        logo_public_id: true, 
+        logoPublicId: true, 
       },
     });
 
@@ -100,117 +108,103 @@ export class AgencyRepository implements IAgencyDomainRepository {
 
     return {
       logo: result.logo,
-      logoPublicId: result.logo_public_id,
+      logoPublicId: result.logoPublicId,
     };
   }
 
-  
-// async getAllAgencies(
-//   skip: number,
-//   limit: number,
-//   search?: string,
-// ): Promise<any[]> {
-//   const words =
-//     search && search.trim().length >= 3
-//       ? search.trim().split(/\s+/)
-//       : undefined;
+  async getAllAgenciesPaginated(
+    skip: number,
+    limit: number,
+    search?: string,
+  ): Promise<{
+    id: number;
+    agency_name: string;
+    logo: string | null;
+    address: string | null;
+    phone: string | null;
+    agency_email: string | null;
+    public_code: string | null;
+    created_at: Date;
+  }[]> {
+    const words =
+      search && search.trim().length >= 3
+        ? search.trim().toLowerCase().split(/\s+/)
+        : undefined;
 
-//   return this.prisma.agency.findMany({
-//     where: {
-//       status: agency_status.active,
-//       ...(words && {
-//         AND: words.map(word => ({
-//           OR: [
-//             { agency_name: { contains: word } },
-//             { address: { contains: word } },
-//           ],
-//         })),
-//       }),
-//     },
-//     orderBy: { created_at: 'desc' },
-//     skip,
-//     take: limit,
-//   });
-// }
-async getAllAgenciesPaginated(
-  skip: number,
-  limit: number,
-  search?: string,
-): Promise<{
- id: number;
-  agency_name: string;
-  logo: string | null;
-  address: string | null;
-  phone: string | null;
-  agency_email: string | null;
-  public_code: string | null;
-  created_at: Date;
-}[]> {
-  const words =
-    search && search.trim().length >= 3
-      ? search.trim().toLowerCase().split(/\s+/)
-      : undefined;
+    const results = await this.prisma.agency.findMany({
+      where: {
+        status: AgencyStatus.active,
+        ...(words && {
+          AND: words.map(word => ({
+            OR: [
+              { 
+                agencyName: { 
+                  contains: word,
+                } 
+              },
+              { 
+                address: { 
+                  contains: word,
+                } 
+              },
+            ],
+          })),
+        }),
+      },
+      select: {
+        id: true,
+        agencyName: true,
+        logo: true,
+        address: true,
+        phone: true,           
+        agencyEmail: true,    
+        publicCode: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    });
 
-  return this.prisma.agency.findMany({
-    where: {
-      status: agency_status.active,
-      ...(words && {
-        AND: words.map(word => ({
-          OR: [
-            { 
-              agency_name: { 
-                contains: word,
-              } 
-            },
-            { 
-              address: { 
-                contains: word,
-              } 
-            },
-          ],
-        })),
-      }),
-    },
-    select: {
-       id: true,
-      agency_name: true,
-      logo: true,
-      address: true,
-      phone: true,           
-      agency_email: true,    
-      public_code: true,
-      created_at: true,
-    },
-    orderBy: { created_at: 'desc' },
-    skip,
-    take: limit,
-  });
-}
-async countAgencies(search?: string): Promise<number> {
-  const words =
-    search && search.trim().length >= 3
-      ? search.trim().split(/\s+/)
-      : undefined;
+    // Map camelCase to snake_case
+    return results.map(result => ({
+      id: result.id,
+      agency_name: result.agencyName,
+      logo: result.logo,
+      address: result.address,
+      phone: result.phone,
+      agency_email: result.agencyEmail,
+      public_code: result.publicCode,
+      created_at: result.createdAt,
+    }));
+  }
 
-  return this.prisma.agency.count({
-    where: {
-      status: agency_status.active,
-      ...(words && {
-        AND: words.map(word => ({
-          OR: [
-            { agency_name: { contains: word } },
-            { address: { contains: word } },
-          ],
-        })),
-      }),
-    },
-  });
-}
+  async countAgencies(search?: string): Promise<number> {
+    const words =
+      search && search.trim().length >= 3
+        ? search.trim().split(/\s+/)
+        : undefined;
+
+    return this.prisma.agency.count({
+      where: {
+        status: AgencyStatus.active,
+        ...(words && {
+          AND: words.map(word => ({
+            OR: [
+              { agencyName: { contains: word } },
+              { address: { contains: word } },
+            ],
+          })),
+        }),
+      },
+    });
+  }
+
   // VALIDATION METHODS
 
   async agencyNameExists(name: string): Promise<boolean> {
     const exists = await this.prisma.agency.findFirst({
-      where: { agency_name: name },
+      where: { agencyName: name },
       select: { id: true },
     });
     return exists !== null;
@@ -218,7 +212,7 @@ async countAgencies(search?: string): Promise<number> {
 
   async licenseExists(license: string): Promise<boolean> {
     const exists = await this.prisma.agency.findFirst({
-      where: { license_number: license },
+      where: { licenseNumber: license },
       select: { id: true },
     });
     return exists !== null;
@@ -232,7 +226,7 @@ async countAgencies(search?: string): Promise<number> {
       license_number: string;
       address: string;
       owner_user_id: number;
-      status: agency_status;
+      status: AgencyStatus;
     },
     tx?: Prisma.TransactionClient
   ): Promise<number> {
@@ -245,8 +239,12 @@ async countAgencies(search?: string): Promise<number> {
 
     const newAgency = await client.agency.create({
       data: {
-        ...data,
-        public_code: publicCode,
+        agencyName: data.agency_name,        
+        licenseNumber: data.license_number,  
+        address: data.address,
+        ownerUserId: data.owner_user_id,     
+        status: data.status,
+        publicCode: publicCode,
       },
       select: { id: true },
     });
@@ -258,9 +256,9 @@ async countAgencies(search?: string): Promise<number> {
     const prismaData: any = {};
     
     if (data.logo !== undefined) prismaData.logo = data.logo;
-    if (data.logoPublicId !== undefined) prismaData.logo_public_id = data.logoPublicId;
-    if (data.agencyName !== undefined) prismaData.agency_name = data.agencyName;
-    if (data.agencyEmail !== undefined) prismaData.agency_email = data.agencyEmail;
+    if (data.logoPublicId !== undefined) prismaData.logoPublicId = data.logoPublicId;
+    if (data.agencyName !== undefined) prismaData.agencyName = data.agencyName;
+    if (data.agencyEmail !== undefined) prismaData.agencyEmail = data.agencyEmail;
     if (data.phone !== undefined) prismaData.phone = data.phone;
     if (data.address !== undefined) prismaData.address = data.address;
     if (data.website !== undefined) prismaData.website = data.website;
@@ -278,17 +276,16 @@ async countAgencies(search?: string): Promise<number> {
     const client = tx ?? this.prisma;
     await client.agency.update({
       where: { id: agencyId },
-      data: { status: agency_status.active },
+      data: { status: AgencyStatus.active },
     });
   }
 
-  
   async deleteLogo(agencyId: number): Promise<void> {
     await this.prisma.agency.update({
       where: { id: agencyId },
       data: { 
         logo: null,
-        logo_public_id: null, 
+        logoPublicId: null, 
       },
     });
   }
@@ -297,35 +294,35 @@ async countAgencies(search?: string): Promise<number> {
 
   private async publicCodeExists(publicCode: string): Promise<boolean> {
     const existing = await this.prisma.agency.findUnique({
-      where: { public_code: publicCode },
+      where: { publicCode: publicCode },
       select: { id: true },
     });
     return existing !== null;
   }
 
-  //  UPDATED METHOD
+  // Map Prisma camelCase to entity snake_case
   private mapToEntity(data: any): Agency {
     return Agency.create({
       id: data.id,
-      agencyName: data.agency_name,
-      licenseNumber: data.license_number,
+      agencyName: data.agencyName,
+      licenseNumber: data.licenseNumber,
       address: data.address,
-      ownerUserId: data.owner_user_id,
+      ownerUserId: data.ownerUserId,
       status: data.status,
-      publicCode: data.public_code,
-      logoPublicId: data.logo_public_id, 
-      agencyEmail: data.agency_email,
+      publicCode: data.publicCode,
+      logoPublicId: data.logoPublicId, 
+      agencyEmail: data.agencyEmail,
       phone: data.phone,
       website: data.website,
       logo: data.logo,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     });
   }
 
   async deleteByOwnerUserId(ownerUserId: number): Promise<number> {
     const result = await this.prisma.agency.deleteMany({
-      where: { owner_user_id: ownerUserId },
+      where: { ownerUserId: ownerUserId },
     });
     return result.count;
   }

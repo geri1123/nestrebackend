@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { AgencyOwnerContextService } from '../agency-owner-context.service';
 import { GetAgencyByOwnerUseCase } from '../../../../modules/agency/application/use-cases/get-agency-by-owner.use-case';
 import { ForbiddenException } from '@nestjs/common';
-import { agency_status } from '@prisma/client';
+import { AgencyStatus } from '@prisma/client';
 
 describe('AgencyOwnerContextService', () => {
   let service: AgencyOwnerContextService;
@@ -13,7 +13,7 @@ describe('AgencyOwnerContextService', () => {
     agencyName: 'Best Agency',
     agencyEmail: 'agency@example.com',
     logo: 'logo.png',
-    status: agency_status.active,
+    status: AgencyStatus.active,
     address: '123 Main St',
     phone: '+355691234567',
     website: 'https://bestagency.com',
@@ -49,7 +49,7 @@ describe('AgencyOwnerContextService', () => {
         name: 'Best Agency',
         email: 'agency@example.com',
         logo: 'logo.png',
-        status: agency_status.active,
+        status: AgencyStatus.active,
         address: '123 Main St',
         phone: '+355691234567',
         website: 'https://bestagency.com',
@@ -67,19 +67,19 @@ describe('AgencyOwnerContextService', () => {
       await service.loadAgencyOwnerContext(req, 'en');
 
       expect(req.agencyId).toBe(1);
-      expect(req.agencyStatus).toBe(agency_status.active);
+      expect(req.agencyStatus).toBe(AgencyStatus.active);
       expect(req.isAgencyOwner).toBe(true);
     });
   });
 
   describe('validateAgencyStatus', () => {
     it('does not throw if agency status is active', () => {
-      const req: any = { agencyStatus: agency_status.active };
+      const req: any = { agencyStatus: AgencyStatus.active };
       expect(() => service.validateAgencyStatus(req, 'en')).not.toThrow();
     });
 
     it('throws ForbiddenException if agency is suspended', () => {
-      const req: any = { agencyStatus: agency_status.suspended };
+      const req: any = { agencyStatus: AgencyStatus.suspended };
       expect(() => service.validateAgencyStatus(req, 'en')).toThrow(ForbiddenException);
     });
   });

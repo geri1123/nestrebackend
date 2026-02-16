@@ -15,7 +15,7 @@ export class ChangeUsernameUseCase {
     @Inject(USERNAME_REPO)
     private readonly usernameHistoryRepository: IUsernameHistoryDomainRepository,
     
-    private readonly findUserById: FindUserByIdUseCase, // <-- use entity, not DTO
+    private readonly findUserById: FindUserByIdUseCase,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 

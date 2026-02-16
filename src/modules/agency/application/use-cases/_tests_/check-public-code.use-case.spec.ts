@@ -83,8 +83,11 @@ describe('GetAgencyByPublicCodeUseCase', () => {
         fail('Should have thrown BadRequestException');
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
-        expect(error.response).toHaveProperty('success', false);
-        expect(error.response).toHaveProperty('message');
+        if (error instanceof BadRequestException) {
+          const response = error.getResponse();
+          expect(response).toHaveProperty('success', false);
+          expect(response).toHaveProperty('message');
+        }
       }
     });
 

@@ -3,14 +3,14 @@ import {  WalletRepository } from "../../infrastructure/persistence/wallet.repos
 import { WalletTransactionRepository } from "../../infrastructure/persistence/wallet-transaction.repository";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { WalletDomainEntity } from "../../domain/entities/wallet.entity";
-import { wallet_transaction_type, WalletTransaction } from "@prisma/client";
+import { WalletTransactionType } from "@prisma/client";
 import { SupportedLang, t } from "../../../../locales";
 import {type IWalletRepository } from "../../domain/repositories/wallet.interface.repository";
 import { type IWalletTransactionRepository } from "../../domain/repositories/wallet-transaction.interface.repository";
 
 interface ChangeBalanceInput {
   userId: number;
-  type: wallet_transaction_type;
+  type: WalletTransactionType;
   amount: number;
   language: SupportedLang;
 }
@@ -39,13 +39,13 @@ export class ChangeWalletBalanceUseCase {
   let newBalance: number;
 
   switch (type) {
-    case wallet_transaction_type.topup:
+    case WalletTransactionType.topup:
       newBalance = wallet.topup(amount);
       break;
-    case wallet_transaction_type.withdraw:
+    case WalletTransactionType.withdraw:
       newBalance = wallet.withdraw(amount);
       break;
-  case wallet_transaction_type.purchase:
+  case WalletTransactionType.purchase:
     try {
       newBalance = wallet.purchase(amount);
     } catch (err) {

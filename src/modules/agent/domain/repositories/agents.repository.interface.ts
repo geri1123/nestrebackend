@@ -2,7 +2,7 @@ import { AgentEntity } from '../entities/agent.entity';
 import { AgentStatus } from '../types/agent-status.type';
 import { AgentRole } from '../types/agent-role.type';
 import { AgentPermissionEntity } from '../entities/agent-permission.entity';
-import { agencyagent_role_in_agency, agencyagent_status, Prisma } from '@prisma/client';
+import {  AgencyAgentRoleInAgency, AgencyAgentStatus, Prisma } from '@prisma/client';
 
 // basic aggregate used in listing:
 export interface AgentUserProps {
@@ -68,9 +68,9 @@ findByAgencyAndAgent(
 getAgentAuthContext(userId: number): Promise<{
     agencyId: number;
     agencyAgentId: number;
-    roleInAgency: agencyagent_role_in_agency;
+    roleInAgency: AgencyAgentRoleInAgency;
     commissionRate:number | null;
-    status: agencyagent_status;
+    status: AgencyAgentStatus;
     startDate:Date |null;
     
     updatedAt:Date | null;

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { advertisement_status, advertisement_type } from '@prisma/client';
+import { AdvertisementStatus, AdvertisementType } from '@prisma/client';
 
 
  // DTO for product images in list view
@@ -31,7 +31,7 @@ export class ProductListAgencyDto {
     example: 'Prime Real Estate',
     description: 'Name of the real estate agency'
   })
-  agency_name!: string;
+  agencyName!: string;
 
   @ApiProperty({ 
     example: 'https://storage.googleapis.com/bucket/logo.webp', 
@@ -56,7 +56,7 @@ export class ProductListAdvertisementDto {
     enum: ['active', 'inactive', 'expired', 'pending'],
     description: 'Current status of the advertisement'
   })
-  status!: advertisement_status;
+  status!: AdvertisementStatus;
 }
 
  // DTO for individual product in list view

@@ -20,18 +20,18 @@ export class GetPaginatedAgenciesUseCase {
 const total_pages = Math.ceil(total / limit);
     return {
   total,
-  total_pages,
+  totalPages:total_pages,
   page,
   limit,
   agencies: agencies.map(agency => ({
     id: agency.id,
-    agency_name: agency.agency_name,
+    agencyName: agency.agency_name,
     logo: agency.logo,
     address: agency.address,
     phone:agency.phone,
     agencyEmail:agency.agency_email,
-    public_code: agency.public_code,
-    created_at: agency.created_at.toISOString(),
+    publicCode: agency.public_code,
+    createdAt: agency.created_at.toISOString(),
   })),
 };
   }

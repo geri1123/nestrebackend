@@ -5,7 +5,7 @@ export class AgencyListItemResponse {
   id!: number;
 
   @ApiProperty({ example: 'DreamHomes Agency', description: 'Agency name' })
-  agency_name!: string;
+  agencyName!: string;
 
   @ApiProperty({ 
     example: 'https://bucket.s3.amazonaws.com/logo.jpg', 
@@ -18,10 +18,10 @@ export class AgencyListItemResponse {
   @ApiProperty({example:'+35569.....' , description:"agency phone nr"})
  phone!:string|null;
   @ApiProperty({ example: 'ABCD1234', description: 'Agency public code', nullable: true })
- public_code!: string | null;
+ publicCode!: string | null;
   @ApiProperty({ example: 'Rruga e Kavajës 120, Tirana', description: 'Agency address' })
   address!: string | null;
 
   @ApiProperty({ example: '10/12/2025', description: 'Creation date (formatted)' })
-  created_at!: string;
+  createdAt!: string;
 }
