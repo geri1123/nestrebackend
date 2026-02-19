@@ -2,14 +2,13 @@ import { SupportedLang } from "../../../../locales";
 import { AgencyAgentRoleInAgency, AgencyAgentStatus } from "@prisma/client";
 import { UpdateAgentsDto } from "../../dto/update-agents.dto";
 
-// Field translations
 const fieldTranslations = {
-  commission_rate: {
+  commissionRate: {
     en: "commission rate",
     al: "përqindja e komisionit",
     it: "percentuale di commissione",
   },
-  role_in_agency: {
+  roleInAgency: {
     en: "role",
     al: "roli",
     it: "ruolo",
@@ -19,7 +18,7 @@ const fieldTranslations = {
     al: "statusi",
     it: "stato",
   },
-  end_date: {
+  endDate: {
     en: "end date",
     al: "data e përfundimit",
     it: "data di fine",
@@ -31,63 +30,60 @@ const fieldTranslations = {
   },
 };
 
-// Role translations
 const roleTranslations: Record<AgencyAgentRoleInAgency, Record<SupportedLang, string>> = {
   agent: { en: "agent", al: "agjent", it: "agente" },
   senior_agent: { en: "senior agent", al: "agjent i lartë", it: "agente senior" },
   team_lead: { en: "team lead", al: "udhëheqës i ekipit", it: "capo squadra" },
 };
 
-// Status translations
 const statusTranslations: Record<AgencyAgentStatus, Record<SupportedLang, string>> = {
   active: { en: "active", al: "aktiv", it: "attivo" },
   terminated: { en: "terminated", al: "përfunduar", it: "terminato" },
   inactive: { en: "inactive", al: "jo aktiv", it: "inattivo" },
 };
 
-// Permission translations
 const permissionTranslations: Record<string, Record<SupportedLang, string>> = {
-  can_edit_own_post: {
+  canEditOwnPost: {
     en: "edit own posts",
     al: "ndryshoni postimet e veta",
     it: "modificare i propri post",
   },
-  can_edit_others_post: {
+  canEditOthersPost: {
     en: "edit others' posts",
     al: "ndryshoni postimet e të tjerëve",
     it: "modificare i post degli altri",
   },
-  can_approve_requests: {
+  canApproveRequests: {
     en: "approve requests",
     al: "miratoni kërkesat",
     it: "approvare le richieste",
   },
-  can_view_all_posts: {
+  canViewAllPosts: {
     en: "view all posts",
     al: "shikoni të gjitha postimet",
     it: "visualizzare tutti i post",
   },
-  can_delete_posts: {
+  canDeletePosts: {
     en: "delete posts",
     al: "fshini postimet",
     it: "eliminare i post",
   },
-  can_manage_agents: {
+  canManageAgents: {
     en: "manage agents",
     al: "menaxhoni agjentët",
     it: "gestire gli agenti",
   },
 };
 
-export function translateAgentChanges(dto: any, lang: SupportedLang): string {
+export function translateAgentChanges(dto: UpdateAgentsDto, lang: SupportedLang): string {
   const changes: string[] = [];
 
-  if (dto.commission_rate !== undefined)
-    changes.push(`${fieldTranslations.commission_rate[lang]} → ${dto.commission_rate}`);
+  if (dto.commissionRate !== undefined)
+    changes.push(`${fieldTranslations.commissionRate[lang]} → ${dto.commissionRate}`);
 
-  if (dto.role_in_agency !== undefined)
+  if (dto.roleInAgency !== undefined)
     changes.push(
-      `${fieldTranslations.role_in_agency[lang]} → ${roleTranslations[dto.role_in_agency][lang]}`
+      `${fieldTranslations.roleInAgency[lang]} → ${roleTranslations[dto.roleInAgency][lang]}`
     );
 
   if (dto.status !== undefined)
@@ -95,20 +91,19 @@ export function translateAgentChanges(dto: any, lang: SupportedLang): string {
       `${fieldTranslations.status[lang]} → ${statusTranslations[dto.status][lang]}`
     );
 
-  if (dto.end_date !== undefined)
+  if (dto.endDate !== undefined)
     changes.push(
-      `${fieldTranslations.end_date[lang]} → ${new Date(dto.end_date).toLocaleDateString()}`
+      `${fieldTranslations.endDate[lang]} → ${new Date(dto.endDate).toLocaleDateString()}`
     );
 
-  // Handle permissions
   if (dto.permissions !== undefined) {
     const permissionChanges: string[] = [];
-    
+
     Object.entries(dto.permissions).forEach(([key, value]) => {
       if (permissionTranslations[key]) {
-        const status = value ? 
-          (lang === 'al' ? 'aktiv' : lang === 'it' ? 'attivo' : 'enabled') : 
-          (lang === 'al' ? 'joaktiv' : lang === 'it' ? 'disattivato' : 'disabled');
+        const status = value
+          ? (lang === 'al' ? 'aktiv' : lang === 'it' ? 'attivo' : 'enabled')
+          : (lang === 'al' ? 'joaktiv' : lang === 'it' ? 'disattivato' : 'disabled');
         permissionChanges.push(`${permissionTranslations[key][lang]} (${status})`);
       }
     });
@@ -122,22 +117,21 @@ export function translateAgentChanges(dto: any, lang: SupportedLang): string {
 }
 
 export function hasAgentChanges(dto: UpdateAgentsDto, existing: any): boolean {
-  if (dto.role_in_agency !== undefined && dto.role_in_agency !== existing.role_in_agency)
+  if (dto.roleInAgency !== undefined && dto.roleInAgency !== existing.roleInAgency)
     return true;
 
-  if (dto.commission_rate !== undefined && dto.commission_rate !== existing.commission_rate)
+  if (dto.commissionRate !== undefined && dto.commissionRate !== existing.commissionRate)
     return true;
 
-  if (dto.end_date !== undefined) {
-    const newDate = new Date(dto.end_date).getTime();
-    const oldDate = existing.end_date ? new Date(existing.end_date).getTime() : null;
+  if (dto.endDate !== undefined) {
+    const newDate = new Date(dto.endDate).getTime();
+    const oldDate = existing.endDate ? new Date(existing.endDate).getTime() : null;
     if (newDate !== oldDate) return true;
   }
 
   if (dto.status !== undefined && dto.status !== existing.status)
     return true;
 
-  // Permission changes
   if (dto.permissions) {
     const existingPerms = existing.permissions || {};
     for (const [key, value] of Object.entries(dto.permissions)) {

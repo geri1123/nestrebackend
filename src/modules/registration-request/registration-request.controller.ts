@@ -1,17 +1,19 @@
-import { Controller, Param, ParseIntPipe, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
 
 import { Roles } from "../../common/decorators/roles.decorator";
 import {type RequestWithUser } from "../../common/types/request-with-user.interface";
 import { t } from "../../locales";
 import { SendQuickRequestUseCase } from "./application/use-cases/send-quick-request.use-case";
-import { ApiSendQuickRequest } from "./decorators/registration-request.decorators";
+import { ApiGetActiveRequest, ApiSendQuickRequest } from "./decorators/registration-request.decorators";
 import { RolesGuard } from "../../infrastructure/auth/guard/role-guard";
+import { FindRequestByUserIdUseCase } from "./application/use-cases/find-requests-by-user-id.use-case";
 @UseGuards(RolesGuard)
 @Controller('registration-request')
 
 export class RegistrationRequestController{
     constructor(
-    private  sendquickRequest:SendQuickRequestUseCase
+    private  sendquickRequest:SendQuickRequestUseCase ,
+    private findActiveRequest:FindRequestByUserIdUseCase,
     ){
 
     }
@@ -38,5 +40,14 @@ return{
     success:true, 
     message:t("requestSentSuccessfully",  req.language)
 }
+}
+@ApiGetActiveRequest()
+@Get('my-active-request')
+async getActiveRequest(@Req() req: RequestWithUser) {
+  const request = await this.findActiveRequest.execute(req.userId, req.language);
+  return {
+    success: true,
+    data: request ?? null
+  };
 }
 }

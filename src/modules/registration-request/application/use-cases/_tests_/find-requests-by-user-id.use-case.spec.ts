@@ -1,37 +1,35 @@
 import { NotFoundException } from '@nestjs/common';
-import { FindRequestsByUserIdUseCase } from '../find-requests-by-user-id.use-case';
+import { FindRequestByUserIdUseCase } from '../find-requests-by-user-id.use-case';
 import type { IRegistrationRequestRepository } from '../../../domain/repositories/registration-request.repository.interface';
 
-describe('FindRequestsByUserIdUseCase', () => {
-  let useCase: FindRequestsByUserIdUseCase;
+describe('FindRequestByUserIdUseCase', () => {
+  let useCase: FindRequestByUserIdUseCase;
   let repo: jest.Mocked<IRegistrationRequestRepository>;
 
   beforeEach(() => {
     repo = {
-      findByUserId: jest.fn(),
+      findActiveRequestByUserId: jest.fn(), 
     } as any;
 
-    useCase = new FindRequestsByUserIdUseCase(repo);
+    useCase = new FindRequestByUserIdUseCase(repo);
   });
 
-  it('should return requests when they exist', async () => {
-    const requests = [{ id: 1, userId: 10 }];
-
-    repo.findByUserId.mockResolvedValue(requests as any);
+  it('should return request when it exists', async () => {
+    const request = { id: 1, userId: 10 };
+    repo.findActiveRequestByUserId.mockResolvedValue(request as any);
 
     const result = await useCase.execute(10, 'en');
 
-    expect(repo.findByUserId).toHaveBeenCalledWith(10);
-    expect(result).toBe(requests);
+    expect(repo.findActiveRequestByUserId).toHaveBeenCalledWith(10);
+    expect(result).toBe(request);
   });
 
-  it('should throw NotFoundException when no requests exist', async () => {
-    repo.findByUserId.mockResolvedValue([]);
+  it('should return null when no request exists', async () => {
+    repo.findActiveRequestByUserId.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute(10, 'en'),
-    ).rejects.toThrow(NotFoundException);
+    const result = await useCase.execute(10, 'en');
 
-    expect(repo.findByUserId).toHaveBeenCalledWith(10);
+    expect(repo.findActiveRequestByUserId).toHaveBeenCalledWith(10);
+    expect(result).toBeNull(); // ← no throw, just null
   });
 });

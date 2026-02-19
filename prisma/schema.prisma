@@ -196,7 +196,7 @@ model RegistrationRequest {
   reviewedByUser       User?                              @relation("RegistrationRequestReviewedBy", fields: [reviewedBy], references: [id])
   user                 User                               @relation("RegistrationRequestUser", fields: [userId], references: [id])
 
-  @@unique([userId, requestType, status], map: "RegistrationRequest_user_id_request_type_status_key")
+  
   @@index([agencyId], map: "RegistrationRequest_agency_id_idx")
   @@index([requestType], map: "RegistrationRequest_request_type_idx")
   @@index([reviewedBy], map: "RegistrationRequest_reviewed_by_idx")

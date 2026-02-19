@@ -25,21 +25,12 @@ export class UpdateAgencyRequestStatusUseCase {
     language: SupportedLang = "al"
   ) {
     try {
-      console.log('=== START UpdateAgencyRequestStatusUseCase ===');
-      console.log('Input:', { requestId, agencyId, approvedBy, dto });
+     
 
       // Find the request
-      console.log('Step 1: Finding request by ID...');
+      
       const request = await this.findRequestById.execute(requestId, language);
-      console.log('Request found:', {
-        id: request.id,
-        userId: request.userId,
-        agencyId: request.agencyId,
-        hasUser: !!request.user,
-        userEmail: request.user?.email,
-        userFirstName: request.user?.firstName,
-        userLastName: request.user?.lastName,
-      });
+      
 
       console.log('Validating agency ownership...');
       if (request.agencyId !== agencyId) {
@@ -49,22 +40,15 @@ export class UpdateAgencyRequestStatusUseCase {
           errors: { general: [t('cannotApproveOtherAgency', language)] }
         });
       }
-      console.log('Agency validation passed');
+     
 
       if (dto.action === 'approved') {
-        console.log('Step 3: Processing approval...');
+       
         if (!dto.roleInAgency) {
           throw new Error('roleInAgency is required when approving');
         }
 
-        console.log('Approval input:', {
-          userId: request.userId,
-          agencyId,
-          approvedBy,
-          roleInAgency: dto.roleInAgency,
-          commissionRate: dto.commissionRate,
-          permissions: dto.permissions
-        });
+       
 
         await this.approveRequest.execute({
           request,
@@ -75,12 +59,12 @@ export class UpdateAgencyRequestStatusUseCase {
           permissions: dto.permissions,
         }, language);
         
-        console.log('Approval completed successfully');
+      
       } 
       // Handle rejection
       else if (dto.action === "rejected") {
         await this.rejectRequest.execute(request);
-        console.log('Rejection completed successfully');
+       
       }
 
       // Update request status
@@ -90,14 +74,14 @@ export class UpdateAgencyRequestStatusUseCase {
         reviewedBy: approvedBy,
         reviewNotes: dto.reviewNotes,
       });
-      console.log('Status update completed');
+     
 
       const message =
         dto.action === 'approved'
           ? t('registrationApprovedSuccessfully', language)
           : t('registrationRejectedSuccessfully', language);
 
-      console.log('=== END UpdateAgencyRequestStatusUseCase SUCCESS ===');
+      
       return {
         success: true,
         message,

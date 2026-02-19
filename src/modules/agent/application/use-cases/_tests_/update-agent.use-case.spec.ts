@@ -7,7 +7,6 @@ import { NotFoundException } from '@nestjs/common';
 import { AgencyAgentRoleInAgency, AgencyAgentStatus } from '@prisma/client';
 import * as classValidator from 'class-validator';
 
-// Mock class-validator
 jest.mock('class-validator', () => ({
   ...jest.requireActual('class-validator'),
   validate: jest.fn(),
@@ -44,19 +43,19 @@ describe('UpdateAgentUseCase', () => {
     id: 10,
     agentUserId: 100,
     agencyId: 5,
-    role_in_agency: 'agent' as AgencyAgentRoleInAgency,
-    commission_rate: 5,
+    roleInAgency: 'agent' as AgencyAgentRoleInAgency,
+    commissionRate: 5,
     status: 'active' as AgencyAgentStatus,
-    end_date: null,
+    endDate: null,
   };
 
   const mockExistingPermissions = {
-    can_edit_own_post: true,
-    can_edit_others_post: false,
-    can_approve_requests: false,
-    can_view_all_posts: true,
-    can_delete_posts: false,
-    can_manage_agents: false,
+    canEditOwnPost: true,
+    canEditOthersPost: false,
+    canApproveRequests: false,
+    canViewAllPosts: true,
+    canDeletePosts: false,
+    canManageAgents: false,
   };
 
   beforeEach(async () => {
@@ -81,8 +80,7 @@ describe('UpdateAgentUseCase', () => {
 
     useCase = module.get(UpdateAgentUseCase);
     jest.clearAllMocks();
-    
-    // Mock validate to return no errors by default
+
     (classValidator.validate as jest.Mock).mockResolvedValue([]);
   });
 
@@ -91,7 +89,7 @@ describe('UpdateAgentUseCase', () => {
       agentRepo.findById.mockResolvedValue(null);
 
       const dto = {
-        role_in_agency: 'senior_agent' as AgencyAgentRoleInAgency,
+        roleInAgency: 'senior_agent' as AgencyAgentRoleInAgency,
       };
 
       await expect(
@@ -108,10 +106,9 @@ describe('UpdateAgentUseCase', () => {
         mockExistingPermissions,
       );
 
-      // DTO with same values as existing agent
       const dto = {
-        role_in_agency: 'agent' as AgencyAgentRoleInAgency,
-        commission_rate: 5,
+        roleInAgency: 'agent' as AgencyAgentRoleInAgency,
+        commissionRate: 5,
         status: 'active' as AgencyAgentStatus,
       };
 
@@ -130,7 +127,7 @@ describe('UpdateAgentUseCase', () => {
 
       const updatedAgent = {
         ...mockExistingAgent,
-        role_in_agency: 'senior_agent' as AgencyAgentRoleInAgency,
+        roleInAgency: 'senior_agent' as AgencyAgentRoleInAgency,
       };
 
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
@@ -141,13 +138,13 @@ describe('UpdateAgentUseCase', () => {
       });
 
       const dto = {
-        role_in_agency: 'senior_agent' as AgencyAgentRoleInAgency,
+        roleInAgency: 'senior_agent' as AgencyAgentRoleInAgency,
       };
 
       const result = await useCase.execute(10, 5, dto, 'al', mockUser);
 
       expect(agentRepo.updateAgencyAgent).toHaveBeenCalledWith(10, {
-        role_in_agency: 'senior_agent',
+        roleInAgency: 'senior_agent',
       });
 
       expect(notificationTemplateService.getAllTranslations).toHaveBeenCalledWith(
@@ -176,22 +173,16 @@ describe('UpdateAgentUseCase', () => {
         mockExistingPermissions,
       );
 
-      const updatedAgent = {
-        ...mockExistingAgent,
-        commission_rate: 10,
-      };
-
+      const updatedAgent = { ...mockExistingAgent, commissionRate: 10 };
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
       notificationTemplateService.getAllTranslations.mockReturnValue({});
 
-      const dto = {
-        commission_rate: 10,
-      };
+      const dto = { commissionRate: 10 };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);
 
       expect(agentRepo.updateAgencyAgent).toHaveBeenCalledWith(10, {
-        commission_rate: 10,
+        commissionRate: 10,
       });
     });
 
@@ -209,9 +200,7 @@ describe('UpdateAgentUseCase', () => {
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
       notificationTemplateService.getAllTranslations.mockReturnValue({});
 
-      const dto = {
-        status: 'inactive' as AgencyAgentStatus,
-      };
+      const dto = { status: 'inactive' as AgencyAgentStatus };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);
 
@@ -220,7 +209,7 @@ describe('UpdateAgentUseCase', () => {
       });
     });
 
-    it('should update end_date', async () => {
+    it('should update endDate', async () => {
       agentRepo.findById.mockResolvedValue(mockExistingAgent);
       agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(
         mockExistingPermissions,
@@ -229,20 +218,18 @@ describe('UpdateAgentUseCase', () => {
       const endDate = '2025-12-31';
       const updatedAgent = {
         ...mockExistingAgent,
-        end_date: new Date(endDate),
+        endDate: new Date(endDate),
       };
 
       agentRepo.updateAgencyAgent.mockResolvedValue(updatedAgent);
       notificationTemplateService.getAllTranslations.mockReturnValue({});
 
-      const dto = {
-        end_date: endDate,
-      };
+      const dto = { endDate };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);
 
       expect(agentRepo.updateAgencyAgent).toHaveBeenCalledWith(10, {
-        end_date: new Date(endDate),
+        endDate: new Date(endDate),
       });
     });
 
@@ -257,16 +244,16 @@ describe('UpdateAgentUseCase', () => {
 
       const dto = {
         permissions: {
-          can_edit_others_post: true,
-          can_approve_requests: true,
+          canEditOthersPost: true,
+          canApproveRequests: true,
         },
       };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);
 
       expect(agentPermissionRepo.updatePermissions).toHaveBeenCalledWith(10, {
-        can_edit_others_post: true,
-        can_approve_requests: true,
+        canEditOthersPost: true,
+        canApproveRequests: true,
       });
 
       expect(agentPermissionRepo.createPermissions).not.toHaveBeenCalled();
@@ -281,8 +268,8 @@ describe('UpdateAgentUseCase', () => {
 
       const dto = {
         permissions: {
-          can_edit_own_post: true,
-          can_view_all_posts: true,
+          canEditOwnPost: true,
+          canViewAllPosts: true,
         },
       };
 
@@ -292,8 +279,8 @@ describe('UpdateAgentUseCase', () => {
         10,
         5,
         {
-          can_edit_own_post: true,
-          can_view_all_posts: true,
+          canEditOwnPost: true,
+          canViewAllPosts: true,
         },
       );
 
@@ -308,8 +295,8 @@ describe('UpdateAgentUseCase', () => {
 
       const updatedAgent = {
         ...mockExistingAgent,
-        role_in_agency: 'team_lead' as AgencyAgentRoleInAgency,
-        commission_rate: 15,
+        roleInAgency: 'team_lead' as AgencyAgentRoleInAgency,
+        commissionRate: 15,
         status: 'inactive' as AgencyAgentStatus,
       };
 
@@ -317,32 +304,29 @@ describe('UpdateAgentUseCase', () => {
       notificationTemplateService.getAllTranslations.mockReturnValue({});
 
       const dto = {
-        role_in_agency: 'team_lead' as AgencyAgentRoleInAgency,
-        commission_rate: 15,
+        roleInAgency: 'team_lead' as AgencyAgentRoleInAgency,
+        commissionRate: 15,
         status: 'inactive' as AgencyAgentStatus,
       };
 
       await useCase.execute(10, 5, dto, 'al', mockUser);
 
       expect(agentRepo.updateAgencyAgent).toHaveBeenCalledWith(10, {
-        role_in_agency: 'team_lead',
-        commission_rate: 15,
+        roleInAgency: 'team_lead',
+        commissionRate: 15,
         status: 'inactive',
       });
     });
 
     it('should throw BadRequestException on validation errors', async () => {
-      // Mock validation to return errors
       const validationError = {
-        property: 'commission_rate',
+        property: 'commissionRate',
         constraints: { min: 'Commission rate must be >= 0' },
       };
-      
+
       (classValidator.validate as jest.Mock).mockResolvedValueOnce([validationError]);
 
-      const dto = {
-        commission_rate: -5,
-      };
+      const dto = { commissionRate: -5 };
 
       await expect(
         useCase.execute(10, 5, dto as any, 'al', mockUser),

@@ -58,15 +58,25 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
 
     return result.id;
   }
+async findActiveRequestByUserId(userId: number): Promise<RegistrationRequestEntity | null> {
+  const data = await this.prisma.registrationRequest.findFirst({
+    where: { 
+      userId,
+      status: { in: [RegistrationRequestStatus.approved , RegistrationRequestStatus.pending , RegistrationRequestStatus.under_review] }
+    },
+    orderBy: { createdAt: "desc" }
+  });
 
-  async findByUserId(userId: number): Promise<RegistrationRequestEntity[]> {
-    const data = await this.prisma.registrationRequest.findMany({
-      where: { userId: userId },
-      orderBy: { createdAt: "desc" }
-    });
+  return data ? this.mapToEntity(data) : null;
+}
+  // async findByUserId(userId: number): Promise<RegistrationRequestEntity[]> {
+  //   const data = await this.prisma.registrationRequest.findMany({
+  //     where: { userId: userId },
+  //     orderBy: { createdAt: "desc" }
+  //   });
 
-    return data.map(d => this.mapToEntity(d));
-  }
+  //   return data.map(d => this.mapToEntity(d));
+  // }
 
   async findById(id: number): Promise<RegistrationRequestEntity | null> {
     const result = await this.prisma.registrationRequest.findUnique({
@@ -87,54 +97,129 @@ export class RegistrationRequestRepository implements IRegistrationRequestReposi
     return result ? this.mapToEntity(result) : null;
   }
 
-  async findByAgencyIdAndStatus(
-    agencyId: number,
-    status?: RegistrationRequestStatus,
-    skip = 0,
-    take = 10
-  ): Promise<RegistrationRequestEntity[]> {
-    const results = await this.prisma.registrationRequest.findMany({
-      where: {
-        agencyId: agencyId,
-        ...(status
-          ? { status }
-          : { status: { not: "pending" } }),  
-      },
-      orderBy: { createdAt: "desc" },
-      skip,
-      take,
-      include: {
-        user: {
-          select: {
-            email: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            role: true,      
-            status: true,    
-          },
-        },
-        reviewedByUser: { 
-          select: {
-            email: true,
-            username: true,
-            role: true,
-          },
-        },
-      },
-    });
+  // async findByAgencyIdAndStatus(
+  //   agencyId: number,
+  //   status?: RegistrationRequestStatus,
+  //   skip = 0,
+  //   take = 10
+  // ): Promise<RegistrationRequestEntity[]> {
+  //   const results = await this.prisma.registrationRequest.findMany({
+  //     where: {
+  //       agencyId: agencyId,
+  //       ...(status
+  //         ? { status }
+  //         : { status: { not: "pending" } }),  
+  //     },
+  //     orderBy: { createdAt: "desc" },
+  //     skip,
+  //     take,
+  //     include: {
+  //       user: {
+  //         select: {
+  //           email: true,
+  //           firstName: true,
+  //           lastName: true,
+  //           username: true,
+  //           role: true,      
+  //           status: true,    
+  //         },
+  //       },
+  //       reviewedByUser: { 
+  //         select: {
+  //           email: true,
+  //           username: true,
+  //           role: true,
+  //         },
+  //       },
+  //     },
+  //   });
 
-    return results.map(r => this.mapToEntity(r));
-  }
+  //   return results.map(r => this.mapToEntity(r));
+  // }
 
-  async countRequests(agencyId: number, status?: RegistrationRequestStatus): Promise<number> {
-    return this.prisma.registrationRequest.count({
-      where: {
-        agencyId: agencyId,
-        ...(status ? { status } : { NOT: { status: "pending" } }),
+async findByAgencyIdAndStatus(
+  agencyId: number,
+  status?: RegistrationRequestStatus,
+  skip = 0,
+  take = 10,
+  search?: string,
+): Promise<RegistrationRequestEntity[]> {
+   const searchFilter = search
+    ? {
+        OR: [
+          { user: { firstName: { contains: search } } },
+          { user: { lastName: { contains: search} } },
+          { user: { email: { contains: search } } },
+          { user: { username: { contains: search} } },
+        ],
+      }
+    : {};
+
+  const results = await this.prisma.registrationRequest.findMany({
+    where: {
+      agencyId,
+      ...(status ? { status } : { status: { not: "pending" } }),
+      ...searchFilter,
+    },
+    orderBy: { createdAt: "desc" },
+    skip,
+    take,
+    include: {
+      user: {
+        select: {
+          email: true,
+          firstName: true,
+          lastName: true,
+          username: true,
+          role: true,
+          status: true,
+        },
       },
-    });
-  }
+      reviewedByUser: {
+        select: {
+          email: true,
+          username: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return results.map(r => this.mapToEntity(r));
+}
+
+async countRequests(
+  agencyId: number,
+  status?: RegistrationRequestStatus,
+  search?: string,
+): Promise<number> {
+ const searchFilter = search
+    ? {   
+      OR: [
+          { user: { firstName: { contains: search } } },
+          { user: { lastName: { contains: search} } },
+          { user: { email: { contains: search} } },
+          { user: { username: { contains: search} } },
+        ],
+      }
+    : {};
+
+  return this.prisma.registrationRequest.count({
+    where: {
+      agencyId,
+      ...(status ? { status } : { NOT: { status: "pending" } }),
+      ...searchFilter,
+    },
+  });
+}
+  // async countRequests(agencyId: number, status?: RegistrationRequestStatus): Promise<number> {
+  //   return this.prisma.registrationRequest.count({
+  //     where: {
+  //       agencyId: agencyId,
+  //       ...(status ? { status } : { NOT: { status: "pending" } }),
+  //     },
+  //   });
+  // }
 
   async setLatestUnderReview(
     userId: number,

@@ -6,15 +6,16 @@ import { RegistrationRequestEntity } from "../entities/registration-request.enti
 export interface IRegistrationRequestRepository {
   create(request: RegistrationRequestEntity , tx?:Prisma.TransactionClient): Promise<number>;
 
-  findByUserId(userId: number): Promise<RegistrationRequestEntity[]>;
-
+  // findByUserId(userId: number): Promise<RegistrationRequestEntity[]>;
+findActiveRequestByUserId(userId: number): Promise<RegistrationRequestEntity | null>;
   findById(id: number): Promise<RegistrationRequestEntity | null>;
 
   findByAgencyIdAndStatus(
     agencyId: number,
     status?: RegistrationRequestStatus,
     skip?: number,
-    take?: number
+    take?: number,
+    search?: string,
   ): Promise<RegistrationRequestEntity[]>;
 
   // setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null>;
@@ -32,6 +33,6 @@ export interface IRegistrationRequestRepository {
      tx?: Prisma.TransactionClient
   ): Promise<RegistrationRequestEntity>;
 
-  countRequests(agencyId: number, status?: RegistrationRequestStatus): Promise<number>;
+  countRequests(agencyId: number, status?: RegistrationRequestStatus , search?: string,): Promise<number>;
    deleteByUserId(userId: number): Promise<number>;
 }

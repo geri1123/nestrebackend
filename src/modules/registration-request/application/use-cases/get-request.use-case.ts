@@ -14,14 +14,16 @@ export class GetRequestsUseCase {
     agencyId: number,
     page: number,
     take: number,
-    status?: RegistrationRequestStatus
+    status?: RegistrationRequestStatus,
+    search?:string
   ) {
     // fetch entities from repo
     const entities = await this.repo.findByAgencyIdAndStatus(
       agencyId,
       status,
       (page - 1) * take,
-      take
+      take,
+      search,
     );
 
     // map entities to DTOs for frontend

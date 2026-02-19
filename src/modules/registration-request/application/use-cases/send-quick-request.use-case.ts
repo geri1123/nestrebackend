@@ -17,6 +17,12 @@ export class SendQuickRequestUseCase {
   ) {}
 
   async execute(userId: number, agencyId: number, username: string, lang: SupportedLang) {
+
+   
+    const existing = await this.repo.findActiveRequestByUserId(userId);
+  if (existing) {
+    throw new BadRequestException(t("alreadyHasActiveRequest", lang));
+  }
     const agency = await this.GetAgencyWithOwnerById.execute(agencyId , lang);
 
     if (!agency) throw new BadRequestException(t("invalidAgencyId", lang));
@@ -35,16 +41,9 @@ export class SendQuickRequestUseCase {
 await this.notificationService.sendNotification({
   userId: agency.owner_user_id,
   type: "user_send_request",
-  templateData: { username }, // Translations will be auto-generated from this
+  templateData: { username },
   metadata: { username }, 
 });
-    // const translations = this.templateService.getAllTranslations("user_send_request", { username });
-
-    // await this.notificationService.sendNotification({
-    //   userId: agency.owner_user_id,
-    //   type: "user_send_request",
-    //   translations,
-    //   metadata: { username }, 
-    // });
+   
   }
 }

@@ -11,7 +11,7 @@ export class UpdateAgentsDto {
   })
   @IsOptional()
   @IsEnum(AgencyAgentRoleInAgency, { message: 'roleInAgencyRequired' })
-  role_in_agency?: AgencyAgentRoleInAgency;
+  roleInAgency?: AgencyAgentRoleInAgency;  
 
   @ApiPropertyOptional({
     example: 10,
@@ -21,7 +21,7 @@ export class UpdateAgentsDto {
   @IsNumber({}, { message: 'invalidCommissionRate' })
   @Min(0, { message: 'invalidCommissionRate' })
   @Type(() => Number)
-  commission_rate?: number;
+  commissionRate?: number;  
 
   @ApiPropertyOptional({
     example: '2025-12-31',
@@ -29,7 +29,7 @@ export class UpdateAgentsDto {
   })
   @IsOptional()
   @IsDateString({}, { message: 'endDateInvalid' })
-  end_date?: string;
+  endDate?: string;
 
   @ApiPropertyOptional({
     enum: AgencyAgentStatus,
@@ -42,21 +42,21 @@ export class UpdateAgentsDto {
 
   @ApiPropertyOptional({
     example: {
-     can_edit_own_post: true,
-    can_edit_others_post: true,
-    can_approve_requests: true,
-    can_view_all_posts: true,
-    can_delete_posts: true,
-    can_manage_agents: true,
+      canEditOwnPost: true,
+      canEditOthersPost: true,
+      canApproveRequests: true,
+      canViewAllPosts: true,
+      canDeletePosts: true,
+      canManageAgents: true,
     },
     description: 'Agent permissions',
   })
   permissions?: {
-    can_edit_own_post?: boolean;
-    can_edit_others_post?: boolean;
-    can_approve_requests?: boolean;
-    can_view_all_posts?: boolean;
-    can_delete_posts?: boolean;
-    can_manage_agents?: boolean;
+    canEditOwnPost?: boolean;
+    canEditOthersPost?: boolean;
+    canApproveRequests?: boolean;
+    canViewAllPosts?: boolean;
+    canDeletePosts?: boolean;
+    canManageAgents?: boolean;
   };
 }

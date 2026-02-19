@@ -7,7 +7,7 @@ import { EmailService } from '../../../../infrastructure/email/email.service';
 import { NotificationService } from '../../../notification/notification.service';
 import { NotificationTemplateService } from '../../../notification/notifications-template.service';
 import { FindUserByIdUseCase } from '../../../users/application/use-cases/find-user-by-id.use-case';
-import { FindRequestsByUserIdUseCase } from '../../../registration-request/application/use-cases/find-requests-by-user-id.use-case';
+import { FindRequestByUserIdUseCase } from '../../../registration-request/application/use-cases/find-requests-by-user-id.use-case';
 import { GetAgencyWithOwnerByIdUseCase } from '../../../agency/application/use-cases/get-agency-with-owner-byid.use-case';
 import { SetUnderReviewUseCase } from '../../../registration-request/application/use-cases/set-under-review.use-case';
 import { ActivateAgencyByOwnerUseCase } from '../../../agency/application/use-cases/activate-agency-by-owner.use-case';
@@ -21,7 +21,7 @@ export class VerifyEmailUseCase {
     private readonly cache: CacheService,
     private readonly email: EmailService,
     private readonly findUserById: FindUserByIdUseCase,
-    private readonly findrequestsbyuserid: FindRequestsByUserIdUseCase,
+    private readonly findrequestsbyuserid: FindRequestByUserIdUseCase,
     private readonly verifyEmail: VerifyUserEmailUseCase,
     private readonly activateAgencyByOwner: ActivateAgencyByOwnerUseCase,
     private readonly getAgencyWithOwner: GetAgencyWithOwnerByIdUseCase, 
@@ -110,21 +110,20 @@ export class VerifyEmailUseCase {
   }
 
   private async handleAgentProcessAfterCommit(user: any, lang: SupportedLang) {
-    const requests = await this.findrequestsbyuserid.execute(user.id, lang);
-    if (!requests?.length) {
-      throw new BadRequestException({ 
-        errors: { registration: ['No request'] } 
-      });
-    }
+    const request = await this.findrequestsbyuserid.execute(user.id, lang);
+    if (!request) {
+    throw new BadRequestException({ 
+      errors: { registration: ['No request'] } 
+    });
+  }
 
-    const agencyId = requests[0]?.agencyId;
-    if (!agencyId) {
-      throw new BadRequestException({ 
-        message: t('agencyNotFound', lang) 
-      });
-    }
+  if (!request.agencyId) {
+    throw new BadRequestException({ 
+      message: t('agencyNotFound', lang) 
+    });
+  }
 
-    const agency = await this.getAgencyWithOwner.execute(agencyId, lang);
+    const agency = await this.getAgencyWithOwner.execute(request.agencyId, lang);
 
 await this.notifications.sendNotification({
   userId: agency.owner_user_id,

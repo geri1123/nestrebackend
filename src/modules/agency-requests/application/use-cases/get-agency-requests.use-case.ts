@@ -10,26 +10,26 @@ export class GetAgencyRequestsUseCase {
     private readonly getRequestCount: GetRequestCountUseCase,
     private readonly getRequests: GetRequestsUseCase,
   ) {}
+async execute(
+  agencyId: number,
+  page = 1,
+  status?: RegistrationRequestStatus,
+  search?: string,
+): Promise<PaginatedRegistrationRequestResponseDto> {
+  const limit = 6;
+  const skip = (page - 1) * limit;
 
-  async execute(
-    agencyId: number,
-    page = 1,
-    status?: RegistrationRequestStatus
-  ): Promise<PaginatedRegistrationRequestResponseDto> { 
-    const limit = 12;
-    const skip = (page - 1) * limit;
+  const [total, requests] = await Promise.all([
+    this.getRequestCount.execute(agencyId, status, search),
+    this.getRequests.execute(agencyId, page, limit, status, search),
+  ]);
 
-    const [total, requests] = await Promise.all([
-      this.getRequestCount.execute(agencyId, status),
-      this.getRequests.execute(agencyId, page, limit, status)
-    ]);
-
-    return {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-      requests, 
-    };
-  }
+  return {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+    requests,
+  };
+}
 }

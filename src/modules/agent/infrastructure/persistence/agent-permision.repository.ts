@@ -37,12 +37,12 @@ export class AgentPermissionRepository
       data: {
         agencyAgentId: agencyAgentId,
         agencyId: agencyId,
-        canEditOwnPost: permissions.can_edit_own_post ?? true,
-        canEditOthersPost: permissions.can_edit_others_post ?? false,
-        canApproveRequests: permissions.can_approve_requests ?? false,
-        canViewAllPosts: permissions.can_view_all_posts ?? false,
-        canDeletePosts: permissions.can_delete_posts ?? false,
-        canManageAgents: permissions.can_manage_agents ?? false,
+        canEditOwnPost: permissions.canEditOwnPost ?? true,
+        canEditOthersPost: permissions.canEditOthersPost ?? false,
+        canApproveRequests: permissions.canApproveRequests ?? false,
+        canViewAllPosts: permissions.canViewAllPosts ?? false,
+        canDeletePosts: permissions.canDeletePosts ?? false,
+        canManageAgents: permissions.canManageAgents ?? false,
       },
     });
 
@@ -60,12 +60,12 @@ async updatePermissions(
   const updated = await client.agencyAgentPermission.update({
     where: { agencyAgentId: agencyAgentId },
     data: {
-      canEditOwnPost: permissions.can_edit_own_post,
-      canEditOthersPost: permissions.can_edit_others_post,
-      canApproveRequests: permissions.can_approve_requests,
-      canViewAllPosts: permissions.can_view_all_posts,
-      canDeletePosts: permissions.can_delete_posts,
-      canManageAgents: permissions.can_manage_agents,
+      canEditOwnPost: permissions.canEditOwnPost,
+      canEditOthersPost: permissions.canEditOthersPost,
+      canApproveRequests: permissions.canApproveRequests,
+      canViewAllPosts: permissions.canViewAllPosts,
+      canDeletePosts: permissions.canDeletePosts,
+      canManageAgents: permissions.canManageAgents,
     },
   });
 

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Search } from "@nestjs/common";
 import { RegistrationRequestStatus } from "@prisma/client";
 import { REG_REQ_TOKEN } from "../../domain/repositories/reg-req.repository.token";
 import {type IRegistrationRequestRepository } from "../../domain/repositories/registration-request.repository.interface";
@@ -12,8 +12,9 @@ export class GetRequestCountUseCase {
 
   async execute(
     agencyId: number,
-    status?: RegistrationRequestStatus
+    status?: RegistrationRequestStatus,
+    search?:string,
   ): Promise<number> {
-    return this.repo.countRequests(agencyId, status);
+    return this.repo.countRequests(agencyId, status , search);
   }
 }

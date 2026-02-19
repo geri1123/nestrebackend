@@ -53,24 +53,22 @@ export class UpdateRequestStatusDto {
 
   @ApiPropertyOptional({
     example: {
-      can_edit_own_post: true,
-      can_view_all_posts: true,
-      can_approve_requests: false,
-    can_edit_others_post:true,
-    
-    can_delete_posts: true,
-    can_manage_agents: true
+      canEditOwnPost: true,
+      canViewAllPosts: true,
+      canApproveRequests: false,
+      canEditOthersPost: true,
+      canDeletePosts: true,
+      canManageAgents: true
     },
-    description:
-      'Agent permissions (only required when approving)',
+    description: 'Agent permissions (only required when approving)',
   })
   @ValidateIf(o => o.action === 'approved')
   permissions?: {
-    can_edit_own_post?: boolean;
-    can_edit_others_post?: boolean;
-    can_approve_requests?: boolean;
-    can_view_all_posts?: boolean;
-    can_delete_posts?: boolean;
-    can_manage_agents?: boolean;
+    canEditOwnPost?: boolean;
+    canEditOthersPost?: boolean;
+    canApproveRequests?: boolean;
+    canViewAllPosts?: boolean;
+    canDeletePosts?: boolean;
+    canManageAgents?: boolean;
   };
 }

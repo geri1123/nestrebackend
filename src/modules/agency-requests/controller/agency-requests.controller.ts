@@ -27,30 +27,24 @@ export class AgencyRequestsController {
 
 
     
- 
 @RequireAgencyContext()
 @Get('registration-requests')
 @Roles('agent', 'agency_owner')
 @Permissions('can_approve_requests')
-  @ApiAgencyRequestsDecorators.GetRegistrationRequests()
-  async getRegistrationRequests(
-    @Req() req: RequestWithUser,
-    @Query('page') page = 1,        
-
-    @Query('status') status?: string,
-  ) {
- 
-
-  
-
-   return this.getAgencyRequests.execute(
-      req.agencyId!,
-      Number(page),
-      status as any,
-    );
-  }
-  
-
+@ApiAgencyRequestsDecorators.GetRegistrationRequests()
+async getRegistrationRequests(
+  @Req() req: RequestWithUser,
+  @Query('page') page = 1,
+  @Query('status') status?: string,
+  @Query('search') search?: string,
+) {
+  return this.getAgencyRequests.execute(
+    req.agencyId!,
+    Number(page),
+    status as any,
+    search,
+  );
+}
 
 
 
@@ -68,11 +62,7 @@ async updateRegistrationRequestStatus(
     const language = req.language || 'al';
     const userId = req.userId;
     
-    console.log('=== Controller: Received request ===');
-    console.log('Request ID:', requestId);
-    console.log('Body:', body);
-    console.log('User ID:', userId);
-    console.log('Agency ID:', req.agencyId);
+
     
     const dto = plainToInstance(UpdateRequestStatusDto, body);
     const errors = await validate(dto);
@@ -90,11 +80,10 @@ async updateRegistrationRequestStatus(
       language
     );
     
-    console.log('=== Controller: Success ===');
+   
     return result;
   } catch (error) {
-    console.error('=== Controller: Error ===');
-    console.error('Error:', error);
+   
     throw error;
   }
 }

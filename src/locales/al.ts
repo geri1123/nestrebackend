@@ -37,7 +37,7 @@ walletAlreadyExists:"Portofoli ekziston tashmë.",
    cannotResendTokenForCurrentStatus: "Nuk mund të dërgohet përsëri token-i i verifikimit për statusin aktual të përdoruesit.",
  productUnsavedSuccessfully: "Produkti u hoq me sukses",
   productSavedSuccessfully: "Produkti u ruajt me sukses!",
-  agentTerminated:"",
+  agentTerminated:"Agjenti është çaktivizuar",
   saveFailed: "Produkti nuk mund të ruhej. Ju lutemi provoni përsëri.",
   productAlreadySaved: "Ky produkt është tashmë në listën tuaj të ruajtur.",
       somethingWentWrong: 'Diçka shkoi gabim',
@@ -218,6 +218,7 @@ commissionRateRequired: "Norma e komisionit është e detyrueshme për miratimin
 invalidCommissionRate: "Norma e komisionit duhet të jetë midis 0 dhe 100",
 
 //
+alreadyHasActiveRequest:"Ju keni tashmë një kërkesë aktive. Nuk mund të dërgoni një kërkesë tjetër derisa të zgjidhet",
 registrationApprovedSuccessfully:"Kërkesa për regjistrim u aprovua me sukses",
 registrationRejectedSuccessfully:"Kërkesa për regjistrim u refuzua me sukses",
 

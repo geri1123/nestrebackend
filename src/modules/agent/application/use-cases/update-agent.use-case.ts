@@ -68,21 +68,17 @@ export class UpdateAgentUseCase {
       return existingAgent;
     }
 
-    const dataToUpdate: Partial<{
-      role_in_agency: AgencyAgentRoleInAgency;
-      commission_rate: number;
-      end_date: Date;
-      status: AgencyAgentStatus;
-    }> = {
-      ...(dto.role_in_agency !== undefined && {
-        role_in_agency: dto.role_in_agency,
-      }),
-      ...(dto.commission_rate !== undefined && {
-        commission_rate: dto.commission_rate,
-      }),
-      ...(dto.end_date !== undefined && { end_date: new Date(dto.end_date) }),
-      ...(dto.status !== undefined && { status: dto.status }),
-    };
+   const dataToUpdate: Partial<{
+  roleInAgency: AgencyAgentRoleInAgency;
+  commissionRate: number;
+  endDate: Date;
+  status: AgencyAgentStatus;
+}> = {
+  ...(dto.roleInAgency !== undefined && { roleInAgency: dto.roleInAgency }),
+  ...(dto.commissionRate !== undefined && { commissionRate: dto.commissionRate }),
+  ...(dto.endDate !== undefined && { endDate: new Date(dto.endDate) }),
+  ...(dto.status !== undefined && { status: dto.status }),
+};
 
     const updatedAgent = await this.agentRepo.updateAgencyAgent(id, dataToUpdate);
 

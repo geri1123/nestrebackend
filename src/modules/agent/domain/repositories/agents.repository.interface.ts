@@ -102,11 +102,11 @@ getAgentAuthContext(userId: number): Promise<{
   updateAgencyAgent(
     agencyAgentId: number,
     data: Partial<{
-      id_card_number: string;
-      role_in_agency: AgentRole;
-      commission_rate: number;
-      end_date: Date;
-      status: AgentStatus;
+     idCardNumber: string;
+    roleInAgency: AgentRole;
+    commissionRate: number;
+    endDate: Date;
+    status: AgentStatus;
     }>,
   ): Promise<AgentEntity>;
 getAgentMe(

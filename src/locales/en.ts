@@ -159,7 +159,8 @@ nofileUpload:'No file upload.',
   
     approved: "Request approved successfully",
     rejected: "Request rejected successfully",
-  
+  alreadyHasActiveRequest:"You already have an active request. You cannot send another request until it is resolved.",
+
 
 agencyNotFound:"Agency not found.",
 invalidAgencyId: "Invalid agency ID",
