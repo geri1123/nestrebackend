@@ -12,15 +12,17 @@ import {
 } from 'class-validator';
 
 export class ProductAttributeValueDto {
-  @IsInt({ message: 'Attribute ID must be an integer' })
-  @IsNotEmpty({ message: 'Attribute ID is required' })
+  @Type(() => Number)
+  @IsInt({ message: 'attributeId' })
+  @Min(1, { message: 'attributeId' })
   attributeId!: number;
 
-  @IsOptional() 
-  @IsInt({ message: 'Attribute Value ID must be an integer' })
-  attributeValueId?: number;  
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt({ message: 'attributeValueId' })
+  @Min(1, { message: 'attributeValueId' })
+  attributeValueId?: number;
 }
-
 export class CreateProductDto {
   @IsString({ message: 'title' })
   @IsNotEmpty({ message: 'title' })
@@ -28,24 +30,22 @@ export class CreateProductDto {
 
   @Type(() => Number)
   @IsNumber({}, { message: 'price' })
-  @Min(0, { message: 'pricePositive' })
-  @IsNotEmpty({ message: 'price' })
+  @Min(1, { message: 'pricePositive' })
   price!: number;
 
   @Type(() => Number)
-  @IsInt({ message: 'cityId' }) 
+  @IsInt({ message: 'cityId' })
   @Min(1, { message: 'cityId' })
-  @IsNotEmpty({ message: 'cityId' })
   cityId!: number;
 
   @Type(() => Number)
-  @IsInt({ message: 'subcategoryId' })  
-  @IsNotEmpty({ message: 'subcategoryId' })
+  @IsInt({ message: 'subcategoryId' })
+  @Min(1, { message: 'subcategoryId' })
   subcategoryId!: number;
 
   @Type(() => Number)
-  @IsInt({ message: "listingTypeId" })  
-  @IsNotEmpty({ message: 'listingTypeId' })
+  @IsInt({ message: 'listingTypeId' })
+  @Min(1, { message: 'listingTypeId' })
   listingTypeId!: number;
 
   @IsOptional()
@@ -58,24 +58,25 @@ export class CreateProductDto {
 
   @Type(() => Number)
   @IsOptional()
-  @IsInt({ message: 'area must be an integer' })  
-  @Min(1, { message: 'area must be positive' })
-  area?: number;  
+  @IsInt({ message: 'area' })
+  @Min(1, { message: 'area' })
+  area?: number;
 
   @Type(() => Number)
   @IsOptional()
-  @IsInt({ message: 'buildYearInt' })  
+  @IsInt({ message: 'buildYearInt' })
   @Min(1900, { message: 'buildYearMin' })
   @Max(new Date().getFullYear(), { message: 'buildYearMax' })
   buildYear?: number;
 
   @IsOptional()
-  
   @ValidateNested({ each: true })
   @Type(() => ProductAttributeValueDto)
   attributes?: ProductAttributeValueDto[];
 
   @IsOptional()
-  @IsEnum(['active', 'inactive', 'sold', 'pending', 'draft'], { message: 'Invalid status' })
+  @IsEnum(['active', 'inactive', 'sold', 'pending', 'draft'], {
+    message: 'Invalid status',
+  })
   status?: 'active' | 'inactive' | 'sold' | 'pending' | 'draft';
 }

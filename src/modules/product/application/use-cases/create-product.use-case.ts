@@ -69,12 +69,20 @@ export class CreateProductUseCase {
         },
       };
     } catch (error ) {
-      console.error('Error creating product:', error);
-      throw new BadRequestException({
-        success: false,
-        message: t('failedCreatingProduct', language),
-        errors:  { general: [t('failedCreatingProduct', language)] },
-      });
+        console.error('Error creating product:', error);
+
+  if (error instanceof BadRequestException) {
+    throw error;
+  }
+
+  
+
+ 
+  throw new BadRequestException({
+    success: false,
+    message: t('failedCreatingProduct', language),
+    errors: { general: [t('failedCreatingProduct', language)] },
+  });
     }
   }
 }

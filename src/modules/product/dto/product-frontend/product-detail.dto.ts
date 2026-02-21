@@ -235,7 +235,14 @@ export class ProductDetailDto {
     description: 'City where the product is located'
   })
   city!: string;
+@ApiProperty({ example: 3 })
+cityId!: number | null;
 
+@ApiProperty({ example: 'AL' })
+countryCode!: string | null;
+
+@ApiProperty({ example: 2 })
+listingTypeId!: number | null;
   @ApiProperty({ 
     example: 'active',
     description: 'Product status'

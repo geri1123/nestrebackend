@@ -35,7 +35,7 @@ import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-co
 import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions.guard';
 import { permission } from 'node:process';
 import { Permissions } from '../../../common/decorators/permissions.decorator';
-
+import { MultipartValidationPipe } from '../../../common/pipes/multipart-validation.pipe';
 type MulterFile = Express.Multer.File;
 
 @ApiTags('Products')
@@ -47,34 +47,56 @@ export class ManageProductController {
     private readonly searchProductsUseCase: SearchProductsUseCase,
     private readonly searchFiltersHelper: SearchFiltersHelper
   ) {}
-@RequireAgencyContext()
+  @RequireAgencyContext()
 @UseGuards(AgencyContextGuard)
-  @Post('add')
-  @ApiCreateProduct()
-  @UseInterceptors(FilesInterceptor('images', 7))
-  async createProduct(
-    @Body() body: Record<string, any>,
-    @UploadedFiles() images: MulterFile[],
-    @Req() req: RequestWithUser
-  ) {
-    const language = req.language;
-    const userId = req.userId;
-    const agencyId = req.agencyId;
+@Post('add')
+@ApiCreateProduct()
+@UseInterceptors(FilesInterceptor('images', 7))
+async createProduct(
+   @Body(new MultipartValidationPipe(CreateProductDto)) dto: CreateProductDto,
+  @UploadedFiles() images: MulterFile[],
+  @Req() req: RequestWithUser
+) {
+  const { language, userId, agencyId } = req;
 
-    if (!userId) {
-      throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-    }
-
-    if (req.user?.role !== 'user' && !req.agencyId) {
-      throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
-    }
-
-    const dto = plainToInstance(CreateProductDto, body);
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, language);
-
-    return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
+  if (!userId) {
+    throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
+
+  if (req.user?.role !== 'user' && !agencyId) {
+    throw new ForbiddenException(t('userNotAssociatedWithAgency', language));
+  }
+
+  return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
+}
+// @RequireAgencyContext()
+// @UseGuards(AgencyContextGuard)
+//   @Post('add')
+//   @ApiCreateProduct()
+//   @UseInterceptors(FilesInterceptor('images', 7))
+//   async createProduct(
+//     @Body() body: Record<string, any>,
+//     @UploadedFiles() images: MulterFile[],
+//     @Req() req: RequestWithUser
+//   ) {
+//     const language = req.language;
+//     const userId = req.userId;
+//     const agencyId = req.agencyId;
+
+//     if (!userId) {
+//       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
+//     }
+
+//     if (req.user?.role !== 'user' && !req.agencyId) {
+//       throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
+//     }
+
+//     const dto = plainToInstance(CreateProductDto, body);
+//     const errors = await validate(dto);
+//     if (errors.length > 0) throwValidationErrors(errors, language);
+
+//     return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
+//   }
 
     @RequireAgencyContext()
 
@@ -82,31 +104,26 @@ export class ManageProductController {
   @Patch('update/:id')
   @ApiUpdateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
-  async updateProduct(
-    @Param('id') id: string,
-    @Body() body: Record<string, any>,
-    @UploadedFiles() images: MulterFile[],
-    @Req() req: RequestWithUser
-  ) {
-    const language = req.language;
-    const userId = req.userId;
+ async updateProduct(
+  @Param('id') id: string,
+  @Body(new MultipartValidationPipe(UpdateProductDto)) dto: UpdateProductDto,
+  @UploadedFiles() images: MulterFile[],
+  @Req() req: RequestWithUser
+) {
+  const { language, userId } = req;
 
-    if (!userId) {
-      throw new UnauthorizedException(t('userNotAuthenticated', language));
-    }
-
-    const dto = plainToInstance(UpdateProductDto, body);
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, language);
-
-    return this.updateProductUseCase.execute({
-      productId: Number(id),
-      dto,
-      userId,
-      language,
-      images,
-    });
+  if (!userId) {
+    throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
+
+  return this.updateProductUseCase.execute({
+    productId: Number(id),
+    dto,
+    userId,
+    language,
+    images,
+  });
+}
 @RequireAgencyContext()
 @UseGuards(AgencyContextGuard)
   @Get('dashboard/products')

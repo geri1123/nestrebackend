@@ -41,7 +41,11 @@ export class ProductImageRepository implements IProductImageRepository {
       })
     );
   }
-
+async deleteByUrls(urls: string[]): Promise<void> {
+  await this.prisma.productImage.deleteMany({
+    where: { imageUrl: { in: urls } },
+  });
+}
   async deleteByProductId(productId: number): Promise<void> {
     await this.prisma.productImage.deleteMany({
       where: { productId },

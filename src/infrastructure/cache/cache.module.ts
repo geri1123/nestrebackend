@@ -6,7 +6,9 @@ import KeyvRedis from '@keyv/redis';
 import { CacheService } from './cache.service';
 import { CACHE_KEYV } from './cache.constants';
 
+import { ClearCache } from './cache.controller';
 @Module({
+  controllers:[ClearCache],
   providers: [
     {
       provide: CACHE_KEYV,

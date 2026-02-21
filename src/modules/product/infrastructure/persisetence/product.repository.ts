@@ -89,8 +89,15 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       subcategoryId: true,
       area: true,
       productImage: { select: { imageUrl: true } },
-      city: { select: { name: true } },
-
+    city: { 
+  select: { 
+    name: true,
+    id: true,
+    country: {
+      select: { code: true }
+    }
+  } 
+},
       
       productAttributeValue: {
         select: {
@@ -145,6 +152,7 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
 
       listingType: {
         select: {
+           id: true, 
           slug: true,
           listingTypeTranslation: {
             where: { language },

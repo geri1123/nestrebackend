@@ -68,27 +68,34 @@ export class UpdateProductUseCase {
     }
 
     //  Images
-    let imagesResponse: { id: number; imageUrl: string }[] = [];
+   let imagesResponse: { id: number; imageUrl: string }[] = [];
 
-    if (Array.isArray(images) && images.length > 0) {
-      await this.deleteImagesUseCase.execute(productId);
+const existingUrlsToKeep: string[] = Array.isArray(dto.existingImageUrls)
+  ? dto.existingImageUrls
+  : [];
 
-      const uploadedImages =
-        (await this.uploadImagesUseCase.execute(
-          images,
-          productId,
-          userId,
-          language,
-        )) ?? [];
+const hasNewImages = Array.isArray(images) && images.length > 0;
 
-      imagesResponse = uploadedImages
-        .filter(img => img?.imageUrl)
-        .map(img => ({
-          id: img.id,
-          imageUrl: img.imageUrl!,
-        }));
-    }
+const allImages = await this.deleteImagesUseCase.findByProductId(productId);
+const toDelete = allImages.filter(
+  (img) => img.imageUrl && !existingUrlsToKeep.includes(img.imageUrl)
+);
 
+if (toDelete.length > 0) {
+  await this.deleteImagesUseCase.executeByUrls(
+    toDelete.map((img) => img.imageUrl!).filter(Boolean),
+    toDelete.map((img) => img.publicId).filter((id): id is string => !!id)
+  );
+}
+
+if (hasNewImages) {
+  const uploadedImages =
+    (await this.uploadImagesUseCase.execute(images!, productId, userId, language)) ?? [];
+
+  imagesResponse = uploadedImages
+    .filter((img) => img?.imageUrl)
+    .map((img) => ({ id: img.id, imageUrl: img.imageUrl! }));
+}
     return {
       success: true,
       message: t('productUpdated', language),
