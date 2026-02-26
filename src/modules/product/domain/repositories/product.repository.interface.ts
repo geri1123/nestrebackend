@@ -7,6 +7,7 @@ export interface IProductRepository {
   findByIdWithDetails(id: number, language: SupportedLang): Promise<any>;
   findForPermissionCheck(id: number): Promise<{ id: number; userId: number | null; agencyId: number | null } | null>;
   update(id: number, data: Partial<Product>): Promise<Product>;
+   deleteWithRelations(id: number): Promise<void>; 
   delete(id: number): Promise<void>;
 }
 

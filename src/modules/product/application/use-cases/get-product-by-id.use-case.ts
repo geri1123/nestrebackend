@@ -1,4 +1,5 @@
 
+
 import { Inject, Injectable } from '@nestjs/common';
 import { PRODUCT_REPO, type IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { SupportedLang } from '../../../../locales';
@@ -20,7 +21,7 @@ export class GetProductByIdUseCase {
     id: number,
     language: SupportedLang,
     isProtectedRoute: boolean,
-    req?: RequestWithUser
+    req?: RequestWithUser,
   ): Promise<ProductDetailResponseDto> {
     const product = await this.productRepository.findByIdWithDetails(id, language);
 
@@ -33,26 +34,46 @@ export class GetProductByIdUseCase {
     const totalClicks = productClicks.reduce((sum, c) => sum + c.count, 0);
 
     // Check status and permissions
-    if (product.status !== ProductStatus.active) {
-      if (!isProtectedRoute) {
-        return { product: null };
-      }
+  if (isProtectedRoute) {
+  const isOwner =
+    req?.userId === product.userId &&
+    (!product.agencyId || req?.agencyId === product.agencyId);
 
-      const isOwner = req?.userId === product.userId;
-      const isAgencyOwner = 
-        req?.user?.role === UserRole.agency_owner && 
-        req?.agencyId === product.agencyId;
-      const canAgentSee = 
-        req?.user?.role === UserRole.agent && 
-        req?.agentPermissions?.can_view_all_posts;
+  const isAgencyOwner =
+    req?.user?.role === UserRole.agency_owner &&
+    req?.agencyId === product.agencyId;
 
-      if (!isOwner && !isAgencyOwner && !canAgentSee) {
-        return { product: null };
-      }
-    }
+ const canAgentView =
+  req?.user?.role === UserRole.agent &&
+  req?.agencyId === product.agencyId &&
+  (
+    req?.userId === product.userId ||           
+    req?.agentPermissions?.can_view_all_posts || 
+    product.status === ProductStatus.active      
+  );
 
+const canAgentEdit =
+  req?.user?.role === UserRole.agent &&
+  req?.agencyId === product.agencyId &&
+  req?.agentPermissions?.can_edit_others_post &&
+  (
+    req?.userId === product.userId ||           
+    req?.agentPermissions?.can_view_all_posts || 
+    product.status === ProductStatus.active      
+  );
+
+
+  if (!isOwner && !isAgencyOwner && !canAgentView && !canAgentEdit) {
+    return { product: null };
+  }
+}else {
+  if (product.status !== ProductStatus.active) {
+    return { product: null };
+  }
+}
+   
     if (
-      product.user?.status === 'suspended' || 
+      product.user?.status === 'suspended' ||
       product.agency?.status === 'suspended'
     ) {
       return { product: null };

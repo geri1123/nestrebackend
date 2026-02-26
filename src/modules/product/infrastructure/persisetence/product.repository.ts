@@ -251,7 +251,13 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       updatedAt: updated.updatedAt,
     });
   }
-
+async deleteWithRelations(id: number): Promise<void> {
+  await this.prisma.$transaction(async (tx) => {
+    await tx.productImage.deleteMany({ where: { productId: id } });
+    await tx.productAttributeValue.deleteMany({ where: { productId: id } });
+    await tx.product.delete({ where: { id } });
+  });
+}
   async delete(id: number): Promise<void> {
     await this.prisma.product.delete({ where: { id } });
   }

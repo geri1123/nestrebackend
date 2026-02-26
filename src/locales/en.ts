@@ -1,5 +1,6 @@
 export const en = {
       failedToUpdateProfileImage:"Failed to update profile image in database.",
+      productSuccesfullyDeleted:"Product deleted successfully",
       noimagetodelete:"No image to delete.",
      agencyCreatedSuccessfully:"Agency created successfully",
    faildCreateWallet:"Failed to create wallet. Please try again.",

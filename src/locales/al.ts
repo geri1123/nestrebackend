@@ -1,6 +1,7 @@
 export const al = {
   failedToUpdateProfileImage:"Dështoi përditësimi i fotos së profilit në bazën e të dhënave.",
- failedToUpdateAgencyLogo: "Dështoi përditësimi i logos së agjencisë.",
+ productSuccesfullyDeleted:"Produkti u fshi me sukses",
+  failedToUpdateAgencyLogo: "Dështoi përditësimi i logos së agjencisë.",
        agencyCreatedSuccessfully:"Agjencia u krijua me sukses",
    faildCreateWallet:"Krijimi i portofolit dështoi. Ju lutemi provoni përsëri.",
 walletSuccessfullyCreated:"Portofoli u krijua me sukses.",

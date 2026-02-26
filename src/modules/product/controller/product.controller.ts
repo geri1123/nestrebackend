@@ -1,5 +1,5 @@
 
-import { Controller, Get, Query, Param, Req, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Param, Req, NotFoundException, UseGuards, Delete, UnauthorizedException } from '@nestjs/common';
 import { SearchProductsUseCase } from '../application/use-cases/search-products.use-case';
 import { GetProductByIdUseCase } from '../application/use-cases/get-product-by-id.use-case';
 import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
@@ -21,6 +21,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
+import { DeleteProductUseCase } from '../application/use-cases/delete-product.use-case';
 @ApiTags('Products')
 @SkipThrottle()
 @Controller('products')
@@ -33,7 +34,8 @@ export class SearchProductsController {
     private readonly productClicksService: ProductClicksService,
     private readonly getMostClickedProductsUseCase: GetMostClickedProductsUseCase,
     private readonly getRelatedProductsUseCase: GetRelatedProductsUseCase,
-    private readonly softAuth: SoftAuthService
+    private readonly softAuth: SoftAuthService,
+    private readonly deleteProductUseCase: DeleteProductUseCase
   ) {}
 
   @Public()
@@ -169,4 +171,5 @@ async getRelatedProducts(
 
   return { products: relatedProducts };
 }
+
 }

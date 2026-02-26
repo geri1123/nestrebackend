@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -36,6 +37,7 @@ import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions
 import { permission } from 'node:process';
 import { Permissions } from '../../../common/decorators/permissions.decorator';
 import { MultipartValidationPipe } from '../../../common/pipes/multipart-validation.pipe';
+import { DeleteProductUseCase } from '../application/use-cases/delete-product.use-case';
 type MulterFile = Express.Multer.File;
 
 @ApiTags('Products')
@@ -45,7 +47,8 @@ export class ManageProductController {
     private readonly createProductUseCase: CreateProductUseCase,
     private readonly updateProductUseCase: UpdateProductUseCase,
     private readonly searchProductsUseCase: SearchProductsUseCase,
-    private readonly searchFiltersHelper: SearchFiltersHelper
+    private readonly searchFiltersHelper: SearchFiltersHelper,
+    private readonly deleteProductUseCase: DeleteProductUseCase
   ) {}
   @RequireAgencyContext()
 @UseGuards(AgencyContextGuard)
@@ -69,34 +72,7 @@ async createProduct(
 
   return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
 }
-// @RequireAgencyContext()
-// @UseGuards(AgencyContextGuard)
-//   @Post('add')
-//   @ApiCreateProduct()
-//   @UseInterceptors(FilesInterceptor('images', 7))
-//   async createProduct(
-//     @Body() body: Record<string, any>,
-//     @UploadedFiles() images: MulterFile[],
-//     @Req() req: RequestWithUser
-//   ) {
-//     const language = req.language;
-//     const userId = req.userId;
-//     const agencyId = req.agencyId;
 
-//     if (!userId) {
-//       throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-//     }
-
-//     if (req.user?.role !== 'user' && !req.agencyId) {
-//       throw new ForbiddenException(t('userNotAssociatedWithAgency', req.language));
-//     }
-
-//     const dto = plainToInstance(CreateProductDto, body);
-//     const errors = await validate(dto);
-//     if (errors.length > 0) throwValidationErrors(errors, language);
-
-//     return this.createProductUseCase.execute(dto, images, language, userId, agencyId!);
-//   }
 
     @RequireAgencyContext()
 
@@ -160,4 +136,14 @@ async createProduct(
 
     return this.searchProductsUseCase.execute(filters, language, isProtectedRoute);
   }
+  @Delete(':id')
+async deleteProduct(
+  @Param('id') id: number,
+  @Req() req: RequestWithUser,
+) {
+  if (!req.user) throw new UnauthorizedException('Not authenticated');
+  
+  await this.deleteProductUseCase.execute(id, req.user.id, req.user.role , req.language);
+  return { success: true , message: t('productSuccesfullyDeleted', req.language),};
+}
 }

@@ -1,6 +1,7 @@
 export const it = {
     failedToUpdateProfileImage:"Impossibile aggiornare l'immagine del profilo nel database.",
-      agencyCreatedSuccessfully:"Agenzia creata con successo",
+     productSuccesfullyDeleted:"Prodotto eliminato con successo",  
+    agencyCreatedSuccessfully:"Agenzia creata con successo",
       requestSentSuccessfully:'Richiesta inviata con successo.',
    faildCreateWallet:"Creazione del portafoglio fallita. Per favore riprova.",
     walletSuccessfullyCreated:"Portafoglio creato con successo.",
