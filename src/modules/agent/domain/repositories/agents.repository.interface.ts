@@ -9,9 +9,9 @@ export interface AgentUserProps {
   id: number;
   username: string;
   email: string;
-  first_name: string | null;
-  last_name: string | null;
-  profile_img: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profileImg: string | null;
   status: string;
 }
 export type AgentAddedByProps = {
@@ -23,7 +23,7 @@ export type AgentMeRecord = {
   agentUser: AgentUserProps;
   agency: {
     id: number;
-    agency_name: string;
+    agencyName: string;
     logo: string | null;
   };
   permission: AgentPermissionEntity | null;

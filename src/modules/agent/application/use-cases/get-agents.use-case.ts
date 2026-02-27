@@ -55,24 +55,22 @@ export class GetAgentsUseCase {
         return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
       }
 
-      const agentsForFrontend = agentsPage.map((item) => ({
-        id: item.agent.id,
-        role_in_agency: item.agent.roleInAgency as any,
-        status: item.agent.status as any,
-        created_at: formatDate(item.agent.createdAt),
-        agentUser: item.agentUser
-          ? {
-              id: item.agentUser.id,
-              username: item.agentUser.username,
-              email: item.agentUser.email,
-              first_name: item.agentUser.first_name,
-              last_name: item.agentUser.last_name,
-              profile_image: item.agentUser.profile_img
-                ? item.agentUser.profile_img
-                : null,
-            }
-          : null,
-      }));
+     const agentsForFrontend = agentsPage.map((item) => ({
+  id: item.agent.id,
+  roleInAgency: item.agent.roleInAgency,
+  status: item.agent.status,
+  createdAt: formatDate(item.agent.createdAt),
+  agentUser: item.agentUser
+    ? {
+        id: item.agentUser.id,
+        username: item.agentUser.username,
+        email: item.agentUser.email,
+        firstName: item.agentUser.firstName,
+        lastName: item.agentUser.lastName,
+        profileImage: item.agentUser.profileImg ?? null,
+      }
+    : null,
+}));
 
       return {
         agents: agentsForFrontend,

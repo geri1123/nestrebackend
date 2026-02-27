@@ -30,6 +30,8 @@ import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-co
 import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions.guard';
 import { AgentBelongsToAgencyGuard } from '../../../infrastructure/auth/guard/agent-belongs-to-agency.guard';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
+import { Public } from '../../../common/decorators/public.decorator';
+
 
 
 @Controller('agents')
@@ -40,7 +42,7 @@ export class AgentController {
     private readonly getAgentMeUseCase:GetAgentMeUseCase,
     private readonly GetAgentByIdInAgency:GetAgentByIdInAgencyUseCase
   ) {}
-
+@Public()
   @Get('public/:agencyId')
   @ApiAgentDecorators.GetPublicAgents()
 async getPublicAgents(

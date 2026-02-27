@@ -7,7 +7,7 @@ export function mapAgentToResponse(
   record: {
     agent: AgentEntity;
     agentUser: AgentUserProps;
-    agency: { id: number; agency_name: string; logo: string | null };
+    agency: { id: number; agencyName: string; logo: string | null };
     permission: AgentPermissionEntity | null;
       addedBy?: { id: number; username: string } | null;
   },
@@ -17,9 +17,9 @@ export function mapAgentToResponse(
     user: {
       id: record.agentUser.id,
       username: record.agentUser.username,
-      firstName: record.agentUser.first_name,
-      lastName: record.agentUser.last_name,
-      profileImg: record.agentUser.profile_img        ? record.agentUser.profile_img
+      firstName: record.agentUser.firstName,
+      lastName: record.agentUser.lastName,
+      profileImg: record.agentUser.profileImg        ? record.agentUser.profileImg
         : null,
     },
     agent: {
@@ -32,7 +32,7 @@ export function mapAgentToResponse(
     },
     agency: {
       id: record.agency.id,
-      name: record.agency.agency_name,
+      name: record.agency.agencyName,
       logo: record.agency.logo
         ? record.agency.logo
         : null,

@@ -46,9 +46,9 @@ export class AgentMapper {
       id: u.id,
       username: u.username,
       email: u.email,
-      first_name: u.firstName ?? null,
-      last_name: u.lastName?? null,
-      profile_img: u.profileImgUrl ?? null,
+      firstName: u.firstName ?? null,
+      lastName: u.lastName?? null,
+      profileImg: u.profileImgUrl ?? null,
       status: u.status,
     };
   }

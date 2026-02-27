@@ -285,7 +285,7 @@ export class AgentRepository implements IAgentDomainRepository {
       agentUser: AgentMapper.toAgentUserProps(record.agentUser),
       agency: {
         id: record.agency.id,
-        agency_name: record.agency.agencyName,
+        agencyName: record.agency.agencyName,
         logo: record.agency.logo,
       },
       permission: record.permission
@@ -339,7 +339,7 @@ export class AgentRepository implements IAgentDomainRepository {
       agentUser: AgentMapper.toAgentUserProps(record.agentUser),
       agency: {
         id: record.agency.id,
-        agency_name: record.agency.agencyName,
+        agencyName: record.agency.agencyName,
         logo: record.agency.logo,
       },
       permission: record.permission
