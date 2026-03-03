@@ -88,13 +88,22 @@ if (toDelete.length > 0) {
   );
 }
 
+const keptImages = allImages
+  .filter((img) => img.imageUrl && existingUrlsToKeep.includes(img.imageUrl))
+  .map((img) => ({ id: img.id, imageUrl: img.imageUrl! }));
+
 if (hasNewImages) {
   const uploadedImages =
     (await this.uploadImagesUseCase.execute(images!, productId, userId, language)) ?? [];
 
-  imagesResponse = uploadedImages
-    .filter((img) => img?.imageUrl)
-    .map((img) => ({ id: img.id, imageUrl: img.imageUrl! }));
+  imagesResponse = [
+    ...keptImages,
+    ...uploadedImages
+      .filter((img) => img?.imageUrl)
+      .map((img) => ({ id: img.id, imageUrl: img.imageUrl! })),
+  ];
+} else {
+  imagesResponse = keptImages; 
 }
     return {
       success: true,

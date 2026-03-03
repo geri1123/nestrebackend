@@ -16,6 +16,7 @@ export class AdvertisementPricingController {
     private readonly updatePricing: UpdatePricingUseCase,
     private readonly createPricing: CreatePricingUseCase
   ) {}
+  
 @AdvertisementPricingSwagger.GetAllPricing()
   @Get()
   async getAll() {

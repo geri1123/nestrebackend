@@ -8,8 +8,6 @@ import { ChangeWalletBalanceUseCase } from "../../../wallet/application/use-case
 import { FindProductByIdUseCase } from "../../../product/application/use-cases/find-product-by-id.use-case";
 import { GetPricingUseCase } from "../../../advertisement-pricing/application/use-cases/get-pricing.use-case";
 
-const AD_PRICING = { cheap: 5, normal: 10, premium: 20 };
-const AD_DURATION = { cheap: 7, normal: 14, premium: 30 };
 @Injectable()
 export class AdvertiseProductUseCase {
   constructor(
@@ -36,16 +34,14 @@ export class AdvertiseProductUseCase {
   async execute(productId: number, adType: AdvertisementType, userId: number, language: SupportedLang) {
     const product = await this.validate(productId, userId, language);
 
-    
     const pricing = await this.getPricingUseCase.execute(adType);
 
     if (!pricing.isActive) {
       throw new BadRequestException(t("advertisementTypeNotActive", language));
     }
 
-
     const finalPrice = pricing.discount
-      ? pricing.price * (1 - pricing.discount)
+      ? Math.round((pricing.price - (pricing.price * pricing.discount) / 100) * 100) / 100
       : pricing.price;
 
     const endDate = new Date(Date.now() + pricing.duration * 24 * 60 * 60 * 1000);
@@ -72,7 +68,7 @@ export class AdvertiseProductUseCase {
           transactionId
         );
       });
-    } catch (error:any) {
+    } catch (error: any) {
       if (error.message === "Insufficient balance") {
         throw new BadRequestException(t("insufficientBalance", language));
       }

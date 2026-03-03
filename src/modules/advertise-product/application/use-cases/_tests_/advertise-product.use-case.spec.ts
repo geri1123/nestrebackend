@@ -23,12 +23,13 @@ describe('AdvertiseProductUseCase', () => {
     name: 'Test Product',
   };
 
+  // discount is stored as percentage (e.g. 20 = 20%)
   const mockPricing = {
     id: 1,
-    type: AdvertisementType.normal,
+    adType: AdvertisementType.normal,
     price: 10,
     duration: 14,
-    discount: null,
+    discount: 0, // no discount
     isActive: true,
   };
 
@@ -141,13 +142,11 @@ describe('AdvertiseProductUseCase', () => {
     });
 
     it('should use base price when no discount', async () => {
+      // discount: 0 → finalPrice = 10
       getPricingUseCase.execute.mockResolvedValue(mockPricing as any);
-      
-      const mockTx = {} as any;
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback(mockTx);
-      });
 
+      const mockTx = {} as any;
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
       changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
       adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
 
@@ -157,24 +156,22 @@ describe('AdvertiseProductUseCase', () => {
         {
           userId: 100,
           type: WalletTransactionType.purchase,
-          amount: 10,
+          amount: 10, // no discount applied
           language: 'en',
         },
         mockTx
       );
     });
 
-    it('should apply discount correctly', async () => {
+    it('should apply percentage discount correctly', async () => {
+      // price: 10, discount: 20 (20%) → finalPrice = 10 - (10 * 20 / 100) = 8.00
       getPricingUseCase.execute.mockResolvedValue({
         ...mockPricing,
-        discount: 0.2,
+        discount: 20,
       } as any);
 
       const mockTx = {} as any;
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback(mockTx);
-      });
-
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
       changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
       adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
 
@@ -184,9 +181,30 @@ describe('AdvertiseProductUseCase', () => {
         {
           userId: 100,
           type: WalletTransactionType.purchase,
-          amount: 8,
+          amount: 8, // 10 - 20% = 8
           language: 'en',
         },
+        mockTx
+      );
+    });
+
+    it('should round final price to 2 decimal places', async () => {
+      // price: 9.99, discount: 10 (10%) → 9.99 - 0.999 = 8.991 → rounded = 8.99
+      getPricingUseCase.execute.mockResolvedValue({
+        ...mockPricing,
+        price: 9.99,
+        discount: 10,
+      } as any);
+
+      const mockTx = {} as any;
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
+      changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
+      adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
+
+      await useCase.execute(1, AdvertisementType.normal, 100, 'en');
+
+      expect(changeWalletBalanceUseCase.execute).toHaveBeenCalledWith(
+        expect.objectContaining({ amount: 8.99 }),
         mockTx
       );
     });
@@ -206,17 +224,11 @@ describe('AdvertiseProductUseCase', () => {
         id: 1,
         productId: 1,
         userId: 100,
-        type: AdvertisementType.normal,
+        adType: AdvertisementType.normal,
       };
 
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback(mockTx);
-      });
-
-      changeWalletBalanceUseCase.execute.mockResolvedValue({ 
-        transactionId: mockTransactionId 
-      } as any);
-      
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
+      changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: mockTransactionId } as any);
       adRepo.createAdvertisementTx.mockResolvedValue(mockAd as any);
 
       const result = await useCase.execute(1, AdvertisementType.normal, 100, 'en');
@@ -231,7 +243,6 @@ describe('AdvertiseProductUseCase', () => {
         },
         mockTx
       );
-      
       expect(adRepo.createAdvertisementTx).toHaveBeenCalledWith(
         mockTx,
         1,
@@ -241,21 +252,14 @@ describe('AdvertiseProductUseCase', () => {
         expect.any(Date),
         mockTransactionId
       );
-
       expect(result).toEqual(mockAd);
     });
 
     it('should calculate correct end date based on duration', async () => {
       const mockTx = {} as any;
-      
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback(mockTx);
-      });
 
-      changeWalletBalanceUseCase.execute.mockResolvedValue({ 
-        transactionId: 123 
-      } as any);
-      
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
+      changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
       adRepo.createAdvertisementTx.mockResolvedValue({ id: 1 } as any);
 
       const beforeExecution = Date.now();
@@ -275,13 +279,8 @@ describe('AdvertiseProductUseCase', () => {
     });
 
     it('should throw BadRequestException on insufficient balance', async () => {
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback({} as any);
-      });
-
-      changeWalletBalanceUseCase.execute.mockRejectedValue(
-        new Error('Insufficient balance')
-      );
+      prisma.$transaction.mockImplementation(async (callback: any) => callback({} as any));
+      changeWalletBalanceUseCase.execute.mockRejectedValue(new Error('Insufficient balance'));
 
       await expect(
         useCase.execute(1, AdvertisementType.normal, 100, 'en')
@@ -290,18 +289,10 @@ describe('AdvertiseProductUseCase', () => {
 
     it('should rollback transaction on failure', async () => {
       const mockTx = {} as any;
-      
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback(mockTx);
-      });
 
-      changeWalletBalanceUseCase.execute.mockResolvedValue({ 
-        transactionId: 123 
-      } as any);
-      
-      adRepo.createAdvertisementTx.mockRejectedValue(
-        new Error('Database error')
-      );
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
+      changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 123 } as any);
+      adRepo.createAdvertisementTx.mockRejectedValue(new Error('Database error'));
 
       await expect(
         useCase.execute(1, AdvertisementType.normal, 100, 'en')
@@ -311,13 +302,8 @@ describe('AdvertiseProductUseCase', () => {
     });
 
     it('should rethrow non-balance errors', async () => {
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback({} as any);
-      });
-
-      changeWalletBalanceUseCase.execute.mockRejectedValue(
-        new Error('Some other error')
-      );
+      prisma.$transaction.mockImplementation(async (callback: any) => callback({} as any));
+      changeWalletBalanceUseCase.execute.mockRejectedValue(new Error('Some other error'));
 
       await expect(
         useCase.execute(1, AdvertisementType.normal, 100, 'en')
@@ -329,28 +315,21 @@ describe('AdvertiseProductUseCase', () => {
     it('should handle premium ad type with discount', async () => {
       findProduct.execute.mockResolvedValue(mockProduct as any);
       adRepo.getActiveAd.mockResolvedValue(null);
+
+      // price: 20, discount: 15 (15%) → 20 - (20 * 15 / 100) = 20 - 3 = 17.00
       getPricingUseCase.execute.mockResolvedValue({
         id: 3,
-        type: AdvertisementType.premium,
+        adType: AdvertisementType.premium,
         price: 20,
         duration: 30,
-        discount: 0.15,
+        discount: 15,
         isActive: true,
       } as any);
 
       const mockTx = {} as any;
-      prisma.$transaction.mockImplementation(async (callback: any) => {
-        return callback(mockTx);
-      });
-
-      changeWalletBalanceUseCase.execute.mockResolvedValue({ 
-        transactionId: 456 
-      } as any);
-      
-      adRepo.createAdvertisementTx.mockResolvedValue({ 
-        id: 2,
-        type: AdvertisementType.premium 
-      } as any);
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
+      changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 456 } as any);
+      adRepo.createAdvertisementTx.mockResolvedValue({ id: 2, adType: AdvertisementType.premium } as any);
 
       await useCase.execute(1, AdvertisementType.premium, 100, 'en');
 
@@ -358,7 +337,38 @@ describe('AdvertiseProductUseCase', () => {
         {
           userId: 100,
           type: WalletTransactionType.purchase,
-          amount: 17,
+          amount: 17, // 20 - 15% = 17
+          language: 'en',
+        },
+        mockTx
+      );
+    });
+
+    it('should handle cheap ad type with no discount', async () => {
+      findProduct.execute.mockResolvedValue(mockProduct as any);
+      adRepo.getActiveAd.mockResolvedValue(null);
+
+      getPricingUseCase.execute.mockResolvedValue({
+        id: 1,
+        adType: AdvertisementType.cheap,
+        price: 4.99,
+        duration: 7,
+        discount: 0,
+        isActive: true,
+      } as any);
+
+      const mockTx = {} as any;
+      prisma.$transaction.mockImplementation(async (callback: any) => callback(mockTx));
+      changeWalletBalanceUseCase.execute.mockResolvedValue({ transactionId: 789 } as any);
+      adRepo.createAdvertisementTx.mockResolvedValue({ id: 3, adType: AdvertisementType.cheap } as any);
+
+      await useCase.execute(1, AdvertisementType.cheap, 100, 'en');
+
+      expect(changeWalletBalanceUseCase.execute).toHaveBeenCalledWith(
+        {
+          userId: 100,
+          type: WalletTransactionType.purchase,
+          amount: 4.99,
           language: 'en',
         },
         mockTx

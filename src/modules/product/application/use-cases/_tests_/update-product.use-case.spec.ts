@@ -31,6 +31,8 @@ describe('UpdateProductUseCase', () => {
     );
   });
 
+  // ─── Product lookup ────────────────────────────────────────────────────────
+
   it('should throw NotFoundException if product does not exist', async () => {
     repo.findById.mockResolvedValue(null);
 
@@ -43,6 +45,8 @@ describe('UpdateProductUseCase', () => {
       }),
     ).rejects.toThrow(NotFoundException);
   });
+
+  // ─── Basic update ──────────────────────────────────────────────────────────
 
   it('should update product successfully with no images', async () => {
     repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
@@ -63,6 +67,8 @@ describe('UpdateProductUseCase', () => {
     expect(result.product.images).toEqual([]);
   });
 
+  // ─── Attributes ────────────────────────────────────────────────────────────
+
   it('should delete and recreate attributes when provided', async () => {
     repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
     repo.update.mockResolvedValue({
@@ -81,39 +87,83 @@ describe('UpdateProductUseCase', () => {
     expect(createAttributes.execute).toHaveBeenCalled();
   });
 
-  it('should delete removed images from cloudinary and db', async () => {
+  it('should not touch attributes when none are provided', async () => {
     repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
-    repo.update.mockResolvedValue({
-      toResponse: () => ({ id: 1 }),
-    });
-
-    // Two images exist, user kept only one
-    deleteImages.findByProductId.mockResolvedValue([
-      { imageUrl: 'https://cdn.com/img1.jpg', publicId: 'pub1' },
-      { imageUrl: 'https://cdn.com/img2.jpg', publicId: 'pub2' },
-    ]);
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
+    deleteImages.findByProductId.mockResolvedValue([]);
 
     await useCase.execute({
+      productId: 1,
+      dto: {} as any,
+      userId: 10,
+      language: 'en',
+    });
+
+    expect(deleteAttributes.execute).not.toHaveBeenCalled();
+    expect(createAttributes.execute).not.toHaveBeenCalled();
+  });
+
+  // ─── Image deletion ────────────────────────────────────────────────────────
+
+  it('should delete removed images from cloudinary and db', async () => {
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
+
+    deleteImages.findByProductId.mockResolvedValue([
+      { id: 10, imageUrl: 'https://cdn.com/img1.jpg', publicId: 'pub1' },
+      { id: 11, imageUrl: 'https://cdn.com/img2.jpg', publicId: 'pub2' },
+    ]);
+
+    const result = await useCase.execute({
       productId: 1,
       dto: { existingImageUrls: ['https://cdn.com/img1.jpg'] } as any,
       userId: 10,
       language: 'en',
     });
 
+    // img2 should be deleted
     expect(deleteImages.executeByUrls).toHaveBeenCalledWith(
       ['https://cdn.com/img2.jpg'],
       ['pub2'],
     );
+
+    // img1 should still be in the response
+    expect(result.product.images).toEqual([
+      { id: 10, imageUrl: 'https://cdn.com/img1.jpg' },
+    ]);
   });
+
+  it('should delete all images when existingImageUrls is empty', async () => {
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
+
+    deleteImages.findByProductId.mockResolvedValue([
+      { id: 10, imageUrl: 'https://cdn.com/img1.jpg', publicId: 'pub1' },
+      { id: 11, imageUrl: 'https://cdn.com/img2.jpg', publicId: 'pub2' },
+    ]);
+
+    const result = await useCase.execute({
+      productId: 1,
+      dto: { existingImageUrls: [] } as any,
+      userId: 10,
+      language: 'en',
+    });
+
+    expect(deleteImages.executeByUrls).toHaveBeenCalledWith(
+      ['https://cdn.com/img1.jpg', 'https://cdn.com/img2.jpg'],
+      ['pub1', 'pub2'],
+    );
+    expect(result.product.images).toEqual([]);
+  });
+
+  // ─── Image upload ──────────────────────────────────────────────────────────
 
   it('should upload new images when provided', async () => {
     repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
-    repo.update.mockResolvedValue({
-      toResponse: () => ({ id: 1 }),
-    });
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
     deleteImages.findByProductId.mockResolvedValue([]);
     uploadImages.execute.mockResolvedValue([
-      { id: 1, imageUrl: 'https://cdn.com/new.jpg' },
+      { id: 20, imageUrl: 'https://cdn.com/new.jpg' },
     ]);
 
     const result = await useCase.execute({
@@ -125,21 +175,71 @@ describe('UpdateProductUseCase', () => {
     });
 
     expect(uploadImages.execute).toHaveBeenCalled();
-    expect(result.product.images.length).toBe(1);
-    expect(result.product.images[0].imageUrl).toBe('https://cdn.com/new.jpg');
+    expect(result.product.images).toEqual([
+      { id: 20, imageUrl: 'https://cdn.com/new.jpg' },
+    ]);
   });
+
+  it('should not call uploadImages when no new images are provided', async () => {
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
+    deleteImages.findByProductId.mockResolvedValue([]);
+
+    await useCase.execute({
+      productId: 1,
+      dto: {} as any,
+      userId: 10,
+      language: 'en',
+    });
+
+    expect(uploadImages.execute).not.toHaveBeenCalled();
+  });
+
+  // ─── Keep existing + add new (the main bug scenario) ──────────────────────
+
+  it('should keep existing images AND append newly uploaded images', async () => {
+    repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
+
+    // Product already has 1 image
+    deleteImages.findByProductId.mockResolvedValue([
+      { id: 5, imageUrl: 'https://cdn.com/existing.jpg', publicId: 'pub_existing' },
+    ]);
+
+    // User uploads 1 more image without removing the existing one
+    uploadImages.execute.mockResolvedValue([
+      { id: 6, imageUrl: 'https://cdn.com/new.jpg' },
+    ]);
+
+    const result = await useCase.execute({
+      productId: 1,
+      dto: { existingImageUrls: ['https://cdn.com/existing.jpg'] } as any,
+      userId: 10,
+      language: 'en',
+      images: [{} as any],
+    });
+
+    // Nothing should be deleted
+    expect(deleteImages.executeByUrls).not.toHaveBeenCalled();
+
+    // Both images should appear in the response
+    expect(result.product.images).toEqual([
+      { id: 5, imageUrl: 'https://cdn.com/existing.jpg' },
+      { id: 6, imageUrl: 'https://cdn.com/new.jpg' },
+    ]);
+  });
+
+  // ─── Keep existing only (no new uploads) ──────────────────────────────────
 
   it('should keep existing images that are in existingImageUrls', async () => {
     repo.findById.mockResolvedValue({ id: 1, subcategoryId: 2 });
-    repo.update.mockResolvedValue({
-      toResponse: () => ({ id: 1 }),
-    });
+    repo.update.mockResolvedValue({ toResponse: () => ({ id: 1 }) });
 
     deleteImages.findByProductId.mockResolvedValue([
-      { imageUrl: 'https://cdn.com/keep.jpg', publicId: 'pub_keep' },
+      { id: 5, imageUrl: 'https://cdn.com/keep.jpg', publicId: 'pub_keep' },
     ]);
 
-    await useCase.execute({
+    const result = await useCase.execute({
       productId: 1,
       dto: { existingImageUrls: ['https://cdn.com/keep.jpg'] } as any,
       userId: 10,
@@ -148,5 +248,10 @@ describe('UpdateProductUseCase', () => {
 
     // Nothing should be deleted
     expect(deleteImages.executeByUrls).not.toHaveBeenCalled();
+
+    // Kept image should appear in response
+    expect(result.product.images).toEqual([
+      { id: 5, imageUrl: 'https://cdn.com/keep.jpg' },
+    ]);
   });
 });

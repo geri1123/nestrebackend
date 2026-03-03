@@ -8,7 +8,12 @@ export class GetAllPricingUseCase {
     private repo: IAdvertisementPricingRepository
   ) {}
 
-  async execute() {
-    return this.repo.getAll();
-  }
+ async execute() {
+  const pricings = await this.repo.getAll();
+  
+  return pricings.map((p) => ({
+    ...p,
+   finalPrice: p.discount ? Math.round((p.price - (p.price * p.discount) / 100) * 100) / 100 : p.price,
+  }));
+}
 }

@@ -27,7 +27,7 @@ model Agency {
   agencyAgent           AgencyAgent[]
   product               Product[]
   registrationRequest   RegistrationRequest[]
-
+@@index([status])
   @@map("agency")
 }
 
@@ -52,6 +52,7 @@ model AgencyAgent {
   @@unique([agencyId, agentId], map: "AgencyAgent_agency_id_agent_id_key")
   @@index([addedBy], map: "AgencyAgent_added_by_fkey")
   @@index([agentId], map: "AgencyAgent_agent_id_fkey")
+  @@index([agencyId], map: "AgencyAgent_agency_id_fkey")
   @@map("agencyagent")
 }
 
@@ -202,6 +203,7 @@ model RegistrationRequest {
   @@index([reviewedBy], map: "RegistrationRequest_reviewed_by_idx")
   @@index([status], map: "RegistrationRequest_status_idx")
   @@index([userId], map: "RegistrationRequest_user_id_idx")
+  @@index([requestType, status])
   @@map("registrationrequest")
 }
 
@@ -265,7 +267,11 @@ model User {
   registrationRequestsReviewed  RegistrationRequest[] @relation("RegistrationRequestReviewedBy")
   registrationRequests          RegistrationRequest[] @relation("RegistrationRequestUser")
   usernameHistory               UsernameHistory[]
-
+@@index([role])
+@@index([status])
+@@index([role, status])
+@@index([createdAt])
+  @@index([lastActive])
   @@map("user")
 }
 
@@ -332,6 +338,18 @@ model Product {
   @@index([listingTypeId], map: "Product_listingTypeId_fkey")
   @@index([subcategoryId], map: "Product_subcategoryId_fkey")
   @@index([userId], map: "Product_userId_fkey")
+    @@index([status])
+  @@index([createdAt])
+  @@index([status, createdAt])
+  @@index([cityId, status])
+  @@index([subcategoryId, status])
+  @@index([agencyId, status])
+
+  @@index([cityId])
+  @@index([subcategoryId])
+  @@index([listingTypeId])
+  @@index([userId])
+  @@index([agencyId])
   @@map("product")
 }
 

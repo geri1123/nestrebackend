@@ -26,7 +26,7 @@ describe('GetAllPricingUseCase', () => {
     expect(useCase).toBeDefined();
   });
 
-  it('should return all pricing records', async () => {
+  it('should return all pricing records with finalPrice', async () => {
     const pricings = [
       new AdvertisementPricingEntity(1, 'BANNER', 100, 30, 10, true, new Date(), new Date()),
       new AdvertisementPricingEntity(2, 'VIDEO', 200, 60, 15, true, new Date(), new Date()),
@@ -36,9 +36,19 @@ describe('GetAllPricingUseCase', () => {
 
     const result = await useCase.execute();
 
-    expect(mockRepo.getAll).toHaveBeenCalled();
-    expect(result).toEqual(pricings);
+    expect(mockRepo.getAll).toHaveBeenCalledTimes(1);
     expect(result).toHaveLength(2);
+
+    expect(result).toEqual([
+      {
+        ...pricings[0],
+        finalPrice: 90,
+      },
+      {
+        ...pricings[1],
+        finalPrice: 170,
+      },
+    ]);
   });
 
   it('should return empty array when no pricing exists', async () => {
@@ -46,7 +56,7 @@ describe('GetAllPricingUseCase', () => {
 
     const result = await useCase.execute();
 
-    expect(mockRepo.getAll).toHaveBeenCalled();
+    expect(mockRepo.getAll).toHaveBeenCalledTimes(1);
     expect(result).toEqual([]);
   });
 });
