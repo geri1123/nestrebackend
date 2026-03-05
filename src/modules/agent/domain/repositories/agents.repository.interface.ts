@@ -17,6 +17,7 @@ export interface AgentUserProps {
 export type AgentAddedByProps = {
   id: number;
   username: string;
+  profileImg: string | null;
 };
 export type AgentMeRecord = {
   agent: AgentEntity;
@@ -100,15 +101,15 @@ getAgentAuthContext(userId: number): Promise<{
   ): Promise<number>;
 
   updateAgencyAgent(
-    agencyAgentId: number,
-    data: Partial<{
-     idCardNumber: string;
-    roleInAgency: AgentRole;
+  agencyAgentId: number,
+  data: Partial<{
+    roleInAgency: AgencyAgentRoleInAgency;
     commissionRate: number;
     endDate: Date;
-    status: AgentStatus;
-    }>,
-  ): Promise<AgentEntity>;
+    status: AgencyAgentStatus;
+  }>,
+  tx?: Prisma.TransactionClient, 
+): Promise<AgentEntity>;
 getAgentMe(
   userId: number,
 ): Promise<AgentMeRecord | null>;
@@ -116,4 +117,5 @@ getAgentByIdInAgency(
     agencyAgentId: number,
     agencyId: number,
   ): Promise<AgentMeRecord | null>;
+  detachAgentProducts(agentUserId: number, agencyId: number, tx?: Prisma.TransactionClient): Promise<void>;
 }

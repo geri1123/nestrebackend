@@ -44,11 +44,7 @@ export class SearchFiltersResolver {
           where: { slug: normalizedCategory },
         });
 
-        if (!category) {
-          console.warn(` Category slug "${normalizedCategory}" not found in database`);
-        } else {
-          console.log(` Category found: ${category.slug} (ID: ${category.id})`);
-        }
+      
 
         result.categoryId = category?.id || undefined;
       } catch (error) {
@@ -64,20 +60,14 @@ export class SearchFiltersResolver {
           where: { slug: normalizedSubcategory },
         });
 
-        if (!subcategory) {
-          console.warn(` Subcategory slug "${normalizedSubcategory}" not found in database`);
-        } else {
-          console.log(` Subcategory found: ${subcategory.slug} (ID: ${subcategory.id})`);
-        }
+      
 
         result.subcategoryId = subcategory?.id || undefined;
 
         if (!result.categoryId && subcategory?.categoryId) {
           result.categoryId = subcategory.categoryId;
-          console.log(` Auto-bound parent categoryId: ${subcategory.categoryId}`);
         }
       } catch (error) {
-        console.error(' Error finding subcategory:', error);
         throw error;
       }
     }
@@ -89,11 +79,7 @@ export class SearchFiltersResolver {
           where: { slug: normalizedListingType },
         });
 
-        if (!listingType) {
-          console.warn(`Listing type slug "${normalizedListingType}" not found in database`);
-        } else {
-          console.log(` Listing type found: ${listingType.slug} (ID: ${listingType.id})`);
-        }
+       
 
         result.listingTypeId = listingType?.id || undefined;
       } catch (error) {
@@ -114,7 +100,6 @@ export class SearchFiltersResolver {
             continue;
           }
 
-          console.log(`Looking for attribute code: "${normalizedAttrCode}"`);
 
           const attribute = await this.prisma.attribute.findFirst({
             where: {
@@ -180,16 +165,7 @@ export class SearchFiltersResolver {
       result.attributes = resolvedAttributes;
     }
 
-    console.log(' RESOLVED IDs:', {
-      category: result.category,
-      subcategory: result.subcategory,
-      listingtype: result.listingtype,
-      categoryId: result.categoryId,
-      subcategoryId: result.subcategoryId,
-      listingTypeId: result.listingTypeId,
-      attributeCodes: result.attributeCodes,
-      attributes: result.attributes,
-    });
+   
 
     return result;
   }

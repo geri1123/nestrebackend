@@ -221,32 +221,30 @@ export class AgentRepository implements IAgentDomainRepository {
     });
   }
 
-  async updateAgencyAgent(
-    agencyAgentId: number,
-    data: Partial<{
-      id_card_number: string;
-      role_in_agency: AgentRole;
-      commission_rate: number;
-      end_date: Date;
-      status: AgentStatus;
-    }>,
-  ): Promise<AgentEntity> {
-    // Map snake_case to camelCase for Prisma
-    const prismaData: any = {};
-    
-    if (data.id_card_number !== undefined) prismaData.idCardNumber = data.id_card_number;
-    if (data.role_in_agency !== undefined) prismaData.roleInAgency = data.role_in_agency as any;
-    if (data.commission_rate !== undefined) prismaData.commissionRate = data.commission_rate;
-    if (data.end_date !== undefined) prismaData.endDate = data.end_date;
-    if (data.status !== undefined) prismaData.status = data.status as any;
+async updateAgencyAgent(
+  agencyAgentId: number,
+  data: Partial<{
+    roleInAgency: AgencyAgentRoleInAgency;
+    commissionRate: number;
+    endDate: Date;
+    status: AgencyAgentStatus;
+  }>,
+  tx?: Prisma.TransactionClient, 
+): Promise<AgentEntity> {
+  const client = tx ?? this.prisma; 
 
-    const updated = await this.prisma.agencyAgent.update({
-      where: { id: agencyAgentId },
-      data: prismaData,
-    });
+  const updated = await client.agencyAgent.update({ 
+    where: { id: agencyAgentId },
+    data: {
+      ...(data.roleInAgency !== undefined && { roleInAgency: data.roleInAgency }),
+      ...(data.commissionRate !== undefined && { commissionRate: data.commissionRate }),
+      ...(data.endDate !== undefined && { endDate: data.endDate }),
+      ...(data.status !== undefined && { status: data.status }),
+    },
+  });
 
-    return AgentMapper.toDomain(updated);
-  }
+  return AgentMapper.toDomain(updated);
+}
 
   async getAgentMe(
     userId: number,
@@ -271,6 +269,7 @@ export class AgentRepository implements IAgentDomainRepository {
           select: {
             id: true,
             username: true,
+            profileImgUrl:true,
           },
         },
       },
@@ -295,62 +294,75 @@ export class AgentRepository implements IAgentDomainRepository {
         ? {
             id: record.addedByUser.id,
             username: record.addedByUser.username,
+           profileImg:record.addedByUser.profileImgUrl,
           }
         : null,
     };
   }
 
   async getAgentByIdInAgency(
-    agencyAgentId: number,
-    agencyId: number,
-  ): Promise<AgentMeRecord | null> {
-    const record = await this.prisma.agencyAgent.findFirst({
-      where: {
-        id: agencyAgentId,
-        agencyId: agencyId,
-        status: 'active',
-        agency: { status: 'active' },
-      },
-      include: {
-        agency: {
-          select: {
-            id: true,
-            agencyName: true,
-            logo: true,
-          },
-        },
-        agentUser: true,
-        permission: true,
-        addedByUser: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-    });
-
-    if (!record || !record.agentUser || !record.agency) {
-      return null;
-    }
-
-    return {
-      agent: AgentMapper.toDomain(record),
-      agentUser: AgentMapper.toAgentUserProps(record.agentUser),
+  agencyAgentId: number,
+  agencyId: number,
+): Promise<AgentMeRecord | null> {
+  const record = await this.prisma.agencyAgent.findUnique({
+    where: {
+      id: agencyAgentId,
+      agencyId: agencyId,
+    },
+    include: {
       agency: {
-        id: record.agency.id,
-        agencyName: record.agency.agencyName,
-        logo: record.agency.logo,
+        select: {
+          id: true,
+          agencyName: true,
+          logo: true,
+        },
       },
-      permission: record.permission
-        ? AgentMapper.toPermissionDomain(record.permission)
-        : null,
-      addedBy: record.addedByUser
-        ? {
-            id: record.addedByUser.id,
-            username: record.addedByUser.username,
-          }
-        : null,
-    };
+      agentUser: true,
+      permission: true,
+      addedByUser: {
+        select: {
+          id: true,
+          username: true,
+          profileImgUrl: true,
+        },
+      },
+    },
+  });
+
+  if (!record || !record.agentUser || !record.agency) {
+    return null;
   }
+
+  return {
+    agent: AgentMapper.toDomain(record),
+    agentUser: AgentMapper.toAgentUserProps(record.agentUser),
+    agency: {
+      id: record.agency.id,
+      agencyName: record.agency.agencyName,
+      logo: record.agency.logo,
+    },
+    permission: record.permission
+      ? AgentMapper.toPermissionDomain(record.permission)
+      : null,
+    addedBy: record.addedByUser
+      ? {
+          id: record.addedByUser.id,
+          username: record.addedByUser.username,
+          profileImg: record.addedByUser.profileImgUrl,
+        }
+      : null,
+  };
+}
+async detachAgentProducts(agentUserId: number, agencyId: number, tx?: Prisma.TransactionClient): Promise<void> {
+  const client = tx ?? this.prisma;
+  await client.product.updateMany({
+    where: {
+      userId: agentUserId,
+      agencyId: agencyId,
+    },
+    data: {
+      agencyId: null,
+    },
+  });
+}
 }

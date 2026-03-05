@@ -4,6 +4,7 @@ import { DeleteProductImagesByProductIdUseCase } from '../../../product-image/ap
 import { DeleteProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/delete-product-attributes.use-case';
 import { UserRole } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
+import { FiltersService } from '../../../filters/filters.service';
 
 
 @Injectable()
@@ -12,6 +13,7 @@ export class DeleteProductUseCase {
     @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
     private readonly deleteImages: DeleteProductImagesByProductIdUseCase,
+    private readonly filterService:FiltersService,
   ) {}
 
   async execute(productId: number, userId: number, userRole: string, lang: SupportedLang): Promise<void> {
@@ -27,7 +29,7 @@ export class DeleteProductUseCase {
 
   
     await this.productRepository.deleteWithRelations(productId);
-
+  
     if (images.length > 0) {
       await Promise.all(
         images
@@ -37,5 +39,8 @@ export class DeleteProductUseCase {
           )
       );
     }
+
+    this.filterService.refreshCounts();
   }
+     
 }

@@ -35,6 +35,6 @@ import { ATTRIBUTE_REPO } from './repositories/attributes/Iattribute.respository
       useClass:AttributeRepo
     },
   ],
-  exports:[ ATTRIBUTE_REPO]
+  exports:[ ATTRIBUTE_REPO , FiltersService]
 })
 export class FiltersModule {}

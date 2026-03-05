@@ -5,13 +5,15 @@ import { CreateProductDto } from '../../dto/create-product.dto';
 import { SupportedLang, t } from '../../../../locales';
 import { UploadProductImagesUseCase } from '../../../product-image/application/use-cases/upload-product-images.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
+import { FiltersService } from '../../../filters/filters.service';
 @Injectable()
 export class CreateProductUseCase {
   constructor(
     @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,
-    private readonly createAttributeValuesUseCase: CreateProductAttributeValuesUseCase
+    private readonly createAttributeValuesUseCase: CreateProductAttributeValuesUseCase,
+    private readonly filterService:FiltersService,
   ) {}
 
   async execute(
@@ -59,7 +61,7 @@ export class CreateProductUseCase {
       );
 
       const [uploadedImages] = await Promise.all(tasks);
-
+this.filterService.refreshCounts()
       return {
         success: true,
         message: t('successadded', language),

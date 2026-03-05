@@ -61,7 +61,7 @@ async getPublicAgents(
     AgencyAgentStatus.active,
   );
 } 
-
+//dashboard products
 @RequireAgencyContext()
 @Roles('agency_owner', 'agent')
   @UseGuards(AgencyContextGuard, RolesGuard)
@@ -104,8 +104,7 @@ async updateAgencyAgents(
     const agencyId = req.agencyId;
     const user = req.user;
     const language = req.language;
-
-
+   
     if (!user) {
       throw new ForbiddenException(t('userNotFound', language));
     }
@@ -116,17 +115,18 @@ async updateAgencyAgents(
 
     const dto = plainToInstance(UpdateAgentsDto, data);
     
-    console.log('Transformed DTO:', dto);
+  
 
     const result = await this.updateAgentUseCase.execute(
       id, 
       agencyId, 
       dto, 
       language, 
-      user
+      user, 
+      req.agencyAgentId ?? undefined,
     );
     
-    console.log('Update Result:', result);
+   
     
     return result;
   } catch (error) {

@@ -7,12 +7,15 @@ describe('CreateProductUseCase', () => {
   const productRepo = { create: jest.fn() } as any;
   const uploadImages = { execute: jest.fn() } as any;
   const createAttributes = { execute: jest.fn() } as any;
+  const filtersService = { refreshCounts: jest.fn() } as any; // ← add this
 
   beforeEach(() => {
+    jest.clearAllMocks(); // ← clear mocks between tests
     useCase = new CreateProductUseCase(
       productRepo,
       uploadImages,
       createAttributes,
+      filtersService, // ← add this
     );
   });
 
@@ -40,6 +43,7 @@ describe('CreateProductUseCase', () => {
 
     expect(productRepo.create).toHaveBeenCalled();
     expect(result.success).toBe(true);
+    expect(filtersService.refreshCounts).toHaveBeenCalled(); // ← verify it was called
   });
 
   it('should call image and attribute use cases when provided', async () => {
@@ -47,6 +51,9 @@ describe('CreateProductUseCase', () => {
       id: 1,
       toResponse: () => ({ id: 1 }),
     });
+
+    uploadImages.execute.mockResolvedValue([]);
+    createAttributes.execute.mockResolvedValue(undefined);
 
     await useCase.execute(
       {

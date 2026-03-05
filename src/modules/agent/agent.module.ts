@@ -20,12 +20,13 @@ import { GetAgentMeUseCase } from './application/use-cases/get-agent-me.use-case
 import { GetAgentByIdInAgencyUseCase } from './application/use-cases/get-agent-in-agency.use-case';
 import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
 import { CountAgentsInAgencyUseCase } from './application/use-cases/count-agents-in-agency.use-case';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     NotificationModule,
     PrismaModule,
-    // REMOVED: AgencyModule (to break circular dependency)
+    UsersModule,
   ],
   controllers: [AgentController],
   providers: [

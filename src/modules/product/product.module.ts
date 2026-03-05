@@ -39,10 +39,12 @@ import { ProductSearchQueryBuilder } from './infrastructure/search/product-searc
 import { SearchFiltersResolver } from './infrastructure/search/search-filters-resolver.service';
 import { ProductOwnershipGuard } from '../../infrastructure/auth/guard/product-ownership.guard';
 import { DeleteProductUseCase } from './application/use-cases/delete-product.use-case';
+import { FiltersModule } from '../filters/filters.module';
 
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
   imports: [
+    
     UsersModule,
     CommonModule,
     AgentModule,
@@ -51,6 +53,7 @@ import { DeleteProductUseCase } from './application/use-cases/delete-product.use
 SoftAuthModule,
     ProductImageModule,
     ProductAttributeValueModule,
+    FiltersModule,
   ],
   providers: [
     {

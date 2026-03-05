@@ -81,7 +81,6 @@ export class CacheService {
   return promise;
 }
 
-  // Refreshers registry: key -> fetch function + ttl
   private refreshers = new Map<string, { fn: () => Promise<any>; ttl: number }>();
 
   registerRefresher<T>(key: string, fn: () => Promise<T>, ttl: number) {

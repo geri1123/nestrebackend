@@ -7,6 +7,7 @@ import { DeleteProductImagesByProductIdUseCase } from '../../../product-image/ap
 import { UploadProductImagesUseCase } from '../../../product-image/application/use-cases/upload-product-images.use-case';
 import { DeleteProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/delete-product-attributes.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
+import { FiltersService } from '../../../filters/filters.service';
 type MulterFile = Express.Multer.File;
 interface UpdateProductParams {
   productId: number;
@@ -25,6 +26,7 @@ export class UpdateProductUseCase {
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,
     private readonly deleteAttributesUseCase: DeleteProductAttributeValuesUseCase,
     private readonly createAttributesUseCase: CreateProductAttributeValuesUseCase,
+    private readonly filterService:FiltersService,
   ) {}
 
   async execute({
@@ -42,7 +44,7 @@ export class UpdateProductUseCase {
         errors: { general: t('productNotFound', language) },
       });
     }
-
+  const statusChanged = dto.status && dto.status !== product.status;
     const updateData = Product.createForUpdate({
       id: productId,
       title: dto.title,
@@ -105,6 +107,10 @@ if (hasNewImages) {
 } else {
   imagesResponse = keptImages; 
 }
+if (statusChanged) {
+      this.filterService.refreshCounts(); 
+    }
+
     return {
       success: true,
       message: t('productUpdated', language),

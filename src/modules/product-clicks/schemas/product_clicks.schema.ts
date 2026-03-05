@@ -7,13 +7,13 @@ export type ProductClickDocument = ProductClick & Document;
 @Schema({ timestamps: true }) 
 export class ProductClick {
   @Prop({ required: true })
-  productId: string; 
+  productId!: string; 
 
   @Prop({ required: true })
-  userId: string;
+  userId!: string;
 
   @Prop({ default: 1 })
-  count: number; 
+  count!: number; 
 
   @Prop()
   ipAddress?: string; 
