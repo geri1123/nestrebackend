@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CacheService } from '../../../../infrastructure/cache/cache.service';
 import { SupportedLang, t } from '../../../../locales';
-import { EmailService } from '../../../../infrastructure/email/email.service';
 import { generateToken } from '../../../../common/utils/hash';
 import { FindUserForVerificationUseCase } from '../../../users/application/use-cases/find-user-for-verification.use-case';
+import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
 
 @Injectable()
 export class ResendVerificationEmailUseCase {
   constructor(
    private readonly finduserforverification: FindUserForVerificationUseCase,
     private readonly cache: CacheService,
-    private readonly email: EmailService,
+  private readonly emailQueue: EmailQueueService,
   ) {}
 
   async execute(identifier: string, lang: SupportedLang) {
@@ -32,6 +32,6 @@ export class ResendVerificationEmailUseCase {
       30 * 60 * 1000,
     );
 
-    await this.email.sendVerificationEmail(user.email, user.first_name ?? 'User', token, lang);
+    await this.emailQueue.sendVerificationEmail(user.email, user.first_name ?? 'User', token, lang);
   }
 }

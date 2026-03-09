@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from '../users/users.module';
 import { AgencyModule } from '../agency/agency.module';
 import { RegistrationRequestModule } from '../registration-request/registration-request.module';
-import { EmailModule } from '../../infrastructure/email/email.module';
 import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { RegisterAgencyOwnerUseCase } from './application/use-cases/register-agency-owner.use-case';
@@ -15,9 +14,9 @@ import { ValidateAgentRegistrationDataUseCase } from './application/use-cases/va
     UsersModule,
     AgencyModule,
     RegistrationRequestModule,
-    EmailModule,
     AppCacheModule,
-    AgentModule
+    AgentModule,
+   
   ],
   providers: [
     RegisterUserUseCase,

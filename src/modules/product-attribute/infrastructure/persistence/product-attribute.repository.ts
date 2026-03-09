@@ -2,8 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 import { IProductAttributeValueRepository } from '../../domain/repositories/product-attribute.repository.interface';
 import { ProductAttributeValue } from '../../domain/entities/product-attribute-value.entity';
-import { SupportedLang, t } from '../../../../locales';
-import { Prisma } from '@prisma/client';
+
 
 @Injectable()
 export class ProductAttributeValueRepository implements IProductAttributeValueRepository {

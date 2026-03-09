@@ -35,8 +35,9 @@ import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
 import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { QueueModule } from '../../infrastructure/queue/queue.module';
 @Module({
-  imports: [  EmailModule, AppCacheModule , CommonModule  , CloudinaryModule],
+  imports: [   AppCacheModule , CommonModule  , CloudinaryModule  ],
   controllers: [ProfileController , PasswordController , ProfilePictureController],
   providers: [
     // Repository providers

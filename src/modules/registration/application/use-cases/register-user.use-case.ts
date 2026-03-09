@@ -6,6 +6,7 @@ import { CacheService } from '../../../../infrastructure/cache/cache.service';
 import { generateToken } from '../../../../common/utils/hash';
 import { SupportedLang, t } from '../../../../locales';
 import { Prisma, UserStatus } from '@prisma/client';
+import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
 
 export interface RegisterUserData {
   username: string;
@@ -28,8 +29,9 @@ export class RegisterUserUseCase {
   constructor(
     @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
-    private readonly emailService: EmailService,
+  
     private readonly cacheService: CacheService,
+    private readonly emailQueue:EmailQueueService
   ) {}
 
   async execute(
@@ -97,12 +99,12 @@ export class RegisterUserUseCase {
       { userId, role },
       30 * 60 * 1000
     );
-
-    await this.emailService.sendVerificationEmail(
-      email,
-      firstName,
-      token,
-      lang,
-    );
+  await this.emailQueue.sendVerificationEmail(email, firstName, token , lang);
+    // await this.emailService.sendVerificationEmail(
+    //   email,
+    //   firstName,
+    //   token,
+    //   lang,
+    // );
   }
 }

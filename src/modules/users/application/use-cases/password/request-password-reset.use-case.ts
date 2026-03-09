@@ -5,6 +5,7 @@ import { EmailService } from "../../../../../infrastructure/email/email.service"
 import { CacheService } from "../../../../../infrastructure/cache/cache.service";
 import { SupportedLang, t } from "../../../../../locales";
 import { generateToken } from "../../../../../common/utils/hash";
+import { EmailQueueService } from "../../../../../infrastructure/queue/services/email-queue.service";
 
 @Injectable()
 export class RequestPasswordResetUseCase {
@@ -12,8 +13,9 @@ export class RequestPasswordResetUseCase {
       @Inject(USER_REPO)
    
     private readonly userRepo: IUserDomainRepository,
-    private readonly emailService: EmailService,
+    // private readonly emailQueue:EmailQueueService,
     private readonly cacheService: CacheService,
+    private readonly emailQueue:EmailQueueService,
   ) {}
 
   async execute(email: string, lang: SupportedLang): Promise<void> {
@@ -41,13 +43,19 @@ export class RequestPasswordResetUseCase {
     );
 
     const expiresAt = new Date(Date.now() + ttl);
-
-    await this.emailService.sendPasswordRecoveryEmail(
+ await this.emailQueue.sendPasswordResetEmail( 
       user.email,
       user.firstName ?? 'User',
       token,
       lang,
       expiresAt,
     );
+    // await this.emailService.sendPasswordRecoveryEmail(
+    //   user.email,
+    //   user.firstName ?? 'User',
+    //   token,
+    //   lang,
+    //   expiresAt,
+    // );
   }
 }

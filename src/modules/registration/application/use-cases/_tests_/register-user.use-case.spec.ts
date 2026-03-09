@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { RegisterUserUseCase } from '../register-user.use-case';
 import { USER_REPO } from '../../../../users/domain/repositories/user.repository.interface';
-import { EmailService } from '../../../../../infrastructure/email/email.service';
+import { EmailQueueService } from '../../../../../infrastructure/queue/services/email-queue.service'; 
 import { CacheService } from '../../../../../infrastructure/cache/cache.service';
 
 describe('RegisterUserUseCase', () => {
@@ -14,7 +14,7 @@ describe('RegisterUserUseCase', () => {
     create: jest.fn(),
   };
 
-  const emailServiceMock = {
+  const emailQueueMock = { 
     sendVerificationEmail: jest.fn(),
   };
 
@@ -27,7 +27,7 @@ describe('RegisterUserUseCase', () => {
       providers: [
         RegisterUserUseCase,
         { provide: USER_REPO, useValue: userRepoMock },
-        { provide: EmailService, useValue: emailServiceMock },
+        { provide: EmailQueueService, useValue: emailQueueMock }, 
         { provide: CacheService, useValue: cacheServiceMock },
       ],
     }).compile();
@@ -41,16 +41,13 @@ describe('RegisterUserUseCase', () => {
     userRepoMock.emailExists.mockResolvedValue(false);
 
     await expect(
-      useCase.execute(
-        {
-          username: 'john',
-          email: 'john@test.com',
-          password: '12345678',
-          first_name: 'John',
-          last_name: 'Doe',
-        },
-        'al',
-      ),
+      useCase.execute({
+        username: 'john',
+        email: 'john@test.com',
+        password: '12345678',
+        first_name: 'John',
+        last_name: 'Doe',
+      }, 'al'),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
@@ -59,16 +56,13 @@ describe('RegisterUserUseCase', () => {
     userRepoMock.emailExists.mockResolvedValue(true);
 
     await expect(
-      useCase.execute(
-        {
-          username: 'john',
-          email: 'john@test.com',
-          password: '12345678',
-          first_name: 'John',
-          last_name: 'Doe',
-        },
-        'al',
-      ),
+      useCase.execute({
+        username: 'john',
+        email: 'john@test.com',
+        password: '12345678',
+        first_name: 'John',
+        last_name: 'Doe',
+      }, 'al'),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
@@ -77,20 +71,17 @@ describe('RegisterUserUseCase', () => {
     userRepoMock.emailExists.mockResolvedValue(false);
     userRepoMock.create.mockResolvedValue(1);
 
-    const result = await useCase.execute(
-      {
-        username: 'john',
-        email: 'john@test.com',
-        password: '12345678',
-        first_name: 'John',
-        last_name: 'Doe',
-      },
-      'al',
-    );
+    const result = await useCase.execute({
+      username: 'john',
+      email: 'john@test.com',
+      password: '12345678',
+      first_name: 'John',
+      last_name: 'Doe',
+    }, 'al');
 
     expect(userRepoMock.create).toHaveBeenCalled();
     expect(cacheServiceMock.set).toHaveBeenCalled();
-    expect(emailServiceMock.sendVerificationEmail).toHaveBeenCalled();
+    expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalled(); 
     expect(result.userId).toBe(1);
     expect(result.email).toBe('john@test.com');
     expect(result.firstName).toBe('John');
@@ -102,23 +93,17 @@ describe('RegisterUserUseCase', () => {
     userRepoMock.emailExists.mockResolvedValue(false);
     userRepoMock.create.mockResolvedValue(1);
 
-    const result = await useCase.execute(
-      {
-        username: 'john',
-        email: 'john@test.com',
-        password: '12345678',
-        first_name: 'John',
-        last_name: 'Doe',
-      },
-      'al',
-      'user',
-      undefined,
-      true, // skipEmailSending
-    );
+    const result = await useCase.execute({
+      username: 'john',
+      email: 'john@test.com',
+      password: '12345678',
+      first_name: 'John',
+      last_name: 'Doe',
+    }, 'al', 'user', undefined, true);
 
     expect(userRepoMock.create).toHaveBeenCalled();
     expect(cacheServiceMock.set).not.toHaveBeenCalled();
-    expect(emailServiceMock.sendVerificationEmail).not.toHaveBeenCalled();
+    expect(emailQueueMock.sendVerificationEmail).not.toHaveBeenCalled(); // ✅
     expect(result.userId).toBe(1);
     expect(result.token).toBeDefined();
   });
@@ -126,12 +111,7 @@ describe('RegisterUserUseCase', () => {
   describe('sendVerificationEmail', () => {
     it('sends verification email successfully', async () => {
       await useCase.sendVerificationEmail(
-        1,
-        'test-token',
-        'test@example.com',
-        'John',
-        'user',
-        'al',
+        1, 'test-token', 'test@example.com', 'John', 'user', 'al',
       );
 
       expect(cacheServiceMock.set).toHaveBeenCalledWith(
@@ -139,7 +119,7 @@ describe('RegisterUserUseCase', () => {
         { userId: 1, role: 'user' },
         30 * 60 * 1000,
       );
-      expect(emailServiceMock.sendVerificationEmail).toHaveBeenCalledWith(
+      expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalledWith( 
         'test@example.com',
         'John',
         'test-token',

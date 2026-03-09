@@ -1,26 +1,19 @@
 import { BadRequestException } from '@nestjs/common';
 import { ApproveAgencyRequestUseCase } from '../approve-agency-request.use-case';
-import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
 import { AgencyAgentStatus, UserRole, UserStatus } from '@prisma/client';
 
 describe('ApproveAgencyRequestUseCase', () => {
   let useCase: ApproveAgencyRequestUseCase;
 
-  const prisma = {
-    $transaction: jest.fn(),
-  } as any;
-
+  const prisma = { $transaction: jest.fn() } as any;
   const findExistingAgent = { execute: jest.fn() } as any;
   const createAgent = { execute: jest.fn() } as any;
-  const ensureIdCardUnique = { execute: jest.fn() } as any;
-  const addPermissions = { execute: jest.fn() } as any;
+  const addPermissions = { execute: jest.fn() } as any;   
   const updateUserFields = { execute: jest.fn() } as any;
   const getUser = { execute: jest.fn() } as any;
-  const emailService = { sendAgentWelcomeEmail: jest.fn() } as any;
   const notificationService = { sendNotification: jest.fn() } as any;
-  const notificationTemplateService = {
-    getAllTranslations: jest.fn().mockReturnValue({}),
-  } as any;
+  const emailQueue = { sendAgentWelcomeEmail: jest.fn() } as any;
+  
 
   beforeEach(() => {
     prisma.$transaction.mockImplementation(async (cb) => cb({}));
@@ -29,14 +22,14 @@ describe('ApproveAgencyRequestUseCase', () => {
       prisma,
       findExistingAgent,
       createAgent,
-      ensureIdCardUnique,
-      addPermissions,
+      addPermissions,      
       updateUserFields,
       getUser,
-      emailService,
       notificationService,
-      notificationTemplateService,
+      emailQueue,          
     );
+
+    jest.clearAllMocks();
   });
 
   it('should throw if user email is not verified', async () => {
@@ -50,6 +43,9 @@ describe('ApproveAgencyRequestUseCase', () => {
         roleInAgency: 'agent',
       }),
     ).rejects.toThrow(BadRequestException);
+
+    expect(emailQueue.sendAgentWelcomeEmail).not.toHaveBeenCalled();
+    expect(notificationService.sendNotification).not.toHaveBeenCalled();
   });
 
   it('should create agent and complete approval flow', async () => {
@@ -83,9 +79,12 @@ describe('ApproveAgencyRequestUseCase', () => {
     expect(createAgent.execute).toHaveBeenCalled();
     expect(updateUserFields.execute).toHaveBeenCalled();
     expect(addPermissions.execute).toHaveBeenCalled();
-    expect(emailService.sendAgentWelcomeEmail).toHaveBeenCalled();
-    expect(notificationService.sendNotification).toHaveBeenCalled();
-
+    expect(emailQueue.sendAgentWelcomeEmail).toHaveBeenCalledWith('test@mail.com', 'John Doe');
+    expect(notificationService.sendNotification).toHaveBeenCalledWith({
+      userId: 1,
+      type: 'agency_confirm_agent',
+      metadata: { agencyId: 10, approvedBy: 99 },
+    });
     expect(result.id).toBe(100);
   });
 });

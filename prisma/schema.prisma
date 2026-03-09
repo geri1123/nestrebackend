@@ -3,31 +3,33 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Agency {
   id                  Int                     @id @default(autoincrement())
   agencyName          String                  @map("agency_name")
-  publicCode          String?                 @unique(map: "Agency_public_code_key") @map("public_code")
+  publicCode          String?                 @unique(map: "agency_public_code_key") @map("public_code")
   logo                String?
   logoPublicId        String?                 @map("logo_public_id")
-  licenseNumber       String                  @unique(map: "Agency_license_number_key") @map("license_number")
+  licenseNumber       String                  @unique(map: "agency_license_number_key") @map("license_number")
   agencyEmail         String?                 @map("agency_email")
   phone               String?
   address             String?                 @db.Text
   website             String?
   status              AgencyStatus            @default(active)
-  ownerUserId         Int                     @unique(map: "Agency_owner_user_id_key") @map("owner_user_id")
+  ownerUserId         Int                     @unique(map: "agency_owner_user_id_key") @map("owner_user_id")
   createdAt           DateTime                @default(now()) @map("created_at")
   updatedAt           DateTime?               @updatedAt @map("updated_at")
-  user                User                    @relation(fields: [ownerUserId], references: [id], map: "Agency_owner_user_id_fkey")
+  user                User                    @relation(fields: [ownerUserId], references: [id], map: "agency_owner_user_id_fkey")
   agencyAgent         AgencyAgent[]
   permissions         AgencyAgentPermission[]
   product             Product[]
   registrationRequest RegistrationRequest[]
-
+ @@index([agencyName])
+ @@index([publicCode])
+ @@index([createdAt])
   @@index([status])
   @@map("agency")
 }
@@ -45,12 +47,12 @@ model AgencyAgent {
   status         AgencyAgentStatus       @default(active)
   createdAt      DateTime                @default(now()) @map("created_at")
   updatedAt      DateTime?               @updatedAt @map("updated_at")
-  addedByUser    User?                   @relation("AgencyAgentAddedBy", fields: [addedBy], references: [id])
-  agency         Agency                  @relation(fields: [agencyId], references: [id])
-  agentUser      User                    @relation("AgencyAgentAgent", fields: [agentId], references: [id])
+  addedByUser    User?                   @relation("AgencyAgentAddedBy", fields: [addedBy], references: [id], map: "agencyagent_added_by_fkey")
+  agency         Agency                  @relation(fields: [agencyId], references: [id], map: "agencyagent_agency_id_fkey")
+  agentUser      User                    @relation("AgencyAgentAgent", fields: [agentId], references: [id], map: "agencyagent_agent_id_fkey")
   permission     AgencyAgentPermission?
 
-  @@unique([agencyId, agentId], map: "AgencyAgent_agency_id_agent_id_key")
+  @@unique([agencyId, agentId], map: "agencyagent_agency_id_agent_id_key")
   @@index([addedBy], map: "AgencyAgent_added_by_fkey")
   @@index([agentId], map: "AgencyAgent_agent_id_fkey")
   @@index([agencyId], map: "AgencyAgent_agency_id_fkey")
@@ -64,7 +66,7 @@ model Attribute {
   inputType             String                  @map("inputType")
   attributeTranslation  AttributeTranslation[]
   values                AttributeValue[]
-  subcategory           Subcategory             @relation(fields: [subcategoryId], references: [id])
+  subcategory           Subcategory             @relation(fields: [subcategoryId], references: [id], map: "attr_subcategory_id_fkey")
   productAttributeValue ProductAttributeValue[]
 
   @@index([subcategoryId], map: "attributes_subcategoryId_fkey")
@@ -77,7 +79,7 @@ model AttributeTranslation {
   language    LanguageCode
   name        String
   slug        String?
-  attribute   Attribute    @relation(fields: [attributeId], references: [id])
+  attribute   Attribute    @relation(fields: [attributeId], references: [id], map: "attr_translation_attr_id_fkey")
 
   @@index([attributeId], map: "attribute_translation_attribute_id_fkey")
   @@map("attribute_translation")
@@ -88,7 +90,7 @@ model AttributeValue {
   attributeId                Int                         @map("attribute_id")
   valueCode                  String                      @map("value_code")
   attributeValueTranslations AttributeValueTranslation[]
-  attribute                  Attribute                   @relation(fields: [attributeId], references: [id])
+  attribute                  Attribute                   @relation(fields: [attributeId], references: [id], map: "attr_value_attr_id_fkey")
   productAttributeValue      ProductAttributeValue[]
 
   @@index([attributeId], map: "attribute_values_attribute_id_fkey")
@@ -101,7 +103,7 @@ model AttributeValueTranslation {
   language         LanguageCode
   name             String
   slug             String?
-  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id])
+  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], map: "attr_val_translation_fkey")
 
   @@index([attributeValueId], map: "attribute_value_translations_attribute_value_id_fkey")
   @@map("attribute_value_translations")
@@ -109,7 +111,7 @@ model AttributeValueTranslation {
 
 model Category {
   id                  Int                   @id @default(autoincrement())
-  slug                String                @unique(map: "Category_slug_key")
+  slug                String                @unique(map: "category_slug_key")
   createdAt           DateTime              @default(now())
   updatedAt           DateTime?             @updatedAt @map("updated_at")
   categoryTranslation CategoryTranslation[]
@@ -124,9 +126,9 @@ model CategoryTranslation {
   language   LanguageCode
   name       String
   slug       String?
-  category   Category     @relation(fields: [categoryId], references: [id], map: "CategoryTranslation_categoryId_fkey")
+  category   Category     @relation(fields: [categoryId], references: [id], map: "cattranslation_category_id_fkey")
 
-  @@unique([categoryId, language], map: "CategoryTranslation_categoryId_language_key")
+  @@unique([categoryId, language], map: "cattranslation_categoryid_language_key")
   @@map("categorytranslation")
 }
 
@@ -147,9 +149,9 @@ model ListingTypeTranslation {
   language      LanguageCode
   name          String?
   slug          String?
-  listingType   ListingType  @relation(fields: [listingTypeId], references: [id], map: "Listing_Type_Translation_listingTypeId_fkey")
+  listingType   ListingType  @relation(fields: [listingTypeId], references: [id], map: "listingtype_translation_fkey")
 
-  @@unique([listingTypeId, language], map: "Listing_Type_Translation_listingTypeId_language_key")
+  @@unique([listingTypeId, language], map: "listingtype_translation_unique")
   @@map("listing_type_translation")
 }
 
@@ -161,7 +163,7 @@ model Notification {
   metadata                Json?
   readAt                  DateTime?                 @map("readAt")
   createdAt               DateTime                  @default(now())
-  user                    User                      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Notification_userId_fkey")
+  user                    User                      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "notification_user_id_fkey")
   notificationTranslation NotificationTranslation[]
 
   @@index([userId], map: "Notification_userId_fkey")
@@ -173,7 +175,7 @@ model NotificationTranslation {
   notificationId Int
   languageCode   LanguageCode
   message        String       @db.Text
-  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade, map: "NotificationTranslation_notificationId_fkey")
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade, map: "notiftranslation_notif_id_fkey")
 
   @@index([notificationId], map: "NotificationTranslation_notificationId_fkey")
   @@map("notificationtranslation")
@@ -194,9 +196,9 @@ model RegistrationRequest {
   licenseNumber       String?                           @map("license_number")
   createdAt           DateTime                          @default(now()) @map("created_at")
   updatedAt           DateTime?                         @updatedAt @map("updated_at")
-  agency              Agency?                           @relation(fields: [agencyId], references: [id], map: "RegistrationRequest_agency_id_fkey")
-  reviewedByUser      User?                             @relation("RegistrationRequestReviewedBy", fields: [reviewedBy], references: [id])
-  user                User                              @relation("RegistrationRequestUser", fields: [userId], references: [id])
+  agency              Agency?                           @relation(fields: [agencyId], references: [id], map: "regrequest_agency_id_fkey")
+  reviewedByUser      User?                             @relation("RegistrationRequestReviewedBy", fields: [reviewedBy], references: [id], map: "regrequest_reviewed_by_fkey")
+  user                User                              @relation("RegistrationRequestUser", fields: [userId], references: [id], map: "regrequest_user_id_fkey")
 
   @@index([agencyId], map: "RegistrationRequest_agency_id_idx")
   @@index([requestType], map: "RegistrationRequest_request_type_idx")
@@ -210,12 +212,12 @@ model RegistrationRequest {
 model Subcategory {
   id                     Int                      @id @default(autoincrement())
   categoryId             Int
-  slug                   String                   @unique(map: "Subcategory_slug_key")
+  slug                   String                   @unique(map: "subcategory_slug_key")
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
   attributes             Attribute[]
   product                Product[]
-  category               Category                 @relation(fields: [categoryId], references: [id], map: "Subcategory_categoryId_fkey")
+  category               Category                 @relation(fields: [categoryId], references: [id], map: "subcategory_category_id_fkey")
   subcategoryTranslation SubcategoryTranslation[]
 
   @@index([categoryId], map: "Subcategory_categoryId_fkey")
@@ -228,16 +230,16 @@ model SubcategoryTranslation {
   language      LanguageCode
   name          String
   slug          String?
-  subcategory   Subcategory  @relation(fields: [subcategoryId], references: [id], map: "SubcategoryTranslation_subcategoryId_fkey")
+  subcategory   Subcategory  @relation(fields: [subcategoryId], references: [id], map: "subcattranslation_subcat_id_fkey")
 
-  @@unique([subcategoryId, language], map: "SubcategoryTranslation_subcategoryId_language_key")
+  @@unique([subcategoryId, language], map: "subcattranslation_subcat_language_key")
   @@map("subcategorytranslation")
 }
 
 model User {
   id                           Int                    @id @default(autoincrement())
-  username                     String                 @unique(map: "User_username_key")
-  email                        String                 @unique(map: "User_email_key")
+  username                     String                 @unique(map: "user_username_key")
+  email                        String                 @unique(map: "user_email_key")
   password                     String
   firstName                    String?                @map("first_name")
   lastName                     String?                @map("last_name")
@@ -282,7 +284,7 @@ model UsernameHistory {
   oldUsername        String   @map("old_username")
   newUsername        String   @map("new_username")
   nextUsernameUpdate DateTime @default(now()) @map("next_username_update")
-  user               User     @relation(fields: [userId], references: [id], map: "UsernameHistory_user_id_fkey")
+  user               User     @relation(fields: [userId], references: [id], map: "usernamehistory_user_id_fkey")
 
   @@index([userId], map: "UsernameHistory_user_id_idx")
   @@map("usernamehistory")
@@ -292,7 +294,7 @@ model City {
   id        Int       @id @default(autoincrement())
   name      String
   countryId Int
-  country   Country   @relation(fields: [countryId], references: [id], map: "City_countryId_fkey")
+  country   Country   @relation(fields: [countryId], references: [id], map: "city_country_id_fkey")
   product   Product[]
 
   @@index([countryId], map: "City_countryId_fkey")
@@ -301,8 +303,8 @@ model City {
 
 model Country {
   id   Int    @id @default(autoincrement())
-  name String @unique(map: "Country_name_key")
-  code String @unique(map: "Country_code_key")
+  name String @unique(map: "country_name_key")
+  code String @unique(map: "country_code_key")
   city City[]
 
   @@map("country")
@@ -324,12 +326,12 @@ model Product {
   area                  Int?
   buildYear             Int?                    @map("buildYear")
   status                ProductStatus           @default(draft)
-  clickCount            Int                     @default(0)  
-  agency                Agency?                 @relation(fields: [agencyId], references: [id], map: "Product_agencyId_fkey")
-  city                  City                    @relation(fields: [cityId], references: [id], map: "Product_cityId_fkey")
-  listingType           ListingType             @relation(fields: [listingTypeId], references: [id], map: "Product_listingTypeId_fkey")
-  subcategory           Subcategory             @relation(fields: [subcategoryId], references: [id], map: "Product_subcategoryId_fkey")
-  user                  User                    @relation(fields: [userId], references: [id], map: "Product_userId_fkey")
+  clickCount            Int                     @default(0)
+  agency                Agency?                 @relation(fields: [agencyId], references: [id], map: "product_agency_id_fkey")
+  city                  City                    @relation(fields: [cityId], references: [id], map: "product_city_id_fkey")
+  listingType           ListingType             @relation(fields: [listingTypeId], references: [id], map: "product_listing_type_id_fkey")
+  subcategory           Subcategory             @relation(fields: [subcategoryId], references: [id], map: "product_subcategory_id_fkey")
+  user                  User                    @relation(fields: [userId], references: [id], map: "product_user_id_fkey")
   advertisements        ProductAdvertisement[]
   productAttributeValue ProductAttributeValue[]
   productImage          ProductImage[]
@@ -354,11 +356,11 @@ model ProductAttributeValue {
   productId        Int
   attributeId      Int
   attributeValueId Int
-  attributes       Attribute      @relation(fields: [attributeId], references: [id], map: "ProductAttributeValue_attributeId_fkey")
-  attributeValues  AttributeValue @relation(fields: [attributeValueId], references: [id], map: "ProductAttributeValue_attributeValueId_fkey")
-  product          Product        @relation(fields: [productId], references: [id], map: "ProductAttributeValue_productId_fkey")
+  attributes       Attribute      @relation(fields: [attributeId], references: [id], map: "prodattrval_attr_id_fkey")
+  attributeValues  AttributeValue @relation(fields: [attributeValueId], references: [id], map: "prodattrval_attrval_id_fkey")
+  product          Product        @relation(fields: [productId], references: [id], map: "prodattrval_product_id_fkey")
 
-  @@unique([productId, attributeId, attributeValueId], map: "ProductAttributeValue_productId_attributeId_attributeValueId_key")
+  @@unique([productId, attributeId, attributeValueId], map: "prodattrval_unique")
   @@index([attributeId], map: "ProductAttributeValue_attributeId_fkey")
   @@index([attributeValueId], map: "ProductAttributeValue_attributeValueId_fkey")
   @@map("productattributevalue")
@@ -370,8 +372,8 @@ model ProductImage {
   userId    Int
   imageUrl  String? @map("imageUrl") @db.Text
   publicId  String? @map("publicId") @db.Text
-  product   Product @relation(fields: [productId], references: [id], map: "ProductImage_productId_fkey")
-  user      User    @relation(fields: [userId], references: [id], map: "ProductImage_userId_fkey")
+  product   Product @relation(fields: [productId], references: [id], map: "productimage_product_id_fkey")
+  user      User    @relation(fields: [userId], references: [id], map: "productimage_user_id_fkey")
 
   @@index([productId], map: "ProductImage_productId_fkey")
   @@index([userId], map: "ProductImage_userId_fkey")
@@ -390,8 +392,8 @@ model AgencyAgentPermission {
   canManageAgents    Boolean     @default(false) @map("can_manage_agents")
   createdAt          DateTime    @default(now()) @map("created_at")
   updatedAt          DateTime?   @updatedAt @map("updated_at")
-  agencyAgent        AgencyAgent @relation(fields: [agencyAgentId], references: [id], onDelete: Cascade)
-  agency             Agency      @relation(fields: [agencyId], references: [id])
+  agencyAgent        AgencyAgent @relation(fields: [agencyAgentId], references: [id], onDelete: Cascade, map: "agentperm_agent_id_fkey")
+  agency             Agency      @relation(fields: [agencyId], references: [id], map: "agentperm_agency_id_fkey")
 
   @@index([agencyId], map: "agencyagent_permission_agency_id_fkey")
   @@map("agencyagent_permission")
@@ -402,11 +404,11 @@ model SavedProduct {
   userId    Int      @map("user_id")
   productId Int      @map("product_id")
   savedAt   DateTime @default(now()) @map("saved_at")
-  product   Product  @relation(fields: [productId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], map: "savedproduct_product_fk")  
+  user      User     @relation(fields: [userId], references: [id], map: "savedproduct_user_id_fkey")
 
   @@unique([userId, productId])
-  @@index([productId], map: "savedproduct_product_id_fkey")
+  @@index([productId], map: "savedproduct_product_id_fkey") 
   @@map("savedproduct")
 }
 
@@ -417,7 +419,7 @@ model Wallet {
   currency     String              @default("EUR")
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
-  user         User                @relation(fields: [userId], references: [id])
+  user         User                @relation(fields: [userId], references: [id], map: "wallet_user_id_fkey")
   transactions WalletTransaction[]
 
   @@map("wallet")
@@ -432,7 +434,7 @@ model WalletTransaction {
   description          String?
   createdAt            DateTime              @default(now())
   productAdvertisement ProductAdvertisement?
-  wallet               Wallet                @relation(fields: [walletId], references: [id])
+  wallet               Wallet                @relation(fields: [walletId], references: [id], map: "wallettx_wallet_id_fkey")
 
   @@index([walletId], map: "wallettransaction_walletId_fkey")
   @@map("wallettransaction")
@@ -447,9 +449,9 @@ model ProductAdvertisement {
   endDate    DateTime?
   status     AdvertisementStatus @default(active)
   adType     AdvertisementType   @default(normal)
-  product    Product             @relation(fields: [productId], references: [id])
-  user       User                @relation(fields: [userId], references: [id])
-  walletTx   WalletTransaction?  @relation(fields: [walletTxId], references: [id])
+  product    Product             @relation(fields: [productId], references: [id], map: "productad_product_id_fkey")
+  user       User                @relation(fields: [userId], references: [id], map: "productad_user_id_fkey")
+  walletTx   WalletTransaction?  @relation(fields: [walletTxId], references: [id], map: "productad_wallettx_id_fkey")
 
   @@index([productId])
   @@index([userId])

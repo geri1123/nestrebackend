@@ -15,6 +15,7 @@ import { PrismaService } from "../../../../infrastructure/prisma/prisma.service"
 import { EnsureIdCardUniqueUseCase } from "../../../agent/application/use-cases/ensure-idcard-unique.use-case";
 import { NotificationTemplateService } from "../../../notification/notifications-template.service";
 import { NotificationService } from "../../../notification/notification.service";
+import { EmailQueueService } from "../../../../infrastructure/queue/services/email-queue.service";
 
 export interface ApproveRequestInput {
   request: RegistrationRequestEntity;
@@ -31,13 +32,11 @@ export class ApproveAgencyRequestUseCase {
      private readonly prisma: PrismaService,
     private readonly findExistingAgent: FindExistingAgentUseCase,
     private readonly createAgent: CreateAgentUseCase,
-     private readonly ensureIdCardUnique: EnsureIdCardUniqueUseCase,
     private readonly addPermissions: AddAgentPermissionsUseCase,
     private readonly updateUserFields: UpdateUserFieldsUseCase,
     private readonly getuser:FindUserByIdUseCase,
-    private readonly emailService: EmailService,
     private readonly notificationService: NotificationService,
-    private readonly notificationTemplateService: NotificationTemplateService,
+    private readonly queueService:EmailQueueService,
   ) {}
 async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
   const { request, agencyId, approvedBy, roleInAgency, commissionRate, permissions } = input;
@@ -93,7 +92,8 @@ async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
   });
 
   const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
-  await this.emailService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
+  // await this.emailService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
+   await this.queueService.sendAgentWelcomeEmail(request.user?.email || "" , fullName)
 await this.notificationService.sendNotification({
   userId: request.userId,
   type: 'agency_confirm_agent',
@@ -102,19 +102,7 @@ await this.notificationService.sendNotification({
     agencyId,
     approvedBy,
   },
-  // const translations =
-//   this.notificationTemplateService.getAllTranslations(
-//     'agency_confirm_agent',
-//     {},
-//   );
-//   await this.notificationService.sendNotification({
-//   userId: request.userId,
-//   type: 'agency_confirm_agent',
-//   translations,
-//   metadata: {
-//     agencyId,
-//     approvedBy,
-//   },
+ 
 });
   return agent;
 }

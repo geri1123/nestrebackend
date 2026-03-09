@@ -13,13 +13,12 @@ import { SetUnderReviewUseCase } from '../../../registration-request/application
 import { ActivateAgencyByOwnerUseCase } from '../../../agency/application/use-cases/activate-agency-by-owner.use-case';
 import { VerifyUserEmailUseCase } from '../../../users/application/use-cases/verify-user-email.use-case';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
-
+import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
 @Injectable()
 export class VerifyEmailUseCase {
   constructor(
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
-    private readonly email: EmailService,
     private readonly findUserById: FindUserByIdUseCase,
     private readonly findrequestsbyuserid: FindRequestByUserIdUseCase,
     private readonly verifyEmail: VerifyUserEmailUseCase,
@@ -27,7 +26,7 @@ export class VerifyEmailUseCase {
     private readonly getAgencyWithOwner: GetAgencyWithOwnerByIdUseCase, 
     private readonly setUnderReview: SetUnderReviewUseCase,
     private readonly notifications: NotificationService,
-    private readonly templates: NotificationTemplateService,
+    private readonly emailQueue:EmailQueueService,
   ) {}
 
   async execute(token: string, lang: SupportedLang) {
@@ -74,24 +73,23 @@ export class VerifyEmailUseCase {
       return { alreadyVerified: true };
     }
 
-    // Proceed with verification
-    const result = await this.prisma.$transaction(async (tx) => {
-      const user = await this.findUserById.execute(userId, lang);
+   
+const result = await this.prisma.$transaction(async (tx) => {
 
-      if (role === 'agency_owner') {
-        await this.activateAgencyByOwner.execute(userId, lang, tx);
-      }
 
-      const newStatus = role === 'agent' ? 'pending' : 'active';
-      await this.verifyEmail.execute(userId, newStatus, tx);
+  if (role === 'agency_owner') {
+    await this.activateAgencyByOwner.execute(userId, lang, tx);
+  }
 
-      if (role === 'agent') {
-        await this.setUnderReview.execute(userId, lang, tx);
-      }
+  const newStatus = role === 'agent' ? 'pending' : 'active';
+  await this.verifyEmail.execute(userId, newStatus, tx);
 
-      return user;
-    });
+  if (role === 'agent') {
+    await this.setUnderReview.execute(userId, lang, tx);
+  }
 
+  return existingUser; 
+});
     const user = result;
 
     await this.cache.delete(cacheKey);
@@ -99,8 +97,8 @@ export class VerifyEmailUseCase {
 
     const name = user.firstName ?? 'User';
     role === 'agent'
-      ? await this.email.sendPendingApprovalEmail(user.email, name)
-      : await this.email.sendWelcomeEmail(user.email, name);
+      ? await this.emailQueue.sendPendingApprovalEmail(user.email, name)
+      : await this.emailQueue.sendWelcomeEmail(user.email, name);
 
     if (role === 'agent') {
       await this.handleAgentProcessAfterCommit(user, lang);
@@ -130,12 +128,25 @@ await this.notifications.sendNotification({
   type: 'agent_email_confirmed',
   templateData: user, 
 });
-    // const translations = this.templates.getAllTranslations('agent_email_confirmed', user);
-
-    // await this.notifications.sendNotification({
-    //   userId: agency.owner_user_id,
-    //   type: 'agent_email_confirmed',
-    //   translations,
-    // });
+    
   }
 }
+
+
+ // Proceed with verification
+    // const result = await this.prisma.$transaction(async (tx) => {
+    //   const user = await this.findUserById.execute(userId, lang);
+
+    //   if (role === 'agency_owner') {
+    //     await this.activateAgencyByOwner.execute(userId, lang, tx);
+    //   }
+
+    //   const newStatus = role === 'agent' ? 'pending' : 'active';
+    //   await this.verifyEmail.execute(userId, newStatus, tx);
+
+    //   if (role === 'agent') {
+    //     await this.setUnderReview.execute(userId, lang, tx);
+    //   }
+
+    //   return user;
+    // });

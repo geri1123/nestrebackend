@@ -119,7 +119,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CleanupModule,
 
     // BACKGROUND JOBS
-    // CronJobsModule,
+    
   
   ],
 
