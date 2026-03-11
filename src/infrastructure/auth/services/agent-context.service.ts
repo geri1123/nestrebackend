@@ -37,6 +37,8 @@ async getAgentProfileData(userId: number, lang: SupportedLang) {
     logo: agency.logo ?? null,
     website: agency.website ?? null,
     status: agency.status,
+    address:agency.address,
+    publicCode: agency.publicCode ?? null
   },
 };
 }

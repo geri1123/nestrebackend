@@ -36,6 +36,7 @@ import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.mod
 import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { QueueModule } from '../../infrastructure/queue/queue.module';
+import { ChangePasswordUseCase } from './application/use-cases/password/change-password.use-case';
 @Module({
   imports: [   AppCacheModule , CommonModule  , CloudinaryModule  ],
   controllers: [ProfileController , PasswordController , ProfilePictureController],
@@ -50,7 +51,7 @@ import { QueueModule } from '../../infrastructure/queue/queue.module';
       useClass: UsernameHistoryRepository,
     },
     EventEmitterModule,
-    // Use Case providers
+  ChangePasswordUseCase,
     FindUnverifiedUsersUseCase,
     UpdateUserFieldsUseCase,
     GetUserProfileUseCase,

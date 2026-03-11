@@ -26,6 +26,9 @@ import {  ApiBody, ApiOkResponse, ApiOperation, ApiResponse, ApiUnauthorizedResp
 import { NavbarProfileResponse } from '../responses/user-nav-response.response';
 import { ApiBadRequestResponse, ApiSuccessResponse } from '../../../common/swagger/response.helper.ts';
 import { ApiChangeUsername, ApiGetNavbarProfile, ApiGetUserProfile, ApiUpdateProfile } from '../decorators/profile.decorators';
+import { ChangePasswordDto } from '../dto/change-password.dto';
+import { ChangePasswordUseCase } from '../application/use-cases/password/change-password.use-case';
+import { ApiChangePassword } from '../decorators/password.decoretors';
 
 @Controller('profile')
 export class ProfileController {
@@ -34,6 +37,7 @@ export class ProfileController {
     private readonly updateProfileUseCase: UpdateUserProfileUseCase,
     private readonly changeUsernameUseCase: ChangeUsernameUseCase,
     private readonly getUserProfile:GetUserProfileUseCase,
+    private readonly  changePasswordUseCase:ChangePasswordUseCase,
   ) {}
 
 
@@ -84,43 +88,66 @@ async getNavbar(@Req() req: RequestWithUser) {
     role: req.user.role,
   };
 }
-  @Patch('update')
-  @ApiUpdateProfile()
-  async updateProfile(@Req() req: RequestWithUser, @Body() data: Record<string, any>) {
-    if (!req.userId) {
-      throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-    }
-
-    const dto = plainToInstance(UpdateProfileDto, data);
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, req.language);
-
-    return this.updateProfileUseCase.execute(
-      req.userId,
-      {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        aboutMe: data.aboutMe,
-        phone: data.phone,
-      },
-      req.language,
-    );
+ @Patch('update')
+@ApiUpdateProfile()
+async updateProfile(
+  @Req() req: RequestWithUser,
+  @Body() dto: UpdateProfileDto,
+) {
+  if (!req.userId) {
+    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
   }
+
+  return this.updateProfileUseCase.execute(
+    req.userId,
+    {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      aboutMe: dto.aboutMe,
+      phone: dto.phone,
+    },
+    req.language,
+  );
+}
 
   @Patch('username')
 
  @ApiChangeUsername()
   @HttpCode(HttpStatus.OK)
-  async changeUsername(@Req() req: RequestWithUser, @Body() body: Record<string, any>) {
-    if (!req.userId) {
-      throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-    }
-
-    const dto = plainToInstance(UsernameDto, body);
-    const errors = await validate(dto);
-    if (errors.length > 0) throwValidationErrors(errors, req.language);
-
-    return this.changeUsernameUseCase.execute(req.userId, dto.username, req.language);
+ async changeUsername(
+  @Req() req: RequestWithUser,
+  @Body() dto: UsernameDto,
+) {
+  if (!req.userId) {
+    throw new UnauthorizedException(t('userNotAuthenticated', req.language));
   }
+
+  return this.changeUsernameUseCase.execute(
+    req.userId,
+    dto.username,
+    req.language,
+  );
+}
+ @Patch('change-password')
+ @ApiChangePassword() 
+async changePassword(
+  @Req() req: RequestWithUser,
+  @Body() dto: ChangePasswordDto,
+) {
+  console.log('=== CHANGE PASSWORD ===');
+  console.log('body:', JSON.stringify(dto));
+  console.log('userId:', req.userId);
+  if (!req.userId) {
+    throw new UnauthorizedException(
+      t('userNotAuthenticated', req.language),
+    );
+  }
+
+  return this.changePasswordUseCase.execute(
+    req.userId,
+    dto,
+    req.language,
+  );
+}
 }
 

@@ -8,6 +8,7 @@ import {
 } from '../../../common/swagger/response.helper.ts';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { RecoverPasswordDto } from '../dto/recover-password.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto.js';
 
 export const ApiResetPassword = () =>
   applyDecorators(
@@ -30,5 +31,20 @@ export const ApiForgotPassword = () =>
     ApiSuccessResponse('Linku për rivendosjen e fjalëkalimit u dërgua me email.'),
     ApiBadRequestResponse('Përdoruesi nuk u gjet.', {
       email: ['Email i pavlefshëm']
+    })
+  );
+
+export const ApiChangePassword = () =>
+  applyDecorators(
+    HttpCode(HttpStatus.OK),
+    ApiOperation({ summary: 'Change password while logged in' }),
+    ApiBody({ type: ChangePasswordDto }),
+    ApiSuccessResponse('Fjalëkalimi u ndryshua me sukses.'),
+    ApiBadRequestResponse('Gabim validimi', {
+      currentPassword: ['Fjalëkalimi aktual është i gabuar'],
+      newPassword: [
+        'Fjalëkalimi duhet të jetë të paktën 8 karaktere',
+        'Fjalëkalimi i ri nuk mund të jetë i njëjtë me atë aktual',
+      ],
     })
   );

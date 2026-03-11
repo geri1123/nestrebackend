@@ -99,7 +99,7 @@ case "price": return t("price" , lang);
 case "pricePositive": return t("pricePositive" , lang);
 case "title": return t("title" , lang);
 case "productstatus": return t("productstatus", lang);
-
+case "currentPasswordRequired":return t("currentPasswordRequired" , lang)
 case 'endDateInvalid':return t("endDateInvalid", lang);
 case "agencyNameRequired":return t("agencyNameRequired",lang)
 case "phoneMustBeDigits":return t("phoneMustBeDigits", lang)

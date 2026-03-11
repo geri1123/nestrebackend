@@ -13,6 +13,8 @@ productAlreadyAdvertised:"Questo prodotto è già pubblicizzato.",
     advertisementTypeNotActive:"Questo tipo di annuncio al momento non è attivo.",
 notificationMarkedAsRead: 'Notifica segnata come letta',
     walletAlreadyExists:"Il portafoglio esiste già.",
+        passwordChangedSuccessfully:"La password è stata cambiata con successo",
+
     repeatPasswordRequired: 'La conferma della password è obbligatoria.',
     usernameCooldown: "Potrai cambiare il nome utente di nuovo il {date}.",
     agentTerminated:"Agente disattivato",
