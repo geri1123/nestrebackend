@@ -84,6 +84,7 @@ GetMostClickedProductsUseCase,
   exports: [
     SEARCH_PRODUCT_REPO,
     PRODUCT_REPO,
+    
     GetProductByIdUseCase,
     GetProductForPermissionUseCase,
     FindProductByIdUseCase,

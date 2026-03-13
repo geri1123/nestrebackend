@@ -1,11 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { type ISavedProductRepository } from '../../domain/repositories/Isave-product.repository';
+import { SAVED_PRODUCT_REPO, type ISavedProductRepository } from '../../domain/repositories/Isave-product.repository';
 import { SupportedLang, t } from '../../../../locales';
 
 @Injectable()
 export class UnsaveProductUseCase {
   constructor(
-    @Inject('ISavedProductRepository')
+    @Inject(SAVED_PRODUCT_REPO)
     private readonly repository: ISavedProductRepository
   ) {}
 

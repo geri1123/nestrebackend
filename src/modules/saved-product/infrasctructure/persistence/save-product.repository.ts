@@ -52,46 +52,62 @@ export class SavedProductRepository implements ISavedProductRepository {
     });
   }
 
-  async findByUserPaginated(
-    userId: number,
-    language: SupportedLang,
-    skip: number,
-    take: number
-  ) {
-    const lang = language as unknown as LanguageCode;
-    
-    return this.prisma.savedProduct.findMany({
-      where: {
-        userId: userId,
-        product: { status: ProductStatus.active },
-      },
-      include: {
-        product: {
-          include: {
-            productImage: { select: { imageUrl: true }, take: 2 },
-            subcategory: {
-              select: {
-                subcategoryTranslation: { where: { language: lang }, select: { name: true } },
-                category: {
-                  select: {
-                    categoryTranslation: { where: { language: lang }, select: { name: true } },
+async findByUserPaginated(userId: number, language: SupportedLang, skip: number, take: number) {
+  const lang = language as unknown as LanguageCode;
+
+  return this.prisma.savedProduct.findMany({
+    where: {
+      userId,
+      product: { status: ProductStatus.active },
+    },
+    select: {
+      id: true,
+      savedAt: true,
+      product: {
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          area: true,
+          status: true,
+          userId: true,
+          createdAt: true,
+          productImage: { select: { imageUrl: true }, take: 2 },
+          city: { select: { name: true, country: true } },
+          user: { select: { username: true } },
+          subcategory: {
+            select: {
+              subcategoryTranslation: {
+                where: { language: lang },
+                select: { name: true },
+                take: 1,
+              },
+              category: {
+                select: {
+                  categoryTranslation: {
+                    where: { language: lang },
+                    select: { name: true },
+                    take: 1,
                   },
                 },
               },
             },
-            user: { select: { username: true } },
-            city: { select: { name: true, country: true } },
-            listingType: {
-              select: {
-                listingTypeTranslation: { where: { language: lang }, select: { name: true } },
+          },
+          listingType: {
+            select: {
+              listingTypeTranslation: {
+                where: { language: lang },
+                select: { name: true },
+                take: 1,
               },
             },
           },
         },
       },
-      skip,
-      take,
-      orderBy: { savedAt: 'desc' },
-    });
-  }
+    },
+    skip,
+    take,
+    orderBy: { savedAt: 'desc' },
+  });
+}
 }

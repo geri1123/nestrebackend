@@ -12,7 +12,8 @@ export const en = {
     productNotActive:"This product is not active.",
     usernameCooldown: "You can change your username again on {date}.",
     passwordChangedSuccessfully:"Password changed successfully",
-
+userUpdatedSuccess:"User updated successfully .",
+cannotSaveOwnProduct:"Cannot save your own product",
     advertisementTypeNotActive:"This advertisement type is currently not active.",
     notificationDeletedSuccessfully: 'Notification deleted successfully',
     cannotUpdateHigherOrEqualRole: "You cannot update an agent with an equal or higher role than yours",

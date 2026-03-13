@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {type ISavedProductRepository } from '../../domain/repositories/Isave-product.repository';
+import {SAVED_PRODUCT_REPO, type ISavedProductRepository } from '../../domain/repositories/Isave-product.repository';
 
 import { SupportedLang } from '../../../../locales';
 import { formatDate } from '../../../../common/utils/date';
@@ -8,7 +8,7 @@ import { PaginatedSavedProductsDto, SavedProductDto } from '../../dto/save-produ
 @Injectable()
 export class GetSavedProductsUseCase {
   constructor(
-    @Inject('ISavedProductRepository')
+    @Inject(SAVED_PRODUCT_REPO)
     private readonly repository: ISavedProductRepository,
   ) {}
 
@@ -26,42 +26,38 @@ export class GetSavedProductsUseCase {
       this.repository.findByUserPaginated(userId, language as any, skip, limit), 
     ]);
 
-    const products: SavedProductDto[] = savedProducts.map((saved: any) => {
-      const images = Array.isArray(saved.product?.productimage) 
-        ? saved.product.productimage.map((img: any) => ({
-            imageUrl: img?.imageUrl ?? null,
-          }))
-        : [];
+ const products: SavedProductDto[] = savedProducts.map((saved: any) => {
+  const images = Array.isArray(saved.product?.productImage)
+    ? saved.product.productImage.map((img: any) => ({
+        imageUrl: img?.imageUrl ?? null,
+      }))
+    : [];
 
-      const categoryTranslations = saved.product?.subcategory?.category?.categorytranslation;
-      const categoryName = Array.isArray(categoryTranslations) && categoryTranslations.length > 0
-        ? categoryTranslations[0].name
-        : 'No Category';
+  const categoryName =
+    saved.product?.subcategory?.category?.categoryTranslation?.[0]?.name ?? null;
 
-      const subcategoryTranslations = saved.product?.subcategory?.subcategorytranslation;
-      const subcategoryName = Array.isArray(subcategoryTranslations) && subcategoryTranslations.length > 0
-        ? subcategoryTranslations[0].name
-        : 'No Subcategory';
+  const subcategoryName =
+    saved.product?.subcategory?.subcategoryTranslation?.[0]?.name ?? null;
 
-      const listingTypeTranslations = saved.product?.listing_type?.listing_type_translation;
-      const listingTypeName = Array.isArray(listingTypeTranslations) && listingTypeTranslations.length > 0
-        ? listingTypeTranslations[0].name
-        : 'No Listing Type';
+  const listingTypeName =
+    saved.product?.listingType?.listingTypeTranslation?.[0]?.name ?? null;
 
-      return {
-        id: saved.product?.id ?? 0,
-        title: saved.product?.title ?? '',
-        price: saved.product?.price ?? 0,
-        categoryName,
-        subcategoryName,
-        listingTypeName,
-        city: saved.product?.city?.name ?? 'No City',
-        country: saved.product?.city?.country?.name ?? 'No Country',
-        user: { username: saved.product?.user?.username ?? 'Unknown' },
-        images,
-        savedAt: formatDate(saved.saved_at),
-      };
-    });
+  return {
+    id: saved.product?.id ?? 0,
+    title: saved.product?.title ?? '',
+    price: saved.product?.price ?? 0,
+    categoryName,
+    subcategoryName,
+    listingTypeName,
+    area: saved.product?.area ?? null,
+    createdAt: saved.product?.createdAt,
+    city: saved.product?.city?.name ?? null,
+    country: saved.product?.city?.country?.name ?? null,
+    user: { username: saved.product?.user?.username ?? null },
+    images,
+    savedAt:saved.savedAt,
+  };
+});
 
     return {
       products,

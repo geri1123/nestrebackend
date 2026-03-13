@@ -237,7 +237,8 @@ invalidAttributeForSubcategory:"Atribut i pavlefshëm për këtë nënkategori",
  productUpdated: "Produkti u përditësua me sukses.",
   productNotFound: "Produkti nuk u gjet.",
 passwordChangedSuccessfully:"Fjalëkalimi u ndryshua me sukses",
-
+userUpdatedSuccess:"Përdoruesi u përditësua me sukses .",
+cannotSaveOwnProduct:"Nuk mund ta ruani produktin tuaj" ,
       forbiddenProduct: "Nuk keni leje për të modifikuar këtë produkt",
   cannotApproveOtherAgency: "Nuk mund të aprovoheni/refuzoni kërkesat për një agjenci tjetër",
 

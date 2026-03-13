@@ -1,6 +1,7 @@
-import { LanguageCode } from "@prisma/client";
 import { SavedProductEntity } from "../entities/save-product.entity";
 import { SupportedLang } from "../../../../locales";
+export const SAVED_PRODUCT_REPO = 'ISavedProductRepository';
+
 export interface ISavedProductRepository {
    findByUserAndProduct(userId: number, productId: number): Promise<SavedProductEntity | null>;
   save(entity: SavedProductEntity): Promise<SavedProductEntity>;

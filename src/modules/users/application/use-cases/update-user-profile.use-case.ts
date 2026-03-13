@@ -32,12 +32,12 @@ export class UpdateUserProfileUseCase {
 
     await this.userRepository.updateFields(userId, updateFields);
 
-    const messages: string[] = [];
-    if (data.firstName !== undefined) messages.push(t('firstNameUpdated', language));
-    if (data.lastName !== undefined) messages.push(t('lastNameUpdated', language));
-    if (data.aboutMe !== undefined) messages.push(t('aboutMeUpdated', language));
-    if (data.phone !== undefined) messages.push(t('phoneUpdated', language));
+    // const messages: string[] = [];
+    // if (data.firstName !== undefined) messages.push(t('firstNameUpdated', language));
+    // if (data.lastName !== undefined) messages.push(t('lastNameUpdated', language));
+    // if (data.aboutMe !== undefined) messages.push(t('aboutMeUpdated', language));
+    // if (data.phone !== undefined) messages.push(t('phoneUpdated', language));
 
-    return { success: true, message: messages.join(', ') };
+    return { success: true, message:t("userUpdatedSuccess"  , language)};
   }
 }

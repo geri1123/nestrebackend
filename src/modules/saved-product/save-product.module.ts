@@ -4,16 +4,18 @@ import { SaveProductUseCase } from './application/use-cases/save-product.usecase
 import { UnsaveProductUseCase } from './application/use-cases/unsave-product.usecase';
 import { GetSavedProductsUseCase } from './application/use-cases/get-saved-products.usecase';
 import { SavedProductRepository } from './infrasctructure/persistence/save-product.repository';
+import { ProductModule } from '../product/product.module';
+import { SAVED_PRODUCT_REPO } from './domain/repositories/Isave-product.repository';
 
 @Module({
-  imports:[],
+  imports:[ProductModule],
   controllers: [SaveProductController],
   providers: [
     SaveProductUseCase,
     UnsaveProductUseCase,
     GetSavedProductsUseCase,
     {
-      provide: 'ISavedProductRepository',
+       provide: SAVED_PRODUCT_REPO,
       useClass: SavedProductRepository,
     },
   ],

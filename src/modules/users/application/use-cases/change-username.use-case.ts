@@ -4,7 +4,7 @@ import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories
 import { USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
 import { t, SupportedLang } from '../../../../locales';
 import { UserUpdatedEvent } from '../../events/user-updated.event';
-import { FindUserByIdUseCase } from './find-user-by-id.use-case'; // <-- use entity
+import { FindUserByIdUseCase } from './find-user-by-id.use-case'; 
 
 @Injectable()
 export class ChangeUsernameUseCase {

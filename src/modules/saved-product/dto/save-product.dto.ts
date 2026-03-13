@@ -9,6 +9,7 @@ export class SavedProductDto {
   categoryName!: string;
   subcategoryName!: string;
   listingTypeName!: string;
+  area!:string;
   city?: string;
   country?: string;
   user!: { username: string };
