@@ -60,7 +60,7 @@ jobs:
         run: npx prisma generate
 
       - name: Build backend
-        run: npx nest build
+        run:  nest build
 
       - name: Run tests
         run: npm run test
