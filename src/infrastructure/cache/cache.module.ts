@@ -13,25 +13,36 @@ import { ClearCache } from './cache.controller';
     {
       provide: CACHE_KEYV,
       inject: [AppConfigService],
-      useFactory: async (config: AppConfigService) => {
-        const keyv = new Keyv({
-          store: new KeyvRedis(config.redisUrl) as any, 
-        });
+     useFactory: async (config: AppConfigService) => {
+  const redisStore = new KeyvRedis(config.redisUrl);
 
-        keyv.on('error', err => {
-          console.error(' Redis Error:', err.message);
-        });
+  // 🔥 kap error direkt nga Redis (shumë e rëndësishme)
+  redisStore.on('error', (err: any) => {
+    console.error('❌ Redis Store Error:', err.message);
+  });
 
-        try {
-          await keyv.set('ping', 'pong');
-          const result = await keyv.get('ping');
-          console.log(' Redis connected successfully:', result);
-        } catch (err:any) {
-          console.error(' Redis connection failed:', err.message);
-        }
+  const keyv = new Keyv({
+    store: redisStore as any,
+  });
 
-        return keyv;
-      },
+  // fallback error listener
+  keyv.on('error', (err) => {
+    console.error('❌ Keyv Error:', err.message);
+  });
+
+  try {
+    await keyv.set('healthcheck', 'ok', 2000);
+    const result = await keyv.get('healthcheck');
+
+    console.log('Redis connected:', result);
+  } catch (err: any) {
+    console.error(' Redis connection failed → switching to memory:', err.message);
+
+    return new Keyv(); 
+  }
+
+  return keyv;
+}
     },
     CacheService,
   ],

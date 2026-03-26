@@ -14,17 +14,11 @@ import { ChangeUsernameUseCase } from '../application/use-cases/change-username.
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { UsernameDto } from '../dto/username.dto';
 import {  t } from '../../../locales';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
-import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { GetNavbarUserUseCase } from '../application/use-cases/get-navbar-user.use-case';
 import { UpdateUserProfileUseCase } from '../application/use-cases/update-user-profile.use-case';
 import { GetUserProfileUseCase } from '../application/use-cases/get-user-profile.use-case';
 import { UserProfileResponse } from '../responses/user-profile.response';
-import {  ApiBody, ApiOkResponse, ApiOperation, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { NavbarProfileResponse } from '../responses/user-nav-response.response';
-import { ApiBadRequestResponse, ApiSuccessResponse } from '../../../common/swagger/response.helper.ts';
 import { ApiChangeUsername, ApiGetNavbarProfile, ApiGetUserProfile, ApiUpdateProfile } from '../decorators/profile.decorators';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { ChangePasswordUseCase } from '../application/use-cases/password/change-password.use-case';
@@ -81,6 +75,7 @@ async getNavbar(@Req() req: RequestWithUser) {
   }
 
   return {
+    id:req.user.id,
     username: req.user.username,
     email: req.user.email,
     profileImgUrl: req.user.profileImgUrl,

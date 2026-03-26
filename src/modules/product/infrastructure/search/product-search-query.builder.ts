@@ -78,17 +78,47 @@ if (filters.buildYearMin !== undefined || filters.buildYearMax !== undefined) {
       whereConditions.city = whereConditions.city || {};
 
       if (filters.cities && filters.cities.length > 0) {
-        const normalizedCities = filters.cities.map((c) => c.trim().toLowerCase());
+      //   const normalizedCities = filters.cities.map((c) => c.trim().toLowerCase());
 
-        whereConditions.city.name =
-          normalizedCities.length === 1
-            ? normalizedCities[0]
-            : { in: normalizedCities };
+      //   whereConditions.city.name =
+      //     normalizedCities.length === 1
+      //       ? normalizedCities[0]
+      //       : { in: normalizedCities };
+      // }
+const normalizedCities = filters.cities
+          .map((c) => c.trim())
+          .filter((c) => c.length > 0);
+
+        if (normalizedCities.length > 0) {
+          whereConditions.city.OR = normalizedCities.map((cityName) => ({
+            name: {
+              equals: cityName,
+              mode: 'insensitive',
+            },
+          }));
+        }
       }
+      if (filters.countryId) {
+        whereConditions.city.countryId = filters.countryId;
+      } else if (filters.country) {
+        const normalizedCountry = filters.country.trim();
 
-      if (filters.country) {
+
         whereConditions.city.country = {
-          name: filters.country.trim().toLowerCase(),
+           OR: [
+            {
+              name: {
+                equals: normalizedCountry,
+                mode: 'insensitive',
+              },
+            },
+            {
+              code: {
+                equals: normalizedCountry,
+                mode: 'insensitive',
+              },
+            },
+          ],
         };
       }
     }

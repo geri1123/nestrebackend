@@ -11,17 +11,16 @@ import { SocketConnectionService } from '../../infrastructure/websocket/socket-c
 import { SocketRateLimitService } from '../../infrastructure/websocket/socket-rate-limit.service';
 import { NotificationSocketService } from './infrastructure/notification-socket.service';
 import { NotificationGateway } from './infrastructure/gateway/notification.gateway';
+import { WebSocketModule } from '../../infrastructure/websocket/socket.module';
 
 @Module({
-  imports: [SharedAuthModule],
+  imports: [SharedAuthModule , WebSocketModule,],
   controllers: [NotificationController],
   providers: [
     NotificationGateway,
     NotificationSocketService,
     NotificationTemplateService,
-      SocketAuthService,
-    SocketConnectionService,
-    SocketRateLimitService,
+   
     NotificationService,
     {
       provide: NOTIFICATION_REPO,

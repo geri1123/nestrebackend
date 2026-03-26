@@ -51,7 +51,6 @@ export class SavedProductRepository implements ISavedProductRepository {
       where: { userId: userId, product: { status: ProductStatus.active } },
     });
   }
-
 async findByUserPaginated(userId: number, language: SupportedLang, skip: number, take: number) {
   const lang = language as unknown as LanguageCode;
 
@@ -61,31 +60,52 @@ async findByUserPaginated(userId: number, language: SupportedLang, skip: number,
       product: { status: ProductStatus.active },
     },
     select: {
-      id: true,
+      id:      true,
       savedAt: true,
       product: {
         select: {
-          id: true,
-          title: true,
-          price: true,
-          area: true,
-          status: true,
-          userId: true,
+          id:       true,
+          title:    true,
+          price:    true,
+          area:     true,
+          status:   true,
+          userId:   true,
+          agencyId: true,
           createdAt: true,
-          productImage: { select: { imageUrl: true }, take: 2 },
-          city: { select: { name: true, country: true } },
-          user: { select: { username: true } },
+          clickCount: true,          
+          productImage: {
+            select: { imageUrl: true },
+            take: 2,
+          },
+          city: {
+            select: { name: true, country: true },
+          },
+          user: {
+            select: { username: true },
+          },
+          agency: {
+            select: {
+              agencyName: true,
+              logo:       true,
+            },
+          },
+          
+          advertisements: {
+            where:  { status: 'active' },
+            select: { id: true, status: true },
+            take: 1,
+          },
           subcategory: {
             select: {
               subcategoryTranslation: {
-                where: { language: lang },
+                where:  { language: lang },
                 select: { name: true },
                 take: 1,
               },
               category: {
                 select: {
                   categoryTranslation: {
-                    where: { language: lang },
+                    where:  { language: lang },
                     select: { name: true },
                     take: 1,
                   },
@@ -96,7 +116,7 @@ async findByUserPaginated(userId: number, language: SupportedLang, skip: number,
           listingType: {
             select: {
               listingTypeTranslation: {
-                where: { language: lang },
+                where:  { language: lang },
                 select: { name: true },
                 take: 1,
               },
@@ -108,6 +128,15 @@ async findByUserPaginated(userId: number, language: SupportedLang, skip: number,
     skip,
     take,
     orderBy: { savedAt: 'desc' },
+  });
+}
+async findSavedIdsByUserId(userId: number): Promise<{ productId: number }[]> {
+  return this.prisma.savedProduct.findMany({
+    where: {
+      userId,
+      product: { status: ProductStatus.active },
+    },
+    select: { productId: true },
   });
 }
 }

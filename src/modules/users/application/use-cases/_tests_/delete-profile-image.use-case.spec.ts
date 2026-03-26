@@ -14,7 +14,7 @@ describe('DeleteProfileImageUseCase', () => {
   } as any;
 
   const getUserProfile = {
-    execute: jest.fn(), // not used in this case, can be left as is
+    execute: jest.fn(), 
   } as any;
 
   const userWithImage = {

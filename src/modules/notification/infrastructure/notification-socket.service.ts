@@ -9,7 +9,7 @@ import type {
 @Injectable()
 export class NotificationSocketService {
   private readonly logger = new Logger(NotificationSocketService.name);
-  private server!: Server<ClientToServerEvents, ServerToClientEvents>; // ✅ Add ! (definite assignment assertion)
+  private server!: Server<ClientToServerEvents, ServerToClientEvents>; 
 
   setServer(server: Server<ClientToServerEvents, ServerToClientEvents>): void {
     this.server = server;

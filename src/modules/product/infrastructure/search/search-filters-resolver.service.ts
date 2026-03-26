@@ -87,7 +87,25 @@ export class SearchFiltersResolver {
         throw error;
       }
     }
+    // COUNTRY
+    if (result.country && !result.countryId) {
+      const normalizedCountry = result.country.trim();
 
+      const country = await this.prisma.country.findFirst({
+        where: {
+          OR: [
+            { name: { equals: normalizedCountry, mode: 'insensitive' } },
+            { code: { equals: normalizedCountry, mode: 'insensitive' } },
+          ],
+        },
+        select: { id: true, name: true, code: true },
+      });
+
+      if (country) {
+        result.countryId = country.id;
+        result.country = country.name;
+      }
+    }
     // ATTRIBUTES – resolve codes to IDs
     if (result.attributeCodes && Object.keys(result.attributeCodes).length > 0) {
       const resolvedAttributes: Record<number, number[]> = result.attributes || {};

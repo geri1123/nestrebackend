@@ -14,7 +14,9 @@ describe('UpdateProductUseCase', () => {
     findByProductId: jest.fn(),
     executeByUrls: jest.fn(),
   } as any;
-
+const filterService = {
+  refreshCounts: jest.fn(),
+} as any;
   const uploadImages = { execute: jest.fn() } as any;
   const deleteAttributes = { execute: jest.fn() } as any;
   const createAttributes = { execute: jest.fn() } as any;
@@ -22,13 +24,14 @@ describe('UpdateProductUseCase', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    useCase = new UpdateProductUseCase(
-      repo,
-      deleteImages,
-      uploadImages,
-      deleteAttributes,
-      createAttributes,
-    );
+   useCase = new UpdateProductUseCase(
+  repo,
+  deleteImages,
+  uploadImages,
+  deleteAttributes,
+  createAttributes,
+  filterService, 
+);
   });
 
   // ─── Product lookup ────────────────────────────────────────────────────────

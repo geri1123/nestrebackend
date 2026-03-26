@@ -32,7 +32,8 @@ import { REG_REQ_TOKEN } from '../../domain/repositories/reg-req.repository.toke
 export class FindRequestByUserIdUseCase {  
   constructor(
     @Inject(REG_REQ_TOKEN.REG_REQ_REPOSITORY)
-    private readonly repo: IRegistrationRequestRepository
+    private readonly repo: IRegistrationRequestRepository ,
+    
   ) {}
 
   async execute(userId: number, lang: SupportedLang) {

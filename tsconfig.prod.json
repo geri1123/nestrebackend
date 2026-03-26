@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",           // E rëndësishme për Node prod
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "declaration": false,
+    "removeComments": true,
+    "incremental": false,
+    "strict": true
+  },
+  "exclude": ["node_modules", "test", "**/*.spec.ts"]
+}

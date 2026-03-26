@@ -21,7 +21,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
-import { DeleteProductUseCase } from '../application/use-cases/delete-product.use-case';
+import { filter } from 'rxjs';
 @ApiTags('Products')
 @SkipThrottle()
 @Controller('products')
@@ -35,7 +35,7 @@ export class SearchProductsController {
     private readonly getMostClickedProductsUseCase: GetMostClickedProductsUseCase,
     private readonly getRelatedProductsUseCase: GetRelatedProductsUseCase,
     private readonly softAuth: SoftAuthService,
-    private readonly deleteProductUseCase: DeleteProductUseCase
+    
   ) {}
 
   @Public()
@@ -51,7 +51,9 @@ export class SearchProductsController {
      console.log(" RAW QUERY RECEIVED:", rawQuery);
   console.log("PAGE:", page);
   console.log(" LANGUAGE:", req.language);
+ 
     const filters = this.searchFiltersHelper.parse(rawQuery, page);
+   
   console.log(" FILTERS AFTER PARSE:", filters);
     return this.searchProductsUseCase.execute(filters, language, false);
   }

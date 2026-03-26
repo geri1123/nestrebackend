@@ -7,6 +7,8 @@ export type SupportedLang = keyof typeof translations;
 
 export type TranslationKey = keyof typeof translations.en;
 
+export const SUPPORTED_LANGS = Object.keys(translations) as SupportedLang[];
+
 export function t(
   key: TranslationKey,
   lang: SupportedLang = 'al' 

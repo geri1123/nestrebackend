@@ -40,7 +40,7 @@ export class NotificationService {
           id: notification.id,
           type: notification.type,
           status: notification.status,
-          translations: notification.notificationtranslation,
+          translations: notification.notificationTranslation,
           createdAt: notification.createdAt,
         });
 

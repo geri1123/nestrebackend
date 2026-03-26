@@ -5,13 +5,15 @@ import { UnsaveProductUseCase } from '../application/use-cases/unsave-product.us
 import { GetSavedProductsUseCase } from '../application/use-cases/get-saved-products.usecase';
 import { t } from '../../../locales';
 import { SaveProductSwagger } from '../responses/save-product.swaggee.response';
+import { GetSavedProductIdsUseCase } from '../application/use-cases/get-saved-product-ids.usecase';
 
 @Controller('save-product')
 export class SaveProductController {
   constructor(
     private readonly saveProductUseCase: SaveProductUseCase,
     private readonly unsaveProductUseCase: UnsaveProductUseCase,
-    private readonly getSavedProductsUseCase: GetSavedProductsUseCase
+    private readonly getSavedProductsUseCase: GetSavedProductsUseCase,
+    private readonly getSavedProductIdsUseCase:GetSavedProductIdsUseCase
   ) {}
 @SaveProductSwagger.SaveProduct()
   @Post(':id')
@@ -45,6 +47,15 @@ async getSavedProducts(@Req() req: RequestWithUser, @Query('page') page = '1') {
     throw error; 
   }
 }
+
+  @Get('saved-ids')
+  async getSavedIds(@Req() req: RequestWithUser) {
+    const { userId } = req;
+    if (!userId) return { savedIds: [] };
+
+    const savedIds = await this.getSavedProductIdsUseCase.execute(userId);
+    return { savedIds };
+  }
 @SaveProductSwagger.UnsaveProduct()
   @Delete('unsave/:id')
   async unsave(@Param('id') id: string, @Req() req: RequestWithUser) {
@@ -61,5 +72,7 @@ async getSavedProducts(@Req() req: RequestWithUser, @Query('page') page = '1') {
       success: true,
       message: t('productUnsavedSuccessfully', language),
     };
-  }
+  };
+
+  
 }

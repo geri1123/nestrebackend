@@ -21,7 +21,10 @@ export class SearchFiltersDto {
   listingtype?: string;
 
   /*  IDS  */
-
+@ApiPropertyOptional({ description: 'Country ID', example: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  countryId?: number;
   @ApiPropertyOptional({ description: 'Category ID', example: 1 })
   @IsOptional()
   @Type(() => Number)

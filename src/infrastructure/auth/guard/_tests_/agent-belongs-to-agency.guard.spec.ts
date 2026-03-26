@@ -58,7 +58,6 @@ describe('AgentBelongsToAgencyGuard', () => {
   });
 
   it('throws ForbiddenException when agent does not exist', async () => {
-    // Use the same mock from beforeEach, return null safely
     getAgentByIdMock.execute.mockResolvedValue(null as unknown as AgentEntity);
 
     const req: Partial<RequestWithUser> = {

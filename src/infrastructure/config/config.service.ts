@@ -1,121 +1,3 @@
-// import { Injectable } from '@nestjs/common';
-// import { ConfigService } from '@nestjs/config';
-
-// @Injectable()
-// export class AppConfigService {
-//   constructor(private configService: ConfigService) {}
-
-//   // Database
-//   get dbHost(): string {
-//     return this.configService.get<string>('DB_HOST', 'localhost');
-//   }
-//   get dbPort(): number {
-//     return Number(this.configService.get<number>('DB_PORT', 3306));
-//   }
-//   get dbUser(): string {
-//     return this.configService.get<string>('DB_USER', 'root');
-//   }
-//   get dbPassword(): string {
-//     return this.configService.get<string>('DB_PASSWORD', '');
-//   }
-//   get dbName(): string {
-//     return this.configService.get<string>('DB_NAME', '');
-//   }
-
-//   // Server
-//   get port(): number {
-//     return Number(this.configService.get<number>('PORT', 8080));
-//   }
-//   get corsOrigin(): string {
-//     return this.configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
-//   }
-
-//   // JWT
-//   get jwtSecret(): string {
-//     return this.configService.get<string>('JWT_SECRET', '');
-//   }
-
-//   // Client
-//   get clientBaseUrl(): string {
-//     return this.configService.get<string>('CLIENT_BASE_URL', 'http://localhost:3000');
-//   }
-
-//   // Email
-//   get emailUser(): string {
-//     return this.configService.get<string>('EMAIL_USER', '');
-//   }
-//   get emailPass(): string {
-//     return this.configService.get<string>('EMAIL_PASS', '');
-//   }
-//   get emailService(): string {
-//     return this.configService.get<string>('EMAIL_SERVICE', 'gmail');
-//   }
-
-//   // Firebase
-// //   get firebaseBucket(): string {
-// //     return this.configService.get<string>('FIREBASE_STORAGE_BUCKET', '');
-// //   }
-// //  get firebaseProjectId(): string {
-// //     return this.configService.get<string>('FIREBASE_PROJECT_ID')!;
-// //   }
-
-//   // get firebasePrivateKey(): string {
-//   //   return this.configService.get<string>('FIREBASE_PRIVATE_KEY')!.replace(/\\n/g, '\n');
-//   // }
-
-//   // get firebaseClientEmail(): string {
-//   //   return this.configService.get<string>('FIREBASE_CLIENT_EMAIL')!;
-//   // }
-
-//   // get firebaseClientId(): string {
-//   //   return this.configService.get<string>('FIREBASE_CLIENT_ID')!;
-//   // }
-
-//  // PASSWORD_RESET_TOKEN_EXPIRATION=10
-
-// get passwordResetTokenExpiration(): number {
-//   return Number(this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRATION', 10)); // default 10 minutes
-// }
-//   // Node environment
-//   get nodeEnv(): string {
-//     return this.configService.get<string>('NODE_ENV', 'development');
-//   }
-
-//   //redis
-//    get redisUrl(): string {
-//     return this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
-//   }
-
-//   get redisTTL(): number {
-//     return Number(this.configService.get<number>('REDIS_TTL', 3600));
-//   }
-// //google auth 2.0
-// get googleClientId(): string {
-//   return this.configService.get<string>('GOOGLE_CLIENT_ID' ,'') ;
-// }
-
-// get googleClientSecret(): string {
-//   return this.configService.get<string>('GOOGLE_CLIENT_SECRET','');
-// }
-
-// //mongo
-// get mongoUri(): string {
-//   return this.configService.get<string>('MONGO_URI','');
-// }
-
-// //cloudinary
-// get cloudinaryCloudName(): string {
-//   return this.configService.get<string>('CLOUDINARY_CLOUD_NAME')!;
-// }
-
-// get cloudinaryApiKey(): string {
-//   return this.configService.get<string>('CLOUDINARY_API_KEY')!;
-// }
-
-// get cloudinaryApiSecret(): string {
-//   return this.configService.get<string>('CLOUDINARY_API_SECRET')!;
-// }
-// }
 
 
 import { Injectable } from '@nestjs/common';
@@ -184,7 +66,10 @@ export class AppConfigService {
   get clientBaseUrl(): string {
     return this.configService.get<string>('CLIENT_BASE_URL', 'http://localhost:3000');
   }
-
+get corsOrigins(): string[] {
+  const origins = this.configService.get<string>('CORS_ORIGINS', this.clientBaseUrl);
+  return origins.split(',').map(o => o.trim());
+}
   // Email
   get emailUser(): string {
     return this.configService.get<string>('EMAIL_USER', '');
@@ -196,27 +81,7 @@ export class AppConfigService {
     return this.configService.get<string>('EMAIL_SERVICE', 'gmail');
   }
 
-  // Firebase
-//   get firebaseBucket(): string {
-//     return this.configService.get<string>('FIREBASE_STORAGE_BUCKET', '');
-//   }
-//  get firebaseProjectId(): string {
-//     return this.configService.get<string>('FIREBASE_PROJECT_ID')!;
-//   }
-
-  // get firebasePrivateKey(): string {
-  //   return this.configService.get<string>('FIREBASE_PRIVATE_KEY')!.replace(/\\n/g, '\n');
-  // }
-
-  // get firebaseClientEmail(): string {
-  //   return this.configService.get<string>('FIREBASE_CLIENT_EMAIL')!;
-  // }
-
-  // get firebaseClientId(): string {
-  //   return this.configService.get<string>('FIREBASE_CLIENT_ID')!;
-  // }
-
-  // PASSWORD_RESET_TOKEN_EXPIRATION=10
+ 
 
 get passwordResetTokenExpiration(): number {
   return Number(this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRATION', 10)); // default 10 minutes

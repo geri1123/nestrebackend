@@ -38,6 +38,14 @@ export class NotificationTemplateService {
   [LanguageCode.it]: (data) =>
     `${data.username} vuole unirsi alla vostra agenzia.`,
 },
+agent_updated_by_agent: {
+  [LanguageCode.al]: (data) =>
+    `${data.updatedByName} ka modifikuar të dhënat tuaja si agjent. Ndryshimet: ${data.changesText}`,
+  [LanguageCode.en]: (data) =>
+    `${data.updatedByName} has updated your agent profile. Changes: ${data.changesText}`,
+  [LanguageCode.it]: (data) =>
+    `${data.updatedByName} ha aggiornato il tuo profilo agente. Modifiche: ${data.changesText}`,
+},
  advertisement_expire: {
   [LanguageCode.al]: (data) => 
     `Ka përfunduar reklamimi për produktin me id ${data.productId}.`,

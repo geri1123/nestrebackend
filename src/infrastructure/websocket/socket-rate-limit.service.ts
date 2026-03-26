@@ -10,7 +10,7 @@ export class SocketRateLimitService {
   private readonly logger = new Logger(SocketRateLimitService.name);
   private connectionAttempts = new Map<string, number[]>();
   private config: RateLimitConfig = {
-    windowMs: 60000, // 1 minute
+    windowMs: 60000,
     maxAttempts: 10,
   };
 

@@ -6,6 +6,7 @@ import { GetSavedProductsUseCase } from './application/use-cases/get-saved-produ
 import { SavedProductRepository } from './infrasctructure/persistence/save-product.repository';
 import { ProductModule } from '../product/product.module';
 import { SAVED_PRODUCT_REPO } from './domain/repositories/Isave-product.repository';
+import { GetSavedProductIdsUseCase } from './application/use-cases/get-saved-product-ids.usecase';
 
 @Module({
   imports:[ProductModule],
@@ -14,6 +15,7 @@ import { SAVED_PRODUCT_REPO } from './domain/repositories/Isave-product.reposito
     SaveProductUseCase,
     UnsaveProductUseCase,
     GetSavedProductsUseCase,
+    GetSavedProductIdsUseCase,
     {
        provide: SAVED_PRODUCT_REPO,
       useClass: SavedProductRepository,

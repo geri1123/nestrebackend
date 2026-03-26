@@ -16,7 +16,7 @@ export class SearchFiltersHelper {
       if (!key.startsWith('attributes[') && 
           !['category', 'subcategory', 'listingtype', 'categoryId', 'subcategoryId', 
             'listingTypeId', 'pricelow', 'pricehigh', 'areaLow', 'areaHigh', 
-            'cities', 'country', 'sortBy', 'page', 'status', 'userId', 'agencyId'].includes(key)) {
+            'cities', 'country', 'countryId', 'sortBy', 'page', 'status', 'userId', 'agencyId'].includes(key)) {
         attributeCodes[key] = String(rawQuery[key]);
       }
 
@@ -54,6 +54,7 @@ export class SearchFiltersHelper {
       categoryId: rawQuery.categoryId ? Number(rawQuery.categoryId) : undefined,
       subcategoryId: rawQuery.subcategoryId ? Number(rawQuery.subcategoryId) : undefined,
       listingTypeId: rawQuery.listingTypeId ? Number(rawQuery.listingTypeId) : undefined,
+      countryId: rawQuery.countryId ? Number(rawQuery.countryId) : undefined,
       pricelow: rawQuery.pricelow ? Number(rawQuery.pricelow) : undefined,
       pricehigh: rawQuery.pricehigh ? Number(rawQuery.pricehigh) : undefined,
       areaLow: rawQuery.areaLow ? Number(rawQuery.areaLow) : undefined,

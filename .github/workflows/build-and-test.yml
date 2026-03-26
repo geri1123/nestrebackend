@@ -11,17 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # NON-SECRET CONFIG
-      
-      NODE_ENV: development   
+      NODE_ENV: production
       PASSWORD_RESET_TOKEN_EXPIRATION: 10
-      CORS_ORIGIN: ${{ secrets.CORS_ORIGIN || 'http://localhost:3000' }}
-      CLIENT_BASE_URL: http://localhost:3000
+      CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+      CLIENT_BASE_URL: ${{ secrets.CLIENT_BASE_URL }}
       REDIS_TTL: 3600
 
-      # SECRETS
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -59,6 +55,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
 
       - name: Build backend
         run: npm run build

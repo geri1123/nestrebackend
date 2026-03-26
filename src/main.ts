@@ -53,12 +53,18 @@ async function bootstrap() {
   
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  
-  app.enableCors({
-    origin: configService.clientBaseUrl,
-    methods: ['GET', 'POST','PATCH', 'PUT', 'DELETE'],
-    credentials: true,
-  });
+app.enableCors({
+  origin: (origin, callback) => {
+    const allowedOrigins = configService.corsOrigins; 
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS policy: ${origin} not allowed`));
+    }
+  },
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+  credentials: true,
+});
 
   
   const swaggerConfig = new DocumentBuilder()

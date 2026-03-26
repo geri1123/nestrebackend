@@ -20,7 +20,7 @@ import type {
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGINS?.split(',').map(o => o.trim()) || 'http://localhost:3000',
     credentials: true,
   },
   namespace: '/notifications',
@@ -30,10 +30,10 @@ export class NotificationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy
 {
   @WebSocketServer()
-  server!: Server<ClientToServerEvents, ServerToClientEvents>; // ✅ Add !
+  server!: Server<ClientToServerEvents, ServerToClientEvents>; 
 
   private readonly logger = new Logger(NotificationGateway.name);
-  private heartbeatInterval!: NodeJS.Timeout; // ✅ Add !
+  private heartbeatInterval!: NodeJS.Timeout;
 
   constructor(
     private readonly authService: SocketAuthService,

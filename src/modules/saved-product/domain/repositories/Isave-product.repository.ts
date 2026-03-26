@@ -13,4 +13,5 @@ export interface ISavedProductRepository {
     skip: number,
     take: number
   ): Promise<any[]>; 
+  findSavedIdsByUserId(userId: number): Promise<{ productId: number }[]>;
 }

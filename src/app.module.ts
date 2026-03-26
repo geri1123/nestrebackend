@@ -58,6 +58,7 @@ import { QueueModule } from './infrastructure/queue/queue.module';
 
 
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { WebSocketModule } from './infrastructure/websocket/socket.module';
 
 @Module({
   imports: [
@@ -100,7 +101,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AgencyModule,
     AgentModule,
     AgencyRequestsModule,
-
+//Websocket
+WebSocketModule,
     // Products
     ProductModule,
     ProductImageModule,

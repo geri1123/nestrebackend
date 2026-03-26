@@ -74,48 +74,45 @@ const permissionTranslations: Record<string, Record<SupportedLang, string>> = {
     it: "gestire gli agenti",
   },
 };
-
-export function translateAgentChanges(dto: UpdateAgentsDto, lang: SupportedLang): string {
+export function translateAgentChanges(
+  dto: UpdateAgentsDto,
+  lang: SupportedLang,
+  existing?: any,
+): string {
   const changes: string[] = [];
 
-  if (dto.commissionRate !== undefined)
+  if (dto.commissionRate !== undefined && dto.commissionRate !== existing?.commissionRate)
     changes.push(`${fieldTranslations.commissionRate[lang]} → ${dto.commissionRate}`);
 
-  if (dto.roleInAgency !== undefined)
-    changes.push(
-      `${fieldTranslations.roleInAgency[lang]} → ${roleTranslations[dto.roleInAgency][lang]}`
-    );
+  if (dto.roleInAgency !== undefined && dto.roleInAgency !== existing?.roleInAgency)
+    changes.push(`${fieldTranslations.roleInAgency[lang]} → ${roleTranslations[dto.roleInAgency][lang]}`);
 
-  if (dto.status !== undefined)
-    changes.push(
-      `${fieldTranslations.status[lang]} → ${statusTranslations[dto.status][lang]}`
-    );
+  if (dto.status !== undefined && dto.status !== existing?.status)
+    changes.push(`${fieldTranslations.status[lang]} → ${statusTranslations[dto.status][lang]}`);
 
-  if (dto.endDate !== undefined)
-    changes.push(
-      `${fieldTranslations.endDate[lang]} → ${new Date(dto.endDate).toLocaleDateString()}`
-    );
+  if (dto.endDate !== undefined) {
+    const newDate = new Date(dto.endDate).getTime();
+    const oldDate = existing?.endDate ? new Date(existing.endDate).getTime() : null;
+    if (newDate !== oldDate)
+      changes.push(`${fieldTranslations.endDate[lang]} → ${new Date(dto.endDate).toLocaleDateString()}`);
+  }
 
   if (dto.permissions !== undefined) {
     const permissionChanges: string[] = [];
-
     Object.entries(dto.permissions).forEach(([key, value]) => {
-      if (permissionTranslations[key]) {
+      if (permissionTranslations[key] && existing?.permissions?.[key] !== value) {
         const status = value
           ? (lang === 'al' ? 'aktiv' : lang === 'it' ? 'attivo' : 'enabled')
           : (lang === 'al' ? 'joaktiv' : lang === 'it' ? 'disattivato' : 'disabled');
         permissionChanges.push(`${permissionTranslations[key][lang]} (${status})`);
       }
     });
-
-    if (permissionChanges.length > 0) {
+    if (permissionChanges.length > 0)
       changes.push(`${fieldTranslations.permissions[lang]}: ${permissionChanges.join(', ')}`);
-    }
   }
 
-  return changes.join(", ");
+  return changes.join(', ');
 }
-
 export function hasAgentChanges(dto: UpdateAgentsDto, existing: any): boolean {
   if (dto.roleInAgency !== undefined && dto.roleInAgency !== existing.roleInAgency)
     return true;
