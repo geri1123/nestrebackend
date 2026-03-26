@@ -56,8 +56,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Nest CLI
-        run: npm install --save-dev @nestjs/cli
+      - name: Ensure Nest CLI is installed locally
+        run: npm install --no-save @nestjs/cli@^11.0.16
 
       - name: Generate Prisma client
         run: npx prisma generate
