@@ -11,7 +11,7 @@ export class AgentBelongsToAgencyGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
-    const agentId = parseInt(req.params.id);
+   const agentId = parseInt(String(req.params.id));
     const userAgencyId = req.agencyId;
     const language = req.language;
 
