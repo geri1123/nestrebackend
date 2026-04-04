@@ -46,7 +46,7 @@ describe('RequestPasswordResetUseCase', () => {
       1, 'john', 'john@test.com', 'John',
       null, null, null, null, null,
       'user', 'active', true,
-      new Date().toISOString(), null, null,
+      new Date(), null, null,
     );
 
     userRepo.findByEmail.mockResolvedValue(user);
@@ -85,7 +85,7 @@ describe('RequestPasswordResetUseCase', () => {
       2, 'mark', 'mark@test.com', null,
       null, null, null, null, null,
       'user', 'inactive', true,
-      new Date().toISOString(), null, null,
+      new Date(), null, null,
     );
 
     userRepo.findByEmail.mockResolvedValue(inactiveUser);

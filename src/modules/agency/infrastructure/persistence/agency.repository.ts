@@ -222,11 +222,11 @@ export class AgencyRepository implements IAgencyDomainRepository {
 
   async create(
     data: {
-      agency_name: string;
-      license_number: string;
-      address: string;
-      owner_user_id: number;
-      status: AgencyStatus;
+      agencyName: string;
+    licenseNumber: string;
+    address: string;
+    ownerUserId: number;
+    status: AgencyStatus;
     },
     tx?: Prisma.TransactionClient
   ): Promise<number> {
@@ -239,10 +239,10 @@ export class AgencyRepository implements IAgencyDomainRepository {
 
     const newAgency = await client.agency.create({
       data: {
-        agencyName: data.agency_name,        
-        licenseNumber: data.license_number,  
+        agencyName: data.agencyName,        
+        licenseNumber: data.licenseNumber,  
         address: data.address,
-        ownerUserId: data.owner_user_id,     
+        ownerUserId: data.ownerUserId,     
         status: data.status,
         publicCode: publicCode,
       },

@@ -1,14 +1,13 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import {USER_REPO, type IUserDomainRepository } from "../../../domain/repositories/user.repository.interface";
-import { CacheService } from "../../../../../infrastructure/cache/cache.service";
-import { SupportedLang, t } from "../../../../../locales";
-import { comparePassword } from "../../../../../common/utils/hash";
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { USER_REPO, type IUserDomainRepository } from '../../../domain/repositories/user.repository.interface';
+import { CacheService } from '../../../../../infrastructure/cache/cache.service';
+import { SupportedLang, t } from '../../../../../locales';
+import { comparePassword, hashPassword } from '../../../../../common/utils/hash';
 
 @Injectable()
 export class ResetPasswordUseCase {
   constructor(
-       @Inject(USER_REPO)
-   
+    @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
     private readonly cacheService: CacheService,
   ) {}
@@ -41,7 +40,8 @@ export class ResetPasswordUseCase {
       });
     }
 
-    await this.userRepo.updatePassword(cached.userId, newPassword);
+    const hashed = await hashPassword(newPassword);
+    await this.userRepo.updatePassword(cached.userId, hashed);
     await this.cacheService.delete(cacheKey);
   }
 }

@@ -39,14 +39,14 @@ username!: string;
   @ApiProperty({ example: 'John' })
   @Transform(({ value }) => value?.trim())
   @IsNotEmpty({ message: 'firstNameRequired' })
-  first_name!: string;
+  firstName!: string;
 
   @ApiProperty({ example: 'Doe' })
   @Transform(({ value }) => value?.trim())
   @IsNotEmpty({ message: 'lastNameRequired' })
-  last_name!: string;
+  lastName!: string;
 
   @ApiProperty({ example: true })
   @Equals(true, { message: 'termsRequired' })
-  terms_accepted!: boolean;
+  termsAccepted!: boolean;
 }

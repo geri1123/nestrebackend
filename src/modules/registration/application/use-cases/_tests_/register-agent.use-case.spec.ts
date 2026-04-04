@@ -66,11 +66,11 @@ describe('RegisterAgentUseCase', () => {
       email: 'agent@test.com',
       password: '12345678',
       repeatPassword: '12345678',
-      terms_accepted: true,
-      first_name: 'Agent',
-      last_name: 'Test',
-      public_code: 'PUB-001',
-      requested_role: 'agent',
+      termsAccepted: true,
+      firstName: 'Agent',
+      lastName: 'Test',
+      publicCode: 'PUB-001',
+      requestedRole: 'agent',
     };
 
     const result = await useCase.execute(dto, 'al');
@@ -84,8 +84,8 @@ describe('RegisterAgentUseCase', () => {
         username: 'agent',
         email: 'agent@test.com',
         password: '12345678',
-        first_name: 'Agent',
-        last_name: 'Test',
+        firstName: 'Agent',
+        lastName: 'Test',
       },
       'al',
       'agent',
@@ -137,11 +137,11 @@ describe('RegisterAgentUseCase', () => {
       email: 'agent@test.com',
       password: '12345678',
       repeatPassword: '12345678',
-      terms_accepted: true,
-      first_name: 'Agent',
-      last_name: 'Test',
-      public_code: 'PUB-001',
-      requested_role: 'agent',
+      termsAccepted: true,
+      firstName: 'Agent',
+      lastName: 'Test',
+      publicCode: 'PUB-001',
+      requestedRole: 'agent',
     };
 
     await expect(useCase.execute(dto, 'al')).rejects.toThrow('Transaction failed');

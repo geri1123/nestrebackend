@@ -14,12 +14,12 @@ export class ValidateAgencyBeforeRegisterUseCase {
   async execute(data: CreateAgencyData, lang: SupportedLang) {
     const errors: Record<string, string[]> = {};
 
-    if (await this.agencyRepository.agencyNameExists(data.agency_name)) {
-      errors.agency_name = [t('agencyExists', lang)];
+    if (await this.agencyRepository.agencyNameExists(data.agencyName)) {
+      errors.agencyName = [t('agencyExists', lang)];
     }
 
-    if (await this.agencyRepository.licenseExists(data.license_number)) {
-      errors.license_number = [t('licenseExists', lang)];
+    if (await this.agencyRepository.licenseExists(data.licenseNumber)) {
+      errors.licenseNumber = [t('licenseExists', lang)];
     }
 
     if (Object.keys(errors).length > 0) {

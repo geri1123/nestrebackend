@@ -6,7 +6,6 @@ export class User {
     public readonly id: number,
     public username: string,
     public readonly email: string,
-    
     public firstName: string | null,
     public lastName: string | null,
     public aboutMe: string | null,
@@ -16,9 +15,9 @@ export class User {
     public readonly role: userRole,
     public readonly status: userStatus,
     public readonly emailVerified: boolean,
-    public readonly createdAt: string,
-    public readonly updatedAt: string | null,
-    public readonly lastLogin: string | null,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date | null,
+    public readonly lastLogin: Date | null,
   ) {}
 
   /* ---------- FACTORY ---------- */
@@ -35,9 +34,9 @@ export class User {
     role: string;
     status: string;
     email_verified: boolean;
-    created_at: string;
-    updated_at: string | null;
-    last_login: string | null;
+    created_at: Date | string;
+    updated_at: Date | string | null;
+    last_login: Date | string | null;
   }): User {
     return new User(
       props.id,
@@ -52,39 +51,37 @@ export class User {
       props.role as userRole,
       props.status as userStatus,
       props.email_verified,
-      props.created_at,
-      props.updated_at,
-      props.last_login,
+      props.created_at instanceof Date ? props.created_at : new Date(props.created_at),
+      props.updated_at ? (props.updated_at instanceof Date ? props.updated_at : new Date(props.updated_at)) : null,
+      props.last_login ? (props.last_login instanceof Date ? props.last_login : new Date(props.last_login)) : null,
     );
   }
 
   /* ---------- DOMAIN RULES ---------- */
 
- isActive(): boolean {
-  return this.status === 'active' && this.emailVerified;
-}
+  isActive(): boolean {
+    return this.status === 'active' && this.emailVerified;
+  }
 
-isPending(): boolean {
-  return this.status === 'pending';
-}
+  isPending(): boolean {
+    return this.status === 'pending';
+  }
 
-isSuspended(): boolean {
-  return this.status === 'suspended';
-}
+  isSuspended(): boolean {
+    return this.status === 'suspended';
+  }
 
-isInactive(): boolean {
-  return this.status === 'inactive';
-}
+  isInactive(): boolean {
+    return this.status === 'inactive';
+  }
 
-canLogin(): boolean {
-  // Only active users with verified email can login
-  return this.isActive();
-}
+  canLogin(): boolean {
+    return this.isActive();
+  }
 
   canUpdateUsername(lastChangeDate: Date | null, daysLimit = 60): boolean {
     if (!lastChangeDate) return true;
-    const days =
-      (Date.now() - lastChangeDate.getTime()) / (1000 * 60 * 60 * 24);
+    const days = (Date.now() - lastChangeDate.getTime()) / (1000 * 60 * 60 * 24);
     return days >= daysLimit;
   }
 

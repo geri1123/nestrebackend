@@ -28,7 +28,7 @@ export interface INotificationRepository {
   getNotifications(params: GetNotificationsParams): Promise<any[]>;
   
   countUnread(userId: number): Promise<number>;
-  
+  countAll(userId: number): Promise<number>;
   changeNotificationStatus(
     notificationId: number,
     status: NotificationStatus,
@@ -36,7 +36,7 @@ export interface INotificationRepository {
   
   // New method for bulk update
   markAllAsReadForUser(userId: number): Promise<{ count: number }>;
-  
+  countByStatus(userId: number, status: NotificationStatus): Promise<number> ;
   deleteNotification(notificationId: number): Promise<any>;
   
   getNotificationById(notificationId: number): Promise<any>;

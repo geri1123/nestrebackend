@@ -3,58 +3,34 @@ import { NotFoundException } from '@nestjs/common';
 import { GetUserProfileUseCase, UserProfileData } from '../get-user-profile.use-case';
 import { USER_REPO } from '../../../domain/repositories/user.repository.interface';
 import { User } from '../../../domain/entities/user.entity';
-import { AgencyOwnerContextService } from '../../../../../infrastructure/auth/services/agency-owner-context.service';
-import { AgentContextService } from '../../../../../infrastructure/auth/services/agent-context.service';
+import { AGENT_PROFILE_PORT } from '../../../../agent/application/ports/agent-profile.port';
+import { AGENCY_OWNER_PROFILE_PORT } from '../../../../agency/application/ports/agency-owner-profile.port';
 
 describe('GetUserProfileUseCase', () => {
   let useCase: GetUserProfileUseCase;
   let userRepo: { findById: jest.Mock };
-  let agentContextService: { getAgentProfileData: jest.Mock };
-  let agencyOwnerContextService: { getAgencyData: jest.Mock };
+  let agentProfilePort: { getAgentProfileData: jest.Mock };
+  let agencyOwnerProfilePort: { getAgencyData: jest.Mock };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         GetUserProfileUseCase,
-        {
-          provide: USER_REPO,
-          useValue: { findById: jest.fn() },
-        },
-        {
-          provide: AgentContextService,
-          useValue: { getAgentProfileData: jest.fn() },
-        },
-        {
-          provide: AgencyOwnerContextService,
-          useValue: { getAgencyData: jest.fn() },
-        },
+        { provide: USER_REPO, useValue: { findById: jest.fn() } },
+        { provide: AGENT_PROFILE_PORT, useValue: { getAgentProfileData: jest.fn() } },
+        { provide: AGENCY_OWNER_PROFILE_PORT, useValue: { getAgencyData: jest.fn() } },
       ],
     }).compile();
 
     useCase = moduleRef.get(GetUserProfileUseCase);
     userRepo = moduleRef.get(USER_REPO);
-    agentContextService = moduleRef.get(AgentContextService);
-    agencyOwnerContextService = moduleRef.get(AgencyOwnerContextService);
+    agentProfilePort = moduleRef.get(AGENT_PROFILE_PORT);
+    agencyOwnerProfilePort = moduleRef.get(AGENCY_OWNER_PROFILE_PORT);
   });
 
-  it('should return UserProfileData when user exists (regular user)', async () => {
-    const user = new User(
-      1,
-      'john',
-      'john@test.com',
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      'user',
-      'active',
-      true,
-      new Date().toISOString(),
-      null,
-      null,
-    );
+  it('returns profile for regular user without extra data', async () => {
+    const user = new User(1, 'john', 'john@test.com', null, null, null, null, null, null,
+      'user', 'active', true, new Date(), null, null);
 
     userRepo.findById.mockResolvedValue(user);
 
@@ -63,30 +39,12 @@ describe('GetUserProfileUseCase', () => {
     expect(result.user).toBe(user);
     expect(result.agentProfile).toBeUndefined();
     expect(result.agency).toBeUndefined();
-    expect(userRepo.findById).toHaveBeenCalledTimes(1);
     expect(userRepo.findById).toHaveBeenCalledWith(1);
   });
 
-  it('should return UserProfileData with agentProfile for agent', async () => {
-    const user = new User(
-      2,
-      'agentUser',
-      'agent@test.com',
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      'agent',
-      'active',
-      true,
-      new Date().toISOString(),
-      null,
-      null,
-    );
-
-    userRepo.findById.mockResolvedValue(user);
+  it('returns agentProfile for agent user', async () => {
+    const user = new User(2, 'agent1', 'agent@test.com', null, null, null, null, null, null,
+      'agent', 'active', true, new Date(), null, null);
 
     const mockAgentProfile = {
       agencyAgentId: 10,
@@ -103,70 +61,46 @@ describe('GetUserProfileUseCase', () => {
         can_delete_posts: false,
         can_manage_agents: false,
       },
-      agency: {
-        id: 1,
-        name: 'Prime Agency',
-        email: null,
-        logo: null,
-        website: null,
-        status: 'active',
-      },
+      agency: { id: 1, name: 'Test Agency', email: null, logo: null, website: null,
+        status: 'active', address: 'Tirana', publicCode: null },
     };
 
-    agentContextService.getAgentProfileData.mockResolvedValue(mockAgentProfile);
+    userRepo.findById.mockResolvedValue(user);
+    agentProfilePort.getAgentProfileData.mockResolvedValue(mockAgentProfile);
 
-    const result = await useCase.execute(2, 'en');
+    const result = await useCase.execute(2, 'al');
 
     expect(result.user).toBe(user);
     expect(result.agentProfile).toEqual(mockAgentProfile);
+    expect(result.agency).toBeUndefined();
+    expect(agentProfilePort.getAgentProfileData).toHaveBeenCalledWith(2, 'al');
+    expect(agencyOwnerProfilePort.getAgencyData).not.toHaveBeenCalled();
   });
 
-  it('should return UserProfileData with agency for agency_owner', async () => {
-    const user = new User(
-      3,
-      'ownerUser',
-      'owner@test.com',
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      'agency_owner',
-      'active',
-      true,
-      new Date().toISOString(),
-      null,
-      null,
-    );
-
-    userRepo.findById.mockResolvedValue(user);
+  it('returns agency for agency_owner user', async () => {
+    const user = new User(3, 'owner1', 'owner@test.com', null, null, null, null, null, null,
+      'agency_owner', 'active', true, new Date(), null, null);
 
     const mockAgency = {
-      id: 1,
-      name: 'Prime Agency',
-      email: 'agency@test.com',
-      logo: null,
-      status: 'active',
-      address: '123 Street',
-      phone: '123456789',
-      website: 'https://agency.com',
-      licenseNumber: 'LIC123',
-      publicCode: 'PUB123',
+      id: 1, name: 'Test Agency', email: 'a@test.com', logo: null,
+      status: 'active', address: '123 St', phone: '123', website: null,
+      licenseNumber: 'LIC001', publicCode: 'PUB001',
     };
 
-    agencyOwnerContextService.getAgencyData.mockResolvedValue(mockAgency);
+    userRepo.findById.mockResolvedValue(user);
+    agencyOwnerProfilePort.getAgencyData.mockResolvedValue(mockAgency);
 
-    const result = await useCase.execute(3, 'en');
+    const result = await useCase.execute(3, 'al');
 
     expect(result.user).toBe(user);
     expect(result.agency).toEqual(mockAgency);
     expect(result.agentProfile).toBeUndefined();
+    expect(agencyOwnerProfilePort.getAgencyData).toHaveBeenCalledWith(3, 'al');
+    expect(agentProfilePort.getAgentProfileData).not.toHaveBeenCalled();
   });
 
-  it('should throw NotFoundException when user does not exist', async () => {
+  it('throws NotFoundException when user does not exist', async () => {
     userRepo.findById.mockResolvedValue(null);
-
     await expect(useCase.execute(999, 'al')).rejects.toThrow(NotFoundException);
   });
 });

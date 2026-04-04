@@ -8,14 +8,14 @@ export class RegisterAgencyOwnerDto extends BaseRegistrationDto {
     description: 'The official name of the real estate agency.',
   })
   @IsNotEmpty({ message: 'agencyNameRequired' })
-  agency_name!: string;
+  agencyName!: string;
 
   @ApiProperty({
     example: 'LIC-2025-00123',
     description: 'Official license number of the agency, required for verification.',
   })
   @IsNotEmpty({ message: 'licenseRequired' })
-  license_number!: string;
+  licenseNumber!: string;
 
   @ApiProperty({
     example: 'Rruga e Kavajës 120, Tirana, Albania',

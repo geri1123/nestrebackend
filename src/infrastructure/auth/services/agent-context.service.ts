@@ -5,43 +5,47 @@ import { RequestWithUser } from '../../../common/types/request-with-user.interfa
 import { t, SupportedLang } from '../../../locales';
 import { AgencyAgentStatus, AgencyStatus } from '@prisma/client';
 import { mapAgentPermissions } from '../../../common/helpers/permissions.helper';
+import {
+  IAgentProfilePort,
+  AgentProfileData,
+} from '../../../modules/agent/application/ports/agent-profile.port';
 
 @Injectable()
-export class AgentContextService {
+export class AgentContextService implements IAgentProfilePort {
   constructor(
     private readonly getAgentAuthContext: GetAgentAuthContextUseCase,
     private readonly getAgencyById: GetAgencyByIdUseCase,
   ) {}
 
-
-async getAgentProfileData(userId: number, lang: SupportedLang) {
+  async getAgentProfileData(userId: number, lang: string): Promise<AgentProfileData> {
     const agentContext = await this.getAgentAuthContext.execute(userId);
     if (!agentContext) {
-      throw new ForbiddenException(t('userNotAssociatedWithAgency', lang));
+      throw new ForbiddenException(t('userNotAssociatedWithAgency', lang as SupportedLang));
     }
 
-    const agency = await this.getAgencyById.execute(agentContext.agencyId, lang);
+    const agency = await this.getAgencyById.execute(agentContext.agencyId, lang as SupportedLang);
 
-  return {
-  agencyAgentId: agentContext.agencyAgentId,
-  roleInAgency: agentContext.roleInAgency,
-  status: agentContext.status,
-  commissionRate: agentContext.commissionRate,
-  startDate: agentContext.startDate,
-  updatedAt: agentContext.updatedAt,
-  permissions: mapAgentPermissions(agentContext.permissions),
-  agency: {
-    id: agency.id,
-    name: agency.agencyName,
-    email: agency.agencyEmail ?? null,
-    logo: agency.logo ?? null,
-    website: agency.website ?? null,
-    status: agency.status,
-    address:agency.address,
-    publicCode: agency.publicCode ?? null
-  },
-};
-}
+    return {
+      agencyAgentId: agentContext.agencyAgentId,
+      roleInAgency: agentContext.roleInAgency,
+      status: agentContext.status,
+      commissionRate: agentContext.commissionRate,
+      startDate: agentContext.startDate,
+      updatedAt: agentContext.updatedAt,
+      permissions: mapAgentPermissions(agentContext.permissions),
+      agency: {
+        id: agency.id,
+        name: agency.agencyName,
+        email: agency.agencyEmail ?? null,
+        logo: agency.logo ?? null,
+        website: agency.website ?? null,
+        status: agency.status,
+        address: agency.address,
+        publicCode: agency.publicCode ?? null,
+      },
+    };
+  }
+
   async loadAgentContext(req: RequestWithUser, lang: SupportedLang): Promise<void> {
     const agentContext = await this.getAgentAuthContext.execute(req.user!.id);
     if (!agentContext) {

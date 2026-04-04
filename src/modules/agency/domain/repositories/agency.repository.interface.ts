@@ -44,11 +44,11 @@ export interface IAgencyDomainRepository {
   // Command methods
   create(
     data: {
-      agency_name: string;
-      license_number: string;
-      address: string;
-      owner_user_id: number;
-      status: AgencyStatus;
+       agencyName: string;
+    licenseNumber: string;
+    address: string;
+    ownerUserId: number;
+    status: AgencyStatus;
     },
     tx?: Prisma.TransactionClient
   ): Promise<number>;

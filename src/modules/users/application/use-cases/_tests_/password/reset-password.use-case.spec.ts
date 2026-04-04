@@ -1,11 +1,12 @@
-
 import { Test } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ResetPasswordUseCase } from '../../password/reset-password.use-case';
 import { USER_REPO } from '../../../../domain/repositories/user.repository.interface';
 import { CacheService } from '../../../../../../infrastructure/cache/cache.service';
+
 jest.mock('../../../../../../common/utils/hash', () => ({
   comparePassword: jest.fn(),
+  hashPassword: jest.fn().mockResolvedValue('hashed-new-password'),
 }));
 
 import { comparePassword } from '../../../../../../common/utils/hash';
@@ -60,10 +61,8 @@ describe('ResetPasswordUseCase', () => {
 
     await useCase.execute('valid-token', 'NewPassword123!', 'en');
 
-    expect(userRepo.updatePassword).toHaveBeenCalledWith(1, 'NewPassword123!');
-    expect(cacheService.delete).toHaveBeenCalledWith(
-      'password_reset:valid-token',
-    );
+    expect(userRepo.updatePassword).toHaveBeenCalledWith(1, 'hashed-new-password');
+    expect(cacheService.delete).toHaveBeenCalledWith('password_reset:valid-token');
   });
 
   it('throws BadRequestException if token is invalid or expired', async () => {

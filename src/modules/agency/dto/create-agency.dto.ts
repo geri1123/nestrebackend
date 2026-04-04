@@ -9,14 +9,14 @@ export class CreateAgencyDto {
   @IsString({ message: 'agencyNameRequired' })
   @IsNotEmpty({ message: 'agencyNameRequired' })
   @Matches(/\S/, { message: 'agencyNameRequired' })
-  agency_name!: string;
+  agencyName!: string;
 
   @ApiProperty({ example: 'LIC-2025-00123' })
   @Transform(({ value }) => value?.trim())
   @IsString({ message: 'licenseRequired' })
   @IsNotEmpty({ message: 'licenseRequired' })
   @Matches(/\S/, { message: 'licenseRequired' })
-  license_number!: string;
+  licenseNumber!: string;
 
   @ApiProperty({ example: 'Rruga e Kavajës 120, Tirana, Albania' })
   @Transform(({ value }) => value?.trim())

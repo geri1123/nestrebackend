@@ -67,11 +67,11 @@ describe('RegisterAgencyOwnerUseCase', () => {
       email: 'owner@test.com',
       password: '12345678',
       repeatPassword: '12345678',
-      terms_accepted: true,
-      first_name: 'Owner',
-      last_name: 'Test',
-      agency_name: 'Dream Homes',
-      license_number: 'LIC-001',
+      termsAccepted: true,
+      firstName: 'Owner',
+      lastName: 'Test',
+      agencyName: 'Dream Homes',
+      licenseNumber: 'LIC-001',
       address: 'Tirana',
     };
 
@@ -80,8 +80,8 @@ describe('RegisterAgencyOwnerUseCase', () => {
     // Verify validation was called
     expect(validateAgencyMock.execute).toHaveBeenCalledWith(
       {
-        agency_name: 'Dream Homes',
-        license_number: 'LIC-001',
+        agencyName: 'Dream Homes',
+        licenseNumber: 'LIC-001',
         address: 'Tirana',
       },
       'al',
@@ -93,8 +93,8 @@ describe('RegisterAgencyOwnerUseCase', () => {
         username: 'owner',
         email: 'owner@test.com',
         password: '12345678',
-        first_name: 'Owner',
-        last_name: 'Test',
+        firstName: 'Owner',
+        lastName: 'Test',
       },
       'al',
       'agency_owner',
@@ -105,8 +105,8 @@ describe('RegisterAgencyOwnerUseCase', () => {
     // Verify agency creation
     expect(createAgencyMock.execute).toHaveBeenCalledWith(
       {
-        agency_name: 'Dream Homes',
-        license_number: 'LIC-001',
+        agencyName: 'Dream Homes',
+        licenseNumber: 'LIC-001',
         address: 'Tirana',
       },
       1,
@@ -149,11 +149,11 @@ describe('RegisterAgencyOwnerUseCase', () => {
       email: 'owner@test.com',
       password: '12345678',
       repeatPassword: '12345678',
-      terms_accepted: true,
-      first_name: 'Owner',
-      last_name: 'Test',
-      agency_name: 'Dream Homes',
-      license_number: 'LIC-001',
+      termsAccepted: true,
+      firstName: 'Owner',
+      lastName: 'Test',
+      agencyName: 'Dream Homes',
+      licenseNumber: 'LIC-001',
       address: 'Tirana',
     };
 

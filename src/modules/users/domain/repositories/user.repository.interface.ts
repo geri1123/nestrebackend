@@ -53,11 +53,11 @@ export interface CreateUserData {
   username: string;
   email: string;
   password: string;
-  first_name: string | null;
-  last_name: string | null;
+  firstName: string | null;
+  lastName: string | null;
   role: 'user' | 'agency_owner' | 'agent';
   status: string;
-    email_verified?: boolean;  
+    emailVerified?: boolean;  
   google_user?: boolean;     
   google_id?: string;   
    

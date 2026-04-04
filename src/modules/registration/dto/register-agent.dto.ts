@@ -8,7 +8,7 @@ export class RegisterAgentDto extends BaseRegistrationDto {
     description: 'Public code assigned by the agency to identify the agent.',
   })
   @IsNotEmpty({ message: 'publicCodeRequired' })
-  public_code!: string;
+  publicCode!: string;
 
   @ApiProperty({
     example: 'ID-AL-12345678',
@@ -24,5 +24,5 @@ export class RegisterAgentDto extends BaseRegistrationDto {
   @IsEnum(['agent', 'senior_agent', 'team_lead'], {
     message: 'agencyRoleRequired',
   })
-  requested_role!: 'agent' | 'senior_agent' | 'team_lead';
+  requestedRole!: 'agent' | 'senior_agent' | 'team_lead';
 }

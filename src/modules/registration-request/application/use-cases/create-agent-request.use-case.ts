@@ -27,7 +27,7 @@ export class CreateAgentRequestUseCase {
       userId,
      
       agencyId: agency.id,
-      requestedRole: dto.requested_role,
+      requestedRole: dto.requestedRole,
       requestType: "agent_license_verification",
 
     });

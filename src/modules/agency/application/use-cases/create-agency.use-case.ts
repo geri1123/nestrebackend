@@ -5,8 +5,8 @@ import { SupportedLang, t } from '../../../../locales';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
 
 export interface CreateAgencyData {
-  agency_name: string;
-  license_number: string;
+  agencyName: string;
+  licenseNumber: string;
   address: string;
 }
 
@@ -29,11 +29,11 @@ export class CreateAgencyUseCase {
     const errors: Record<string, string[]> = {};
 
     // DOMAIN VALIDATION
-    if (await this.agencyRepository.agencyNameExists(data.agency_name)) {
+    if (await this.agencyRepository.agencyNameExists(data.agencyName)) {
       errors.agency_name = [t('agencyExists', lang)];
     }
 
-    if (await this.agencyRepository.licenseExists(data.license_number)) {
+    if (await this.agencyRepository.licenseExists(data.licenseNumber)) {
       errors.license_number = [t('licenseExists', lang)];
     }
 
@@ -43,10 +43,10 @@ export class CreateAgencyUseCase {
 
     // CREATE AGENCY
     return await this.agencyRepository.create({
-      agency_name: data.agency_name,
-      license_number: data.license_number,
+      agencyName: data.agencyName,
+      licenseNumber: data.licenseNumber,
       address: data.address,
-      owner_user_id: ownerUserId,
+      ownerUserId: ownerUserId,
       status,
      
     },

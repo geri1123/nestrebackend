@@ -73,7 +73,7 @@ export class CleanupProcessor extends WorkerHost {
         await this.cleanupService.expireExpiredAdvertisements();
 
       const duration = Date.now() - startTime;
-      this.logger.log(`✓ Expired ${expiredCount} advertisements in ${duration}ms`);
+      this.logger.log(` Expired ${expiredCount} advertisements in ${duration}ms`);
 
       return {
         success: true,

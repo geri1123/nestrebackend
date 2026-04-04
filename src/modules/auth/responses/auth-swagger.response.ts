@@ -35,10 +35,10 @@ export class AuthSwagger {
         repeatPassword: [
             "Repeat password must not be empty."
         ],
-        first_name: [
+        firstName: [
             "Name is required."
         ],
-        last_name: [
+        lastName: [
             "Last Name is required"
         ]
         },
@@ -56,7 +56,7 @@ export class AuthSwagger {
         data: {
           id: 5,
           username: 'owner123',
-          agency_name: 'DreamHomes Agency',
+          agencyName: 'DreamHomes Agency',
         },
       }),
       ApiBadRequestResponse('Invalid registration data', {
@@ -70,13 +70,13 @@ export class AuthSwagger {
         repeatPassword: [
             "Repeat password must not be empty."
         ],
-        first_name: [
+        firstName: [
             "Name is required."
         ],
-        last_name: [
+        lastName: [
             "Last Name is required"
         ],
-          license_number: ['License number already exists'],
+          licenseNumber: ['License number already exists'],
           address:['Address is required.']
         },
       }),
@@ -93,7 +93,7 @@ export class AuthSwagger {
         data: {
           id: 12,
           username: 'agent007',
-          requested_role: 'agent',
+          requestedRole: 'agent',
         },
       }),
       ApiBadRequestResponse('Invalid agent registration data', {
@@ -107,17 +107,17 @@ export class AuthSwagger {
         repeatPassword: [
             "Repeat password must not be empty."
         ],
-        first_name: [
+        firstName: [
             "Name is required."
         ],
-        last_name: [
+        lastName: [
             "Last Name is required"
         ],
-        requested_role:[
+        requestedRole:[
           "U must select role agent | senior_agent | team_lead"
 
         ],
-          public_code: ['Invalid or expired public code'],
+          publicCode: ['Invalid or expired public code'],
         },
       }),
     

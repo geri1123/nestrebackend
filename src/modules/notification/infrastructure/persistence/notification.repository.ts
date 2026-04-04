@@ -31,31 +31,41 @@ export class NotificationRepository implements INotificationRepository {
       },
     });
   }
+async countAll(userId: number): Promise<number> {
+  return this.prisma.notification.count({
+    where: { userId },
+  });
+}
 
+async countByStatus(userId: number, status: NotificationStatus): Promise<number> {
+  return this.prisma.notification.count({
+    where: { userId, status },
+  });
+}
   async getNotifications(params: GetNotificationsParams) {
-    const { userId, languageCode, limit = 10, offset = 0, status } = params;
+  const { userId, languageCode, limit = 10, offset = 0, status } = params;
 
-    return this.prisma.notification.findMany({
-      where: {
-        userId,
-        ...(status && { status }),
-      },
-      include: {
-        notificationTranslation: languageCode
-          ? {
-              where: {
-              languageCode: languageCode,
-              },
-            }
-          : true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: limit,
-      skip: offset,
-    });
-  }
+  return this.prisma.notification.findMany({
+    where: {
+      userId,
+      ...(status ? { status } : {}),
+    },
+    include: {
+      notificationTranslation: languageCode
+        ? {
+            where: {
+              languageCode,
+            },
+          }
+        : true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit,
+    skip: offset,
+  });
+}
 
   async countUnread(userId: number): Promise<number> {
     return this.prisma.notification.count({

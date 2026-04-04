@@ -45,8 +45,8 @@ describe('RegisterUserUseCase', () => {
         username: 'john',
         email: 'john@test.com',
         password: '12345678',
-        first_name: 'John',
-        last_name: 'Doe',
+        firstName: 'John',
+        lastName: 'Doe',
       }, 'al'),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
@@ -60,8 +60,8 @@ describe('RegisterUserUseCase', () => {
         username: 'john',
         email: 'john@test.com',
         password: '12345678',
-        first_name: 'John',
-        last_name: 'Doe',
+        firstName: 'John',
+        lastName: 'Doe',
       }, 'al'),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
@@ -75,8 +75,8 @@ describe('RegisterUserUseCase', () => {
       username: 'john',
       email: 'john@test.com',
       password: '12345678',
-      first_name: 'John',
-      last_name: 'Doe',
+      firstName: 'John',
+      lastName: 'Doe',
     }, 'al');
 
     expect(userRepoMock.create).toHaveBeenCalled();
@@ -97,8 +97,8 @@ describe('RegisterUserUseCase', () => {
       username: 'john',
       email: 'john@test.com',
       password: '12345678',
-      first_name: 'John',
-      last_name: 'Doe',
+      firstName: 'John',
+      lastName: 'Doe',
     }, 'al', 'user', undefined, true);
 
     expect(userRepoMock.create).toHaveBeenCalled();

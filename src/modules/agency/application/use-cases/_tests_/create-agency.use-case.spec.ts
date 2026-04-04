@@ -30,7 +30,7 @@ describe('CreateAgencyUseCase', () => {
 
     await expect(
       useCase.execute(
-        { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
+        { agencyName: 'Dream', licenseNumber: 'LIC-1', address: 'Tirana' },
         1,
         AgencyStatus.active,
         'al',
@@ -44,7 +44,7 @@ describe('CreateAgencyUseCase', () => {
 
     await expect(
       useCase.execute(
-        { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
+        { agencyName: 'Dream', licenseNumber: 'LIC-1', address: 'Tirana' },
         1,
         AgencyStatus.active,
         'al',
@@ -58,7 +58,7 @@ describe('CreateAgencyUseCase', () => {
     repoMock.create.mockResolvedValue(10);
 
     const agencyId = await useCase.execute(
-      { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
+      { agencyName: 'Dream', licenseNumber: 'LIC-1', address: 'Tirana' },
       1,
       AgencyStatus.active,
       'al',

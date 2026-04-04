@@ -39,7 +39,7 @@ describe('RegisterAgencyFromUserUseCase', () => {
     createAgencyMock.execute.mockResolvedValue(15);
 
     const result = await useCase.execute(
-      { agency_name: 'Dream', license_number: 'LIC-1', address: 'Tirana' },
+      { agencyName: 'Dream', licenseNumber: 'LIC-1', address: 'Tirana' },
       5,
       'al',
     );

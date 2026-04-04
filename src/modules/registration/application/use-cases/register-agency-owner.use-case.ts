@@ -21,8 +21,8 @@ export class RegisterAgencyOwnerUseCase {
   async execute(dto: RegisterAgencyOwnerDto, lang: SupportedLang) {
     await this.validateAgencyUseCase.execute(
       {
-        agency_name: dto.agency_name,
-        license_number: dto.license_number,
+        agencyName: dto.agencyName,
+        licenseNumber: dto.licenseNumber,
         address: dto.address,
       },
       lang,
@@ -34,8 +34,8 @@ export class RegisterAgencyOwnerUseCase {
           username: dto.username,
           email: dto.email,
           password: dto.password,
-          first_name: dto.first_name,
-          last_name: dto.last_name,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
         },
         lang,
         'agency_owner',
@@ -45,8 +45,8 @@ export class RegisterAgencyOwnerUseCase {
 
       const agencyId = await this.createAgencyUseCase.execute(
         {
-          agency_name: dto.agency_name,
-          license_number: dto.license_number,
+          agencyName: dto.agencyName,
+          licenseNumber: dto.licenseNumber,
           address: dto.address,
         },
         userData.userId,

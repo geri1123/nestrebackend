@@ -18,7 +18,7 @@ export class GetAgencyByPublicCodeUseCase {
         success: false,
         message: t('validationFailed', language),
         errors:{
-          public_code: [t('agencyNotFound', language)],
+          publicCode: [t('agencyNotFound', language)],
         }
       });
     }

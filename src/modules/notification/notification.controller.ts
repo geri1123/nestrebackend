@@ -47,22 +47,31 @@ export class NotificationController {
     const userId = req['userId'];
     return this.notificationService.markAllAsRead(userId);
   }
+@Get()
+async getMyNotifications(
+  @Req() req: RequestWithUser,
+  @Query('page', new ParseIntPipe({ optional: true })) page = 1,
+  @Query('limit', new ParseIntPipe({ optional: true })) limit = 10,
+  @Query('status') status?: 'read' | 'unread',
+) {
+  const language = req.language;
+  const userId = req.userId;
 
-  // ── Collection routes ──────────────────────────────────
+  const result = await this.notificationService.getUserNotifications(
+    userId,
+    language,
+    page,
+    limit,
+    status, // pass status
+  );
 
-  @Get()
-  async getMyNotifications(
-    @Req() req: RequestWithUser,
-    @Query('limit', new ParseIntPipe({ optional: true })) limit = 10,
-    @Query('offset', new ParseIntPipe({ optional: true })) offset = 0,
-  ) {
-    const language = req.language;
-    const userId = req.userId;
-    const notifications = await this.notificationService.getUserNotifications(userId, language, limit, offset);
-    const unreadCount = await this.notificationService.countUnreadNotifications(userId);
-    return { notifications, unreadCount, total: notifications.length, limit, offset };
-  }
+  const unreadCount = await this.notificationService.countUnreadNotifications(userId);
 
+  return {
+    ...result,
+    unreadCount,
+  };
+}
   @Post()
   async createNotification(@Body() data: CreateNotificationDto) {
     return this.notificationService.sendNotification(data);

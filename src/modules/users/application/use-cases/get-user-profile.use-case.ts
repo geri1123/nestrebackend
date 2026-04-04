@@ -2,58 +2,38 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { t, SupportedLang } from '../../../../locales';
-import { AgencyAgentRoleInAgency, UserRole } from '@prisma/client';
-import { AgentContextService } from '../../../../infrastructure/auth/services/agent-context.service';
-import { AgencyOwnerContextService } from '../../../../infrastructure/auth/services/agency-owner-context.service';
-import { AgentStatus } from '../../../agent/domain/types/agent-status.type';
-import { AgencyStatus } from '../../../agency/domain/types/agency-status.type';
-import { AgentPermissions } from '../../../../common/types/permision.type';
-import { AgentPermissionsResponse } from '../../responses/types/agent-permissions.response.type';
-
+import { UserRole } from '@prisma/client';
+import {
+  AGENT_PROFILE_PORT,
+  type IAgentProfilePort,
+  type AgentProfileData,
+} from '../../../agent/application/ports/agent-profile.port';
+import {
+  AGENCY_OWNER_PROFILE_PORT,
+  type IAgencyOwnerProfilePort,
+  type AgencyData,
+} from '../../../agency/application/ports/agency-owner-profile.port';
+ 
 export interface UserProfileData {
   user: User;
-  agentProfile?: {
-    agencyAgentId: number;
-    roleInAgency: AgencyAgentRoleInAgency;
-    status: AgentStatus;
-    commissionRate: number | null;
-    startDate: Date | null;
-    updatedAt: Date | null;
-    permissions: AgentPermissions;
-    agency: {
-      id: number;
-      name: string;
-      email: string | null;
-      logo: string | null;
-      website: string | null;
-      status: AgencyStatus;
-    };
-  };
-  agency?: {
-    id: number;
-    name: string;
-    email: string | null;
-    logo: string | null;
-    status: AgencyStatus;
-    address: string | null;
-    phone: string | null;
-    website: string | null;
-    licenseNumber: string;
-    publicCode: string | null;
-  };
+  agentProfile?: AgentProfileData;
+  agency?: AgencyData;
 }
-
+ 
 @Injectable()
 export class GetUserProfileUseCase {
   constructor(
-    @Inject(USER_REPO) private readonly userRepository: IUserDomainRepository,
-    private readonly agentContextService: AgentContextService,
-    private readonly agencyOwnerContextService: AgencyOwnerContextService,
+    @Inject(USER_REPO)
+    private readonly userRepository: IUserDomainRepository,
+    @Inject(AGENT_PROFILE_PORT)
+    private readonly agentProfilePort: IAgentProfilePort,
+    @Inject(AGENCY_OWNER_PROFILE_PORT)
+    private readonly agencyOwnerProfilePort: IAgencyOwnerProfilePort,
   ) {}
-
+ 
   async execute(userId: number, language: SupportedLang = 'al'): Promise<UserProfileData> {
     const user = await this.userRepository.findById(userId);
-    
+ 
     if (!user) {
       throw new NotFoundException({
         success: false,
@@ -61,19 +41,18 @@ export class GetUserProfileUseCase {
         errors: { user: [t('userNotFound', language)] },
       });
     }
-
+ 
     const result: UserProfileData = { user };
-
-    // Add agent profile if user is an agent
+ 
     if (user.role === UserRole.agent) {
-      result.agentProfile = await this.agentContextService.getAgentProfileData(userId, language);
+      result.agentProfile = await this.agentProfilePort.getAgentProfileData(userId, language);
     }
-
-    // Add agency if user is an agency owner
+ 
     if (user.role === UserRole.agency_owner) {
-      result.agency = await this.agencyOwnerContextService.getAgencyData(userId, language);
+      result.agency = await this.agencyOwnerProfilePort.getAgencyData(userId, language);
     }
-
+ 
     return result;
   }
 }
+ 

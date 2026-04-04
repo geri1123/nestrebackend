@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
-import { IUserDomainRepository , CreateUserData  , UpdateUserFields } from '../../domain/repositories/user.repository.interface';
+import { IUserDomainRepository, CreateUserData, UpdateUserFields } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
-import { hashPassword } from '../../../../common/utils/hash';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -35,7 +34,6 @@ export class UserRepository implements IUserDomainRepository {
 
     if (!user) return null;
 
-    // Map camelCase to snake_case for entity
     return User.create({
       id: user.id,
       username: user.username,
@@ -49,10 +47,10 @@ export class UserRepository implements IUserDomainRepository {
       phone: user.phone,
       status: user.status,
       email_verified: user.emailVerified,
-      last_login: user.lastLogin?.toISOString() ?? null,
-      created_at: user.createdAt.toISOString(),
-      updated_at: user.updatedAt?.toISOString() ?? null,
-    } as any);
+      last_login: user.lastLogin,
+      created_at: user.createdAt,
+      updated_at: user.updatedAt,
+    });
   }
 
   async findByIdentifier(identifier: string): Promise<User | null> {
@@ -79,7 +77,6 @@ export class UserRepository implements IUserDomainRepository {
 
     if (!user) return null;
 
-    // Map camelCase to snake_case for entity
     return User.create({
       id: user.id,
       username: user.username,
@@ -93,10 +90,10 @@ export class UserRepository implements IUserDomainRepository {
       profile_img_url: user.profileImgUrl,
       profile_img_public_id: user.profileImgPublicId,
       phone: user.phone,
-      last_login: user.lastLogin?.toISOString() ?? null,
-      created_at: user.createdAt.toISOString(),
-      updated_at: user.updatedAt?.toISOString() ?? null,
-    } as any);
+      last_login: user.lastLogin,
+      created_at: user.createdAt,
+      updated_at: user.updatedAt,
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -123,7 +120,6 @@ export class UserRepository implements IUserDomainRepository {
 
     if (!user) return null;
 
-    // Map camelCase to snake_case for entity
     return User.create({
       id: user.id,
       email: user.email,
@@ -137,10 +133,10 @@ export class UserRepository implements IUserDomainRepository {
       profile_img_url: user.profileImgUrl,
       profile_img_public_id: user.profileImgPublicId,
       phone: user.phone,
-      last_login: user.lastLogin?.toISOString() ?? null,
-      created_at: user.createdAt.toISOString(),
-      updated_at: user.updatedAt?.toISOString() ?? null,
-    } as any);
+      last_login: user.lastLogin,
+      created_at: user.createdAt,
+      updated_at: user.updatedAt,
+    });
   }
 
   async usernameExists(username: string): Promise<boolean> {
@@ -159,24 +155,21 @@ export class UserRepository implements IUserDomainRepository {
     return !!user;
   }
 
-  async create(
-    data: CreateUserData,
-    tx?: Prisma.TransactionClient
-  ): Promise<number> {
+  // Password MUST already be hashed by the calling use case
+  async create(data: CreateUserData, tx?: Prisma.TransactionClient): Promise<number> {
     const client = tx ?? this.prisma;
-    const hashedPassword = await hashPassword(data.password);
     const result = await client.user.create({
       data: {
         username: data.username,
         email: data.email,
-        password: hashedPassword,
-        firstName: data.first_name,
-        lastName: data.last_name,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
         role: data.role,
         status: data.status as any,
-        emailVerified: data.email_verified ?? false,
-        googleUser: data.google_user ?? false,     
-        googleId: data.google_id ?? null,  
+        emailVerified: data.emailVerified ?? false,
+        googleUser: data.google_user ?? false,
+        googleId: data.google_id ?? null,
       },
     });
     return result.id;
@@ -185,13 +178,11 @@ export class UserRepository implements IUserDomainRepository {
   async updateFields(
     userId: number,
     fields: Partial<UpdateUserFields>,
-    tx?: Prisma.TransactionClient
+    tx?: Prisma.TransactionClient,
   ): Promise<void> {
     const client = tx ?? this.prisma;
-
-    // Map snake_case to camelCase for Prisma
     const prismaFields: any = {};
-    
+
     if (fields.first_name !== undefined) prismaFields.firstName = fields.first_name;
     if (fields.last_name !== undefined) prismaFields.lastName = fields.last_name;
     if (fields.about_me !== undefined) prismaFields.aboutMe = fields.about_me;
@@ -207,10 +198,7 @@ export class UserRepository implements IUserDomainRepository {
 
     prismaFields.updatedAt = new Date();
 
-    await client.user.update({
-      where: { id: userId },
-      data: prismaFields,
-    });
+    await client.user.update({ where: { id: userId }, data: prismaFields });
   }
 
   async updateUsername(userId: number, newUsername: string): Promise<void> {
@@ -220,37 +208,30 @@ export class UserRepository implements IUserDomainRepository {
     });
   }
 
-  async updateProfileImage(
-    userId: number,
-    imageUrl: string,
-    publicId: string,
-  ): Promise<void> {
+  async updateProfileImage(userId: number, imageUrl: string, publicId: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: {
-        profileImgUrl: imageUrl,
-        profileImgPublicId: publicId,
-        updatedAt: new Date(),
-      },
+      data: { profileImgUrl: imageUrl, profileImgPublicId: publicId, updatedAt: new Date() },
     });
   }
 
   async deleteProfileImage(userId: number): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: {
-        profileImgUrl: null,
-        profileImgPublicId: null,
-        updatedAt: new Date(),
-      },
+      data: { profileImgUrl: null, profileImgPublicId: null, updatedAt: new Date() },
     });
   }
 
-  async verifyEmail(userId: number, emailVerified: boolean, status: string, tx?: Prisma.TransactionClient): Promise<void> {
+  async verifyEmail(
+    userId: number,
+    emailVerified: boolean,
+    status: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
     const client = tx ?? this.prisma;
     await client.user.update({
       where: { id: userId },
-      data: { emailVerified: emailVerified, status: status as any, updatedAt: new Date() },
+      data: { emailVerified, status: status as any, updatedAt: new Date() },
     });
   }
 
@@ -268,14 +249,7 @@ export class UserRepository implements IUserDomainRepository {
     });
 
     return user
-      ? new NavbarUser(
-          user.username,
-          user.email,
-          user.profileImgUrl,
-          user.lastLogin,
-          user.createdAt,
-          user.role,
-        )
+      ? new NavbarUser(user.username, user.email, user.profileImgUrl, user.lastLogin, user.createdAt, user.role)
       : null;
   }
 
@@ -292,23 +266,12 @@ export class UserRepository implements IUserDomainRepository {
 
   async findByIdentifierForAuth(identifier: string) {
     const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: identifier }, { username: identifier }]
-      },
-      select: {
-        id: true,
-        password: true,
-        status: true,
-        role: true,
-        username: true,
-        email: true,
-        emailVerified: true,
-      }
+      where: { OR: [{ email: identifier }, { username: identifier }] },
+      select: { id: true, password: true, status: true, role: true, username: true, email: true, emailVerified: true },
     });
 
     if (!user) return null;
 
-    // Map camelCase to snake_case for interface
     return {
       id: user.id,
       password: user.password,
@@ -323,38 +286,22 @@ export class UserRepository implements IUserDomainRepository {
   async findByIdWithPassword(userId: number) {
     return this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        password: true,
-      },
+      select: { id: true, password: true },
     });
   }
 
-  async updatePassword(userId: number, newPassword: string): Promise<void> {
-    const hashed = await hashPassword(newPassword);
-
+  // Password MUST already be hashed by the calling use case
+  async updatePassword(userId: number, hashedPassword: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: {
-        password: hashed,
-        updatedAt: new Date(),
-      },
+      data: { password: hashedPassword, updatedAt: new Date() },
     });
   }
 
   async findByIdentifierForVerification(identifier: string) {
     const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: identifier }, { username: identifier }],
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        role: true,
-        status: true,
-        emailVerified: true,
-      },
+      where: { OR: [{ email: identifier }, { username: identifier }] },
+      select: { id: true, email: true, firstName: true, role: true, status: true, emailVerified: true },
     });
 
     if (!user) return null;

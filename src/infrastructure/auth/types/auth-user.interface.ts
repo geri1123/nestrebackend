@@ -1,13 +1,13 @@
 import { userRole } from '../../../modules/users/domain/types/user-role.type';
 import { userStatus } from '../../../modules/users/domain/types/user-status.type';
-
+// auth-user.interface.ts
 export interface AuthUser {
   id: number;
   username: string;
   role: userRole;
-  email:string;
+  email: string;
   status: userStatus;
-  profileImgUrl:string | null;
+  profileImgUrl: string | null;
   emailVerified: boolean;
-  createdAt:string;
+  createdAt: Date;  
 }

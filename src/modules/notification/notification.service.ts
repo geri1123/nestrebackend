@@ -54,19 +54,33 @@ export class NotificationService {
       throw error;
     }
   }
-  async getUserNotifications(
-    userId: number,
-    language: SupportedLang = 'al',
-    limit = 10,
-    offset = 0,
-  ) {
-    return this.notificationRepo.getNotifications({
+ async getUserNotifications(
+  userId: number,
+  language: SupportedLang = 'al',
+  page = 1,
+  limit = 10,
+  status?: 'read' | 'unread'
+) {
+  const offset = (page - 1) * limit;
+
+  const [notifications, total] = await Promise.all([
+    this.notificationRepo.getNotifications({
       userId,
       languageCode: language,
       limit,
       offset,
-    });
-  }
+      status, // pass the filter to repository
+    }),
+    status ? this.notificationRepo.countByStatus(userId, status) : this.notificationRepo.countAll(userId),
+  ]);
+
+  return {
+    data: notifications,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
 
   async countUnreadNotifications(userId: number) {
     return this.notificationRepo.countUnread(userId);

@@ -12,7 +12,7 @@ export class ValidateAgentRegistrationDataUseCase {
   ) {}
 
   async execute(dto: RegisterAgentDto, lang: SupportedLang) {
-    const agency = await this.getAgencyByPublicCode.execute(dto.public_code, lang);
+    const agency = await this.getAgencyByPublicCode.execute(dto.publicCode, lang);
     
     return agency;
   }

@@ -17,7 +17,7 @@ describe('AuthContextService', () => {
     status: UserStatus.active,
     emailVerified: true,
     profileImgUrl: null,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
   };
 
   beforeEach(() => {
@@ -94,7 +94,10 @@ describe('AuthContextService', () => {
   describe('updateLastActive', () => {
     it('calls userRepository.updateFields', async () => {
       await service.updateLastActive(1);
-      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(1, expect.objectContaining({ last_active: expect.any(Date) }));
+      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ last_active: expect.any(Date) })
+      );
     });
   });
 
@@ -107,7 +110,10 @@ describe('AuthContextService', () => {
       expect(authTokenServiceMock.verifyAccessToken).toHaveBeenCalledWith('token123');
       expect(getUserProfileMock.execute).toHaveBeenCalledWith(1, 'en');
       expect(context.userId).toBe(mockUser.id);
-      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(1, expect.objectContaining({ last_active: expect.any(Date) }));
+      expect(userRepositoryMock.updateFields).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ last_active: expect.any(Date) })
+      );
     });
   });
 });
