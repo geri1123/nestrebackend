@@ -24,13 +24,14 @@ export interface IUserDomainRepository {
   findUnverifiedBefore(date: Date): Promise<{ id: number }[]>;
 deleteById(userId: number): Promise<void>;
  findByIdWithPassword(userId: number): Promise<{
-    id: number;
-    password: string;} | null>;
+  id: number;
+  password: string | null;
+} | null>;
     findByIdentifierForAuth(
   identifier: string
 ): Promise<{
   id: number;
-  password: string;
+  password: string | null;
   email: string;
   username: string;
   status: string;
@@ -52,7 +53,7 @@ deleteById(userId: number): Promise<void>;
 export interface CreateUserData {
   username: string;
   email: string;
-  password: string;
+  password: string | null;
   firstName: string | null;
   lastName: string | null;
   role: 'user' | 'agency_owner' | 'agent';

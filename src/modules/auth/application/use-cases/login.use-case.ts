@@ -25,6 +25,9 @@ export class LoginUseCase {
     if (!authUser) {
       throw new UnauthorizedException({ message: t('invalidCredentials', lang) });
     }
+if (!authUser.password) {
+  throw new UnauthorizedException({ message: t('invalidCredentials', lang) });
+}
 
     const isMatch = await comparePassword(password, authUser.password);
     if (!isMatch) {

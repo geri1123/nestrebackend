@@ -171,7 +171,7 @@ export class AuthController {
 
   // ── Logout 
   @Post('logout')
-  @Throttle({ default: { limit: 3, ttl: 600 } })
+  // @Throttle({ default: { limit: 3, ttl: 600 } })
   @HttpCode(HttpStatus.OK)
   logout(
     @Req() req: RequestWithUser,

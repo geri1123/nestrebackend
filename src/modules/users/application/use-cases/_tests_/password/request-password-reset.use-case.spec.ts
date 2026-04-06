@@ -42,13 +42,10 @@ describe('RequestPasswordResetUseCase', () => {
   });
 
   it('sends password reset email when user exists and is active', async () => {
-    const user = new User(
-      1, 'john', 'john@test.com', 'John',
-      null, null, null, null, null,
-      'user', 'active', true,
-      new Date(), null, null,
-    );
-
+   const user = new User(
+  1, 'john', 'john@test.com', 'John', null, null, null, null, null,
+  'user', 'active', true, new Date(), null, null, false, null
+);
     userRepo.findByEmail.mockResolvedValue(user);
 
     await useCase.execute('john@test.com', 'en');
@@ -82,12 +79,9 @@ describe('RequestPasswordResetUseCase', () => {
 
   it('throws NotFoundException if user is inactive', async () => {
     const inactiveUser = new User(
-      2, 'mark', 'mark@test.com', null,
-      null, null, null, null, null,
-      'user', 'inactive', true,
-      new Date(), null, null,
-    );
-
+  2, 'mark', 'mark@test.com', 'Mark', null, null, null, null, null,
+  'user', 'inactive', true, new Date(), null, null, false, null
+);
     userRepo.findByEmail.mockResolvedValue(inactiveUser);
 
     await expect(

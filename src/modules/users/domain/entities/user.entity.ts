@@ -18,9 +18,10 @@ export class User {
     public readonly createdAt: Date,
     public readonly updatedAt: Date | null,
     public readonly lastLogin: Date | null,
+    public readonly googleUser: boolean,        
+    public readonly googleId: string | null,
   ) {}
 
-  /* ---------- FACTORY ---------- */
   static create(props: {
     id: number;
     username: string;
@@ -37,6 +38,8 @@ export class User {
     created_at: Date | string;
     updated_at: Date | string | null;
     last_login: Date | string | null;
+    google_user?: boolean;       
+    google_id?: string | null;   
   }): User {
     return new User(
       props.id,
@@ -54,10 +57,10 @@ export class User {
       props.created_at instanceof Date ? props.created_at : new Date(props.created_at),
       props.updated_at ? (props.updated_at instanceof Date ? props.updated_at : new Date(props.updated_at)) : null,
       props.last_login ? (props.last_login instanceof Date ? props.last_login : new Date(props.last_login)) : null,
+      props.google_user ?? false,      
+      props.google_id ?? null,         
     );
   }
-
-  /* ---------- DOMAIN RULES ---------- */
 
   isActive(): boolean {
     return this.status === 'active' && this.emailVerified;
@@ -79,6 +82,10 @@ export class User {
     return this.isActive();
   }
 
+  isGoogleUser(): boolean {
+    return this.googleUser;   
+  }
+
   canUpdateUsername(lastChangeDate: Date | null, daysLimit = 60): boolean {
     if (!lastChangeDate) return true;
     const days = (Date.now() - lastChangeDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -92,20 +99,18 @@ export class User {
     phone?: string;
   }): void {
     if (data.firstName !== undefined) this.firstName = data.firstName;
-    if (data.lastName !== undefined) this.lastName = data.lastName;
-    if (data.aboutMe !== undefined) this.aboutMe = data.aboutMe;
-    if (data.phone !== undefined) this.phone = data.phone;
+    if (data.lastName !== undefined)  this.lastName  = data.lastName;
+    if (data.aboutMe !== undefined)   this.aboutMe   = data.aboutMe;
+    if (data.phone !== undefined)     this.phone     = data.phone;
   }
 
-  /* ---------- IMAGE LOGIC ---------- */
-
   updateProfileImage(url: string, publicId: string) {
-    this.profileImgUrl = url;
+    this.profileImgUrl    = url;
     this.profileImgPublicId = publicId;
   }
 
   removeProfileImage() {
-    this.profileImgUrl = null;
+    this.profileImgUrl      = null;
     this.profileImgPublicId = null;
   }
 

@@ -162,7 +162,7 @@ export class UserRepository implements IUserDomainRepository {
       data: {
         username: data.username,
         email: data.email,
-        password: data.password,
+          password:      data.password ?? null,
         firstName: data.firstName,
         lastName: data.lastName,
         role: data.role,

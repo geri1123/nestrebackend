@@ -194,10 +194,11 @@ export class AgencyController {
       req.userId,
       req.language,
     );
-
+const fullAgency = await this.getAgencyInfo.execute(agency.agencyId, req.language, true);
     return {
+      success: true,
       message: t('agencyCreatedSuccessfully', req.language),
-      agency,
+      agency: fullAgency,
     };
   }
 }

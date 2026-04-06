@@ -240,7 +240,7 @@ model User {
   id                           Int                    @id @default(autoincrement())
   username                     String                 @unique(map: "user_username_key")
   email                        String                 @unique(map: "user_email_key")
-  password                     String
+ password                      String?
   firstName                    String?                @map("first_name")
   lastName                     String?                @map("last_name")
   aboutMe                      String?                @map("about_me") @db.Text

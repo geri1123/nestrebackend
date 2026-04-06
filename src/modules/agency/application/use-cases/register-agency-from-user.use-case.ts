@@ -22,7 +22,14 @@ export class RegisterAgencyFromUserUseCase {
     userId: number,
     language: SupportedLang = 'al',
   ): Promise<{ agencyId: number }> {
+      const existingAgency = await this.prisma.agency.findUnique({
+    where: { ownerUserId: userId },
+    select: { id: true },
+  });
 
+ if (existingAgency) {
+    throw new Error('You already have an agency');
+  }
     return this.prisma.$transaction(async (tx) => {
 
       

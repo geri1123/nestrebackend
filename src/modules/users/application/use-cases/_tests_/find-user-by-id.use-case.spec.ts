@@ -30,9 +30,9 @@ describe('FindUserByIdUseCase', () => {
       1,
       'john',
       'john@test.com',
-      null,
-      null,
-      null,
+      'John',
+      'Doe',
+      'About me',
       null,
       null,
       null,
@@ -41,6 +41,8 @@ describe('FindUserByIdUseCase', () => {
       true,
       new Date(),
       null,
+      null,
+      false,
       null,
     );
 
@@ -55,8 +57,17 @@ describe('FindUserByIdUseCase', () => {
   it('throws NotFoundException when user not found', async () => {
     userRepo.findById.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute(999, 'al'),
-    ).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(999, 'en')).rejects.toThrow(NotFoundException);
+  });
+
+  it('throws NotFoundException with localized message', async () => {
+    userRepo.findById.mockResolvedValue(null);
+
+    await expect(useCase.execute(999, 'al')).rejects.toMatchObject({
+      response: {
+        success: false,
+        message: expect.any(String), // mund të verifikosh mesazhin e saktë nëse e di
+      },
+    });
   });
 });

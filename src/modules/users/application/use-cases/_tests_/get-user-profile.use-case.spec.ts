@@ -5,6 +5,7 @@ import { USER_REPO } from '../../../domain/repositories/user.repository.interfac
 import { User } from '../../../domain/entities/user.entity';
 import { AGENT_PROFILE_PORT } from '../../../../agent/application/ports/agent-profile.port';
 import { AGENCY_OWNER_PROFILE_PORT } from '../../../../agency/application/ports/agency-owner-profile.port';
+import { UserRole } from '@prisma/client';
 
 describe('GetUserProfileUseCase', () => {
   let useCase: GetUserProfileUseCase;
@@ -29,8 +30,25 @@ describe('GetUserProfileUseCase', () => {
   });
 
   it('returns profile for regular user without extra data', async () => {
-    const user = new User(1, 'john', 'john@test.com', null, null, null, null, null, null,
-      'user', 'active', true, new Date(), null, null);
+    const user = new User(
+      1,
+      'regularUser',
+      'user@test.com',
+      'Regular',
+      'User',
+      null,
+      null,
+      null,
+      null,
+      UserRole.user, // Regular user
+      'active',
+      true,
+      new Date(),
+      null,
+      null,
+      false, // googleUser
+      null   // googleId
+    );
 
     userRepo.findById.mockResolvedValue(user);
 
@@ -43,8 +61,25 @@ describe('GetUserProfileUseCase', () => {
   });
 
   it('returns agentProfile for agent user', async () => {
-    const user = new User(2, 'agent1', 'agent@test.com', null, null, null, null, null, null,
-      'agent', 'active', true, new Date(), null, null);
+    const user = new User(
+      2,
+      'agent1',
+      'agent@test.com',
+      'Agent',
+      'User',
+      null,
+      null,
+      null,
+      null,
+      UserRole.agent, // Correct role
+      'active',
+      true,
+      new Date(),
+      null,
+      null,
+      false,
+      null
+    );
 
     const mockAgentProfile = {
       agencyAgentId: 10,
@@ -61,8 +96,16 @@ describe('GetUserProfileUseCase', () => {
         can_delete_posts: false,
         can_manage_agents: false,
       },
-      agency: { id: 1, name: 'Test Agency', email: null, logo: null, website: null,
-        status: 'active', address: 'Tirana', publicCode: null },
+      agency: {
+        id: 1,
+        name: 'Test Agency',
+        email: null,
+        logo: null,
+        website: null,
+        status: 'active',
+        address: 'Tirana',
+        publicCode: null,
+      },
     };
 
     userRepo.findById.mockResolvedValue(user);
@@ -78,13 +121,37 @@ describe('GetUserProfileUseCase', () => {
   });
 
   it('returns agency for agency_owner user', async () => {
-    const user = new User(3, 'owner1', 'owner@test.com', null, null, null, null, null, null,
-      'agency_owner', 'active', true, new Date(), null, null);
+    const user = new User(
+      3,
+      'owner1',
+      'owner@test.com',
+      'Owner',
+      'One',
+      null,
+      null,
+      null,
+      null,
+      UserRole.agency_owner, // Correct role
+      'active',
+      true,
+      new Date(),
+      null,
+      null,
+      false,
+      null
+    );
 
     const mockAgency = {
-      id: 1, name: 'Test Agency', email: 'a@test.com', logo: null,
-      status: 'active', address: '123 St', phone: '123', website: null,
-      licenseNumber: 'LIC001', publicCode: 'PUB001',
+      id: 1,
+      name: 'Test Agency',
+      email: 'a@test.com',
+      logo: null,
+      status: 'active',
+      address: '123 St',
+      phone: '123',
+      website: null,
+      licenseNumber: 'LIC001',
+      publicCode: 'PUB001',
     };
 
     userRepo.findById.mockResolvedValue(user);
