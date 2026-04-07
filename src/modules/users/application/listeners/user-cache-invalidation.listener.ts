@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UserUpdatedEvent } from '../../events/user-updated.event';
+import { UserUpdatedEvent } from '../events/user-updated.event';
 import { CacheService } from '../../../../infrastructure/cache/cache.service';
 
 @Injectable()

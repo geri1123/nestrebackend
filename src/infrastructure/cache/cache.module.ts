@@ -7,6 +7,7 @@ import { CacheService } from './cache.service';
 import { CACHE_KEYV } from './cache.constants';
 
 import { ClearCache } from './cache.controller';
+import { UserCacheInvalidationListener } from './user-cache-invalidation.listener';
 @Module({
   controllers:[ClearCache],
   providers: [
@@ -16,9 +17,8 @@ import { ClearCache } from './cache.controller';
      useFactory: async (config: AppConfigService) => {
   const redisStore = new KeyvRedis(config.redisUrl);
 
-  // 🔥 kap error direkt nga Redis (shumë e rëndësishme)
   redisStore.on('error', (err: any) => {
-    console.error('❌ Redis Store Error:', err.message);
+    console.error(' Redis Store Error:', err.message);
   });
 
   const keyv = new Keyv({
@@ -27,7 +27,7 @@ import { ClearCache } from './cache.controller';
 
   // fallback error listener
   keyv.on('error', (err) => {
-    console.error('❌ Keyv Error:', err.message);
+    console.error(' Keyv Error:', err.message);
   });
 
   try {
@@ -45,6 +45,7 @@ import { ClearCache } from './cache.controller';
 }
     },
     CacheService,
+    UserCacheInvalidationListener
   ],
   exports: [CacheService],
 })

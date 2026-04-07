@@ -1,5 +1,6 @@
-import { BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { UploadProfileImageUseCase } from '../update-profile-image.use-case';
+import { UserEventPublisher } from '../../events/user-event.publisher';
 
 describe('UploadProfileImageUseCase', () => {
   let useCase: UploadProfileImageUseCase;
@@ -18,35 +19,36 @@ describe('UploadProfileImageUseCase', () => {
     validateFile: jest.fn(),
   } as any;
 
-  const validFile = {
-    mimetype: 'image/png',
-    size: 1024,
-  } as any;
+  const userEventPublisher = {
+    userUpdated: jest.fn(),
+  } as Partial<UserEventPublisher>;
+
+  const validFile = { mimetype: 'image/png', size: 1024 } as any;
 
   const user = {
     profileImgPublicId: null,
     updateProfileImage: jest.fn(),
   };
-const eventEmitter = {
-  emit: jest.fn(),
-} as any;
+
   beforeEach(() => {
     jest.clearAllMocks();
-  useCase = new UploadProfileImageUseCase(
-  userRepo,
-  cloudinary,
-  imageUtils,
-  eventEmitter,
-);
+    useCase = new UploadProfileImageUseCase(
+      userRepo,
+      cloudinary,
+      imageUtils,
+      userEventPublisher as UserEventPublisher
+    );
   });
 
   it('should throw NotFoundException if user does not exist', async () => {
     imageUtils.validateFile.mockImplementation(() => {});
     userRepo.findById.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute(1, validFile, 'en'),
-    ).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute(1, validFile, 'en'))
+      .rejects
+      .toThrow(NotFoundException);
+
+    expect(userEventPublisher.userUpdated).not.toHaveBeenCalled();
   });
 
   it('should upload image and update user successfully', async () => {
@@ -61,12 +63,11 @@ const eventEmitter = {
     const result = await useCase.execute(1, validFile, 'en');
 
     expect(cloudinary.uploadFile).toHaveBeenCalled();
-    expect(userRepo.updateProfileImage).toHaveBeenCalledWith(
-      1,
-      'http://img.test',
-      'img-1',
-    );
+    expect(user.updateProfileImage).toHaveBeenCalledWith('http://img.test', 'img-1');
+    expect(userRepo.updateProfileImage).toHaveBeenCalledWith(1, 'http://img.test', 'img-1');
+    expect(userEventPublisher.userUpdated).toHaveBeenCalledWith(1);
     expect(result.url).toBe('http://img.test');
+    expect(result.publicId).toBe('img-1');
   });
 
   it('should rollback cloudinary upload if DB update fails', async () => {
@@ -80,10 +81,11 @@ const eventEmitter = {
 
     userRepo.updateProfileImage.mockRejectedValue(new Error('DB error'));
 
-    await expect(
-      useCase.execute(1, validFile, 'en'),
-    ).rejects.toThrow(InternalServerErrorException);
+    await expect(useCase.execute(1, validFile, 'en'))
+      .rejects
+      .toThrow(InternalServerErrorException);
 
     expect(cloudinary.deleteFile).toHaveBeenCalledWith('img-1');
+    expect(userEventPublisher.userUpdated).not.toHaveBeenCalled();
   });
 });

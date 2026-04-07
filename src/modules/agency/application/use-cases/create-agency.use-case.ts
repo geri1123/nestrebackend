@@ -3,7 +3,8 @@ import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositor
 import { AgencyStatus, Prisma } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UserEventPublisher } from '../../../users/application/events/user-event.publisher';
 export interface CreateAgencyData {
   agencyName: string;
   licenseNumber: string;
@@ -15,7 +16,8 @@ export class CreateAgencyUseCase {
   constructor(
     @Inject(AGENCY_REPO)
     private readonly agencyRepository: IAgencyDomainRepository,
-  
+    // private readonly eventEmitter: EventEmitter2,
+    private readonly userEventPublisher: UserEventPublisher,
   ) {}
 
   async execute(
@@ -42,15 +44,17 @@ export class CreateAgencyUseCase {
     }
 
     // CREATE AGENCY
-    return await this.agencyRepository.create({
-      agencyName: data.agencyName,
-      licenseNumber: data.licenseNumber,
-      address: data.address,
-      ownerUserId: ownerUserId,
-      status,
-     
-    },
-  
-   tx);
+   const agencyId = await this.agencyRepository.create({
+  agencyName: data.agencyName,
+  licenseNumber: data.licenseNumber,
+  address: data.address,
+  ownerUserId: ownerUserId,
+  status,
+}, tx);
+await this.userEventPublisher.userUpdated(ownerUserId);
+
+return agencyId;
+
   }
+  
 }

@@ -37,6 +37,7 @@ import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
 import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { UserEventPublisher } from './application/events/user-event.publisher';
 
 // NOTE: AGENT_PROFILE_PORT and AGENCY_OWNER_PROFILE_PORT are provided by
 // AgencyContextModule (@Global), so they are available without importing here.
@@ -48,6 +49,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   providers: [
     { provide: USER_REPO, useClass: UserRepository },
     { provide: USERNAME_REPO, useClass: UsernameHistoryRepository },
+    UserEventPublisher,
     EventEmitterModule,
     ChangePasswordUseCase,
     FindUnverifiedUsersUseCase,
@@ -72,6 +74,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   ],
   exports: [
     USER_REPO,
+    UserEventPublisher,
     GetUserProfileUseCase,
     UpdateUserFieldsUseCase,
     FindUnverifiedUsersUseCase,

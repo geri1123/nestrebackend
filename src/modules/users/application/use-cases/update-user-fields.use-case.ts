@@ -7,6 +7,7 @@ import {
 import { SupportedLang } from "../../../../locales";
 import { FindUserByIdUseCase } from "./find-user-by-id.use-case";
 import { Prisma } from "@prisma/client";
+import { UserEventPublisher } from "../events/user-event.publisher";
 
 @Injectable()
 export class UpdateUserFieldsUseCase {
@@ -14,20 +15,42 @@ export class UpdateUserFieldsUseCase {
     @Inject(USER_REPO)
     private readonly repo: IUserDomainRepository,
     private readonly findUserById: FindUserByIdUseCase, 
+    private readonly userEventPublisher: UserEventPublisher,
   ) {}
+async execute(
+  userId: number,
+  fields: Partial<UpdateUserFields>,
+  lang: SupportedLang = "al",
+  tx?: Prisma.TransactionClient,
+) {
+  const user = await this.findUserById.execute(userId, lang);
 
-  async execute(
-    userId: number,
-    fields: Partial<UpdateUserFields>,
-    lang: SupportedLang = "al",
-    tx?: Prisma.TransactionClient,
-  ) {
-    
-    const user = await this.findUserById.execute(userId, lang);
+  await this.repo.updateFields(userId, fields, tx);
 
-    
-    await this.repo.updateFields(userId, fields, tx);
+  const shouldInvalidate =
+  
+    fields.role !== undefined ||
+    fields.status !== undefined ;
+   
 
-    return { success: true };
+  if (shouldInvalidate) {
+    await this.userEventPublisher.userUpdated(userId);
   }
+
+  return { success: true };
+}
+  // async execute(
+  //   userId: number,
+  //   fields: Partial<UpdateUserFields>,
+  //   lang: SupportedLang = "al",
+  //   tx?: Prisma.TransactionClient,
+  // ) {
+    
+  //   const user = await this.findUserById.execute(userId, lang);
+
+    
+  //   await this.repo.updateFields(userId, fields, tx);
+
+  //   return { success: true };
+  // }
 }

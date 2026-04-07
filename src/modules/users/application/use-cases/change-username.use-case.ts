@@ -3,8 +3,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
 import { t, SupportedLang } from '../../../../locales';
-import { UserUpdatedEvent } from '../../events/user-updated.event';
+import { UserUpdatedEvent } from '../events/user-updated.event';
 import { FindUserByIdUseCase } from './find-user-by-id.use-case'; 
+import { RedisPubSubService } from '../../../../infrastructure/cache/redis/redis-pubsub.service';
+import { UserEventPublisher } from '../events/user-event.publisher';
 
 @Injectable()
 export class ChangeUsernameUseCase {
@@ -16,7 +18,8 @@ export class ChangeUsernameUseCase {
     private readonly usernameHistoryRepository: IUsernameHistoryDomainRepository,
     
     private readonly findUserById: FindUserByIdUseCase,
-    private readonly eventEmitter: EventEmitter2,
+  private readonly userEventPublisher: UserEventPublisher,
+
   ) {}
 
   async execute(
@@ -70,10 +73,11 @@ export class ChangeUsernameUseCase {
     await this.userRepository.updateUsername(userId, newUsername);
     
     // Emit event to invalidate cache
-    this.eventEmitter.emit(
-      'user.updated',
-      new UserUpdatedEvent(userId, { username: newUsername }),
-    );
+    await this.userEventPublisher.userUpdated(userId);
+    // this.eventEmitter.emit(
+    //   'user.updated',
+    //   new UserUpdatedEvent(userId, { username: newUsername }),
+    // );
     
     return {
       success: true,

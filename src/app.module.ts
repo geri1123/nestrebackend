@@ -59,6 +59,7 @@ import { QueueModule } from './infrastructure/queue/queue.module';
 
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WebSocketModule } from './infrastructure/websocket/socket.module';
+import { RedisPubSubModule } from './infrastructure/cache/redis/redis-pubsub.module';
 
 @Module({
   imports: [
@@ -73,7 +74,7 @@ import { WebSocketModule } from './infrastructure/websocket/socket.module';
     }),
     ScheduleModule.forRoot(),
     AppConfigModule,
-
+    RedisPubSubModule,
    
     // INFRASTRUCTURE
     

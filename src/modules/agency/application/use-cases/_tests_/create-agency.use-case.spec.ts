@@ -3,6 +3,7 @@ import { CreateAgencyUseCase } from '../create-agency.use-case';
 import { AGENCY_REPO } from '../../../domain/repositories/agency.repository.interface';
 import { AgencyStatus } from '@prisma/client';
 import { BadRequestException } from '@nestjs/common';
+import { UserEventPublisher } from '../../../../users/application/events/user-event.publisher';
 
 describe('CreateAgencyUseCase', () => {
   let useCase: CreateAgencyUseCase;
@@ -13,11 +14,16 @@ describe('CreateAgencyUseCase', () => {
     create: jest.fn(),
   };
 
+  const userEventPublisherMock = {
+    userUpdated: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CreateAgencyUseCase,
         { provide: AGENCY_REPO, useValue: repoMock },
+        { provide: UserEventPublisher, useValue: userEventPublisherMock }, // ✅ FIX
       ],
     }).compile();
 
@@ -36,6 +42,8 @@ describe('CreateAgencyUseCase', () => {
         'al',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(userEventPublisherMock.userUpdated).not.toHaveBeenCalled(); // ✅ FIX
   });
 
   it('throws if license exists', async () => {
@@ -50,9 +58,11 @@ describe('CreateAgencyUseCase', () => {
         'al',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(userEventPublisherMock.userUpdated).not.toHaveBeenCalled(); // ✅ FIX
   });
 
-  it('creates agency when data is valid', async () => {
+  it('creates agency and publishes event when data is valid', async () => {
     repoMock.agencyNameExists.mockResolvedValue(false);
     repoMock.licenseExists.mockResolvedValue(false);
     repoMock.create.mockResolvedValue(10);
@@ -66,5 +76,7 @@ describe('CreateAgencyUseCase', () => {
 
     expect(repoMock.create).toHaveBeenCalled();
     expect(agencyId).toBe(10);
+
+    expect(userEventPublisherMock.userUpdated).toHaveBeenCalledWith(1); // ✅ FIX
   });
 });

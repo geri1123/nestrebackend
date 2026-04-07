@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { ChangeUsernameUseCase } from '../change-username.use-case';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FindUserByIdUseCase } from '../find-user-by-id.use-case';
+import { UserEventPublisher } from '../../events/user-event.publisher';
 
 describe('ChangeUsernameUseCase', () => {
   let useCase: ChangeUsernameUseCase;
@@ -21,8 +21,8 @@ describe('ChangeUsernameUseCase', () => {
     execute: jest.fn(),
   } as any;
 
-  const eventEmitter = {
-    emit: jest.fn(),
+  const userEventPublisher = {
+    userUpdated: jest.fn(),
   } as any;
 
   const baseUser = {
@@ -37,7 +37,7 @@ describe('ChangeUsernameUseCase', () => {
       userRepo,
       usernameHistoryRepo,
       findUserById,
-      eventEmitter,
+      userEventPublisher, // inject the mock
     );
   });
 
@@ -94,10 +94,7 @@ describe('ChangeUsernameUseCase', () => {
 
     expect(userRepo.updateUsername).toHaveBeenCalledWith(1, 'newname');
 
-    expect(eventEmitter.emit).toHaveBeenCalledWith(
-      'user.updated',
-      expect.objectContaining({ userId: 1 }),
-    );
+    expect(userEventPublisher.userUpdated).toHaveBeenCalledWith(1);
 
     expect(result.success).toBe(true);
     expect(result.message).toBeDefined();
