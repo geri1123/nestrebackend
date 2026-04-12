@@ -88,6 +88,7 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       buildYear: true,
       subcategoryId: true,
       area: true,
+      clickCount: true,
       productImage: { select: { imageUrl: true } },
     city: { 
   select: { 

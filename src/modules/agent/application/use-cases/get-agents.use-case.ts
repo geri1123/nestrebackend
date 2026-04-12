@@ -52,14 +52,19 @@ export class GetAgentsUseCase {
       ]);
 
       if (!agentsPage || agentsPage.length === 0) {
-        return { agents: [], totalCount: 0, totalPages: 0, currentPage: page };
+         return { 
+    agents: [],                                
+    totalCount,                                
+    totalPages: Math.ceil(totalCount / limit), 
+    currentPage: page 
+  };
       }
 
      const agentsForFrontend = agentsPage.map((item) => ({
   id: item.agent.id,
   roleInAgency: item.agent.roleInAgency,
   status: item.agent.status,
-  createdAt: formatDate(item.agent.createdAt),
+  createdAt: item.agent.createdAt,
   agentUser: item.agentUser
     ? {
         id: item.agentUser.id,
@@ -72,12 +77,12 @@ export class GetAgentsUseCase {
     : null,
 }));
 
-      return {
+     return {
         agents: agentsForFrontend,
         totalCount,
         totalPages: Math.ceil(totalCount / limit),
         currentPage: page,
-      };
+      }; 
     } catch (error) {
       throw new InternalServerErrorException(t('somethingWentWrong', language));
     }

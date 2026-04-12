@@ -71,7 +71,6 @@ export class AgencyRepository implements IAgencyDomainRepository {
     });
 
     if (!agency) return null;
-
     return {
       id: agency.id,
       agencyName: agency.agencyName,
@@ -84,6 +83,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       website: agency.website,
       logo: agency.logo,
       ownerUserId: agency.ownerUserId,
+      ownerUsername: agency.user?.username ?? '',
       ownerName: agency.user
         ? `${agency.user.firstName} ${agency.user.lastName}`
         : undefined,

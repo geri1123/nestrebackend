@@ -15,6 +15,7 @@ export interface AgencyInfoVO {
   logo: string | null;
 
   ownerUserId: number;
+  ownerUsername:string;
   ownerName?: string;
   ownerEmail?: string;
   createdAt: Date;

@@ -188,6 +188,7 @@ export class AgentRepository implements IAgentDomainRepository {
       skip: offset,
     });
 
+
     return results.map((r) =>
       AgentMapper.toAgentWithUserAndPermission({
         agencyagent: r,

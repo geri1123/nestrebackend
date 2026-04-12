@@ -57,7 +57,7 @@ export class AgentForFrontEndDto {
   id!: number;
   roleInAgency!: AgencyAgentRoleInAgency;
   status!: AgencyAgentStatus;
-  createdAt!: string | null;
+  createdAt!: Date | null;
   agentUser!: AgentUserForFrontEndDto | null;
 }
 export class AgentPaginationResponseDto {

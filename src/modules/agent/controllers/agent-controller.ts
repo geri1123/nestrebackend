@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   ForbiddenException,
   Get,
   Param,
@@ -49,11 +50,11 @@ async getPublicAgents(
   @Param('agencyId', ParseIntPipe) agencyId: number,
   @Req() req: RequestWithLang,
   @Query() filters: FilterAgentsDto,
-  @Query('page') page = '1',
+@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
 ) {
   return this.getAgentsUseCase.execute(
     agencyId,
-    parseInt(page, 10),
+    page,
     12,
     req.language,
     filters,

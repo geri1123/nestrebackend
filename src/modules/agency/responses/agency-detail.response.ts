@@ -69,7 +69,11 @@ export class AgencyDetailResponse {
     description: 'Owner user ID',
   })
   ownerUserId!: number;
-
+ @ApiProperty({
+    example: 'johndoe',
+    description: 'Owner username',
+  })
+  ownerUsername!: string;
   @ApiProperty({
     example: 'John Doe',
     description: 'Owner full name',

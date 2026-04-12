@@ -84,7 +84,7 @@ export class ProductDetailMapper {
             endDate: activeAd.endDate?.toISOString() ?? null,
           }
         : null,
-      totalClicks,
+      totalClicks:product.clickCount ?? totalClicks,
       attributes, 
     };
   }

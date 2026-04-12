@@ -21,7 +21,7 @@ export class ChangePasswordUseCase {
     }
 if (!user.password) {
   throw new BadRequestException(
-    t('passwordNotSetForUser', lang) // or custom message
+    t('passwordNotSetForUser', lang) 
   );
 }
     const passwordMatch = await comparePassword(dto.currentPassword, user.password);
