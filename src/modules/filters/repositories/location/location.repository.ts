@@ -27,4 +27,10 @@ export class LoationRepository implements ILocationRepository{
       orderBy: { name: "asc" },
     });
   }
+  async getCitiesByIds(ids: number[]): Promise<{ id: number; name: string }[]> {
+  return this.prisma.city.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, name: true },
+  });
+}
 }

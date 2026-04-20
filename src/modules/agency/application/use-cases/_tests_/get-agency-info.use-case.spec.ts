@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { GetAgencyInfoUseCase } from '../get-agency-info.use-case';
-import { AGENCY_REPO, type IAgencyDomainRepository } from '../../../domain/repositories/agency.repository.interface';
+import {
+  AGENCY_REPO,
+  type IAgencyDomainRepository
+} from '../../../domain/repositories/agency.repository.interface';
 import { AgencyInfoVO } from '../../../domain/value-objects/agency-info.vo';
 import { SupportedLang } from '../../../../../locales';
 
@@ -79,9 +82,7 @@ describe('GetAgencyInfoUseCase', () => {
       it('should throw NotFoundException for suspended agency on public route', async () => {
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(mockSuspendedAgencyInfo);
 
-        await expect(useCase.execute(2, 'al', false)).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(useCase.execute(2, 'al', false)).rejects.toThrow(NotFoundException);
       });
 
       it('should use default language and isProtectedRoute when not provided', async () => {
@@ -106,9 +107,7 @@ describe('GetAgencyInfoUseCase', () => {
       it('should throw BadRequestException when agency not found', async () => {
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(null);
 
-        await expect(useCase.execute(999, 'al')).rejects.toThrow(
-          BadRequestException,
-        );
+        await expect(useCase.execute(999, 'al')).rejects.toThrow(BadRequestException);
       });
 
       it('should throw BadRequestException with correct structure', async () => {
@@ -118,21 +117,21 @@ describe('GetAgencyInfoUseCase', () => {
           await useCase.execute(999, 'al');
           fail('Should have thrown BadRequestException');
         } catch (error) {
-          expect(error).toBeInstanceOf(BadRequestException);
-          expect(error.response).toHaveProperty('success', false);
-          expect(error.response).toHaveProperty('message');
-        }
+  expect(error).toBeInstanceOf(BadRequestException);
+
+  if (error instanceof BadRequestException) {
+    const response = error.getResponse() as any;
+    expect(response).toHaveProperty('success', false);
+    expect(response).toHaveProperty('message');
+  }
+}
       });
 
       it('should throw BadRequestException for both protected and public routes', async () => {
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(null);
 
-        await expect(useCase.execute(999, 'al', true)).rejects.toThrow(
-          BadRequestException,
-        );
-        await expect(useCase.execute(999, 'al', false)).rejects.toThrow(
-          BadRequestException,
-        );
+        await expect(useCase.execute(999, 'al', true)).rejects.toThrow(BadRequestException);
+        await expect(useCase.execute(999, 'al', false)).rejects.toThrow(BadRequestException);
       });
     });
 
@@ -142,12 +141,10 @@ describe('GetAgencyInfoUseCase', () => {
           ...mockActiveAgencyInfo,
           status: 'inactive',
         } as AgencyInfoVO;
-        
+
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(inactiveAgency);
 
-        await expect(useCase.execute(1, 'al', false)).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(useCase.execute(1, 'al', false)).rejects.toThrow(NotFoundException);
       });
 
       it('should allow inactive status on protected route', async () => {
@@ -155,7 +152,7 @@ describe('GetAgencyInfoUseCase', () => {
           ...mockActiveAgencyInfo,
           status: 'inactive',
         } as AgencyInfoVO;
-        
+
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(inactiveAgency);
 
         const result = await useCase.execute(1, 'al', true);
@@ -168,17 +165,13 @@ describe('GetAgencyInfoUseCase', () => {
       it('should handle different supported languages', async () => {
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(null);
 
-        await expect(useCase.execute(999, 'en')).rejects.toThrow(
-          BadRequestException,
-        );
+        await expect(useCase.execute(999, 'en')).rejects.toThrow(BadRequestException);
       });
 
       it('should pass language to error messages', async () => {
         agencyRepository.getAgencyInfoByOwner.mockResolvedValue(mockSuspendedAgencyInfo);
 
-        await expect(useCase.execute(2, 'en', false)).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(useCase.execute(2, 'en', false)).rejects.toThrow(NotFoundException);
       });
     });
 

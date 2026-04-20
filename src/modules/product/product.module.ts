@@ -40,11 +40,11 @@ import { SearchFiltersResolver } from './infrastructure/search/search-filters-re
 import { ProductOwnershipGuard } from '../../infrastructure/auth/guard/product-ownership.guard';
 import { DeleteProductUseCase } from './application/use-cases/delete-product.use-case';
 import { FiltersModule } from '../filters/filters.module';
-
+import { GetAgencyCityCountsUseCase } from './application/use-cases/get-agency-city-counts.usecase';
 @Module({
   controllers: [SearchProductsController, ManageProductController ],
   imports: [
-    
+    FiltersModule,
     UsersModule,
     CommonModule,
     AgentModule,
@@ -76,6 +76,7 @@ ProductOwnershipGuard,
     GetProductByIdUseCase,
     SearchProductsUseCase,
     GetProductForPermissionUseCase,
+    GetAgencyCityCountsUseCase,
 GetMostClickedProductsUseCase,
     // Utilities
     SearchFiltersHelper,

@@ -6,4 +6,5 @@ export interface ILocationRepository{
   getAllCountries(): Promise<Country[]>;
 
   getCitiesByCountry(countryCode: string): Promise<City[]>;
+   getCitiesByIds(ids: number[]): Promise<{ id: number; name: string }[]>;
 }

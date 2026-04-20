@@ -1,7 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
-import { ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
+import { CityCount, ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
 import { SupportedLang } from '../../../../locales';
 import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
@@ -220,5 +220,29 @@ export class SearchProductRepository implements ISearchProductRepository {
   ): Promise<number> {
     const whereConditions = this.queryBuilder.build(filters, language, isProtectedRoute);
     return this.prisma.product.count({ where: whereConditions });
-  }
+  };
+async getCityCounts(
+  filters: SearchFiltersDto,
+  isProtectedRoute: boolean = false,
+): Promise<CityCount[]> {
+  const where = this.queryBuilder.build(filters, 'en', isProtectedRoute);
+
+  const grouped = await this.prisma.product.groupBy({
+    by: ['cityId'],
+    where,                   
+    _count: {
+      cityId: true,
+    },
+    orderBy: {
+      _count: {
+        cityId: 'desc',
+      },
+    },
+  });
+
+  return grouped.map(g => ({
+    cityId: g.cityId,
+    count: g._count.cityId,
+  }));
+}
 }

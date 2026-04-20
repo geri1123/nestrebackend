@@ -1,6 +1,10 @@
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
 import { SupportedLang } from '../../../../locales';
 export const SEARCH_PRODUCT_REPO = Symbol('SEARCH_PRODUCT_REPO');
+export interface CityCount {
+  cityId: number;
+  count: number;
+}
 export interface ISearchProductRepository {
   searchProducts(
     filters: SearchFiltersDto,
@@ -13,4 +17,8 @@ export interface ISearchProductRepository {
     language: SupportedLang,
     isProtectedRoute: boolean
   ): Promise<number>;
+  getCityCounts(
+    filters: SearchFiltersDto,
+    isProtectedRoute: boolean
+  ): Promise<CityCount[]>;
 }

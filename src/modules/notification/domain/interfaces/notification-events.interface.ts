@@ -4,8 +4,8 @@ export interface NotificationPayload {
   id: number;
   type: string;
   status: string;
-  translations: any[];
-  createdAt: Date;
+  notificationTranslation: { languageCode: string; message: string }[]; 
+    createdAt: Date;
 }
 
 export interface ServerToClientEvents {

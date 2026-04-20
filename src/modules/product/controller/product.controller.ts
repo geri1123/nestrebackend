@@ -22,6 +22,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
 import { filter } from 'rxjs';
+import { GetAgencyCityCountsUseCase } from '../application/use-cases/get-agency-city-counts.usecase';
 @ApiTags('Products')
 @SkipThrottle()
 @Controller('products')
@@ -35,6 +36,7 @@ export class SearchProductsController {
     private readonly getMostClickedProductsUseCase: GetMostClickedProductsUseCase,
     private readonly getRelatedProductsUseCase: GetRelatedProductsUseCase,
     private readonly softAuth: SoftAuthService,
+    private readonly getAgencyCityCountsUseCase: GetAgencyCityCountsUseCase,
     
   ) {}
 
@@ -74,7 +76,24 @@ export class SearchProductsController {
 
     return this.searchProductsUseCase.execute(filters, language, false);
   }
+@Public()
+@Get('agency/:agencyId/city-counts')
+async getCityCounts(
+  @Param('agencyId') agencyId: string,
+  @Req() req: RequestWithLang,
+  @Query() query: any,
+) {
+  const filters = this.searchFiltersHelper.parse(query);
 
+  filters.agencyId = Number(agencyId);
+  filters.status = 'active'; // ← shto kete
+
+  return this.getAgencyCityCountsUseCase.execute(
+    filters,
+    req.language,
+    false,
+  );
+}
   @Public()
   @Get('agent/:agentId')
   @ApiSearchAgentProducts()

@@ -19,7 +19,7 @@ import { ActivateAgencyByOwnerUseCase } from './application/use-cases/activate-a
 import { CheckAgencyNameExistsUseCase } from './application/use-cases/check-agency-name-exists.use-case';
 import { CheckLicenseExistsUseCase } from './application/use-cases/check-license-exists.use-case';
 import { ValidateAgencyBeforeRegisterUseCase } from './application/use-cases/validate-agency-before-register.use-case';
-import { AGENCY_REPO } from './domain/repositories/agency.repository.interface';
+import { AGENCY_REPO  } from './domain/repositories/agency.repository.interface';
 import { CommonModule } from '../../common/common.module';
 
 // Controller
@@ -77,7 +77,7 @@ import { UsersModule } from '../users/users.module';
     CheckAgencyNameExistsUseCase,
     CheckLicenseExistsUseCase,
     GetAgencyByOwnerUseCase,
-    AGENCY_REPO
+    AGENCY_REPO , 
   ],
 })
 export class AgencyModule {}

@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Req } from "@nestjs/common";
-import { CreateContactDto } from "../dto/contact.dto";
+import { CreateContactDto, SendMessageToAgencyDto } from "../dto/contact.dto";
 import { SendContactMessageUseCase } from "../application/use-cases/send-contact-message.use-case";
 
 
@@ -7,18 +7,28 @@ import {type RequestWithUser } from "../../../common/types/request-with-user.int
 import { ApiBadRequestResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { ApiSuccessResponse } from "../../../common/swagger/response.helper.ts";
 import { Public } from "../../../common/decorators/public.decorator";
+import { SendMessageToAgencyUseCase } from "../application/use-cases/send-agency-message.use-case";
 @ApiTags('Contact')
 @Public()
 @Controller('contact')
 export class ContactController {
-  constructor(private readonly sendContactMessageUseCase: SendContactMessageUseCase) {}
+  constructor(
+    private readonly sendContactMessageUseCase: SendContactMessageUseCase,
+    private readonly sendMessageToAgency:SendMessageToAgencyUseCase,
+  ) {}
 
 @Post()
 @ApiBadRequestResponse()
-@ApiSuccessResponse('Message sent successfully')
+@ApiSuccessResponse('Message send successfully')
 async send(@Body() dto: CreateContactDto, @Req() req: RequestWithUser) {
  
 
   return this.sendContactMessageUseCase.execute(dto, req.language);
+}
+@Post("/agency/message")
+@ApiBadRequestResponse()
+@ApiSuccessResponse('Message send successfully')
+async sendToAgency(@Body() dto:SendMessageToAgencyDto, @Req() req:RequestWithUser){
+  return this.sendMessageToAgency.execute(dto , req.language)
 }
 }

@@ -13,7 +13,7 @@ export interface AgencyInfoVO {
   phone: string | null;
   website: string | null;
   logo: string | null;
-
+ownerUserProfileImage: string | null;
   ownerUserId: number;
   ownerUsername:string;
   ownerName?: string;

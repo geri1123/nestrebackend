@@ -65,6 +65,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
             firstName: true,
             lastName: true,
             email: true,
+            profileImgUrl: true,
           },
         },
       },
@@ -84,6 +85,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       logo: agency.logo,
       ownerUserId: agency.ownerUserId,
       ownerUsername: agency.user?.username ?? '',
+      ownerUserProfileImage: agency.user?.profileImgUrl ?? null,
       ownerName: agency.user
         ? `${agency.user.firstName} ${agency.user.lastName}`
         : undefined,

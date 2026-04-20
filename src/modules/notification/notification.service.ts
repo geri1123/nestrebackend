@@ -40,8 +40,8 @@ export class NotificationService {
           id: notification.id,
           type: notification.type,
           status: notification.status,
-          translations: notification.notificationTranslation,
-          createdAt: notification.createdAt,
+        notificationTranslation: notification.notificationTranslation,      
+      createdAt: notification.createdAt,
         });
 
         const unreadCount = await this.countUnreadNotifications(data.userId);
