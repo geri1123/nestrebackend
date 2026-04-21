@@ -1,22 +1,129 @@
-//fix this tomorrow with transaction
+// //fix this tomorrow with transaction
+
+// import { BadRequestException, Injectable } from "@nestjs/common";
+// import { AgencyAgentRoleInAgency, AgencyAgentStatus, AgencyStatus, UserRole, UserStatus } from "@prisma/client";
+// import { SupportedLang, t } from "../../../../locales";
+// import { FindExistingAgentUseCase } from "../../../agent/application/use-cases/find-existing-agent.use-case";
+// import { CreateAgentUseCase } from "../../../agent/application/use-cases/create-agent.use-case";
+// import { AddAgentPermissionsUseCase } from "../../../agent/application/use-cases/add-agenct-permissons.use-case";
+// import { UpdateUserFieldsUseCase } from "../../../users/application/use-cases/update-user-fields.use-case";
+// import { EmailService } from "../../../../infrastructure/email/email.service";
+// import { RegistrationRequestEntity } from "../../../registration-request/domain/entities/registration-request.entity";
+// import { GetUserProfileUseCase } from "../../../users/application/use-cases/get-user-profile.use-case";
+// import { FindUserByIdUseCase } from "../../../users/application/use-cases/find-user-by-id.use-case";
+// import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
+// import { EnsureIdCardUniqueUseCase } from "../../../agent/application/use-cases/ensure-idcard-unique.use-case";
+// import { NotificationTemplateService } from "../../../notification/notifications-template.service";
+// import { NotificationService } from "../../../notification/notification.service";
+// import { EmailQueueService } from "../../../../infrastructure/queue/services/email-queue.service";
+
+// export interface ApproveRequestInput {
+//   request: RegistrationRequestEntity;
+//   agencyId: number;
+//   approvedBy: number;
+//   roleInAgency: AgencyAgentRoleInAgency;
+//   commissionRate?: number;
+//   permissions?: Record<string, any>;
+// }
+
+// @Injectable()
+// export class ApproveAgencyRequestUseCase {
+//   constructor(
+//      private readonly prisma: PrismaService,
+//     private readonly findExistingAgent: FindExistingAgentUseCase,
+//     private readonly createAgent: CreateAgentUseCase,
+//     private readonly addPermissions: AddAgentPermissionsUseCase,
+//     private readonly updateUserFields: UpdateUserFieldsUseCase,
+//     private readonly getuser:FindUserByIdUseCase,
+//     private readonly notificationService: NotificationService,
+//     private readonly queueService:EmailQueueService,
+//   ) {}
+// async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
+//   const { request, agencyId, approvedBy, roleInAgency, commissionRate, permissions } = input;
+
+//   // Validate user
+//   const user = await this.getuser.execute(request.userId, language);
+
+//   if (!user.emailVerified) {
+//     throw new BadRequestException(t("emailNotVerified", language));
+//   }
+
+  
+
+//   // Check if agent exists
+//   await this.findExistingAgent.execute(request.userId, language);
+
+
+//   const agent = await this.prisma.$transaction(async (tx) => {
+
+//     // Create agent
+//     const agent = await this.createAgent.execute(
+//       {
+//         agencyId,
+//         agentId: request.userId,
+//         addedBy: approvedBy,
+//       //  idCardNumber ,
+//         roleInAgency,
+//         commissionRate,
+//         status: AgencyAgentStatus.active,
+//       },
+//       tx
+//     );
+
+//     // Prepare user updates
+//     const updates: any = {};
+//     if (request.user?.role !== UserRole.agent) updates.role = UserRole.agent;
+//     if (request.user?.status !== UserStatus.active) updates.status = UserStatus.active;
+
+//     // Update user fields
+//     if (Object.keys(updates).length > 0) {
+//       await this.updateUserFields.execute(request.userId, updates, language, tx);
+//     }
+
+//     // Add permissions
+//     await this.addPermissions.execute(
+//       agent.id,
+//       agencyId,
+//       permissions ?? {},
+//       tx
+//     );
+
+//     return agent;
+//   });
+
+//   const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
+//   // await this.emailService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
+//    await this.queueService.sendAgentWelcomeEmail(request.user?.email || "" , fullName)
+// await this.notificationService.sendNotification({
+//   userId: request.userId,
+//   type: 'agency_confirm_agent',
+//   // translations will be auto-generated since we don't provide them
+//   metadata: {
+//     agencyId,
+//     approvedBy,
+//   },
+ 
+// });
+//   return agent;
+// }
+// }
 
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { AgencyAgentRoleInAgency, AgencyAgentStatus, AgencyStatus, UserRole, UserStatus } from "@prisma/client";
+import { AgencyAgentRoleInAgency, AgencyAgentStatus, UserRole, UserStatus } from "@prisma/client";
 import { SupportedLang, t } from "../../../../locales";
 import { FindExistingAgentUseCase } from "../../../agent/application/use-cases/find-existing-agent.use-case";
 import { CreateAgentUseCase } from "../../../agent/application/use-cases/create-agent.use-case";
 import { AddAgentPermissionsUseCase } from "../../../agent/application/use-cases/add-agenct-permissons.use-case";
 import { UpdateUserFieldsUseCase } from "../../../users/application/use-cases/update-user-fields.use-case";
-import { EmailService } from "../../../../infrastructure/email/email.service";
 import { RegistrationRequestEntity } from "../../../registration-request/domain/entities/registration-request.entity";
-import { GetUserProfileUseCase } from "../../../users/application/use-cases/get-user-profile.use-case";
 import { FindUserByIdUseCase } from "../../../users/application/use-cases/find-user-by-id.use-case";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
-import { EnsureIdCardUniqueUseCase } from "../../../agent/application/use-cases/ensure-idcard-unique.use-case";
-import { NotificationTemplateService } from "../../../notification/notifications-template.service";
 import { NotificationService } from "../../../notification/notification.service";
 import { EmailQueueService } from "../../../../infrastructure/queue/services/email-queue.service";
-
+import { IAgentDomainRepository } from "../../../agent/domain/repositories/agents.repository.interface";
+import { Inject } from "@nestjs/common";
+import { AGENT_REPOSITORY_TOKENS } from "../../../agent/domain/repositories/agent.repository.tokens";
+import { IAgentPermissionDomainRepository } from "../../../agent/domain/repositories/agent-permission.repository.interface";
 export interface ApproveRequestInput {
   request: RegistrationRequestEntity;
   agencyId: number;
@@ -29,81 +136,91 @@ export interface ApproveRequestInput {
 @Injectable()
 export class ApproveAgencyRequestUseCase {
   constructor(
-     private readonly prisma: PrismaService,
+    private readonly prisma: PrismaService,
     private readonly findExistingAgent: FindExistingAgentUseCase,
     private readonly createAgent: CreateAgentUseCase,
     private readonly addPermissions: AddAgentPermissionsUseCase,
     private readonly updateUserFields: UpdateUserFieldsUseCase,
-    private readonly getuser:FindUserByIdUseCase,
+    private readonly getuser: FindUserByIdUseCase,
     private readonly notificationService: NotificationService,
-    private readonly queueService:EmailQueueService,
+    private readonly queueService: EmailQueueService,
+    @Inject(AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY)
+    private readonly agentRepo: IAgentDomainRepository,
+    @Inject(AGENT_REPOSITORY_TOKENS.AGENT_PERMISSION_REPOSITORY)
+    private readonly agentPermissionRepo: IAgentPermissionDomainRepository,
   ) {}
-async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
-  const { request, agencyId, approvedBy, roleInAgency, commissionRate, permissions } = input;
 
-  // Validate user
-  const user = await this.getuser.execute(request.userId, language);
+  async execute(input: ApproveRequestInput, language: SupportedLang = "al") {
+    const { request, agencyId, approvedBy, roleInAgency, commissionRate, permissions } = input;
 
-  if (!user.emailVerified) {
-    throw new BadRequestException(t("emailNotVerified", language));
-  }
-
-  
-
-  // Check if agent exists
-  await this.findExistingAgent.execute(request.userId, language);
-
-
-  const agent = await this.prisma.$transaction(async (tx) => {
-
-    // Create agent
-    const agent = await this.createAgent.execute(
-      {
-        agencyId,
-        agentId: request.userId,
-        addedBy: approvedBy,
-      //  idCardNumber ,
-        roleInAgency,
-        commissionRate,
-        status: AgencyAgentStatus.active,
-      },
-      tx
-    );
-
-    // Prepare user updates
-    const updates: any = {};
-    if (request.user?.role !== UserRole.agent) updates.role = UserRole.agent;
-    if (request.user?.status !== UserStatus.active) updates.status = UserStatus.active;
-
-    // Update user fields
-    if (Object.keys(updates).length > 0) {
-      await this.updateUserFields.execute(request.userId, updates, language, tx);
+    // Validate user
+    const user = await this.getuser.execute(request.userId, language);
+    if (!user.emailVerified) {
+      throw new BadRequestException(t("emailNotVerified", language));
     }
 
-    // Add permissions
-    await this.addPermissions.execute(
-      agent.id,
-      agencyId,
-      permissions ?? {},
-      tx
-    );
+    // Returns terminated agent or null, throws if active/inactive
+    const existingAgent = await this.findExistingAgent.execute(request.userId, language);
+
+    const agent = await this.prisma.$transaction(async (tx) => {
+
+      let agent;
+
+      if (existingAgent) {
+        // Terminated agent rejoining — update existing record
+        agent = await this.agentRepo.updateAgencyAgent(existingAgent.id, {
+          roleInAgency,
+          commissionRate,
+          status: AgencyAgentStatus.active,
+          endDate: null,
+        }, tx);
+
+        // Update existing permissions
+        const existingPermissions = await this.agentPermissionRepo.getPermissionsByAgentId(existingAgent.id);
+        if (existingPermissions) {
+          await this.agentPermissionRepo.updatePermissions(existingAgent.id, permissions ?? {});
+        } else {
+          await this.addPermissions.execute(existingAgent.id, agencyId, permissions ?? {}, tx);
+        }
+
+      } else {
+        // Brand new agent — create fresh record
+        agent = await this.createAgent.execute(
+          {
+            agencyId,
+            agentId: request.userId,
+            addedBy: approvedBy,
+            roleInAgency,
+            commissionRate,
+            status: AgencyAgentStatus.active,
+          },
+          tx
+        );
+
+        // Add new permissions
+        await this.addPermissions.execute(agent.id, agencyId, permissions ?? {}, tx);
+      }
+
+      // Update user role and status
+      const updates: any = {};
+      if (request.user?.role !== UserRole.agent) updates.role = UserRole.agent;
+      if (request.user?.status !== UserStatus.active) updates.status = UserStatus.active;
+      if (Object.keys(updates).length > 0) {
+        await this.updateUserFields.execute(request.userId, updates, language, tx);
+      }
+
+      return agent;
+    });
+
+    const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
+    await this.queueService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
+
+    await this.notificationService.sendNotification({
+      userId: request.userId,
+      type: 'agency_confirm_agent',
+      metadata: { agencyId, approvedBy },
+    });
 
     return agent;
-  });
-
-  const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
-  // await this.emailService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
-   await this.queueService.sendAgentWelcomeEmail(request.user?.email || "" , fullName)
-await this.notificationService.sendNotification({
-  userId: request.userId,
-  type: 'agency_confirm_agent',
-  // translations will be auto-generated since we don't provide them
-  metadata: {
-    agencyId,
-    approvedBy,
-  },
- 
-});
-  return agent;
-}
+  }
 }

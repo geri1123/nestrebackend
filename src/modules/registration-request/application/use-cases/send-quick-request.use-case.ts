@@ -19,10 +19,11 @@ export class SendQuickRequestUseCase {
   async execute(userId: number, agencyId: number, username: string, lang: SupportedLang) {
 
    
-    const existing = await this.repo.findActiveRequestByUserId(userId);
+    const existing = await this.repo.findPendingRequestByUserId(userId); 
   if (existing) {
     throw new BadRequestException(t("alreadyHasActiveRequest", lang));
   }
+
     const agency = await this.GetAgencyWithOwnerById.execute(agencyId , lang);
 
     if (!agency) throw new BadRequestException(t("invalidAgencyId", lang));

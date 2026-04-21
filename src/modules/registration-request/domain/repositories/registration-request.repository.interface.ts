@@ -17,6 +17,7 @@ findActiveRequestByUserId(userId: number): Promise<RegistrationRequestEntity | n
     take?: number,
     search?: string,
   ): Promise<RegistrationRequestEntity[]>;
+findPendingRequestByUserId(userId: number): Promise<RegistrationRequestEntity | null>;
 
   // setLatestUnderReview(userId: number , tx?:Prisma.TransactionClient): Promise<RegistrationRequestEntity | null>;
   setLatestUnderReview(

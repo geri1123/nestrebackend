@@ -1,8 +1,8 @@
 import { Inject, Injectable, BadRequestException } from "@nestjs/common";
 import { AGENT_REPOSITORY_TOKENS } from "../../domain/repositories/agent.repository.tokens";
-import {type IAgentDomainRepository } from "../../domain/repositories/agents.repository.interface";
+import { type IAgentDomainRepository } from "../../domain/repositories/agents.repository.interface";
 import { SupportedLang, t } from "../../../../locales";
-
+import { AgencyAgentStatus } from "@prisma/client";
 
 @Injectable()
 export class FindExistingAgentUseCase {
@@ -13,11 +13,13 @@ export class FindExistingAgentUseCase {
 
   async execute(agentId: number, language: SupportedLang) {
     const existing = await this.agentRepo.findExistingAgent(agentId);
-    if (existing) {
+    
+    if (existing && existing.status !== AgencyAgentStatus.terminated) {
       throw new BadRequestException({
         errors: { general: [t("agentExist", language)] },
       });
     }
+
     return existing;
   }
 }

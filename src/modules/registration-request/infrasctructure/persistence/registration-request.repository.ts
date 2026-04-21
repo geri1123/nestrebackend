@@ -69,6 +69,17 @@ async findActiveRequestByUserId(userId: number): Promise<RegistrationRequestEnti
 
   return data ? this.mapToEntity(data) : null;
 }
+async findPendingRequestByUserId(userId: number): Promise<RegistrationRequestEntity | null> {
+  const data = await this.prisma.registrationRequest.findFirst({
+    where: { 
+      userId,
+      status: { in: [RegistrationRequestStatus.pending, RegistrationRequestStatus.under_review] }
+    },
+    orderBy: { createdAt: "desc" }
+  });
+
+  return data ? this.mapToEntity(data) : null;
+}
   // async findByUserId(userId: number): Promise<RegistrationRequestEntity[]> {
   //   const data = await this.prisma.registrationRequest.findMany({
   //     where: { userId: userId },

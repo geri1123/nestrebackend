@@ -105,7 +105,7 @@ getAgentAuthContext(userId: number): Promise<{
   data: Partial<{
     roleInAgency: AgencyAgentRoleInAgency;
     commissionRate: number;
-    endDate: Date;
+      endDate: Date | null; 
     status: AgencyAgentStatus;
   }>,
   tx?: Prisma.TransactionClient, 

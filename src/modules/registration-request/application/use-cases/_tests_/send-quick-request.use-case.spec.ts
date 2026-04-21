@@ -6,7 +6,7 @@ describe('SendQuickRequestUseCase', () => {
 
   const repo = { 
     create: jest.fn(),
-    findActiveRequestByUserId: jest.fn(), // ← add this
+    findPendingRequestByUserId: jest.fn(), // ← changed
   } as any;
   const getAgency = { execute: jest.fn() } as any;
   const notificationService = { sendNotification: jest.fn() } as any;
@@ -16,7 +16,7 @@ describe('SendQuickRequestUseCase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    repo.findActiveRequestByUserId.mockResolvedValue(null); // ← default: no active request
+    repo.findPendingRequestByUserId.mockResolvedValue(null); // ← changed
     useCase = new SendQuickRequestUseCase(
       repo,
       getAgency,
@@ -25,8 +25,8 @@ describe('SendQuickRequestUseCase', () => {
     );
   });
 
-  it('should throw BadRequestException if user already has active request', async () => {
-    repo.findActiveRequestByUserId.mockResolvedValue({ id: 5, userId: 1 });
+  it('should throw BadRequestException if user already has pending request', async () => {
+    repo.findPendingRequestByUserId.mockResolvedValue({ id: 5, userId: 1 }); // ← changed
 
     await expect(
       useCase.execute(1, 10, 'john', 'en'),
@@ -67,5 +67,15 @@ describe('SendQuickRequestUseCase', () => {
         type: 'user_send_request',
       }),
     );
+  });
+
+  it('should allow terminated agent (approved request) to send new request', async () => {
+    // terminated agent has approved request, findPendingRequestByUserId returns null
+    repo.findPendingRequestByUserId.mockResolvedValue(null);
+    getAgency.execute.mockResolvedValue({ id: 10, owner_user_id: 99 });
+
+    await useCase.execute(1, 10, 'john', 'en');
+
+    expect(repo.create).toHaveBeenCalled();
   });
 });

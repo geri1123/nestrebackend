@@ -67,7 +67,9 @@ import { UsersModule } from '../users/users.module';
     FindExistingAgentUseCase,
     AddAgentPermissionsUseCase,
     CreateAgentUseCase,
-    CountAgentsInAgencyUseCase
+    CountAgentsInAgencyUseCase,
+     AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY,         
+  AGENT_REPOSITORY_TOKENS.AGENT_PERMISSION_REPOSITORY
   ],
 })
 export class AgentModule {}
