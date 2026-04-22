@@ -9,5 +9,12 @@ export interface IProductRepository {
   update(id: number, data: Partial<Product>): Promise<Product>;
    deleteWithRelations(id: number): Promise<void>; 
   delete(id: number): Promise<void>;
+
+  transferAgentProducts(
+  agentUserId: number,
+  agencyId: number,
+  ownerUserId: number,
+  tx?: any,
+): Promise<void>;
 }
 

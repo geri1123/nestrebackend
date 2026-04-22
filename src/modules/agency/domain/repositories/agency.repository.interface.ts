@@ -30,6 +30,7 @@ export interface IAgencyDomainRepository {
   public_code: string | null;
   created_at: Date;
 }[]>;
+findOwnerUserId(agencyId: number): Promise<number | null>;
   countAgencies(search?: string): Promise<number>;
   getAgencyWithOwnerById(id: number): Promise<{
     id: number;

@@ -6,7 +6,10 @@ import { NotificationTemplateService } from '../../../../notification/notificati
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { AgencyAgentRoleInAgency, AgencyAgentStatus } from '@prisma/client';
 import { USER_REPO } from '../../../../users/domain/repositories/user.repository.interface';
+import { AGENCY_REPO } from '../../../../agency/domain/repositories/agency.repository.interface';
+import { PRODUCT_REPO } from '../../../../product/domain/repositories/product.repository.interface';
 import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
+import { UserEventPublisher } from '../../../../users/application/events/user-event.publisher';
 import * as classValidator from 'class-validator';
 
 jest.mock('class-validator', () => ({
@@ -35,6 +38,14 @@ describe('UpdateAgentUseCase', () => {
     updateFields: jest.fn(),
   };
 
+  const agencyRepo = {
+    findOwnerUserId: jest.fn(),
+  };
+
+  const productRepo = {
+    transferAgentProducts: jest.fn(),
+  };
+
   const prisma = {
     $transaction: jest.fn((cb) => cb(mockTx)),
   };
@@ -45,6 +56,10 @@ describe('UpdateAgentUseCase', () => {
 
   const notificationTemplateService = {
     getTemplate: jest.fn(),
+  };
+
+  const userEventPublisher = {
+    userUpdated: jest.fn(),
   };
 
   const mockUser = {
@@ -108,6 +123,14 @@ describe('UpdateAgentUseCase', () => {
           useValue: userRepo,
         },
         {
+          provide: AGENCY_REPO,
+          useValue: agencyRepo,
+        },
+        {
+          provide: PRODUCT_REPO,
+          useValue: productRepo,
+        },
+        {
           provide: PrismaService,
           useValue: prisma,
         },
@@ -116,25 +139,23 @@ describe('UpdateAgentUseCase', () => {
           provide: NotificationTemplateService,
           useValue: notificationTemplateService,
         },
+        {
+          provide: UserEventPublisher,
+          useValue: userEventPublisher,
+        },
       ],
     }).compile();
 
     useCase = module.get(UpdateAgentUseCase);
     jest.clearAllMocks();
     (classValidator.validate as jest.Mock).mockResolvedValue([]);
-
-    // default mock për template
     notificationTemplateService.getTemplate.mockReturnValue('mocked message');
   });
 
-  describe('execute', () => {
-
+  describe('validation', () => {
     it('should throw BadRequestException on validation errors', async () => {
       (classValidator.validate as jest.Mock).mockResolvedValueOnce([
-        {
-          property: 'commissionRate',
-          constraints: { min: 'error' },
-        },
+        { property: 'commissionRate', constraints: { min: 'error' } },
       ]);
 
       await expect(
@@ -143,7 +164,9 @@ describe('UpdateAgentUseCase', () => {
 
       expect(agentRepo.findById).not.toHaveBeenCalled();
     });
+  });
 
+  describe('agent lookup', () => {
     it('should throw NotFoundException if agent not found', async () => {
       agentRepo.findById.mockResolvedValue(null);
 
@@ -152,7 +175,7 @@ describe('UpdateAgentUseCase', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw Forbidden if terminated', async () => {
+    it('should throw ForbiddenException if agent is already terminated', async () => {
       agentRepo.findById.mockResolvedValue({
         ...mockAgentAgent,
         status: 'terminated',
@@ -162,66 +185,78 @@ describe('UpdateAgentUseCase', () => {
         useCase.execute(10, 5, { status: 'active' }, 'en', mockUser),
       ).rejects.toThrow(ForbiddenException);
     });
+  });
 
-    it('should allow update and send notification', async () => {
+  describe('role hierarchy (actingAgentId)', () => {
+    it('should throw ForbiddenException if acting agent tries to update themselves', async () => {
       agentRepo.findById.mockResolvedValue(mockAgentAgent);
-      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
 
+      await expect(
+        useCase.execute(10, 5, {}, 'en', mockUser, 10),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw ForbiddenException if acting agent has lower rank than target', async () => {
+      // acting = agent (rank 1), target = senior_agent (rank 2) — cannot update higher
+      agentRepo.findById
+        .mockResolvedValueOnce(mockSeniorAgent)  // target
+        .mockResolvedValueOnce(mockAgentAgent);  // acting
+
+      await expect(
+        useCase.execute(20, 5, { commissionRate: 15 }, 'en', mockUser, 10),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw ForbiddenException if acting agent has equal rank to target', async () => {
+      // acting = senior_agent (rank 2), target = senior_agent (rank 2) — equal rank blocked
+      agentRepo.findById
+        .mockResolvedValueOnce(mockSeniorAgent)  // target
+        .mockResolvedValueOnce(mockSeniorAgent); // acting (same rank)
+
+      await expect(
+        useCase.execute(20, 5, { commissionRate: 15 }, 'en', mockUser, 20),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw ForbiddenException if acting agent tries to assign a role >= their own rank', async () => {
+      // acting = senior_agent (rank 2), tries to promote target to team_lead (rank 3)
+      agentRepo.findById
+        .mockResolvedValueOnce(mockAgentAgent)   // target (rank 1)
+        .mockResolvedValueOnce(mockSeniorAgent); // acting (rank 2)
+
+      await expect(
+        useCase.execute(10, 5, { roleInAgency: 'team_lead' }, 'en', mockUser, 20),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow update if acting agent has strictly higher rank than target', async () => {
+      // acting = team_lead (rank 3), target = agent (rank 1)
+      agentRepo.findById
+        .mockResolvedValueOnce(mockAgentAgent) // target
+        .mockResolvedValueOnce(mockTeamLead);  // acting
+
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
       agentRepo.updateAgencyAgent.mockResolvedValue({
         ...mockAgentAgent,
-        commissionRate: 10,
+        commissionRate: 8,
       });
 
       const result = await useCase.execute(
         10,
         5,
-        { commissionRate: 10 },
+        { commissionRate: 8 },
         'en',
         mockUser,
+        30,
       );
 
-      expect(notificationTemplateService.getTemplate).toHaveBeenCalled();
-
-      expect(notificationService.sendNotification).toHaveBeenCalledWith({
-        userId: 100,
-        type: 'agent_updated_by_agent',
-        translations: expect.arrayContaining([
-          expect.objectContaining({
-            languageCode: expect.any(String),
-            message: expect.any(String),
-          }),
-        ]),
-      });
-
-      expect(result).toEqual({
-        success: true,
-        message: expect.any(String),
-      });
+      expect(agentRepo.updateAgencyAgent).toHaveBeenCalled();
+      expect(result).toEqual({ success: true, message: expect.any(String) });
     });
+  });
 
-    it('should run transaction on termination', async () => {
-      agentRepo.findById.mockResolvedValue(mockAgentAgent);
-      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
-
-      agentRepo.updateAgencyAgent.mockResolvedValue({
-        ...mockAgentAgent,
-        status: 'terminated',
-      });
-
-      await useCase.execute(
-        10,
-        5,
-        { status: 'terminated' },
-        'en',
-        mockUser,
-      );
-
-      expect(prisma.$transaction).toHaveBeenCalled();
-      expect(userRepo.updateFields).toHaveBeenCalled();
-      expect(agentRepo.detachAgentProducts).toHaveBeenCalled();
-    });
-
-    it('should return early if no changes', async () => {
+  describe('no-change early return', () => {
+    it('should return existing agent without updating if nothing changed', async () => {
       agentRepo.findById.mockResolvedValue(mockAgentAgent);
       agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
 
@@ -240,8 +275,129 @@ describe('UpdateAgentUseCase', () => {
       expect(agentRepo.updateAgencyAgent).not.toHaveBeenCalled();
       expect(result).toEqual(mockAgentAgent);
     });
+  });
 
-    it('should update permissions (existing)', async () => {
+  describe('standard update', () => {
+    it('should update agent and send notification', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agentRepo.updateAgencyAgent.mockResolvedValue({
+        ...mockAgentAgent,
+        commissionRate: 10,
+      });
+
+      const result = await useCase.execute(
+        10,
+        5,
+        { commissionRate: 10 },
+        'en',
+        mockUser,
+      );
+
+      expect(agentRepo.updateAgencyAgent).toHaveBeenCalledWith(
+        10,
+        expect.objectContaining({ commissionRate: 10 }),
+      );
+      expect(notificationTemplateService.getTemplate).toHaveBeenCalled();
+      expect(notificationService.sendNotification).toHaveBeenCalledWith({
+        userId: 100,
+        type: 'agent_updated_by_agent',
+        translations: expect.arrayContaining([
+          expect.objectContaining({
+            languageCode: expect.any(String),
+            message: expect.any(String),
+          }),
+        ]),
+      });
+      expect(result).toEqual({ success: true, message: expect.any(String) });
+    });
+
+    it('should NOT run transaction for a regular (non-termination) update', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agentRepo.updateAgencyAgent.mockResolvedValue({
+        ...mockAgentAgent,
+        commissionRate: 10,
+      });
+
+      await useCase.execute(10, 5, { commissionRate: 10 }, 'en', mockUser);
+
+      expect(prisma.$transaction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('termination flow', () => {
+    it('should run full transaction when terminating an agent', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agencyRepo.findOwnerUserId.mockResolvedValue(99);
+      agentRepo.updateAgencyAgent.mockResolvedValue({
+        ...mockAgentAgent,
+        status: 'terminated',
+      });
+
+      await useCase.execute(10, 5, { status: 'terminated' }, 'en', mockUser);
+
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(agencyRepo.findOwnerUserId).toHaveBeenCalledWith(5);
+      expect(agentRepo.updateAgencyAgent).toHaveBeenCalledWith(
+        10,
+        expect.objectContaining({ status: 'terminated' }),
+        mockTx,
+      );
+      expect(userRepo.updateFields).toHaveBeenCalledWith(
+        100,
+        { role: 'user' },
+        mockTx,
+      );
+      expect(productRepo.transferAgentProducts).toHaveBeenCalledWith(
+        100,
+        5,
+        99,
+        mockTx,
+      );
+    });
+
+    it('should publish userUpdated event after termination', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agencyRepo.findOwnerUserId.mockResolvedValue(99);
+      agentRepo.updateAgencyAgent.mockResolvedValue({
+        ...mockAgentAgent,
+        status: 'terminated',
+      });
+
+      await useCase.execute(10, 5, { status: 'terminated' }, 'en', mockUser);
+
+      expect(userEventPublisher.userUpdated).toHaveBeenCalledWith(100);
+    });
+
+    it('should NOT publish userUpdated event for a non-termination update', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agentRepo.updateAgencyAgent.mockResolvedValue({
+        ...mockAgentAgent,
+        commissionRate: 10,
+      });
+
+      await useCase.execute(10, 5, { commissionRate: 10 }, 'en', mockUser);
+
+      expect(userEventPublisher.userUpdated).not.toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException if agency owner is not found during termination', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agencyRepo.findOwnerUserId.mockResolvedValue(null);
+
+      await expect(
+        useCase.execute(10, 5, { status: 'terminated' }, 'en', mockUser),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('permissions update', () => {
+    it('should update existing permissions when they already exist', async () => {
       agentRepo.findById.mockResolvedValue(mockAgentAgent);
       agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
       agentRepo.updateAgencyAgent.mockResolvedValue(mockAgentAgent);
@@ -249,17 +405,19 @@ describe('UpdateAgentUseCase', () => {
       await useCase.execute(
         10,
         5,
-        {
-          permissions: { canEditOthersPost: true },
-        },
+        { permissions: { canEditOthersPost: true } },
         'en',
         mockUser,
       );
 
-      expect(agentPermissionRepo.updatePermissions).toHaveBeenCalled();
+      expect(agentPermissionRepo.updatePermissions).toHaveBeenCalledWith(
+        10,
+        { canEditOthersPost: true },
+      );
+      expect(agentPermissionRepo.createPermissions).not.toHaveBeenCalled();
     });
 
-    it('should create permissions (new)', async () => {
+    it('should create new permissions when none exist yet', async () => {
       agentRepo.findById.mockResolvedValue(mockAgentAgent);
       agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(null);
       agentRepo.updateAgencyAgent.mockResolvedValue(mockAgentAgent);
@@ -267,14 +425,31 @@ describe('UpdateAgentUseCase', () => {
       await useCase.execute(
         10,
         5,
-        {
-          permissions: { canEditOwnPost: true },
-        },
+        { permissions: { canEditOwnPost: true } },
         'en',
         mockUser,
       );
 
-      expect(agentPermissionRepo.createPermissions).toHaveBeenCalled();
+      expect(agentPermissionRepo.createPermissions).toHaveBeenCalledWith(
+        10,
+        5,
+        { canEditOwnPost: true },
+      );
+      expect(agentPermissionRepo.updatePermissions).not.toHaveBeenCalled();
+    });
+
+    it('should skip permission update if dto.permissions is not provided', async () => {
+      agentRepo.findById.mockResolvedValue(mockAgentAgent);
+      agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(mockExistingPermissions);
+      agentRepo.updateAgencyAgent.mockResolvedValue({
+        ...mockAgentAgent,
+        commissionRate: 8,
+      });
+
+      await useCase.execute(10, 5, { commissionRate: 8 }, 'en', mockUser);
+
+      expect(agentPermissionRepo.updatePermissions).not.toHaveBeenCalled();
+      expect(agentPermissionRepo.createPermissions).not.toHaveBeenCalled();
     });
   });
 });

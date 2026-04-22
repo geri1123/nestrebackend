@@ -365,5 +365,6 @@ async detachAgentProducts(agentUserId: number, agencyId: number, tx?: Prisma.Tra
       agencyId: null,
     },
   });
-}
+};
+
 }

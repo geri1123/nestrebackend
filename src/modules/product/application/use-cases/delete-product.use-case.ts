@@ -16,31 +16,26 @@ export class DeleteProductUseCase {
     private readonly filterService:FiltersService,
   ) {}
 
-  async execute(productId: number, userId: number, userRole: string, lang: SupportedLang): Promise<void> {
-    const product = await this.productRepository.findForPermissionCheck(productId);
-    if (!product) throw new NotFoundException('Product not found');
+  async execute(productId: number, lang: SupportedLang): Promise<void> {
+  const product = await this.productRepository.findForPermissionCheck(productId);
+  if (!product) throw new NotFoundException(t('productNotFound', lang));
 
-    const isOwner = product.userId === userId;
-    const isAdmin = userRole === UserRole.agency_owner;
-    if (!isOwner && !isAdmin) throw new ForbiddenException(t('insufficientPermissions', lang));
 
-    
-    const images = await this.deleteImages.findByProductId(productId);
+  const images = await this.deleteImages.findByProductId(productId);
 
-  
-    await this.productRepository.deleteWithRelations(productId);
-  
-    if (images.length > 0) {
-      await Promise.all(
-        images
-          .filter((img) => img.publicId)
-          .map((img) =>
-            this.deleteImages.executeByUrls([], [img.publicId!]).catch(console.error)
-          )
-      );
-    }
+  await this.productRepository.deleteWithRelations(productId);
 
-    this.filterService.refreshCounts();
+  if (images.length > 0) {
+    await Promise.all(
+      images
+        .filter((img) => img.publicId)
+        .map((img) =>
+          this.deleteImages.executeByUrls([], [img.publicId!]).catch(console.error)
+        )
+    );
   }
+
+  this.filterService.refreshCounts();
+}
      
 }

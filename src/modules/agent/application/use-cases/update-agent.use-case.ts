@@ -1,26 +1,28 @@
-
-
 import {
   ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { SupportedLang, t } from '../../../../locales';
+import { SupportedLang, t, SUPPORTED_LANGS } from '../../../../locales';
 import { UpdateAgentsDto } from '../../dto/update-agents.dto';
 import { validate } from 'class-validator';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
 import { type IAgentDomainRepository } from '../../domain/repositories/agents.repository.interface';
 import { type IAgentPermissionDomainRepository } from '../../domain/repositories/agent-permission.repository.interface';
-import { type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
-import { USER_REPO } from '../../../users/domain/repositories/user.repository.interface';
+import { type IUserDomainRepository, USER_REPO } from '../../../users/domain/repositories/user.repository.interface';
+import { type IAgencyDomainRepository } from '../../../agency/domain/repositories/agency.repository.interface';
+import { type IProductRepository } from '../../../product/domain/repositories/product.repository.interface';
 import { NotificationService } from '../../../notification/notification.service';
 import { NotificationTemplateService } from '../../../notification/notifications-template.service';
 import { AgencyAgentRoleInAgency, AgencyAgentStatus } from '@prisma/client';
 import { hasAgentChanges, translateAgentChanges } from '../helpers/agent-change-translator';
 import { AGENT_REPOSITORY_TOKENS } from '../../domain/repositories/agent.repository.tokens';
+import { AGENCY_REPO } from '../../../agency/domain/repositories/agency.repository.interface';
+import { PRODUCT_REPO } from '../../../product/domain/repositories/product.repository.interface'; // token-i yt
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
-import { SUPPORTED_LANGS } from '../../../../locales';
+import { UserEventPublisher } from '../../../users/application/events/user-event.publisher';
+
 export interface BaseUserInfo {
   id: number;
   username: string;
@@ -45,10 +47,16 @@ export class UpdateAgentUseCase {
     @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
 
-    private readonly prisma: PrismaService,
+    @Inject(AGENCY_REPO)
+    private readonly agencyRepo: IAgencyDomainRepository,
 
+    @Inject(PRODUCT_REPO)
+    private readonly productRepo: IProductRepository,
+
+    private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
     private readonly notificationTemplateService: NotificationTemplateService,
+     private readonly userEventPublisher: UserEventPublisher,
   ) {}
 
   async execute(
@@ -117,15 +125,35 @@ export class UpdateAgentUseCase {
       ...(dto.status !== undefined && { status: dto.status }),
     };
 
-const updatedAgent = dto.status === AgencyAgentStatus.terminated
-  ? await this.prisma.$transaction(async (tx) => {
-      const agent = await this.agentRepo.updateAgencyAgent(id, dataToUpdate, tx);
-      await this.userRepo.updateFields(agent.agentUserId, { role: 'user' }, tx);
-      await this.agentRepo.detachAgentProducts(agent.agentUserId, agencyId, tx);
-      return agent;
-    })
-  : await this.agentRepo.updateAgencyAgent(id, dataToUpdate);
+    const updatedAgent = dto.status === AgencyAgentStatus.terminated
+      ? await this.prisma.$transaction(async (tx) => {
+          // 1. Gjej ownerUserId nga agency
+          const ownerUserId = await this.agencyRepo.findOwnerUserId(agencyId);
 
+          if (!ownerUserId) {
+            throw new NotFoundException(t('agencyOrOwnerNotFound', language));
+          }
+
+          // 2. Termino agjentin
+          const agent = await this.agentRepo.updateAgencyAgent(id, dataToUpdate, tx);
+
+          // 3. Ktheje rolin e userit te 'user'
+          await this.userRepo.updateFields(agent.agentUserId, { role: 'user' }, tx);
+
+          // 4. Transfero produktet e agjentit te pronari i agjencisë
+          await this.productRepo.transferAgentProducts(
+            agent.agentUserId,
+            agencyId,
+            ownerUserId,
+            tx,
+          );
+
+          return agent;
+        })
+      : await this.agentRepo.updateAgencyAgent(id, dataToUpdate);
+  if (dto.status === AgencyAgentStatus.terminated) {
+      await this.userEventPublisher.userUpdated(updatedAgent.agentUserId);
+    }
     if (dto.permissions) {
       if (existingPermissions) {
         await this.agentPermissionRepo.updatePermissions(id, dto.permissions);
@@ -134,22 +162,18 @@ const updatedAgent = dto.status === AgencyAgentStatus.terminated
       }
     }
 
-    const changesText = translateAgentChanges(dto, language);
     const updatedByName = user.username;
 
-    // const translations = this.notificationTemplateService.getAllTranslations(
-    //   'agent_updated_by_agent',
-    //   { updatedByName, changesText },
-    // );
-const translations = SUPPORTED_LANGS.map((lang) => {
-  const changesText = translateAgentChanges(dto, lang, existingAgent);
-  const message = this.notificationTemplateService.getTemplate(
-    'agent_updated_by_agent',
-    { updatedByName, changesText },
-    lang,
-  );
-  return { languageCode: lang, message };
-});
+    const translations = SUPPORTED_LANGS.map((lang) => {
+      const changesText = translateAgentChanges(dto, lang, existingAgent);
+      const message = this.notificationTemplateService.getTemplate(
+        'agent_updated_by_agent',
+        { updatedByName, changesText },
+        lang,
+      );
+      return { languageCode: lang, message };
+    });
+
     await this.notificationService.sendNotification({
       userId: updatedAgent.agentUserId,
       type: 'agent_updated_by_agent',

@@ -3,6 +3,7 @@ import { PrismaService } from '../../../../infrastructure/prisma/prisma.service'
 import { IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { Product } from '../../domain/entities/product.entity';
 import { SupportedLang } from '../../../../locales';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductRepository implements IProductRepository {
@@ -261,5 +262,23 @@ async deleteWithRelations(id: number): Promise<void> {
 }
   async delete(id: number): Promise<void> {
     await this.prisma.product.delete({ where: { id } });
-  }
+  };
+async transferAgentProducts(
+  agentUserId: number,
+  agencyId: number,
+  ownerUserId: number,
+  tx?: Prisma.TransactionClient,
+): Promise<void> {
+  const client = tx ?? this.prisma;
+
+  await client.product.updateMany({
+    where: {
+      userId: agentUserId,
+      agencyId: agencyId,
+    },
+    data: {
+      userId: ownerUserId, 
+    },
+  });
+}
 }

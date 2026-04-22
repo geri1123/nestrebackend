@@ -21,12 +21,17 @@ import { GetAgentByIdInAgencyUseCase } from './application/use-cases/get-agent-i
 import { PrismaModule } from '../../infrastructure/prisma/prisma.module';
 import { CountAgentsInAgencyUseCase } from './application/use-cases/count-agents-in-agency.use-case';
 import { UsersModule } from '../users/users.module';
+import { AgencyModule } from '../agency/agency.module';
+import { PRODUCT_REPO } from '../product/domain/repositories/product.repository.interface';
+import { ProductRepository } from '../product/infrastructure/persisetence/product.repository';
 
 @Module({
   imports: [
     NotificationModule,
     PrismaModule,
     UsersModule,
+    AgencyModule,
+  
   ],
   controllers: [AgentController],
   providers: [
@@ -53,6 +58,13 @@ import { UsersModule } from '../users/users.module';
       provide: AGENT_REPOSITORY_TOKENS.AGENT_PERMISSION_REPOSITORY,
       useClass: AgentPermissionRepository,
     },
+    {
+        provide: PRODUCT_REPO,
+      useClass: ProductRepository,
+    }
+  
+  
+,
     GetAgentsUseCase,
     UpdateAgentUseCase,
   ],

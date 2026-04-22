@@ -8,24 +8,42 @@ import { UserRole } from '@prisma/client';
 export class ProductOwnershipGuard implements CanActivate {
   constructor(private readonly getProductForPermission: GetProductForPermissionUseCase) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest<RequestWithUser>();
-    const productId = Number(req.params.id);
-    const lang:SupportedLang = req.language;
+  // async canActivate(context: ExecutionContext): Promise<boolean> {
+  //   const req = context.switchToHttp().getRequest<RequestWithUser>();
+  //   const productId = Number(req.params.id);
+  //   const lang:SupportedLang = req.language;
 
-    const product = await this.getProductForPermission.execute(productId, lang);
+  //   const product = await this.getProductForPermission.execute(productId, lang);
 
-    if (req.user?.role === UserRole.agency_owner) {
-      return this.validateAgencyOwnerAccess(req, product, lang);
-    }
+  //   if (req.user?.role === UserRole.agency_owner) {
+  //     return this.validateAgencyOwnerAccess(req, product, lang);
+  //   }
 
-    if (req.user?.role === UserRole.agent) {
-      return this.validateAgentAccess(req, product, lang);
-    }
+  //   if (req.user?.role === UserRole.agent) {
+  //     return this.validateAgentAccess(req, product, lang);
+  //   }
 
-    return this.validateRegularUserAccess(req, product, lang);
+  //   return this.validateRegularUserAccess(req, product, lang);
+  // }
+
+async canActivate(context: ExecutionContext): Promise<boolean> {
+  const req = context.switchToHttp().getRequest<RequestWithUser>();
+  const productId = Number(req.params.id);
+  const lang: SupportedLang = req.language;
+  const isDeleteRequest = req.method === 'DELETE'; 
+
+  const product = await this.getProductForPermission.execute(productId, lang);
+
+  if (req.user?.role === UserRole.agency_owner) {
+    return this.validateAgencyOwnerAccess(req, product, lang);
   }
 
+  if (req.user?.role === UserRole.agent) {
+    return this.validateAgentAccess(req, product, lang, isDeleteRequest); 
+  }
+
+  return this.validateRegularUserAccess(req, product, lang);
+}
   
   private validateAgencyOwnerAccess(
     req: RequestWithUser,
@@ -38,29 +56,55 @@ export class ProductOwnershipGuard implements CanActivate {
     return true;
   }
 
-  
   private validateAgentAccess(
-    req: RequestWithUser,
-    product: any,
-    lang: SupportedLang
-  ): boolean {
-    if (!req.agencyAgentId) {
-      throw new ForbiddenException(t('noAgency', lang));
-    }
-
-    if (product.userId === req.userId) {
-      return true;
-    }
-
-    if (product.agencyId === req.agencyId) {
-      if (req.agentPermissions?.can_edit_others_post) {
-        return true;
-      }
-      throw new ForbiddenException(t('insufficientPermissions', lang));
-    }
-
-    throw new ForbiddenException(t('cannotEditOthersProduct', lang));
+  req: RequestWithUser,
+  product: any,
+  lang: SupportedLang,
+  isDeleteRequest: boolean 
+): boolean {
+  if (!req.agencyAgentId) {
+    throw new ForbiddenException(t('noAgency', lang));
   }
+
+  // Agent always can delete/edit their own post
+  if (product.userId === req.userId) {
+    return true;
+  }
+
+  if (product.agencyId === req.agencyId) {
+    const hasPermission = isDeleteRequest
+      ? req.agentPermissions?.can_delete_posts      
+      : req.agentPermissions?.can_edit_others_post;  
+
+    if (hasPermission) return true;
+
+    throw new ForbiddenException(t('insufficientPermissions', lang));
+  }
+
+  throw new ForbiddenException(t('cannotEditOthersProduct', lang));
+}
+  // private validateAgentAccess(
+  //   req: RequestWithUser,
+  //   product: any,
+  //   lang: SupportedLang
+  // ): boolean {
+  //   if (!req.agencyAgentId) {
+  //     throw new ForbiddenException(t('noAgency', lang));
+  //   }
+
+  //   if (product.userId === req.userId) {
+  //     return true;
+  //   }
+
+  //   if (product.agencyId === req.agencyId) {
+  //     if (req.agentPermissions?.can_edit_others_post) {
+  //       return true;
+  //     }
+  //     throw new ForbiddenException(t('insufficientPermissions', lang));
+  //   }
+
+  //   throw new ForbiddenException(t('cannotEditOthersProduct', lang));
+  // }
 
   private validateRegularUserAccess(
     req: RequestWithUser,

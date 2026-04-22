@@ -136,14 +136,15 @@ async createProduct(
 
     return this.searchProductsUseCase.execute(filters, language, isProtectedRoute);
   }
-  @Delete(':id')
+@Delete(':id')
+
+@RequireAgencyContext()  
+@UseGuards( AgencyContextGuard, ProductOwnershipGuard)
 async deleteProduct(
   @Param('id') id: number,
   @Req() req: RequestWithUser,
 ) {
-  if (!req.user) throw new UnauthorizedException('Not authenticated');
-  
-  await this.deleteProductUseCase.execute(id, req.user.id, req.user.role , req.language);
-  return { success: true , message: t('productSuccesfullyDeleted', req.language),};
+  await this.deleteProductUseCase.execute(id, req.language);
+  return { success: true, message: t('productSuccesfullyDeleted', req.language) };
 }
 }

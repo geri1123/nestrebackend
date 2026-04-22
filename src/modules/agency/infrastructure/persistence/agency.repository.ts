@@ -55,6 +55,14 @@ export class AgencyRepository implements IAgencyDomainRepository {
     return data ? this.mapToEntity(data) : null;
   }
 
+  async findOwnerUserId(agencyId:number):Promise<number|null>{
+   const result = await this.prisma.agency.findUnique({
+    where: { id: agencyId },
+    select: { ownerUserId: true },
+  });
+  return result?.ownerUserId ?? null;
+  }
+
   async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfoVO | null> {
     const agency = await this.prisma.agency.findUnique({
       where: { id: agencyId },
