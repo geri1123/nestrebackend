@@ -61,21 +61,22 @@ export class SearchProductsController {
   }
 
   @Public()
-  @Get('agency/:agencyId')
-  @ApiSearchAgencyProducts()
-  async getAgencyProducts(
-    @Param('agencyId') agencyId: number,
-    @Req() req: RequestWithLang,
-    @Query('page') page = '1'
-  ) {
-    const language = req.language;
-    const filters = this.searchFiltersHelper.parse(req.query, page);
+ @Get('agency/:agencyId')
+@ApiSearchAgencyProducts()
+async getAgencyProducts(
+  @Param('agencyId') agencyId: number,
+  @Req() req: RequestWithLang,
+  @Query() rawQuery: Record<string, any>,  
+  @Query('page') page = '1'
+) {
+  const language = req.language;
+  const filters = this.searchFiltersHelper.parse(rawQuery, page);
 
-    filters.agencyId = agencyId;
-    filters.status = 'active';
+  filters.agencyId = agencyId;
+  filters.status = 'active';
 
-    return this.searchProductsUseCase.execute(filters, language, false);
-  }
+  return this.searchProductsUseCase.execute(filters, language, false);
+}
 @Public()
 @Get('agency/:agencyId/city-counts')
 async getCityCounts(
@@ -86,7 +87,7 @@ async getCityCounts(
   const filters = this.searchFiltersHelper.parse(query);
 
   filters.agencyId = Number(agencyId);
-  filters.status = 'active'; // ← shto kete
+  filters.status = 'active'; 
 
   return this.getAgencyCityCountsUseCase.execute(
     filters,
