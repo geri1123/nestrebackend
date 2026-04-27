@@ -38,6 +38,7 @@ import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.mod
 import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { UserEventPublisher } from './application/events/user-event.publisher';
+import { GetPublicUserProfileUseCase } from './application/use-cases/get-public-user.use-case';
 
 // NOTE: AGENT_PROFILE_PORT and AGENCY_OWNER_PROFILE_PORT are provided by
 // AgencyContextModule (@Global), so they are available without importing here.
@@ -71,6 +72,7 @@ import { UserEventPublisher } from './application/events/user-event.publisher';
     FindUserForAuthUseCase,
     DeleteProfileImageUseCase,
     UserCacheInvalidationListener,
+    GetPublicUserProfileUseCase
   ],
   exports: [
     USER_REPO,

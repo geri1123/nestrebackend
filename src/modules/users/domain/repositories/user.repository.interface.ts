@@ -48,6 +48,21 @@ deleteById(userId: number): Promise<void>;
   status: string;
   email_verified: boolean;
 } | null>;
+findPublicById(userId: number): Promise<{
+  id: number;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
+  aboutMe: string | null;
+  profileImgUrl: string | null;
+  role: string;
+  createdAt: Date;
+  agency: { id: number; agencyName: string; logo: string | null } | null;
+  agencyAgentAgent: {
+    roleInAgency: string;
+    agency: { id: number; agencyName: string; logo: string | null };
+  }[];
+} | null>;
 }
 
 export interface CreateUserData {

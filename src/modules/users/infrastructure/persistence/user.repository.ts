@@ -314,5 +314,49 @@ export class UserRepository implements IUserDomainRepository {
       status: user.status,
       email_verified: user.emailVerified,
     };
-  }
+  };
+  async findPublicById(userId: number) {
+  return this.prisma.user.findUnique({
+    where: { 
+      id: userId, 
+      status: 'active',  // ✅ only active users
+    },
+    select: {
+      id: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+      aboutMe: true,
+      profileImgUrl: true,
+      role: true,
+      createdAt: true,
+
+      // agency_owner → linked directly
+      agency: {
+        select: {
+          id: true,
+          agencyName: true,
+          logo: true,
+        }
+      },
+
+      // agent → linked via AgencyAgent
+      agencyAgentAgent: {
+        where: { status: 'active' },
+        select: {
+          roleInAgency: true,
+          agency: {
+            select: {
+              id: true,
+              agencyName: true,
+              logo: true,
+            }
+          }
+        },
+        take: 1,
+      },
+    }
+  });
+}
+
 }

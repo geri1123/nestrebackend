@@ -7,6 +7,8 @@ import {
   HttpStatus,
   Get,
   UnauthorizedException,
+  Param,
+  BadRequestException,
 } from '@nestjs/common';
 
 
@@ -19,10 +21,13 @@ import { GetNavbarUserUseCase } from '../application/use-cases/get-navbar-user.u
 import { UpdateUserProfileUseCase } from '../application/use-cases/update-user-profile.use-case';
 import { GetUserProfileUseCase } from '../application/use-cases/get-user-profile.use-case';
 import { UserProfileResponse } from '../responses/user-profile.response';
-import { ApiChangeUsername, ApiGetNavbarProfile, ApiGetUserProfile, ApiUpdateProfile } from '../decorators/profile.decorators';
+import { ApiChangeUsername, ApiGetNavbarProfile, ApiGetPublicProfile, ApiGetUserProfile, ApiUpdateProfile } from '../decorators/profile.decorators';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { ChangePasswordUseCase } from '../application/use-cases/password/change-password.use-case';
 import { ApiChangePassword } from '../decorators/password.decoretors';
+import { Public } from '../../../common/decorators/public.decorator';
+import { RequestWithLang } from '../../../middlewares/language.middleware';
+import { GetPublicUserProfileUseCase } from '../application/use-cases/get-public-user.use-case';
 
 @Controller('profile')
 export class ProfileController {
@@ -32,6 +37,7 @@ export class ProfileController {
     private readonly changeUsernameUseCase: ChangeUsernameUseCase,
     private readonly getUserProfile:GetUserProfileUseCase,
     private readonly  changePasswordUseCase:ChangePasswordUseCase,
+    private readonly getpublicuserid:GetPublicUserProfileUseCase
   ) {}
 
 
@@ -51,23 +57,7 @@ async getUserInfo(@Req() req: RequestWithUser) {
 }
   
  @ApiGetNavbarProfile()
-  // @Get('navbar')
-  // async getProfile(@Req() req: RequestWithUser) {
-  //   if (!req.userId) {
-  //     throw new UnauthorizedException(t('userNotAuthenticated', req.language));
-  //   }
-
-  //  const navbarUser=await this.getNavbarUserUseCase.execute(req.userId, req.language);
-
-  //    return {
-  //   username: navbarUser.username,
-  //   email: navbarUser.email,
-  //   profileImgUrl: navbarUser.profileImg,
-  //   lastLogin: navbarUser.lastLogin ,
-  //   createdAt:navbarUser.createdAt,
-  //   role: navbarUser.role,
-  // };
-  // }
+ 
 @Get('navbar')
 async getNavbar(@Req() req: RequestWithUser) {
   if (!req.user) {
@@ -143,6 +133,16 @@ async changePassword(
     dto,
     req.language,
   );
+}
+
+@Get(':id')
+@Public()
+@ApiGetPublicProfile()
+async getPublicProfile(@Param('id') id: string, @Req() req: RequestWithLang) {
+  const userId = parseInt(id, 10);
+  if (isNaN(userId)) throw new BadRequestException('Invalid user id');
+  
+  return this.getpublicuserid.execute(userId, req.language);
 }
 }
 

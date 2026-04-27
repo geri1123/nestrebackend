@@ -192,6 +192,22 @@ async getRelatedProducts(
   );
 
   return { products: relatedProducts };
+};
+@Public()
+@Get('user/:userId')
+async getUserProducts(
+  @Param('userId') userId: number,
+  @Req() req: RequestWithLang,
+  @Query() rawQuery: Record<string, any>,
+  @Query('page') page = '1'
+) {
+  const language = req.language;
+  const filters = this.searchFiltersHelper.parse(rawQuery, page);
+
+  filters.userId = userId;
+  filters.status = 'active';
+
+  return this.searchProductsUseCase.execute(filters, language, false);
 }
 
 }

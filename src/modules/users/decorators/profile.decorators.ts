@@ -1,6 +1,6 @@
 // profile.decorators.ts
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiBody, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { 
   ApiSuccessResponse, 
   ApiBadRequestResponse, 
@@ -56,4 +56,31 @@ export const ApiChangeUsername = () =>
       username: ['Emri i përdoruesit duhet të jetë midis 4 dhe 30 karakteresh']
     }),
     ApiUnauthorizedResponse()
+  );
+  export const ApiGetPublicProfile = () =>
+  applyDecorators(
+    ApiOperation({ summary: 'Get public user profile by ID' }),
+    ApiOkResponse({
+      description: 'Public user profile retrieved successfully',
+      schema: {
+        example: {
+          id: 1,
+          username: 'johndoe',
+          firstName: 'John',
+          lastName: 'Doe',
+          aboutMe: 'Real estate agent with 5 years experience',
+          profileImgUrl: 'https://res.cloudinary.com/example.png',
+          role: 'agent',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          agency: {
+            id: 1,
+            agencyName: 'Best Agency',
+            logo: 'https://res.cloudinary.com/logo.png',
+          },
+          roleInAgency: 'senior_agent',
+        },
+      },
+    }),
+    ApiNotFoundResponse({ description: 'User not found or inactive' }),
+    ApiBadRequestResponse('Invalid user id', {}),
   );
