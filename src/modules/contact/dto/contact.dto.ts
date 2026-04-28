@@ -51,3 +51,9 @@ export class SendMessageToAgencyDto extends BaseMessageDto{
   @IsNumber()
   agencyId!:number;
 }
+
+export class SendMessageToUserDto extends BaseMessageDto {
+  @ApiProperty({ required: true, description: "ID of the user to send message to" })
+  @IsNumber()
+  userId!: number;
+}

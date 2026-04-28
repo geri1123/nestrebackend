@@ -161,5 +161,29 @@ async sendAgentRejectedEmail(to: string, name: string) {
   `;
 
   return this.sendEmail(recipientEmail, subject, html);
+};
+async sendMessageToUserEmail(params: {
+  senderName: string;
+  senderEmail: string;
+  recipientEmail: string;
+  message: string;
+  phone: string;
+}): Promise<boolean> {
+  const { senderName, senderEmail, recipientEmail, message, phone } = params;
+
+  const subject = `New message from ${senderName}`;
+
+  const html = `
+    <h2>You have a new message</h2>
+    <hr/>
+    <p><strong>Name:</strong> ${senderName}</p>
+    <p><strong>Email:</strong> ${senderEmail}</p>
+    <p><strong>Phone:</strong> ${phone || "-"}</p>
+    <hr/>
+    <p><strong>Message:</strong></p>
+    <p>${message}</p>
+  `;
+
+  return this.sendEmail(recipientEmail, subject, html);
 }
 }

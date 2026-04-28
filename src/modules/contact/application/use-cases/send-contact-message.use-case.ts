@@ -2,13 +2,13 @@ import { Injectable, BadRequestException } from "@nestjs/common";
 import { CreateContactDto } from "../../dto/contact.dto";
 import { GetProductByIdUseCase } from "../../../product/application/use-cases/get-product-by-id.use-case";
 import { SupportedLang, t } from "../../../../locales";
-import { EmailService } from "../../../../infrastructure/email/email.service";
+import { EmailQueueService } from "../../../../infrastructure/queue/services/email-queue.service";
 
 @Injectable()
 export class SendContactMessageUseCase {
   constructor(
     private readonly getProductByIdUseCase: GetProductByIdUseCase,
-    private readonly emailService: EmailService
+    private readonly emailQueueService: EmailQueueService
   ) {}
 
   async execute(dto: CreateContactDto, lang: SupportedLang) {
@@ -24,44 +24,18 @@ export class SendContactMessageUseCase {
       throw new BadRequestException(t('productOwnerNotFound', lang));
     }
 
-    const productTitle = product.title;
-    const productCategory = product.categoryName;
-    const productListingType = product.listingTypeName;
-    const productPrice = product.price;
-const productImage = product.image?.[0]?.imageUrl ?? '';
-
-    const contactMessage = {
-      senderName: dto.name,
-      senderEmail: dto.email,
-    
-      message: dto.message,
- phone:dto.phone,
-      productId: dto.productId,
-      productName: productTitle,
-      productPrice,
-      productCategory,
-      productListingType,
-      createdAt: new Date(),
-    };
-    console.log(contactMessage);
-
-    const emailSent = await this.emailService.sendContactMessageEmail({
-      senderName:  dto.name ?? '',
+    await this.emailQueueService.sendContactMessageEmail({
+      senderName: dto.name ?? '',
       senderEmail: dto.email ?? '',
-      recipientEmail: recipientEmail,
-     
+      recipientEmail,
       message: dto.message,
-phone:dto.phone ??'',
-      productName: productTitle,
-      productPrice,
-      productCategory,
-      productListingType,
-      productImage,
+      phone: dto.phone ?? '',
+      productName: product.title,
+      productPrice: product.price,
+      productCategory: product.categoryName,
+      productListingType: product.listingTypeName,
+      productImage: product.image?.[0]?.imageUrl ?? '',
     });
-
-    if (!emailSent) {
-      throw new BadRequestException(t('emailSendFailed', lang));
-    }
 
     return {
       success: true,

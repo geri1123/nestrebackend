@@ -21,6 +21,12 @@ export class EmailProcessor extends WorkerHost {
         return await this.sendPasswordReset(job);
       case EMAIL_JOBS.SEND_EMAIL:
         return await this.sendGenericEmail(job);
+        case EMAIL_JOBS.SEND_CONTACT_MESSAGE:
+  return await this.sendContactMessage(job);
+case EMAIL_JOBS.SEND_AGENCY_MESSAGE:
+  return await this.sendAgencyMessage(job);
+  case EMAIL_JOBS.SEND_MESSAGE_TO_USER:
+  return await this.sendMessageToUser(job);
       default:
         this.logger.warn(`Unknown email job: ${job.name}`);
         return { success: false };
@@ -60,6 +66,19 @@ export class EmailProcessor extends WorkerHost {
      if (type === 'agent_rejected') await this.emailService.sendAgentRejectedEmail(email, name); 
     return { success: true };
   }
+  private async sendContactMessage(job: Job) {
+  await this.emailService.sendContactMessageEmail(job.data);
+  return { success: true };
+}
+
+private async sendAgencyMessage(job: Job) {
+  await this.emailService.sendAgencyMessageEmail(job.data);
+  return { success: true };
+}
+private async sendMessageToUser(job: Job) {
+  await this.emailService.sendMessageToUserEmail(job.data);
+  return { success: true };
+}
 @OnWorkerEvent('failed')
 onFailed(job: Job, error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
