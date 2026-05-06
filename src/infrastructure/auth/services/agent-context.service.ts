@@ -42,6 +42,7 @@ export class AgentContextService implements IAgentProfilePort {
         status: agency.status,
         address: agency.address,
         publicCode: agency.publicCode ?? null,
+        description: agency.description ?? null,
       },
     };
   }

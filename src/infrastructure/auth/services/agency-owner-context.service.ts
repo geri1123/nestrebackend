@@ -28,6 +28,7 @@ export class AgencyOwnerContextService implements IAgencyOwnerProfilePort {
       website: agency.website ?? null,
       licenseNumber: agency.licenseNumber,
       publicCode: agency.publicCode ?? null,
+      description: agency.description ?? null,
     };
   }
 

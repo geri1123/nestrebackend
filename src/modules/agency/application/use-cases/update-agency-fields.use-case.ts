@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {AGENCY_REPO, type IAgencyDomainRepository } from '../../domain/repositories/agency.repository.interface';
 import { GetAgencyByIdUseCase } from './get-agency-by-id.use-case';
-import { SupportedLang } from '../../../../locales';
+import { SupportedLang, t } from '../../../../locales';
 
 export interface UpdateAgencyFieldsData {
   agencyName?: string;
@@ -9,6 +9,7 @@ export interface UpdateAgencyFieldsData {
   phone?: string;
   address?: string;
   website?: string;
+  description?: string;
 }
 
 @Injectable()
@@ -33,6 +34,7 @@ async execute(
     phone: data.phone,
     address: data.address,
     website: data.website,
+    description:data.description,
   });
 
 
@@ -41,7 +43,8 @@ async execute(
     data.agencyEmail === undefined &&
     data.phone === undefined &&
     data.address === undefined &&
-    data.website === undefined
+    data.website === undefined &&
+    data.description === undefined
   ) {
     return {
       success: false,
@@ -58,7 +61,7 @@ async execute(
 
   return {
     success: true,
-    message: 'Agency updated successfully.',
+    message: t('agencyUpdatedSuccess', language),
     data: updatedAgency,
   };
 }

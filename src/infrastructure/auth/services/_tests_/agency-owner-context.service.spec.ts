@@ -14,6 +14,7 @@ describe('AgencyOwnerContextService', () => {
     agencyEmail: 'agency@example.com',
     logo: 'logo.png',
     status: AgencyStatus.active,
+    description: 'Agency that provides the best services in the industry.',
     address: '123 Main St',
     phone: '+355691234567',
     website: 'https://bestagency.com',
@@ -55,6 +56,7 @@ describe('AgencyOwnerContextService', () => {
         website: 'https://bestagency.com',
         licenseNumber: 'LIC123456',
         publicCode: 'ABC123',
+        description: 'Agency that provides the best services in the industry.',
       });
     });
   });

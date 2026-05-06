@@ -14,6 +14,7 @@ describe('GetAgencyByPublicCodeUseCase', () => {
     'Test Agency',
     'LIC-123456',
     '123 Test Street',
+    null,
     100,
     'active',
     'ABC123',

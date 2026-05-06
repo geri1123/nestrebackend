@@ -88,6 +88,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       status: agency.status,
       publicCode: agency.publicCode,
       agencyEmail: agency.agencyEmail,
+      description: agency.description,
       phone: agency.phone,
       website: agency.website,
       logo: agency.logo,
@@ -131,6 +132,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     agency_name: string;
     logo: string | null;
     address: string | null;
+    
     phone: string | null;
     agency_email: string | null;
     public_code: string | null;
@@ -170,6 +172,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
         agencyEmail: true,    
         publicCode: true,
         createdAt: true,
+        
       },
       orderBy: { createdAt: 'desc' },
       skip,
@@ -186,6 +189,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       agency_email: result.agencyEmail,
       public_code: result.publicCode,
       created_at: result.createdAt,
+      
     }));
   }
 
@@ -269,6 +273,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     if (data.logoPublicId !== undefined) prismaData.logoPublicId = data.logoPublicId;
     if (data.agencyName !== undefined) prismaData.agencyName = data.agencyName;
     if (data.agencyEmail !== undefined) prismaData.agencyEmail = data.agencyEmail;
+    if (data.description !== undefined) prismaData.description = data.description;
     if (data.phone !== undefined) prismaData.phone = data.phone;
     if (data.address !== undefined) prismaData.address = data.address;
     if (data.website !== undefined) prismaData.website = data.website;
@@ -316,6 +321,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
       id: data.id,
       agencyName: data.agencyName,
       licenseNumber: data.licenseNumber,
+      description: data.description,
       address: data.address,
       ownerUserId: data.ownerUserId,
       status: data.status,

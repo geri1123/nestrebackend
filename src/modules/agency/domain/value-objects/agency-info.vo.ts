@@ -8,7 +8,7 @@ export interface AgencyInfoVO {
   address: string | null;
   status: AgencyStatus;
   publicCode: string | null;
-
+  description: string | null;
   agencyEmail: string | null;
   phone: string | null;
   website: string | null;

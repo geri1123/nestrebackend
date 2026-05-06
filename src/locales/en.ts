@@ -14,7 +14,9 @@ export const en = {
     passwordChangedSuccessfully:"Password changed successfully",
       googleUsersCannotChangePassword: "This account uses Google login. Cannot change password.",
   passwordCreatedSuccessfully: "Password created successfully",
-
+descriptionTooManyWords: "Description cannot exceed 100 words.",
+descriptionMustBeString: "Description must be a valid string.",
+agencyUpdatedSuccess: "Agency updated successfully",
     passwordNotSetForUser:"This account uses Google login. You need to set a password before changing it.",
 userUpdatedSuccess:"User updated successfully .",
 cannotSaveOwnProduct:"Cannot save your own product",

@@ -10,6 +10,7 @@ datasource db {
 model Agency {
   id                  Int                     @id @default(autoincrement())
   agencyName          String                  @map("agency_name")
+  description         String?                 @db.Text          
   publicCode          String?                 @unique(map: "agency_public_code_key") @map("public_code")
   logo                String?
   logoPublicId        String?                 @map("logo_public_id")

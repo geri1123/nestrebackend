@@ -20,6 +20,7 @@ export interface AgentProfileData {
     status: AgencyStatus;
     address: string;
     publicCode: string | null;
+    description: string | null;
   };
 }
  

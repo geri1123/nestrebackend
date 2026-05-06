@@ -6,8 +6,10 @@ import {
   IsEmail,
   IsNumberString,
   Length,
-  IsUrl
+  IsUrl,
+  MaxLength
 } from "class-validator";
+import { MaxWords } from "../../../common/helpers/max-words.validator";
 
 export class UpdateAgencyDto {
   @ApiPropertyOptional({
@@ -52,4 +54,17 @@ export class UpdateAgencyDto {
   @IsOptional()
   @IsUrl()
   website?: string;
+   @ApiPropertyOptional({
+    example: 'We are a leading real estate agency in Tirana specializing in luxury apartments and commercial properties.',
+    description: 'Agency description (max 500 characters)',
+    maxLength: 500
+  })
+ @ApiPropertyOptional({
+  example: 'Leading real estate agency in Tirana specializing in luxury apartments.',
+  description: 'Agency description (max 100 words)'
+})
+@IsOptional()
+@IsString({ message: 'descriptionMustBeString' })
+@MaxWords(100, { message: 'descriptionTooManyWords' })
+description?: string;
 }

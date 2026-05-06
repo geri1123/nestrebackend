@@ -55,6 +55,8 @@ export function translateValidationMessage(code: string, lang: SupportedLang): s
      case 'agencyNameRequired': return t('agencyNameRequired', lang);
     case 'licenseRequired': return t('licenseRequired', lang);
     case 'addressRequired': return t('addressRequired', lang);
+    case 'descriptionTooManyWords': return t('descriptionTooManyWords', lang);
+    case 'descriptionMustBeString': return t('descriptionMustBeString', lang);
 // Agent registration
     case 'publicCodeRequired': return t('publicCodeRequired', lang);
     case 'idCardRequired': return t('idCardRequired', lang);
@@ -109,6 +111,8 @@ case 'repeatPasswordRequired':return t('repeatPasswordRequired', lang);
 case 'fullnamerequired' :return t("fullnamerequired" , lang);
 case 'messagerequired':return t("messagerequired" , lang);
 case 'phoneformat':return t("phoneformat", lang);
+
+
 default: return code;
   }
 }

@@ -6,6 +6,7 @@ export class Agency {
     public agencyName: string,
     public licenseNumber: string,
     public address: string,
+    public description: string | null,
     public ownerUserId: number,
     public status: AgencyStatus,
     public publicCode: string,
@@ -25,12 +26,14 @@ export class Agency {
     phone?: string;
     address?: string;
     website?: string;
+    description?: string | null;
   }): void {
     if (data.agencyName !== undefined) this.agencyName = data.agencyName;
     if (data.agencyEmail !== undefined) this.agencyEmail = data.agencyEmail;
     if (data.phone !== undefined) this.phone = data.phone;
     if (data.address !== undefined) this.address = data.address;
     if (data.website !== undefined) this.website = data.website;
+    if (data.description !== undefined) this.description = data.description;
   }
 
   updateLogo(url: string, publicId: string): void {
@@ -72,10 +75,11 @@ export class Agency {
     agencyName: string;
     licenseNumber: string;
     address: string;
+    description?: string | null;
     ownerUserId: number;
     status: AgencyStatus;
     publicCode: string;
-    logoPublicId?: string; 
+    logoPublicId?: string;
     agencyEmail?: string;
     phone?: string;
     website?: string;
@@ -88,10 +92,11 @@ export class Agency {
       data.agencyName,
       data.licenseNumber,
       data.address,
+      data.description ?? null,
       data.ownerUserId,
       data.status,
       data.publicCode,
-      data.logoPublicId, 
+      data.logoPublicId,
       data.agencyEmail,
       data.phone,
       data.website,

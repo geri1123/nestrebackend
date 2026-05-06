@@ -11,6 +11,7 @@ export interface AgencyData {
   website: string | null;
   licenseNumber: string;
   publicCode: string | null;
+  description: string | null;
 }
  
 export const AGENCY_OWNER_PROFILE_PORT = Symbol('AGENCY_OWNER_PROFILE_PORT');
