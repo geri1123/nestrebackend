@@ -29,9 +29,7 @@ export class GetProductByIdUseCase {
       return { product: null };
     }
 
-    // Get click count
-    const productClicks = await this.productClicksService.getClicksByProduct(`${id}`);
-    const totalClicks = productClicks.reduce((sum, c) => sum + c.count, 0);
+    const totalClicks = product.clickCount ?? 0;
 
     // Check status and permissions
   if (isProtectedRoute) {

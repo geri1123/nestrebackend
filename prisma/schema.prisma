@@ -345,6 +345,7 @@ model Product {
   @@index([userId], map: "Product_userId_fkey")
   @@index([status])
   @@index([createdAt])
+   @@index([status, clickCount])
   @@index([status, createdAt])
   @@index([cityId, status])
   @@index([subcategoryId, status])

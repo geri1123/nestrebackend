@@ -7,6 +7,8 @@ describe('GetProductByIdUseCase', () => {
     findByIdWithDetails: jest.fn(),
   } as any;
 
+  // E mbajmë mock-un e clicksService sepse constructor-i e kërkon,
+  // edhe pse use case-i nuk e thërret më
   const clicksService = {
     getClicksByProduct: jest.fn(),
   } as any;
@@ -23,6 +25,7 @@ describe('GetProductByIdUseCase', () => {
     status: 'draft',
     userId: 10,
     agencyId: null,
+    clickCount: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
     description: 'Test description',
@@ -55,42 +58,36 @@ describe('GetProductByIdUseCase', () => {
 
   it('returns null if product not found', async () => {
     repo.findByIdWithDetails.mockResolvedValue(null);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result).toEqual({ product: null });
   });
 
   it('returns null for draft product on public route', async () => {
     repo.findByIdWithDetails.mockResolvedValue(userProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result).toEqual({ product: null });
   });
 
   it('returns null for pending product on public route', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...userProduct, status: 'pending' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result).toEqual({ product: null });
   });
 
   it('returns null for sold product on public route', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...userProduct, status: 'sold' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result).toEqual({ product: null });
   });
 
   it('returns active product on public route', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...userProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result.product).not.toBeNull();
   });
 
   it('returns active agency product on public route', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...agencyProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result.product).not.toBeNull();
   });
@@ -99,7 +96,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows individual user to see their own draft (no agency)', async () => {
     repo.findByIdWithDetails.mockResolvedValue(userProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 10,
       user: { role: 'user' },
@@ -110,7 +106,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks individual user from seeing draft of another user', async () => {
     repo.findByIdWithDetails.mockResolvedValue(userProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       user: { role: 'user' },
@@ -120,7 +115,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks individual user from seeing agency product draft even if userId matches', async () => {
     repo.findByIdWithDetails.mockResolvedValue(agencyProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 10,
       user: { role: 'user' },
@@ -132,7 +126,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows agency owner to see draft of their own agency', async () => {
     repo.findByIdWithDetails.mockResolvedValue(agencyProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -144,7 +137,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks agency owner from seeing draft of a different agency', async () => {
     repo.findByIdWithDetails.mockResolvedValue(agencyProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 999,
@@ -157,7 +149,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows agent with can_view_all_posts to see draft of same agency', async () => {
     repo.findByIdWithDetails.mockResolvedValue(agencyProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -169,7 +160,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks agent without can_view_all_posts from seeing draft of others', async () => {
     repo.findByIdWithDetails.mockResolvedValue(agencyProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -181,7 +171,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows agent to see active product of same agency without any permissions', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...agencyProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -193,7 +182,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows agent to see their own draft without any permissions', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...agencyProduct, userId: 99 });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -205,7 +193,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks agent from seeing draft of a different agency', async () => {
     repo.findByIdWithDetails.mockResolvedValue(agencyProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 999,
@@ -217,7 +204,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks agent from seeing draft of individual user product (no agencyId)', async () => {
     repo.findByIdWithDetails.mockResolvedValue(userProduct);
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -231,7 +217,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows agent with can_edit_others_post to see active product of same agency', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...agencyProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -243,7 +228,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks agent with only can_edit_others_post from seeing draft of others', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...agencyProduct, status: 'draft' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -255,7 +239,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('allows agent with both permissions to see and edit draft of others', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...agencyProduct, status: 'draft' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -267,7 +250,6 @@ describe('GetProductByIdUseCase', () => {
 
   it('blocks agent with can_edit_others_post from accessing individual user product', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...userProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true, {
       userId: 99,
       agencyId: 5,
@@ -285,7 +267,6 @@ describe('GetProductByIdUseCase', () => {
       status: 'active',
       user: { ...userProduct.user, status: 'suspended' },
     });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true);
     expect(result).toEqual({ product: null });
   });
@@ -296,7 +277,6 @@ describe('GetProductByIdUseCase', () => {
       status: 'active',
       agency: { agencyName: 'Test Agency', status: 'suspended' },
     });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', true);
     expect(result).toEqual({ product: null });
   });
@@ -304,16 +284,28 @@ describe('GetProductByIdUseCase', () => {
   // ── Clicks & related data ──────────────────────────────────────────
 
   it('returns active product with total clicks', async () => {
-    repo.findByIdWithDetails.mockResolvedValue({ ...userProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([{ count: 2 }, { count: 3 }]);
+    repo.findByIdWithDetails.mockResolvedValue({
+      ...userProduct,
+      status: 'active',
+      clickCount: 5,
+    });
     const result = await useCase.execute(1, 'en', false);
     expect(result.product).not.toBeNull();
     expect(result.product?.totalClicks).toBe(5);
   });
 
+  it('returns 0 clicks when clickCount is missing on the product', async () => {
+    repo.findByIdWithDetails.mockResolvedValue({
+      ...userProduct,
+      status: 'active',
+      clickCount: undefined,
+    });
+    const result = await useCase.execute(1, 'en', false);
+    expect(result.product?.totalClicks).toBe(0);
+  });
+
   it('includes related data if subcategory and category exist', async () => {
     repo.findByIdWithDetails.mockResolvedValue({ ...userProduct, status: 'active' });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result.relatedData).toEqual({ subcategoryId: 1, categoryId: 1 });
   });
@@ -324,7 +316,6 @@ describe('GetProductByIdUseCase', () => {
       status: 'active',
       subcategory: null,
     });
-    clicksService.getClicksByProduct.mockResolvedValue([]);
     const result = await useCase.execute(1, 'en', false);
     expect(result.relatedData).toBeUndefined();
   });

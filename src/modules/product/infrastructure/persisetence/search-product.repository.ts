@@ -4,7 +4,7 @@ import { PrismaService } from '../../../../infrastructure/prisma/prisma.service'
 import { CityCount, ISearchProductRepository } from '../../domain/repositories/search-product.repository.interface';
 import { SearchFiltersDto } from '../../dto/product-filters.dto';
 import { SupportedLang } from '../../../../locales';
-import { ProductClicksService } from '../../../product-clicks/product-clicks.service';
+
 import { ProductSearchQueryBuilder } from '../search/product-search-query.builder';
 import { Prisma } from '@prisma/client';
 
@@ -12,7 +12,7 @@ import { Prisma } from '@prisma/client';
 export class SearchProductRepository implements ISearchProductRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly productClicksService: ProductClicksService,
+    
     private readonly queryBuilder: ProductSearchQueryBuilder,
   ) {}
 
@@ -157,61 +157,50 @@ export class SearchProductRepository implements ISearchProductRepository {
       },
     };
   }
+async searchProducts(
+  filters: SearchFiltersDto,
+  language: SupportedLang,
+  isProtectedRoute: boolean = false,
+): Promise<any[]> {
+  const whereConditions = this.queryBuilder.build(filters, language, isProtectedRoute);
+  const { adWhere, regularWhere } = this.buildAdWheres(whereConditions);
+  const orderBy = this.getOrderBy(filters.sortBy);
 
-  async searchProducts(
-    filters: SearchFiltersDto,
-    language: SupportedLang,
-    isProtectedRoute: boolean = false,
-  ): Promise<any[]> {
-    const whereConditions = this.queryBuilder.build(filters, language, isProtectedRoute);
-    const { adWhere, regularWhere } = this.buildAdWheres(whereConditions);
-    const orderBy = this.getOrderBy(filters.sortBy);
+  const limit = filters.limit!;
+  const offset = filters.offset!;
 
-    const limit = filters.limit!;
-    const offset = filters.offset!;
+  const totalAds = await this.prisma.product.count({ where: adWhere });
 
-    // how many ad products exist matching this filter
-    const totalAds = await this.prisma.product.count({ where: adWhere });
+  const adsSkipped     = Math.min(offset, totalAds);
+  const adsToShow      = Math.min(Math.max(totalAds - adsSkipped, 0), limit);
+  const regularToShow  = limit - adsToShow;
+  const regularSkipped = Math.max(offset - totalAds, 0);
 
-    // calculate how many ads and regular products to fetch for this page
-    const adsSkipped   = Math.min(offset, totalAds);
-    const adsToShow    = Math.min(Math.max(totalAds - adsSkipped, 0), limit);
-    const regularToShow  = limit - adsToShow;
-    const regularSkipped = Math.max(offset - totalAds, 0);
+  const [adProducts, regularProducts] = await Promise.all([
+    adsToShow > 0
+      ? this.prisma.product.findMany({
+          where: adWhere,
+          orderBy,
+          take: adsToShow,
+          skip: adsSkipped,
+          select: this.getSelect(language),
+        })
+      : Promise.resolve([]),
 
-    const [adProducts, regularProducts] = await Promise.all([
-      adsToShow > 0
-        ? this.prisma.product.findMany({
-            where: adWhere,
-            orderBy,
-            take: adsToShow,
-            skip: adsSkipped,
-            select: this.getSelect(language),
-          })
-        : Promise.resolve([]),
+    regularToShow > 0
+      ? this.prisma.product.findMany({
+          where: regularWhere,
+          orderBy,
+          take: regularToShow,
+          skip: regularSkipped,
+          select: this.getSelect(language),
+        })
+      : Promise.resolve([]),
+  ]);
 
-      regularToShow > 0
-        ? this.prisma.product.findMany({
-            where: regularWhere,
-            orderBy,
-            take: regularToShow,
-            skip: regularSkipped,
-            select: this.getSelect(language),
-          })
-        : Promise.resolve([]),
-    ]);
-
-    const allProducts = [...adProducts, ...regularProducts] as any[];
-
-    // enrich with click counts
-    const productIds = allProducts.map((p) => p.id);
-    const clicksMap = await this.productClicksService.getClicksForProducts(productIds);
-
-    return allProducts.map((p) => ({
-      ...p,
-      clickCount: clicksMap.get(String(p.id)) ?? p.clickCount ?? 0,
-    }));
-  }
+  // clickCount tashmë vjen nga Postgres në select → s'duhet enrichment
+  return [...adProducts, ...regularProducts];
+}
 
   async getProductsCount(
     filters: SearchFiltersDto,
