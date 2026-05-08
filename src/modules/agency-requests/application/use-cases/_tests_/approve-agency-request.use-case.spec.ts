@@ -1,23 +1,21 @@
 import { BadRequestException } from '@nestjs/common';
 import { ApproveAgencyRequestUseCase } from '../approve-agency-request.use-case';
 import { AgencyAgentStatus, UserRole, UserStatus } from '@prisma/client';
+import { EMAIL_EVENTS, EmailAgentWelcomeEvent } from '../../../../../infrastructure/events/email/email.events';
 
 describe('ApproveAgencyRequestUseCase', () => {
   let useCase: ApproveAgencyRequestUseCase;
 
-  const prisma = { $transaction: jest.fn() } as any;
-  const findExistingAgent = { execute: jest.fn() } as any;
-  const createAgent = { execute: jest.fn() } as any;
-  const addPermissions = { execute: jest.fn() } as any;
-  const updateUserFields = { execute: jest.fn() } as any;
-  const getUser = { execute: jest.fn() } as any;
-  const notificationService = { sendNotification: jest.fn() } as any;
-  const emailQueue = { sendAgentWelcomeEmail: jest.fn() } as any;
-  const agentRepo = { updateAgencyAgent: jest.fn() } as any;
-  const agentPermissionRepo = {
-    getPermissionsByAgentId: jest.fn(),
-    updatePermissions: jest.fn(),
-  } as any;
+  const prisma               = { $transaction: jest.fn() }                                  as any;
+  const findExistingAgent    = { execute: jest.fn() }                                        as any;
+  const createAgent          = { execute: jest.fn() }                                        as any;
+  const addPermissions       = { execute: jest.fn() }                                        as any;
+  const updateUserFields     = { execute: jest.fn() }                                        as any;
+  const getUser              = { execute: jest.fn() }                                        as any;
+  const notificationService  = { sendNotification: jest.fn() }                              as any;
+  const eventEmitter         = { emit: jest.fn() }                                           as any;
+  const agentRepo            = { updateAgencyAgent: jest.fn() }                             as any;
+  const agentPermissionRepo  = { getPermissionsByAgentId: jest.fn(), updatePermissions: jest.fn() } as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -31,7 +29,7 @@ describe('ApproveAgencyRequestUseCase', () => {
       updateUserFields,
       getUser,
       notificationService,
-      emailQueue,
+      eventEmitter,
       agentRepo,
       agentPermissionRepo,
     );
@@ -49,7 +47,7 @@ describe('ApproveAgencyRequestUseCase', () => {
       }),
     ).rejects.toThrow(BadRequestException);
 
-    expect(emailQueue.sendAgentWelcomeEmail).not.toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
     expect(notificationService.sendNotification).not.toHaveBeenCalled();
   });
 
@@ -68,7 +66,13 @@ describe('ApproveAgencyRequestUseCase', () => {
     const result = await useCase.execute({
       request: {
         userId: 1,
-        user: { firstName: 'John', lastName: 'Doe', email: 'test@mail.com', role: UserRole.user, status: UserStatus.inactive },
+        user: {
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'test@mail.com',
+          role: UserRole.user,
+          status: UserStatus.inactive,
+        },
       } as any,
       agencyId: 10,
       approvedBy: 99,
@@ -80,12 +84,18 @@ describe('ApproveAgencyRequestUseCase', () => {
     expect(agentRepo.updateAgencyAgent).not.toHaveBeenCalled();
     expect(addPermissions.execute).toHaveBeenCalled();
     expect(updateUserFields.execute).toHaveBeenCalled();
-    expect(emailQueue.sendAgentWelcomeEmail).toHaveBeenCalledWith('test@mail.com', 'John Doe');
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      EMAIL_EVENTS.AGENT_WELCOME,
+      new EmailAgentWelcomeEvent('test@mail.com', 'John Doe'),
+    );
+
     expect(notificationService.sendNotification).toHaveBeenCalledWith({
       userId: 1,
       type: 'agency_confirm_agent',
       metadata: { agencyId: 10, approvedBy: 99 },
     });
+
     expect(result.id).toBe(100);
   });
 
@@ -105,7 +115,13 @@ describe('ApproveAgencyRequestUseCase', () => {
     const result = await useCase.execute({
       request: {
         userId: 1,
-        user: { firstName: 'Jane', lastName: 'Doe', email: 'test@mail.com', role: UserRole.user, status: UserStatus.active },
+        user: {
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'test@mail.com',
+          role: UserRole.user,
+          status: UserStatus.active,
+        },
       } as any,
       agencyId: 10,
       approvedBy: 99,
@@ -128,7 +144,7 @@ describe('ApproveAgencyRequestUseCase', () => {
     getUser.execute.mockResolvedValue({ id: 1, emailVerified: true, email: 'test@mail.com' });
     findExistingAgent.execute.mockResolvedValue({ id: 50, status: AgencyAgentStatus.terminated });
     agentRepo.updateAgencyAgent.mockResolvedValue({ id: 50, status: AgencyAgentStatus.active });
-    agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(null); // ← no existing permissions
+    agentPermissionRepo.getPermissionsByAgentId.mockResolvedValue(null);
 
     await useCase.execute({
       request: {
@@ -142,6 +158,6 @@ describe('ApproveAgencyRequestUseCase', () => {
     });
 
     expect(agentPermissionRepo.updatePermissions).not.toHaveBeenCalled();
-    expect(addPermissions.execute).toHaveBeenCalled(); // ← creates new permissions
+    expect(addPermissions.execute).toHaveBeenCalled();
   });
 });

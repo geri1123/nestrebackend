@@ -8,11 +8,15 @@ export const CLEANUP_JOBS = {
   EXPIRE_ADS: 'expire-expired-ads',
 } as const;
 
+
 export const EMAIL_JOBS = {
-  SEND_EMAIL: 'send-email',
-  SEND_VERIFICATION: 'send-verification',
-  SEND_PASSWORD_RESET: 'send-password-reset',
-  SEND_CONTACT_MESSAGE: 'send-contact-message',
-  SEND_AGENCY_MESSAGE: 'send-agency-message',
-  SEND_MESSAGE_TO_USER: 'send-message-to-user',
+  SEND_VERIFICATION:      'send-verification',
+  SEND_PASSWORD_RESET:    'send-password-reset',
+  SEND_WELCOME:           'send-welcome',
+  SEND_PENDING_APPROVAL:  'send-pending-approval',
+  SEND_AGENT_WELCOME:     'send-agent-welcome',
+  SEND_AGENT_REJECTED:    'send-agent-rejected',
+  SEND_CONTACT_MESSAGE:   'send-contact-message',
+  SEND_AGENCY_MESSAGE:    'send-agency-message',
+  SEND_MESSAGE_TO_USER:   'send-message-to-user',
 } as const;

@@ -124,6 +124,8 @@ import { IAgentDomainRepository } from "../../../agent/domain/repositories/agent
 import { Inject } from "@nestjs/common";
 import { AGENT_REPOSITORY_TOKENS } from "../../../agent/domain/repositories/agent.repository.tokens";
 import { IAgentPermissionDomainRepository } from "../../../agent/domain/repositories/agent-permission.repository.interface";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { EMAIL_EVENTS, EmailAgentWelcomeEvent } from "../../../../infrastructure/events/email/email.events";
 export interface ApproveRequestInput {
   request: RegistrationRequestEntity;
   agencyId: number;
@@ -143,7 +145,7 @@ export class ApproveAgencyRequestUseCase {
     private readonly updateUserFields: UpdateUserFieldsUseCase,
     private readonly getuser: FindUserByIdUseCase,
     private readonly notificationService: NotificationService,
-    private readonly queueService: EmailQueueService,
+      private readonly eventEmitter: EventEmitter2,
     @Inject(AGENT_REPOSITORY_TOKENS.AGENT_REPOSITORY)
     private readonly agentRepo: IAgentDomainRepository,
     @Inject(AGENT_REPOSITORY_TOKENS.AGENT_PERMISSION_REPOSITORY)
@@ -213,7 +215,11 @@ export class ApproveAgencyRequestUseCase {
     });
 
     const fullName = `${request.user?.firstName || ""} ${request.user?.lastName || ""}`.trim();
-    await this.queueService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
+    // await this.queueService.sendAgentWelcomeEmail(request.user?.email || "", fullName);
+     this.eventEmitter.emit(
+      EMAIL_EVENTS.AGENT_WELCOME,
+      new EmailAgentWelcomeEvent(request.user?.email || '', fullName),
+    );
 
     await this.notificationService.sendNotification({
       userId: request.userId,

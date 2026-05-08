@@ -12,76 +12,100 @@ export class EmailProcessor extends WorkerHost {
     super();
   }
 
-  async process(job: Job): Promise<any> {
-      this.logger.log(`Processing email job: ${job.name} (ID: ${job.id})`);
+  async process(job: Job): Promise<{ success: boolean; email?: string }> {
+    this.logger.log(`Processing email job: ${job.name} (ID: ${job.id})`);
+
     switch (job.name) {
       case EMAIL_JOBS.SEND_VERIFICATION:
-        return await this.sendVerification(job);
-       case EMAIL_JOBS.SEND_PASSWORD_RESET:       
-        return await this.sendPasswordReset(job);
-      case EMAIL_JOBS.SEND_EMAIL:
-        return await this.sendGenericEmail(job);
-        case EMAIL_JOBS.SEND_CONTACT_MESSAGE:
-  return await this.sendContactMessage(job);
-case EMAIL_JOBS.SEND_AGENCY_MESSAGE:
-  return await this.sendAgencyMessage(job);
-  case EMAIL_JOBS.SEND_MESSAGE_TO_USER:
-  return await this.sendMessageToUser(job);
+        return this.sendVerification(job);
+      case EMAIL_JOBS.SEND_PASSWORD_RESET:
+        return this.sendPasswordReset(job);
+      case EMAIL_JOBS.SEND_WELCOME:
+        return this.sendWelcome(job);
+      case EMAIL_JOBS.SEND_PENDING_APPROVAL:
+        return this.sendPendingApproval(job);
+      case EMAIL_JOBS.SEND_AGENT_WELCOME:
+        return this.sendAgentWelcome(job);
+      case EMAIL_JOBS.SEND_AGENT_REJECTED:
+        return this.sendAgentRejected(job);
+      case EMAIL_JOBS.SEND_CONTACT_MESSAGE:
+        return this.sendContactMessage(job);
+      case EMAIL_JOBS.SEND_AGENCY_MESSAGE:
+        return this.sendAgencyMessage(job);
+      case EMAIL_JOBS.SEND_MESSAGE_TO_USER:
+        return this.sendMessageToUser(job);
       default:
         this.logger.warn(`Unknown email job: ${job.name}`);
         return { success: false };
     }
   }
 
- private async sendVerification(job: Job) {
-  const { email, name, token, lang } = job.data;
-  this.logger.log(`Sending verification email to ${email}`); 
-  try {
+  // ── Handlers ────────────────────────────────────────────────────────────────
+
+  private async sendVerification(job: Job) {
+    const { email, name, token, lang } = job.data;
     await this.emailService.sendVerificationEmail(email, name, token, lang);
-    this.logger.log(`✓ Verification email sent to ${email}`); 
     return { success: true, email };
- } catch (error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  this.logger.error(`✗ Failed to send verification email to ${email}:`, message);
-  throw error;
-}
-}
-  private async sendPasswordReset(job: Job) {      
+  }
+
+  private async sendPasswordReset(job: Job) {
     const { email, name, token, lang, expiresAt } = job.data;
     await this.emailService.sendPasswordRecoveryEmail(
-      email,
-      name,
-      token,
-      lang,
-      new Date(expiresAt), 
+      email, name, token, lang, new Date(expiresAt),
     );
     return { success: true, email };
   }
-  
-  private async sendGenericEmail(job: Job) {
-    const { email, name, type } = job.data;
-    if (type === 'welcome') await this.emailService.sendWelcomeEmail(email, name);
-    if (type === 'pending') await this.emailService.sendPendingApprovalEmail(email, name);
-    if (type==='agent_welcome') await  this.emailService.sendAgentWelcomeEmail(email, name);
-     if (type === 'agent_rejected') await this.emailService.sendAgentRejectedEmail(email, name); 
+
+  private async sendWelcome(job: Job) {
+    const { email, name } = job.data;
+    await this.emailService.sendWelcomeEmail(email, name);
+    return { success: true, email };
+  }
+
+  private async sendPendingApproval(job: Job) {
+    const { email, name } = job.data;
+    await this.emailService.sendPendingApprovalEmail(email, name);
+    return { success: true, email };
+  }
+
+  private async sendAgentWelcome(job: Job) {
+    const { email, name } = job.data;
+    await this.emailService.sendAgentWelcomeEmail(email, name);
+    return { success: true, email };
+  }
+
+  private async sendAgentRejected(job: Job) {
+    const { email, name } = job.data;
+    await this.emailService.sendAgentRejectedEmail(email, name);
+    return { success: true, email };
+  }
+
+  private async sendContactMessage(job: Job) {
+    await this.emailService.sendContactMessageEmail(job.data);
     return { success: true };
   }
-  private async sendContactMessage(job: Job) {
-  await this.emailService.sendContactMessageEmail(job.data);
-  return { success: true };
-}
 
-private async sendAgencyMessage(job: Job) {
-  await this.emailService.sendAgencyMessageEmail(job.data);
-  return { success: true };
-}
-private async sendMessageToUser(job: Job) {
-  await this.emailService.sendMessageToUserEmail(job.data);
-  return { success: true };
-}
-@OnWorkerEvent('failed')
-onFailed(job: Job, error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  this.logger.error(`Email job ${job.id} failed: ${message}`);
-}
+  private async sendAgencyMessage(job: Job) {
+    await this.emailService.sendAgencyMessageEmail(job.data);
+    return { success: true };
+  }
+
+  private async sendMessageToUser(job: Job) {
+    await this.emailService.sendMessageToUserEmail(job.data);
+    return { success: true };
+  }
+
+  // ── Worker events ────────────────────────────────────────────────────────────
+
+  @OnWorkerEvent('completed')
+  onCompleted(job: Job, result: unknown) {
+    this.logger.log(`✓ Job ${job.id} (${job.name}) completed`, result);
+  }
+
+  @OnWorkerEvent('failed')
+  onFailed(job: Job, error: Error) {
+    this.logger.error(
+      `✗ Job ${job.id} (${job.name}) failed after ${job.attemptsMade} attempts: ${error.message}`,
+    );
+  }
 }

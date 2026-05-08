@@ -9,6 +9,7 @@ import { getBullConfig } from './config/bull.config';
 import { EmailModule } from '../email/email.module';
 import { EmailQueueService } from './services/email-queue.service';
 import { EmailProcessor } from './processors/email.processor';
+import { EmailEventsListener } from './listeners/email-events.listener';
 @Global()
 @Module({
   imports: [
@@ -22,9 +23,10 @@ import { EmailProcessor } from './processors/email.processor';
       {name:QUEUES.EMAIL},
     ),
     CleanupModule,
-    EmailModule
+    EmailModule,
+   
   ],
-  providers: [CleanupProcessor, CleanupProducer , EmailQueueService ,EmailProcessor ],
+  providers: [CleanupProcessor, CleanupProducer , EmailQueueService ,EmailProcessor  , EmailEventsListener,],
   exports: [CleanupProducer , EmailQueueService],
 })
 export class QueueModule {}

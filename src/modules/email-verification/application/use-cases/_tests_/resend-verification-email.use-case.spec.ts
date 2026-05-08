@@ -1,5 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { ResendVerificationEmailUseCase } from '../resend-verification-email.use-case';
+import { EMAIL_EVENTS, EmailVerificationRequestedEvent } from '../../../../../infrastructure/events/email/email.events';
+
 jest.mock('../../../../../common/utils/hash', () => ({
   generateToken: jest.fn(() => 'fixed-token'),
 }));
@@ -7,29 +9,24 @@ jest.mock('../../../../../common/utils/hash', () => ({
 describe('ResendVerificationEmailUseCase', () => {
   let useCase: ResendVerificationEmailUseCase;
 
-  const findUser = { execute: jest.fn() } as any;
-  const cache = { set: jest.fn() } as any;
-  const email = { sendVerificationEmail: jest.fn() } as any;
+  const findUser    = { execute: jest.fn() } as any;
+  const cache       = { set: jest.fn() }     as any;
+  const eventEmitter = { emit: jest.fn() }   as any;
 
   beforeEach(() => {
-    useCase = new ResendVerificationEmailUseCase(
-      findUser,
-      cache,
-      email,
-    );
+    jest.clearAllMocks();
+    useCase = new ResendVerificationEmailUseCase(findUser, cache, eventEmitter);
   });
 
   it('should throw if email is already verified', async () => {
-    findUser.execute.mockResolvedValue({
-      email_verified: true,
-    });
+    findUser.execute.mockResolvedValue({ email_verified: true });
 
-    await expect(
-      useCase.execute('test@mail.com', 'en'),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute('test@mail.com', 'en')).rejects.toThrow(
+      BadRequestException,
+    );
 
     expect(cache.set).not.toHaveBeenCalled();
-    expect(email.sendVerificationEmail).not.toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
   });
 
   it('should throw if user status is not pending or inactive', async () => {
@@ -38,12 +35,15 @@ describe('ResendVerificationEmailUseCase', () => {
       status: 'active',
     });
 
-    await expect(
-      useCase.execute('test@mail.com', 'en'),
-    ).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute('test@mail.com', 'en')).rejects.toThrow(
+      BadRequestException,
+    );
+
+    expect(cache.set).not.toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
   });
 
-  it('should store token in cache and send verification email', async () => {
+  it('should store token in cache and emit verification event', async () => {
     findUser.execute.mockResolvedValue({
       id: 1,
       email: 'test@mail.com',
@@ -61,15 +61,13 @@ describe('ResendVerificationEmailUseCase', () => {
       30 * 60 * 1000,
     );
 
-    expect(email.sendVerificationEmail).toHaveBeenCalledWith(
-      'test@mail.com',
-      'John',
-      'fixed-token',
-      'en',
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      EMAIL_EVENTS.VERIFICATION_REQUESTED,
+      new EmailVerificationRequestedEvent('test@mail.com', 'John', 'fixed-token', 'en'),
     );
   });
 
-  it('should use default name when first_name is null', async () => {
+  it('should use fallback name "User" when first_name is null', async () => {
     findUser.execute.mockResolvedValue({
       id: 2,
       email: 'user@mail.com',
@@ -81,11 +79,9 @@ describe('ResendVerificationEmailUseCase', () => {
 
     await useCase.execute('user@mail.com', 'en');
 
-    expect(email.sendVerificationEmail).toHaveBeenCalledWith(
-      'user@mail.com',
-      'User',
-      'fixed-token',
-      'en',
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      EMAIL_EVENTS.VERIFICATION_REQUESTED,
+      new EmailVerificationRequestedEvent('user@mail.com', 'User', 'fixed-token', 'en'),
     );
   });
 });

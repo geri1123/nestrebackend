@@ -1,0 +1,147 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+import { EmailQueueService } from '../services/email-queue.service';
+import {
+  EMAIL_EVENTS,
+  EmailVerificationRequestedEvent,
+  EmailPasswordResetRequestedEvent,
+  EmailWelcomeEvent,
+  EmailPendingApprovalEvent,
+  EmailAgentWelcomeEvent,
+  EmailAgentRejectedEvent,
+  EmailContactMessageEvent,
+  EmailAgencyMessageEvent,
+  EmailUserMessageEvent,
+} from '../../events/email/email.events';
+
+/**
+ * The single seam between the application/domain layer and the email
+ * infrastructure. Use cases emit events; this listener pushes them into
+ * the BullMQ email queue. Errors are logged here — BullMQ already retries
+ * on the worker side, so the use case can stay decoupled.
+ */
+@Injectable()
+export class EmailEventsListener {
+  private readonly logger = new Logger(EmailEventsListener.name);
+
+  constructor(private readonly emailQueue: EmailQueueService) {}
+
+  @OnEvent(EMAIL_EVENTS.VERIFICATION_REQUESTED, { async: true })
+  async onVerificationRequested(event: EmailVerificationRequestedEvent) {
+    try {
+      await this.emailQueue.sendVerificationEmail(
+        event.email,
+        event.name,
+        event.token,
+        event.lang,
+      );
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue verification email for ${event.email}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.PASSWORD_RESET_REQUESTED, { async: true })
+  async onPasswordResetRequested(event: EmailPasswordResetRequestedEvent) {
+    try {
+      await this.emailQueue.sendPasswordResetEmail(
+        event.email,
+        event.name,
+        event.token,
+        event.lang,
+        event.expiresAt,
+      );
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue password-reset email for ${event.email}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.WELCOME, { async: true })
+  async onWelcome(event: EmailWelcomeEvent) {
+    try {
+      await this.emailQueue.sendWelcomeEmail(event.email, event.name);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue welcome email for ${event.email}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.PENDING_APPROVAL, { async: true })
+  async onPendingApproval(event: EmailPendingApprovalEvent) {
+    try {
+      await this.emailQueue.sendPendingApprovalEmail(event.email, event.name);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue pending-approval email for ${event.email}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.AGENT_WELCOME, { async: true })
+  async onAgentWelcome(event: EmailAgentWelcomeEvent) {
+    try {
+      await this.emailQueue.sendAgentWelcomeEmail(event.email, event.name);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue agent-welcome email for ${event.email}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.AGENT_REJECTED, { async: true })
+  async onAgentRejected(event: EmailAgentRejectedEvent) {
+    try {
+      await this.emailQueue.sendAgentRejectedEmail(event.email, event.name);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue agent-rejected email for ${event.email}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.CONTACT_MESSAGE, { async: true })
+  async onContactMessage(event: EmailContactMessageEvent) {
+    try {
+      await this.emailQueue.sendContactMessageEmail(event.payload);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue contact-message email to ${event.payload.recipientEmail}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.AGENCY_MESSAGE, { async: true })
+  async onAgencyMessage(event: EmailAgencyMessageEvent) {
+    try {
+      await this.emailQueue.sendAgencyMessageEmail(event.payload);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue agency-message email to ${event.payload.recipientEmail}`,
+        err as Error,
+      );
+    }
+  }
+
+  @OnEvent(EMAIL_EVENTS.USER_MESSAGE, { async: true })
+  async onUserMessage(event: EmailUserMessageEvent) {
+    try {
+      await this.emailQueue.sendMessageToUser(event.payload);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue user-message email to ${event.payload.recipientEmail}`,
+        err as Error,
+      );
+    }
+  }
+}

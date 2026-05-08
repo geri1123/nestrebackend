@@ -1,10 +1,14 @@
 import { Test } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RequestPasswordResetUseCase } from '../../password/request-password-reset.use-case';
 import { USER_REPO } from '../../../../domain/repositories/user.repository.interface';
-import { EmailQueueService } from '../../../../../../infrastructure/queue/services/email-queue.service'; // ✅
 import { CacheService } from '../../../../../../infrastructure/cache/cache.service';
 import { User } from '../../../../domain/entities/user.entity';
+import {
+  EMAIL_EVENTS,
+  EmailPasswordResetRequestedEvent,
+} from '../../../../../../infrastructure/events/email/email.events';
 
 jest.mock('../../../../../../common/utils/hash', () => ({
   generateToken: () => 'fixed-token',
@@ -13,7 +17,7 @@ jest.mock('../../../../../../common/utils/hash', () => ({
 describe('RequestPasswordResetUseCase', () => {
   let useCase: RequestPasswordResetUseCase;
   let userRepo: { findByEmail: jest.Mock };
-  let emailQueue: { sendPasswordResetEmail: jest.Mock }; 
+  let eventEmitter: { emit: jest.Mock };
   let cacheService: { set: jest.Mock };
 
   beforeEach(async () => {
@@ -25,8 +29,8 @@ describe('RequestPasswordResetUseCase', () => {
           useValue: { findByEmail: jest.fn() },
         },
         {
-          provide: EmailQueueService, 
-          useValue: { sendPasswordResetEmail: jest.fn() },
+          provide: EventEmitter2,
+          useValue: { emit: jest.fn() },
         },
         {
           provide: CacheService,
@@ -37,15 +41,15 @@ describe('RequestPasswordResetUseCase', () => {
 
     useCase = moduleRef.get(RequestPasswordResetUseCase);
     userRepo = moduleRef.get(USER_REPO);
-    emailQueue = moduleRef.get(EmailQueueService); 
+    eventEmitter = moduleRef.get(EventEmitter2);
     cacheService = moduleRef.get(CacheService);
   });
 
-  it('sends password reset email when user exists and is active', async () => {
-   const user = new User(
-  1, 'john', 'john@test.com', 'John', null, null, null, null, null,
-  'user', 'active', true, new Date(), null, null, false, null
-);
+  it('emits password reset event when user exists and is active', async () => {
+    const user = new User(
+      1, 'john', 'john@test.com', 'John', null, null, null, null, null,
+      'user', 'active', true, new Date(), null, null, false, null,
+    );
     userRepo.findByEmail.mockResolvedValue(user);
 
     await useCase.execute('john@test.com', 'en');
@@ -56,13 +60,20 @@ describe('RequestPasswordResetUseCase', () => {
       10 * 60 * 1000,
     );
 
-    expect(emailQueue.sendPasswordResetEmail).toHaveBeenCalledTimes(1); 
-    expect(emailQueue.sendPasswordResetEmail).toHaveBeenCalledWith( 
-      'john@test.com',
-      'John',
-      'fixed-token',
-      'en',
-      expect.any(Date),
+    expect(eventEmitter.emit).toHaveBeenCalledTimes(1);
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      EMAIL_EVENTS.PASSWORD_RESET_REQUESTED,
+      expect.any(EmailPasswordResetRequestedEvent),
+    );
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      EMAIL_EVENTS.PASSWORD_RESET_REQUESTED,
+      expect.objectContaining({
+        email: 'john@test.com',
+        name: 'John',
+        token: 'fixed-token',
+        lang: 'en',
+        expiresAt: expect.any(Date),
+      }),
     );
   });
 
@@ -73,22 +84,22 @@ describe('RequestPasswordResetUseCase', () => {
       useCase.execute('missing@test.com', 'al'),
     ).rejects.toThrow(NotFoundException);
 
-    expect(emailQueue.sendPasswordResetEmail).not.toHaveBeenCalled(); 
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
     expect(cacheService.set).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundException if user is inactive', async () => {
     const inactiveUser = new User(
-  2, 'mark', 'mark@test.com', 'Mark', null, null, null, null, null,
-  'user', 'inactive', true, new Date(), null, null, false, null
-);
+      2, 'mark', 'mark@test.com', 'Mark', null, null, null, null, null,
+      'user', 'inactive', true, new Date(), null, null, false, null,
+    );
     userRepo.findByEmail.mockResolvedValue(inactiveUser);
 
     await expect(
       useCase.execute('mark@test.com', 'en'),
     ).rejects.toThrow(NotFoundException);
 
-    expect(emailQueue.sendPasswordResetEmail).not.toHaveBeenCalled(); 
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
     expect(cacheService.set).not.toHaveBeenCalled();
   });
 });

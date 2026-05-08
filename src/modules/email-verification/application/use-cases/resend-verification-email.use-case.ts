@@ -1,27 +1,35 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CacheService } from '../../../../infrastructure/cache/cache.service';
 import { SupportedLang, t } from '../../../../locales';
 import { generateToken } from '../../../../common/utils/hash';
 import { FindUserForVerificationUseCase } from '../../../users/application/use-cases/find-user-for-verification.use-case';
-import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
+import {
+  EMAIL_EVENTS,
+  EmailVerificationRequestedEvent,
+} from '../../../../infrastructure/events/email/email.events';
 
 @Injectable()
 export class ResendVerificationEmailUseCase {
   constructor(
-   private readonly finduserforverification: FindUserForVerificationUseCase,
+    private readonly finduserforverification: FindUserForVerificationUseCase,
     private readonly cache: CacheService,
-  private readonly emailQueue: EmailQueueService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(identifier: string, lang: SupportedLang) {
     const user = await this.finduserforverification.execute(identifier, lang);
 
     if (user.email_verified) {
-      throw new BadRequestException({ errors: { email: [t('emailAlreadyVerified', lang)] } });
+      throw new BadRequestException({
+        errors: { email: [t('emailAlreadyVerified', lang)] },
+      });
     }
 
     if (!['pending', 'inactive'].includes(user.status)) {
-      throw new BadRequestException({ errors: { status: [t('cannotResendTokenForCurrentStatus', lang)] } });
+      throw new BadRequestException({
+        errors: { status: [t('cannotResendTokenForCurrentStatus', lang)] },
+      });
     }
 
     const token = generateToken();
@@ -32,6 +40,14 @@ export class ResendVerificationEmailUseCase {
       30 * 60 * 1000,
     );
 
-    await this.emailQueue.sendVerificationEmail(user.email, user.first_name ?? 'User', token, lang);
+    this.eventEmitter.emit(
+      EMAIL_EVENTS.VERIFICATION_REQUESTED,
+      new EmailVerificationRequestedEvent(
+        user.email,
+        user.first_name ?? 'User',
+        token,
+        lang,
+      ),
+    );
   }
 }
