@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { CacheService } from "../../../../../infrastructure/cache/cache.service";
+import { CacheService } from "../../../../../infrastructure/redis/cache.service";
 import { SupportedLang, t } from "../../../../../locales";
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { VerifyPasswordResetTokenUseCase } from '../../password/verify-password-reset-token.use-case';
-import { CacheService } from '../../../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../../../infrastructure/redis/cache.service';
 
 describe('VerifyPasswordResetTokenUseCase', () => {
   let useCase: VerifyPasswordResetTokenUseCase;

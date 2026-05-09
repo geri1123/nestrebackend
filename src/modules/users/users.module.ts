@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 
 // Repositories
 import { UserRepository } from './infrastructure/persistence/user.repository';
@@ -35,7 +34,7 @@ import { USER_REPO } from './domain/repositories/user.repository.interface';
 import { USERNAME_REPO } from './domain/repositories/username-history.repository.interface';
 import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
-import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
+// import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { UserEventPublisher } from './application/events/user-event.publisher';
 import { GetPublicUserProfileUseCase } from './application/use-cases/get-public-user.use-case';
@@ -45,7 +44,7 @@ import { GetPublicUserProfileUseCase } from './application/use-cases/get-public-
 // AgencyContextModule is imported by GuardsModule which is global.
 
 @Module({
-  imports: [AppCacheModule, CommonModule, CloudinaryModule],
+  imports: [ CommonModule, CloudinaryModule],
   controllers: [ProfileController, PasswordController, ProfilePictureController],
   providers: [
     { provide: USER_REPO, useClass: UserRepository },
@@ -71,7 +70,7 @@ import { GetPublicUserProfileUseCase } from './application/use-cases/get-public-
     UserRepository,
     FindUserForAuthUseCase,
     DeleteProfileImageUseCase,
-    UserCacheInvalidationListener,
+    // UserCacheInvalidationListener,
     GetPublicUserProfileUseCase
   ],
   exports: [

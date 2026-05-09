@@ -1,6 +1,7 @@
 export const QUEUES = {
   CLEANUP: 'system.cleanup',
   EMAIL: 'system.email',
+   PRODUCT_COUNTS: 'product.counts',
 } as const;
 
 export const CLEANUP_JOBS = {
@@ -20,3 +21,11 @@ export const EMAIL_JOBS = {
   SEND_AGENCY_MESSAGE:    'send-agency-message',
   SEND_MESSAGE_TO_USER:   'send-message-to-user',
 } as const;
+
+export const PRODUCT_COUNTS_JOBS = {
+  CREATED: 'product-created',
+  STATUS_CHANGED: 'product-status-changed',
+  DELETED: 'product-deleted',
+  RECONCILE: 'reconcile-counts',
+} as const;
+ 

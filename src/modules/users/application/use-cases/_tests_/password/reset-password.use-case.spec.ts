@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ResetPasswordUseCase } from '../../password/reset-password.use-case';
 import { USER_REPO } from '../../../../domain/repositories/user.repository.interface';
-import { CacheService } from '../../../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../../../infrastructure/redis/cache.service';
 
 jest.mock('../../../../../../common/utils/hash', () => ({
   comparePassword: jest.fn(),

@@ -6,6 +6,8 @@ import { SupportedLang, t } from '../../../../locales';
 import { UploadProductImagesUseCase } from '../../../product-image/application/use-cases/upload-product-images.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
 import { FiltersService } from '../../../filters/filters.service';
+import { ProductCountsProducer } from '../../../../infrastructure/queue/producers/product-counts.producer';
+import { ProductStatus } from '@prisma/client';
 @Injectable()
 export class CreateProductUseCase {
   constructor(
@@ -13,7 +15,7 @@ export class CreateProductUseCase {
     private readonly productRepository: IProductRepository,
     private readonly uploadImagesUseCase: UploadProductImagesUseCase,
     private readonly createAttributeValuesUseCase: CreateProductAttributeValuesUseCase,
-    private readonly filterService:FiltersService,
+     private readonly productCountsProducer: ProductCountsProducer,
   ) {}
 
   async execute(
@@ -61,7 +63,16 @@ export class CreateProductUseCase {
       );
 
       const [uploadedImages] = await Promise.all(tasks);
-this.filterService.refreshCounts()
+ this.productCountsProducer
+        .emitCreated({
+          subcategoryId: createdProduct.subcategoryId,
+          listingTypeId: createdProduct.listingTypeId,
+          status: createdProduct.status as ProductStatus,
+        })
+        .catch((err) =>
+          console.error('[CreateProduct] emitCreated failed:', err),
+        );
+ 
       return {
         success: true,
         message: t('successadded', language),

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { RedisPubSubService } from '../../../../infrastructure/cache/redis/redis-pubsub.service';
-import { CHANNELS } from '../../../../infrastructure/cache/redis/redis-pubsub.channels';
+import { RedisPubSubService } from '../../../../infrastructure/redis/redis-pubsub.service';
+import { CHANNELS } from '../../../../infrastructure/redis/redis-pubsub.channels';
 
 @Injectable()
 export class UserEventPublisher {

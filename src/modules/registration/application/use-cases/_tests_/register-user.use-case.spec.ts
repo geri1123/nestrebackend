@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RegisterUserUseCase } from '../register-user.use-case';
 import { USER_REPO } from '../../../../users/domain/repositories/user.repository.interface';
-import { CacheService } from '../../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../../infrastructure/redis/cache.service';
 import {
   EMAIL_EVENTS,
   EmailVerificationRequestedEvent,

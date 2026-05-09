@@ -4,8 +4,7 @@ import { USER_REPO, type IUserDomainRepository } from '../../../modules/users/do
 import { AuthTokenService } from './auth-token.service';
 import { t, SupportedLang } from '../../../locales';
 import { AuthUser } from '../types/auth-user.interface';
-import { CacheService } from '../../cache/cache.service'; 
-
+import { CacheService } from '../../redis/cache.service';
 export interface AuthContext {
   user: AuthUser;
   userId: number;

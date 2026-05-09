@@ -1,18 +1,30 @@
-// infrastructure/redis/redis-pubsub.service.ts
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import Redis from 'ioredis';
-import { AppConfigService } from '../../config/config.service';
+import { AppConfigService } from '../config/config.service';
 
 type Handler = (payload: any) => Promise<void> | void;
 
+/**
+ * Owns two dedicated Redis connections:
+ *   • subscriber — locked in subscribe mode, can only receive messages
+ *   • publisher  — issues PUBLISH commands
+ *
+ * Cannot share REDIS_CLIENT: once a connection enters subscribe mode it
+ * can no longer issue regular commands (Redis protocol rule).
+ */
 @Injectable()
 export class RedisPubSubService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(RedisPubSubService.name);
   private publisher: Redis;
   private subscriber: Redis;
   private handlers = new Map<string, Handler[]>();
-  private logger = new Logger(RedisPubSubService.name);
 
-  constructor(private config: AppConfigService) {
+  constructor(private readonly config: AppConfigService) {
     this.publisher = new Redis(config.redisUrl);
     this.subscriber = new Redis(config.redisUrl);
   }
@@ -26,23 +38,23 @@ export class RedisPubSubService implements OnModuleInit, OnModuleDestroy {
       try {
         payload = JSON.parse(message);
       } catch {
-        this.logger.error(`Invalid JSON: ${message}`);
+        this.logger.error(`Invalid JSON on ${channel}: ${message}`);
         return;
       }
 
       handlers.forEach((h) =>
         Promise.resolve(h(payload)).catch((err) =>
-          this.logger.error(`Handler error`, err),
+          this.logger.error(`Handler error on ${channel}`, err),
         ),
       );
     });
   }
 
-  async publish(channel: string, payload: any) {
+  async publish(channel: string, payload: any): Promise<void> {
     await this.publisher.publish(channel, JSON.stringify(payload));
   }
 
-  async subscribe(channel: string, handler: Handler) {
+  async subscribe(channel: string, handler: Handler): Promise<void> {
     if (!this.handlers.has(channel)) {
       this.handlers.set(channel, []);
       await this.subscriber.subscribe(channel);
@@ -51,7 +63,7 @@ export class RedisPubSubService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    await this.publisher.quit();
-    await this.subscriber.quit();
+    await this.publisher.quit().catch(() => {});
+    await this.subscriber.quit().catch(() => {});
   }
 }

@@ -7,26 +7,30 @@ describe('CreateProductUseCase', () => {
   const productRepo = { create: jest.fn() } as any;
   const uploadImages = { execute: jest.fn() } as any;
   const createAttributes = { execute: jest.fn() } as any;
-  const filtersService = { refreshCounts: jest.fn() } as any; // ← add this
+  const productCountsProducer = { emitCreated: jest.fn() } as any; // ← ProductCountsProducer, jo FiltersService
 
   beforeEach(() => {
-    jest.clearAllMocks(); // ← clear mocks between tests
+    jest.clearAllMocks();
     useCase = new CreateProductUseCase(
       productRepo,
       uploadImages,
       createAttributes,
-      filtersService, // ← add this
+      productCountsProducer, // ← i saktë
     );
   });
 
   it('should create product successfully', async () => {
     productRepo.create.mockResolvedValue({
       id: 1,
+      subcategoryId: 2,
+      listingTypeId: 1,
+      status: 'draft',
       toResponse: () => ({ id: 1, title: 'Test' }),
     });
 
     uploadImages.execute.mockResolvedValue([]);
     createAttributes.execute.mockResolvedValue(undefined);
+    productCountsProducer.emitCreated.mockResolvedValue(undefined); // ← mock emit
 
     const result = await useCase.execute(
       {
@@ -43,17 +47,25 @@ describe('CreateProductUseCase', () => {
 
     expect(productRepo.create).toHaveBeenCalled();
     expect(result.success).toBe(true);
-    expect(filtersService.refreshCounts).toHaveBeenCalled(); // ← verify it was called
+    expect(productCountsProducer.emitCreated).toHaveBeenCalledWith({
+      subcategoryId: 2,
+      listingTypeId: 1,
+      status: 'draft',
+    });
   });
 
   it('should call image and attribute use cases when provided', async () => {
     productRepo.create.mockResolvedValue({
       id: 1,
+      subcategoryId: 2,
+      listingTypeId: 1,
+      status: 'draft',
       toResponse: () => ({ id: 1 }),
     });
 
     uploadImages.execute.mockResolvedValue([]);
     createAttributes.execute.mockResolvedValue(undefined);
+    productCountsProducer.emitCreated.mockResolvedValue(undefined);
 
     await useCase.execute(
       {
@@ -84,5 +96,28 @@ describe('CreateProductUseCase', () => {
         10,
       ),
     ).rejects.toThrow(BadRequestException);
+  });
+
+  it('should not throw if emitCreated fails (fire and forget)', async () => {
+    productRepo.create.mockResolvedValue({
+      id: 1,
+      subcategoryId: 2,
+      listingTypeId: 1,
+      status: 'draft',
+      toResponse: () => ({ id: 1 }),
+    });
+
+    uploadImages.execute.mockResolvedValue([]);
+    createAttributes.execute.mockResolvedValue(undefined);
+    productCountsProducer.emitCreated.mockRejectedValue(new Error('Queue down')); // ← dështon por nuk hedh gabim
+
+    const result = await useCase.execute(
+      { title: 'Test', price: 100, cityId: 1, subcategoryId: 2, listingTypeId: 1 } as any,
+      [],
+      'en',
+      10,
+    );
+
+    expect(result.success).toBe(true); // ← produkti krijohet gjithsesi
   });
 });

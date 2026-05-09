@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CacheService } from '../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../infrastructure/redis/cache.service';
 import { SupportedLang, t } from '../../../../locales';
 import { generateToken } from '../../../../common/utils/hash';
 import { FindUserForVerificationUseCase } from '../../../users/application/use-cases/find-user-for-verification.use-case';

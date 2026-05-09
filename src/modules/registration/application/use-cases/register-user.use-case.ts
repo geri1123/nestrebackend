@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { USER_REPO, type IUserDomainRepository } from '../../../users/domain/repositories/user.repository.interface';
-import { CacheService } from '../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../infrastructure/redis/cache.service';
 import { generateToken, hashPassword } from '../../../../common/utils/hash';
 import { SupportedLang, t } from '../../../../locales';
 import { Prisma, UserStatus } from '@prisma/client';

@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RequestPasswordResetUseCase } from '../../password/request-password-reset.use-case';
 import { USER_REPO } from '../../../../domain/repositories/user.repository.interface';
-import { CacheService } from '../../../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../../../infrastructure/redis/cache.service';
 import { User } from '../../../../domain/entities/user.entity';
 import {
   EMAIL_EVENTS,

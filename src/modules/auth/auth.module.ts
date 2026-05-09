@@ -6,7 +6,6 @@ import { NotificationModule } from '../notification/notification.module';
 import { AgencyModule } from '../agency/agency.module';
 import { AgentModule } from '../agent/agent.module';
 import { UsersModule } from '../users/users.module';
-import { AppCacheModule } from '../../infrastructure/cache/cache.module';
 import { RegistrationModule } from '../registration/registration.module';
 import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
@@ -26,7 +25,6 @@ import { AuthContextModule } from '../../infrastructure/auth/modules/auth-contex
     AgencyModule,
     AgentModule,
     RegistrationRequestModule,
-    AppCacheModule,
     AuthContextModule,
   ],
   providers: [

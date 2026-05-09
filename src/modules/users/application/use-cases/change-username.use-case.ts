@@ -5,7 +5,7 @@ import { USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../doma
 import { t, SupportedLang } from '../../../../locales';
 import { UserUpdatedEvent } from '../events/user-updated.event';
 import { FindUserByIdUseCase } from './find-user-by-id.use-case'; 
-import { RedisPubSubService } from '../../../../infrastructure/cache/redis/redis-pubsub.service';
+import { RedisPubSubService } from '../../../../infrastructure/redis/redis-pubsub.service';
 import { UserEventPublisher } from '../events/user-event.publisher';
 
 @Injectable()

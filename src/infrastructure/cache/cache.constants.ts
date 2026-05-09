@@ -1,1 +1,0 @@
-export const CACHE_KEYV = 'CACHE_KEYV';

@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { USER_REPO, type IUserDomainRepository } from '../../../domain/repositories/user.repository.interface';
-import { CacheService } from '../../../../../infrastructure/cache/cache.service';
+import { CacheService } from '../../../../../infrastructure/redis/cache.service';
 import { SupportedLang, t } from '../../../../../locales';
 import { comparePassword, hashPassword } from '../../../../../common/utils/hash';
 

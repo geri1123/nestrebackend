@@ -58,4 +58,6 @@ export class FiltersResponseDto {
 
   @ApiProperty({ type: [ListingTypeDto] })
   listingTypes!: ListingTypeDto[];
+  @ApiProperty({ example: 100 })
+  totalProductCount !: number;
 }
