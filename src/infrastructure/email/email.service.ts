@@ -11,6 +11,7 @@ import {
   AgentRejectedEmailTemplate,
   passwordRecoveryTemplate,
   contactMessageTemplate,
+  contactPlatformTemplate
 } from './tamplates';
 
 @Injectable()
@@ -41,6 +42,31 @@ export class EmailService {
   }
 
   // EMAIL FUNCTIONS
+ async sendContactPlatformEmail(params: {
+  senderName: string;
+  senderEmail: string;
+  senderPhone: string;
+  subject: string;
+  message: string;
+}) {
+  const {
+    senderName,
+    senderEmail,
+    senderPhone,
+    subject,
+    message
+  } = params;
+
+  const html = contactPlatformTemplate(
+    senderName,
+    senderEmail,
+    senderPhone,
+    subject,
+    message
+  );
+
+  return this.sendEmail(this.configService.supportEmail, subject, html);
+}
 
   async sendVerificationEmail(to: string, name: string, token: string, language = 'al') {
     if (!token?.trim()) throw new Error('Verification token cannot be empty');

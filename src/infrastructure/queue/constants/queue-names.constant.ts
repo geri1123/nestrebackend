@@ -17,6 +17,7 @@ export const EMAIL_JOBS = {
   SEND_PENDING_APPROVAL:  'send-pending-approval',
   SEND_AGENT_WELCOME:     'send-agent-welcome',
   SEND_AGENT_REJECTED:    'send-agent-rejected',
+  SEND_SUPPORT_EMAIL:     'send-support-email',
   SEND_CONTACT_MESSAGE:   'send-contact-message',
   SEND_AGENCY_MESSAGE:    'send-agency-message',
   SEND_MESSAGE_TO_USER:   'send-message-to-user',

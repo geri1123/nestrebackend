@@ -57,3 +57,9 @@ export class SendMessageToUserDto extends BaseMessageDto {
   @IsNumber()
   userId!: number;
 }
+export class ContactPlatformDto extends BaseMessageDto {
+  @ApiProperty({ required: true, description: "Subject of the message" })
+  @IsNotEmpty({ message: "Subject is required" })
+  @IsString()
+  subject!: string;
+}

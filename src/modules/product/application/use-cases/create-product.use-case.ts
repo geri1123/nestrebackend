@@ -63,8 +63,7 @@ export class CreateProductUseCase {
       );
 
       const [uploadedImages] = await Promise.all(tasks);
- this.productCountsProducer
-        .emitCreated({
+ this.productCountsProducer.emitCreated({
           subcategoryId: createdProduct.subcategoryId,
           listingTypeId: createdProduct.listingTypeId,
           status: createdProduct.status as ProductStatus,

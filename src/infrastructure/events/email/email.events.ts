@@ -1,20 +1,18 @@
 import { SupportedLang } from '../../../locales';
-import {
-  AgencyMessagePayload,
-  ContactMessagePayload,
-  UserMessagePayload,
-} from '../../queue/types/email-payloads.type';
+import { AgencyMessagePayload, ContactMessagePayload, SupportMessagePayload, UserMessagePayload } from '../../queue/payloads/email-payloads.type';
+
 
 export const EMAIL_EVENTS = {
-  VERIFICATION_REQUESTED: 'email.verification.requested',
+  VERIFICATION_REQUESTED:   'email.verification.requested',
   PASSWORD_RESET_REQUESTED: 'email.password-reset.requested',
-  WELCOME: 'email.welcome',
-  PENDING_APPROVAL: 'email.pending-approval',
-  AGENT_WELCOME: 'email.agent.welcome',
-  AGENT_REJECTED: 'email.agent.rejected',
-  CONTACT_MESSAGE: 'email.contact-message',
-  AGENCY_MESSAGE: 'email.agency-message',
-  USER_MESSAGE: 'email.user-message',
+  WELCOME:                  'email.welcome',
+  PENDING_APPROVAL:         'email.pending-approval',
+  AGENT_WELCOME:            'email.agent.welcome',
+  AGENT_REJECTED:           'email.agent.rejected',
+  SUPPORT_MESSAGE:          'email.support-message',
+  CONTACT_MESSAGE:          'email.contact-message',
+  AGENCY_MESSAGE:           'email.agency-message',
+  USER_MESSAGE:             'email.user-message',
 } as const;
 
 export class EmailVerificationRequestedEvent {
@@ -62,6 +60,10 @@ export class EmailAgentRejectedEvent {
     public readonly email: string,
     public readonly name: string,
   ) {}
+}
+
+export class EmailSupportMessageEvent {
+  constructor(public readonly payload: SupportMessagePayload) {}
 }
 
 export class EmailContactMessageEvent {

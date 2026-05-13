@@ -3,23 +3,18 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { EmailQueueService } from '../services/email-queue.service';
 import {
   EMAIL_EVENTS,
-  EmailVerificationRequestedEvent,
-  EmailPasswordResetRequestedEvent,
-  EmailWelcomeEvent,
-  EmailPendingApprovalEvent,
-  EmailAgentWelcomeEvent,
-  EmailAgentRejectedEvent,
-  EmailContactMessageEvent,
   EmailAgencyMessageEvent,
+  EmailAgentRejectedEvent,
+  EmailAgentWelcomeEvent,
+  EmailContactMessageEvent,
+  EmailPasswordResetRequestedEvent,
+  EmailPendingApprovalEvent,
+  EmailSupportMessageEvent,
   EmailUserMessageEvent,
+  EmailVerificationRequestedEvent,
+  EmailWelcomeEvent,
 } from '../../events/email/email.events';
 
-/**
- * The single seam between the application/domain layer and the email
- * infrastructure. Use cases emit events; this listener pushes them into
- * the BullMQ email queue. Errors are logged here — BullMQ already retries
- * on the worker side, so the use case can stay decoupled.
- */
 @Injectable()
 export class EmailEventsListener {
   private readonly logger = new Logger(EmailEventsListener.name);
@@ -109,6 +104,18 @@ export class EmailEventsListener {
     }
   }
 
+  @OnEvent(EMAIL_EVENTS.SUPPORT_MESSAGE, { async: true })
+  async onSupportMessage(event: EmailSupportMessageEvent) {
+    try {
+      await this.emailQueue.sendSupportMessageEmail(event.payload);
+    } catch (err) {
+      this.logger.error(
+        `Failed to enqueue support email from ${event.payload.senderEmail}`,
+        err as Error,
+      );
+    }
+  }
+
   @OnEvent(EMAIL_EVENTS.CONTACT_MESSAGE, { async: true })
   async onContactMessage(event: EmailContactMessageEvent) {
     try {
@@ -136,7 +143,7 @@ export class EmailEventsListener {
   @OnEvent(EMAIL_EVENTS.USER_MESSAGE, { async: true })
   async onUserMessage(event: EmailUserMessageEvent) {
     try {
-      await this.emailQueue.sendMessageToUser(event.payload);
+      await this.emailQueue.sendMessageToUserEmail(event.payload);
     } catch (err) {
       this.logger.error(
         `Failed to enqueue user-message email to ${event.payload.recipientEmail}`,

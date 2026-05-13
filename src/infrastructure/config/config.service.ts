@@ -81,6 +81,9 @@ get corsOrigins(): string[] {
     return this.configService.get<string>('EMAIL_SERVICE', 'gmail');
   }
 
+  get supportEmail(): string {
+    return this.configService.get<string>('SUPPORT_EMAIL', '');
+  }
  
 
 get passwordResetTokenExpiration(): number {

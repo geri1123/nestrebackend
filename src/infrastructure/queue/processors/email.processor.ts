@@ -18,6 +18,8 @@ export class EmailProcessor extends WorkerHost {
     switch (job.name) {
       case EMAIL_JOBS.SEND_VERIFICATION:
         return this.sendVerification(job);
+      case EMAIL_JOBS.SEND_SUPPORT_EMAIL:
+        return this.sendSupportEmail(job);
       case EMAIL_JOBS.SEND_PASSWORD_RESET:
         return this.sendPasswordReset(job);
       case EMAIL_JOBS.SEND_WELCOME:
@@ -41,7 +43,17 @@ export class EmailProcessor extends WorkerHost {
   }
 
   // ── Handlers ────────────────────────────────────────────────────────────────
-
+ private async sendSupportEmail(job: Job) {
+  const { senderName, senderEmail, senderPhone, subject, message } = job.data;
+  await this.emailService.sendContactPlatformEmail({
+    senderName,
+    senderEmail,
+    senderPhone,
+    subject,
+    message
+  });
+  return { success: true };
+ }
   private async sendVerification(job: Job) {
     const { email, name, token, lang } = job.data;
     await this.emailService.sendVerificationEmail(email, name, token, lang);

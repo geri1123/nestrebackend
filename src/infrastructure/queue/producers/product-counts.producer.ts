@@ -10,7 +10,7 @@ import {
   ProductDeletedPayload,
   ProductStatusChangedPayload,
   ReconcileCountsPayload,
-} from '../types/product-counts-payloads.type';
+} from '../payloads/product-counts.payloads';
 
 @Injectable()
 export class ProductCountsProducer implements OnModuleInit {

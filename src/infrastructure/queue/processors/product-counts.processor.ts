@@ -11,7 +11,7 @@ import {
   ProductDeletedPayload,
   ProductStatusChangedPayload,
   ReconcileCountsPayload,
-} from '../types/product-counts-payloads.type';
+} from '../payloads/product-counts.payloads';
 import {
   IProductCountsRepository,
   PRODUCT_COUNTS_REPO,
