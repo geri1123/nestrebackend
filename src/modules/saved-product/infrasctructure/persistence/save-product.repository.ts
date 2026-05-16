@@ -139,4 +139,14 @@ async findSavedIdsByUserId(userId: number): Promise<{ productId: number }[]> {
     select: { productId: true },
   });
 }
+ async countSavesByOwner(ownerUserId: number): Promise<number> {
+    return this.prisma.savedProduct.count({
+      where: { product: { userId: ownerUserId } },
+    });
+  }
+  async countSavesByAgency(agencyId: number): Promise<number> {
+  return this.prisma.savedProduct.count({
+    where: { product: { agencyId } },
+  });
+}
 }

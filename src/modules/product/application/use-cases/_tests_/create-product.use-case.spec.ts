@@ -109,7 +109,7 @@ describe('CreateProductUseCase', () => {
 
     uploadImages.execute.mockResolvedValue([]);
     createAttributes.execute.mockResolvedValue(undefined);
-    productCountsProducer.emitCreated.mockRejectedValue(new Error('Queue down')); // ← dështon por nuk hedh gabim
+    productCountsProducer.emitCreated.mockRejectedValue(new Error('Queue down')); 
 
     const result = await useCase.execute(
       { title: 'Test', price: 100, cityId: 1, subcategoryId: 2, listingTypeId: 1 } as any,
@@ -118,6 +118,6 @@ describe('CreateProductUseCase', () => {
       10,
     );
 
-    expect(result.success).toBe(true); // ← produkti krijohet gjithsesi
+    expect(result.success).toBe(true); 
   });
 });

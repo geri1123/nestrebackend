@@ -1,6 +1,11 @@
 import { Product } from '../entities/product.entity';
 import { SupportedLang } from '../../../../locales';
 export const PRODUCT_REPO = Symbol('PRODUCT_REPO');
+export interface ProductStatsForUser {
+  id: number;
+  status: string;
+  clickCount: number;
+}
 export interface IProductRepository {
   create(product: Product): Promise<Product>;
   findById(id: number): Promise<Product | null>;
@@ -16,5 +21,8 @@ export interface IProductRepository {
   ownerUserId: number,
   tx?: any,
 ): Promise<void>;
+ findStatsForUser(userId: number): Promise<ProductStatsForUser[]>;
+   findStatsForAgency(agencyId: number): Promise<ProductStatsForUser[]>;
+
 }
 

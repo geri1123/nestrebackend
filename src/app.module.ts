@@ -60,7 +60,7 @@ import { QueueModule } from './infrastructure/queue/queue.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WebSocketModule } from './infrastructure/websocket/socket.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
-
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 @Module({
   imports: [
     // ========================================
@@ -111,7 +111,8 @@ WebSocketModule,
     SaveProductModule,
     AdvertiseProductModule,
     AdvertisementPricingModule,
-
+    //Dashboard
+    DashboardModule,
     // FEATURE MODULES
     NotificationModule,
     FiltersModule,
@@ -152,113 +153,3 @@ export class AppModule {
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }
-
-// import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
-// import { PrismaModule } from './infrastructure/prisma/prisma.module';
-
-// import { AppConfigModule } from './infrastructure/config/config.module';
-// import { LanguageMiddleware } from './middlewares/language.middleware';
-// import { AuthModule } from './modules/auth/auth.module';
-// import { FiltersModule } from './modules/filters/filters.module';
-// import { APP_GUARD } from '@nestjs/core';
-// import { JwtAuthGuard } from './infrastructure/auth/guard/jwt-auth.guard';
-// import { RolesGuard } from './infrastructure/auth/guard/role-guard';
-// import { ProductModule } from './modules/product/product.module';
-// import { NotificationModule } from './modules/notification/notification.module';
-// import { AgencyModule } from './modules/agency/agency.module';
-// import { UsersModule } from './modules/users/users.module';
-// import { AgencyRequestsModule } from './modules/agency-requests/agency-requests.module';
-// import { AgentModule } from './modules/agent/agent.module';
-// import { PermissionsGuard } from './infrastructure/auth/guard/permissions.guard';
-// import { SaveProductModule } from './modules/saved-product/save-product.module';
-
-// import { DatabaseModule } from './infrastructure/database/database.module';
-// import { ProductClicksModule } from './modules/product-clicks/product-clicks.module';
-
-// import { WalletModule } from './modules/wallet/wallet.module';
-// import { ScheduleModule } from '@nestjs/schedule';
-// import { CronJobsModule } from './cron/cron.module';
-// import { CustomThrottlerGuard } from './common/guard/Throttler.guard';
-// import { AdvertiseProductModule } from './modules/advertise-product/advertise-product.module';
-// import { CleanupModule } from './modules/cleanup/cleanup.module';
-// import { RegistrationModule } from './modules/registration/registration.module';
-// import { EmailVerificationModule } from './modules/email-verification/email-verification.module';
-// import { ProductImageModule } from './modules/product-image/product-image.module';
-// import { ProductAttributeValueModule } from './modules/product-attribute/product-attribute.module';
-// import { AdvertisementPricingModule } from './modules/advertisement-pricing/advertisement-prising.module';
-// import { CloudinaryModule } from './infrastructure/cloudinary/cloudinary.module';
-// import { SharedAuthModule } from './infrastructure/auth/modules/shared-auth.module';
-// import { AuthContextService } from './infrastructure/auth/services/auth-context.service';
-// import { AuthContextModule } from './infrastructure/auth/modules/auth-context.module';
-// import { ContactModule } from './modules/contact/contact.module';
-// import { ThrottlerGuard, ThrottlerModule, ThrottlerModuleOptions } from '@nestjs/throttler';
-// import { GuardsModule } from './infrastructure/auth/modules/guards.module';
-// import { AgencyContextGuard } from './infrastructure/auth/guard/agency-context.guard';
-// @Module({
-//   imports: [
-//  ThrottlerModule.forRoot({
-//       throttlers: [{ limit: 100, ttl: 60 }], 
-//     }),
-//         SharedAuthModule, 
- 
-//  ScheduleModule.forRoot(),  
-//  CronJobsModule,
-//     WalletModule,
-//     RegistrationModule,
-//     ProductClicksModule,
-// DatabaseModule,
-//     AppConfigModule,
-//     PrismaModule,
-//     UsersModule,
-//     CleanupModule,
-//     AgencyRequestsModule,
-//      SaveProductModule,
-    
-//     CloudinaryModule,
-//     AgencyModule,
-// AuthModule,
-// AuthContextModule,
-// FiltersModule,
-// ProductModule,
-// ProductImageModule,
-// ProductAttributeValueModule,
-// AdvertiseProductModule,
-// NotificationModule,
-// EmailVerificationModule,
-// SharedAuthModule,
-//     AgentModule, 
-//     AdvertisementPricingModule,
-//     ContactModule,
-//     GuardsModule,
-//   ],
-//   controllers: [AppController],
-//   providers: [
-   
-//     AppService,
-//   { provide: APP_GUARD, useClass: CustomThrottlerGuard },
-//       {
-//     provide: APP_GUARD,
-//     useClass: JwtAuthGuard, 
-//   },
-//   // { provide: APP_GUARD, useClass: AgencyContextGuard },
- 
-
-//   ],
-// })
-// export class AppModule {
-//   configure(consumer: MiddlewareConsumer) {
-//     consumer
-//       .apply(LanguageMiddleware)
-//       .forRoutes({ path: '*', method: RequestMethod.ALL }); 
-//   }
-// }
-//  // {
-//   //   provide: APP_GUARD,
-//   //   useClass: RolesGuard, 
-//   // },
-//   // {
-//   //   provide: APP_GUARD,
-//   //   useClass: PermissionsGuard,
-//   // },

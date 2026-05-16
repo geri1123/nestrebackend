@@ -21,5 +21,6 @@ import { GetSavedProductIdsUseCase } from './application/use-cases/get-saved-pro
       useClass: SavedProductRepository,
     },
   ],
+  exports:[SAVED_PRODUCT_REPO]
 })
 export class SaveProductModule {}

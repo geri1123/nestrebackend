@@ -14,4 +14,6 @@ export interface ISavedProductRepository {
     take: number
   ): Promise<any[]>; 
   findSavedIdsByUserId(userId: number): Promise<{ productId: number }[]>;
+   countSavesByOwner(ownerUserId: number): Promise<number>;
+   countSavesByAgency(agencyId: number): Promise<number>;
 }

@@ -86,6 +86,7 @@ import { GetPublicUserProfileUseCase } from './application/use-cases/get-public-
     VerifyUserEmailUseCase,
     UserRepository,
     FindUserForAuthUseCase,
+    
   ],
 })
 export class UsersModule {}

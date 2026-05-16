@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
-import { IProductRepository } from '../../domain/repositories/product.repository.interface';
+import { IProductRepository, ProductStatsForUser } from '../../domain/repositories/product.repository.interface';
 import { Product } from '../../domain/entities/product.entity';
 import { SupportedLang } from '../../../../locales';
 import { Prisma } from '@prisma/client';
@@ -282,5 +282,28 @@ async transferAgentProducts(
       userId: ownerUserId, 
     },
   });
+}
+ async findStatsForUser(userId: number): Promise<ProductStatsForUser[]> {
+    const products = await this.prisma.product.findMany({
+      where: { userId },
+      select: { id: true, status: true, clickCount: true },
+    });
+ 
+    return products.map((p) => ({
+      id: p.id,
+      status: p.status,
+      clickCount: p.clickCount,
+    }));
+  }
+ async findStatsForAgency(agencyId: number): Promise<ProductStatsForUser[]> {
+  const products = await this.prisma.product.findMany({
+    where: { agencyId },
+    select: { id: true, status: true, clickCount: true },
+  });
+  return products.map((p) => ({
+    id: p.id,
+    status: p.status,
+    clickCount: p.clickCount,
+  }));
 }
 }
