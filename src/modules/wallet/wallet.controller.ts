@@ -10,6 +10,7 @@ import { TopUpDto } from "./dto/topup.dto";
 import { CreateWalletUseCase } from "./application/use-cases/crreate-wallet.use-case";
 import { GetWalletUseCase } from "./application/use-cases/get-wallet.use-case";
 import { ChangeWalletBalanceUseCase } from "./application/use-cases/change-wallet-balance.use-case";
+import { CreateWhopTopupCheckoutUseCase } from "./application/use-cases/create-whop-topup-checkout.use-case";
 
 @Controller('wallet')
 export class WalletController {
@@ -18,6 +19,7 @@ export class WalletController {
         private readonly createWalletUseCase: CreateWalletUseCase,
     private readonly getWalletUseCase: GetWalletUseCase,
     private readonly changeBalanceUseCase: ChangeWalletBalanceUseCase,
+    private readonly createWhopTopupCheckout: CreateWhopTopupCheckoutUseCase,
 
   ) {}
 
@@ -53,7 +55,19 @@ export class WalletController {
       data: walletData,
     };
   }
+@Post('topup/checkout')
+async createTopupCheckout(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
+  const { userId, language } = req;
+  if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
+  const result = await this.createWhopTopupCheckout.execute({
+    userId,
+    amount: body.amount,
+    language,
+  });
+
+  return { success: true, checkoutUrl: result.checkoutUrl };
+}
   // Top-up wallet
   @Post('topup')
   async topUp(@Req() req: RequestWithUser, @Body() body: TopUpDto) {

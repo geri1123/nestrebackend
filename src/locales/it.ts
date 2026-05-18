@@ -1,4 +1,5 @@
 export const it = {
+  invalidTopupAmount: "L'importo del top-up deve essere compreso tra 1 e 10.000.",
     failedToUpdateProfileImage:"Impossibile aggiornare l'immagine del profilo nel database.",
      productSuccesfullyDeleted:"Prodotto eliminato con successo",  
     agencyCreatedSuccessfully:"Agenzia creata con successo",

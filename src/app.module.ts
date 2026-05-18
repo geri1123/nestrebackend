@@ -61,6 +61,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WebSocketModule } from './infrastructure/websocket/socket.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { WhopModule } from './infrastructure/whop/whop.module';
 @Module({
   imports: [
     // ========================================
@@ -120,7 +121,7 @@ WebSocketModule,
     ContactModule,
     QueueModule,
     CleanupModule,
-
+    WhopModule,
     // BACKGROUND JOBS
     
   RedisModule,

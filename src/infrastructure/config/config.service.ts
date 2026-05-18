@@ -128,4 +128,24 @@ get cloudinaryApiKey(): string {
 get cloudinaryApiSecret(): string {
   return this.configService.get<string>('CLOUDINARY_API_SECRET')!;
 }
+
+// Whop
+get whopApiKey(): string {
+  return this.configService.get<string>('WHOP_API_KEY', '');
+}
+get whopCompanyId(): string {
+  return this.configService.get<string>('WHOP_COMPANY_ID', '');
+}
+get whopAccessPassId(): string {
+  return this.configService.get<string>('WHOP_ACCESS_PASS_ID', '');
+}
+get whopWebhookSecret(): string {
+  return this.configService.get<string>('WHOP_WEBHOOK_SECRET', '');
+}
+get whopSuccessRedirectUrl(): string {
+  return this.configService.get<string>('WHOP_SUCCESS_REDIRECT_URL', `${this.clientBaseUrl}/wallet?topup=success`);
+}
+get whopCancelRedirectUrl(): string {
+  return this.configService.get<string>('WHOP_CANCEL_REDIRECT_URL', `${this.clientBaseUrl}/wallet?topup=cancelled`);
+}
 }

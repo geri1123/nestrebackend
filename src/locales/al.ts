@@ -1,4 +1,5 @@
 export const al = {
+  invalidTopupAmount: "Shuma e top-up duhet të jetë midis 1 dhe 10,000.", 
   failedToUpdateProfileImage:"Dështoi përditësimi i fotos së profilit në bazën e të dhënave.",
  productSuccesfullyDeleted:"Produkti u fshi me sukses",
   failedToUpdateAgencyLogo: "Dështoi përditësimi i logos së agjencisë.",

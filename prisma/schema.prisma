@@ -434,11 +434,14 @@ model WalletTransaction {
   amount               Float
   balanceAfter         Float                 @map("balanceAfter")
   description          String?
+  externalPaymentId   String?               @unique  
+  externalProvider    String?   
   createdAt            DateTime              @default(now())
   productAdvertisement ProductAdvertisement?
   wallet               Wallet                @relation(fields: [walletId], references: [id], map: "wallettx_wallet_id_fkey")
 
   @@index([walletId], map: "wallettransaction_walletId_fkey")
+   @@index([externalPaymentId])
   @@map("wallettransaction")
 }
 
