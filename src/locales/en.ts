@@ -1,5 +1,7 @@
 export const en = {
   invalidTopupAmount: "Top-up amount must be between 1 and 10,000.",
+  cannotTransferToSelf: "You cannot transfer money to yourself.",
+  moneyTransferredSuccessfully: "Money transferred successfully",
       failedToUpdateProfileImage:"Failed to update profile image in database.",
       productSuccesfullyDeleted:"Product deleted successfully",
       noimagetodelete:"No image to delete.",

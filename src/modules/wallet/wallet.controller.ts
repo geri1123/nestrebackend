@@ -11,6 +11,8 @@ import { CreateWalletUseCase } from "./application/use-cases/crreate-wallet.use-
 import { GetWalletUseCase } from "./application/use-cases/get-wallet.use-case";
 import { ChangeWalletBalanceUseCase } from "./application/use-cases/change-wallet-balance.use-case";
 import { CreateWhopTopupCheckoutUseCase } from "./application/use-cases/create-whop-topup-checkout.use-case";
+import { TransferDto } from "./dto/transfer.dto";
+import { TransferMoneyUseCase } from "./application/use-cases/transfer-money.use-case";
 
 @Controller('wallet')
 export class WalletController {
@@ -20,6 +22,7 @@ export class WalletController {
     private readonly getWalletUseCase: GetWalletUseCase,
     private readonly changeBalanceUseCase: ChangeWalletBalanceUseCase,
     private readonly createWhopTopupCheckout: CreateWhopTopupCheckoutUseCase,
+    private readonly transferMoneyUseCase: TransferMoneyUseCase,
 
   ) {}
 
@@ -68,27 +71,53 @@ async createTopupCheckout(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
 
   return { success: true, checkoutUrl: result.checkoutUrl };
 }
-  // Top-up wallet
-  @Post('topup')
-  async topUp(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
+
+  @Post("transfer")
+  async transferMoney(
+    @Req() req: RequestWithUser,
+    @Body() body: TransferDto,
+  ) {
     const { userId, language } = req;
-    if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-    const amount = body.amount;
-    const type = WalletTransactionType.topup;
+    if (!userId) {
+      throw new UnauthorizedException(
+        t("userNotAuthenticated", language),
+      );
+    }
 
-    const result = await this.changeBalanceUseCase.execute({
+    await this.transferMoneyUseCase.execute(
       userId,
-      type: WalletTransactionType.topup,
-      amount,
+      body.receiverWalletId,
+      body.amount,
       language,
-    });
+    );
 
     return {
       success: true,
-      message: t('amountAddedSuccessfully', language),
-      balance: result.balance,
-      transactionId: result.transactionId,
+      message: t("moneyTransferredSuccessfully", language),
     };
   }
+  // Top-up wallet
+  // @Post('topup')
+  // async topUp(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
+  //   const { userId, language } = req;
+  //   if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
+
+  //   const amount = body.amount;
+  //   const type = WalletTransactionType.topup;
+
+  //   const result = await this.changeBalanceUseCase.execute({
+  //     userId,
+  //     type: WalletTransactionType.topup,
+  //     amount,
+  //     language,
+  //   });
+
+  //   return {
+  //     success: true,
+  //     message: t('amountAddedSuccessfully', language),
+  //     balance: result.balance,
+  //     transactionId: result.transactionId,
+  //   };
+  // }
 }

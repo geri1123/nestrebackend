@@ -1,4 +1,3 @@
-
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -9,39 +8,54 @@ import { WalletDomainEntity } from "../../domain/entities/wallet.entity";
 export class WalletRepository implements IWalletRepository {
   constructor(private prisma: PrismaService) {}
 
-  // Create a wallet for a user
   async createWallet(userId: number, currency = "EUR"): Promise<WalletDomainEntity> {
     const wallet = await this.prisma.wallet.create({
-      data: {
-        userId,
-        balance: 0,
-        currency,
-      },
+      data: { userId, balance: 0, currency },
     });
     return WalletDomainEntity.fromPrisma(wallet);
   }
 
-  // Get wallet for transaction (domain entity)
-  async getWalletForTx(tx: Prisma.TransactionClient, userId: number): Promise<WalletDomainEntity | null> {
+  async getWalletByUser(userId: number): Promise<WalletDomainEntity | null> {
+    const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
+    return wallet ? WalletDomainEntity.fromPrisma(wallet) : null;
+  }
+
+  async findByUserIdTx(
+    tx: Prisma.TransactionClient,
+    userId: number,
+  ): Promise<WalletDomainEntity | null> {
     const wallet = await tx.wallet.findUnique({ where: { userId } });
     return wallet ? WalletDomainEntity.fromPrisma(wallet) : null;
   }
 
-  // Update balance in transaction
-  async updateWalletBalanceTx(tx: Prisma.TransactionClient, walletId: string, newBalance: number): Promise<void> {
-    await tx.wallet.update({
+  async incrementBalanceTx(
+    tx: Prisma.TransactionClient,
+    walletId: string,
+    amount: number,
+  ): Promise<number> {
+    // SQL: UPDATE wallet SET balance = balance + amount WHERE id = ?
+    const updated = await tx.wallet.update({
       where: { id: walletId },
-      data: { balance: newBalance },
+      data: { balance: { increment: amount } },
     });
+    return updated.balance;
   }
 
-  
-  async getWalletByUser(userId: number): Promise<WalletDomainEntity | null> {
-    const wallet = await this.prisma.wallet.findUnique({
-      where: { userId },
+  async decrementBalanceIfSufficientTx(
+    tx: Prisma.TransactionClient,
+    walletId: string,
+    amount: number,
+  ): Promise<number | null> {
+    // SQL: UPDATE wallet SET balance = balance - amount
+    //      WHERE id = ? AND balance >= amount
+    const result = await tx.wallet.updateMany({
+      where: { id: walletId, balance: { gte: amount } },
+      data: { balance: { decrement: amount } },
     });
-    return wallet ? WalletDomainEntity.fromPrisma(wallet) : null;
-  }
- 
 
+    if (result.count === 0) return null; // balancë e pamjaftueshme
+
+    const fresh = await tx.wallet.findUniqueOrThrow({ where: { id: walletId } });
+    return fresh.balance;
+  }
 }
