@@ -63,14 +63,14 @@ export class WalletDomainEntity {
     };
   }
 
-  static fromPrisma(data: Wallet): WalletDomainEntity {
-    return new WalletDomainEntity(
-      data.id,
-      data.userId,
-      data.balance,
-      data.createdAt,
-      data.updatedAt,
-      data.currency
-    );
-  }
+ static fromPrisma(data: Wallet): WalletDomainEntity {
+  return new WalletDomainEntity(
+    data.id,
+    data.userId,
+    data.balance.toNumber(), 
+    data.createdAt,
+    data.updatedAt,
+    data.currency
+  );
+}
 }

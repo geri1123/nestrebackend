@@ -33,12 +33,11 @@ export class WalletRepository implements IWalletRepository {
     walletId: string,
     amount: number,
   ): Promise<number> {
-    // SQL: UPDATE wallet SET balance = balance + amount WHERE id = ?
-    const updated = await tx.wallet.update({
-      where: { id: walletId },
-      data: { balance: { increment: amount } },
-    });
-    return updated.balance;
+   const updated = await tx.wallet.update({
+    where: { id: walletId },
+    data: { balance: { increment: amount } },
+  });
+  return updated.balance.toNumber();
   }
 
   async decrementBalanceIfSufficientTx(
@@ -46,16 +45,14 @@ export class WalletRepository implements IWalletRepository {
     walletId: string,
     amount: number,
   ): Promise<number | null> {
-    // SQL: UPDATE wallet SET balance = balance - amount
-    //      WHERE id = ? AND balance >= amount
-    const result = await tx.wallet.updateMany({
-      where: { id: walletId, balance: { gte: amount } },
-      data: { balance: { decrement: amount } },
-    });
+     const result = await tx.wallet.updateMany({
+    where: { id: walletId, balance: { gte: amount } },
+    data: { balance: { decrement: amount } },
+  });
 
-    if (result.count === 0) return null; // balancë e pamjaftueshme
+  if (result.count === 0) return null;
 
-    const fresh = await tx.wallet.findUniqueOrThrow({ where: { id: walletId } });
-    return fresh.balance;
+  const fresh = await tx.wallet.findUniqueOrThrow({ where: { id: walletId } });
+  return fresh.balance.toNumber(); 
   }
 }

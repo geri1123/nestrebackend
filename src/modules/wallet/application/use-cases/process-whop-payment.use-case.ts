@@ -28,8 +28,7 @@ export class ProcessWhopPaymentUseCase {
       return;
     }
 
-    // 2. Përdor SHUMËN REALE nga Whop, jo metadata (që mund të mos përputhet
-    //    p.sh. nëse përdoruesi ka aplikuar promo code).
+
     const userId = Number(metadata.user_id);
     const amount = Number(final_amount ?? metadata.amount);
 
@@ -38,12 +37,9 @@ export class ProcessWhopPaymentUseCase {
         `Whop payment ${paymentId} ka metadata të pavlefshme — nuk kreditohet`,
         { metadata, final_amount },
       );
-      return; // mos hidh exception — Whop do bëjë retry pa fund
+      return; 
     }
 
-    // 3. Krediton brenda një single $transaction me externalPaymentId.
-    //    Nëse paymentId-ja ekziston tashmë → unique constraint hidh P2002
-    //    → use-case kthen alreadyProcessed=true. Asnjë double-credit.
     const result = await this.changeBalance.execute({
       userId,
       amount,

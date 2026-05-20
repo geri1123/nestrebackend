@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import { IAdvertisementPricingRepository, UpdatePricingData } from "../../domain/repositories/advertisement-pricing.repository.interface";
-import { AdvertisementType } from "@prisma/client";
+import { AdvertisementType, AdvertisementPricing } from "@prisma/client";
 import { AdvertisementPricingEntity } from "../../domain/entities/advertisement-pricing.entity";
 
 @Injectable()
@@ -9,77 +9,55 @@ export class AdvertisementPricingRepository implements IAdvertisementPricingRepo
 
   constructor(private prisma: PrismaService) {}
 
-  async getPricing(adType: AdvertisementType) {
-    const data = await this.prisma.advertisementPricing.findUnique({
-      where: { adType },
-    });
-    if (!data) return null;
+  private toEntity(data: AdvertisementPricing): AdvertisementPricingEntity {
     return new AdvertisementPricingEntity(
       data.id,
       data.adType,
-      data.price,
+      data.price.toNumber(),
       data.duration,
-      data.discount,
+      data.discount?.toNumber() ?? null,
       data.isActive,
       data.createdAt,
-      data.updatedAt
+      data.updatedAt,
     );
   }
 
-  async getAll() {
-    const rows = await this.prisma.advertisementPricing.findMany();
-    return rows.map(r => new AdvertisementPricingEntity(
-      r.id, r.adType, r.price, r.duration, r.discount,
-      r.isActive, r.createdAt, r.updatedAt
-    ));
+  async getPricing(adType: AdvertisementType): Promise<AdvertisementPricingEntity | null> {
+    const data = await this.prisma.advertisementPricing.findUnique({
+      where: { adType },
+    });
+    return data ? this.toEntity(data) : null;
   }
 
-  async update(
-  adType: AdvertisementType,
-  data: UpdatePricingData
-): Promise<AdvertisementPricingEntity>{
+  async getAll(): Promise<AdvertisementPricingEntity[]> {
+    const rows = await this.prisma.advertisementPricing.findMany();
+    return rows.map(r => this.toEntity(r));
+  }
+
+  async update(adType: AdvertisementType, data: UpdatePricingData): Promise<AdvertisementPricingEntity> {
     const updated = await this.prisma.advertisementPricing.update({
       where: { adType },
       data,
     });
-
-    return new AdvertisementPricingEntity(
-      updated.id,
-      updated.adType,
-      updated.price,
-      updated.duration,
-      updated.discount,
-      updated.isActive,
-      updated.createdAt,
-      updated.updatedAt
-    );
+    return this.toEntity(updated);
   }
-  async create(data: {
-  adType: AdvertisementType;
-  price: number;
-  duration: number;
-  discount?: number;
-  isActive?: boolean;
-}) {
-  const created = await this.prisma.advertisementPricing.create({
-    data: {
-      adType: data.adType,
-      price: data.price,
-      duration: data.duration,
-      discount: data.discount ?? null,
-      isActive: data.isActive ?? true,
-    },
-  });
 
-  return new AdvertisementPricingEntity(
-    created.id,
-    created.adType,
-    created.price,
-    created.duration,
-    created.discount,
-    created.isActive,
-    created.createdAt,
-    created.updatedAt
-  );
-}
+  async create(data: {
+    adType: AdvertisementType;
+    price: number;
+    duration: number;
+    discount?: number;
+    isActive?: boolean;
+  }): Promise<AdvertisementPricingEntity> {
+    const created = await this.prisma.advertisementPricing.create({
+      data: {
+        adType: data.adType,
+        price: data.price,
+        duration: data.duration,
+        discount: data.discount ?? null,
+        isActive: data.isActive ?? true,
+      },
+    });
+    return this.toEntity(created);
+  }
 }

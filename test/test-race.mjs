@@ -1,13 +1,3 @@
-// ============================================================================
-// test-race.mjs — Test për race condition në wallet (topup paralelisht)
-// ============================================================================
-//
-// SI TA EKZEKUTOSH:
-//   1. Vendose këtë file në root-in e projektit backend (krah package.json)
-//   2. Sigurohu që server-i është duke punuar:  npm run start:dev
-//   3. Plotëso variablat e mëposhtëm (API_URL dhe JWT)
-//   4. Hap një terminal të dytë dhe ekzekuto:    node test-race.mjs
-// ============================================================================
 
 // ---------- KONFIGURIMI ----------
 const API_URL = 'http://localhost:8080';
