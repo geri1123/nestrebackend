@@ -56,8 +56,22 @@ CREATE TABLE "agency" (
     "owner_user_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
+    "description" TEXT,
 
     CONSTRAINT "agency_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "review" (
+    "id" SERIAL NOT NULL,
+    "reviewer_user_id" INTEGER NOT NULL,
+    "agency_id" INTEGER NOT NULL,
+    "rating" INTEGER NOT NULL,
+    "comment" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "review_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -231,7 +245,7 @@ CREATE TABLE "user" (
     "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "first_name" TEXT,
     "last_name" TEXT,
     "about_me" TEXT,
@@ -355,7 +369,7 @@ CREATE TABLE "savedproduct" (
 CREATE TABLE "wallet" (
     "id" TEXT NOT NULL,
     "userId" INTEGER NOT NULL,
-    "balance" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "balance" DECIMAL(12,2) NOT NULL DEFAULT 0,
     "currency" TEXT NOT NULL DEFAULT 'EUR',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -368,10 +382,12 @@ CREATE TABLE "wallettransaction" (
     "id" TEXT NOT NULL,
     "walletId" TEXT NOT NULL,
     "type" "wallettransaction_type" NOT NULL,
-    "amount" DOUBLE PRECISION NOT NULL,
-    "balanceAfter" DOUBLE PRECISION NOT NULL,
+    "amount" DECIMAL(12,2) NOT NULL,
+    "balanceAfter" DECIMAL(12,2) NOT NULL,
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "externalPaymentId" TEXT,
+    "externalProvider" TEXT,
 
     CONSTRAINT "wallettransaction_pkey" PRIMARY KEY ("id")
 );
@@ -394,9 +410,9 @@ CREATE TABLE "productadvertisement" (
 CREATE TABLE "advertisementpricing" (
     "id" SERIAL NOT NULL,
     "adType" "advertisement_type" NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
     "duration" INTEGER NOT NULL,
-    "discount" DOUBLE PRECISION,
+    "discount" DECIMAL(5,2),
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -424,6 +440,18 @@ CREATE INDEX "agency_created_at_idx" ON "agency"("created_at");
 
 -- CreateIndex
 CREATE INDEX "agency_status_idx" ON "agency"("status");
+
+-- CreateIndex
+CREATE INDEX "review_agency_id_idx" ON "review"("agency_id");
+
+-- CreateIndex
+CREATE INDEX "review_reviewer_user_id_idx" ON "review"("reviewer_user_id");
+
+-- CreateIndex
+CREATE INDEX "review_created_at_idx" ON "review"("created_at");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "review_reviewer_agency_unique" ON "review"("reviewer_user_id", "agency_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "agencyagent_id_card_number_key" ON "agencyagent"("id_card_number");
@@ -552,6 +580,9 @@ CREATE INDEX "product_status_idx" ON "product"("status");
 CREATE INDEX "product_createdAt_idx" ON "product"("createdAt");
 
 -- CreateIndex
+CREATE INDEX "product_status_clickCount_idx" ON "product"("status", "clickCount");
+
+-- CreateIndex
 CREATE INDEX "product_status_createdAt_idx" ON "product"("status", "createdAt");
 
 -- CreateIndex
@@ -594,7 +625,13 @@ CREATE UNIQUE INDEX "savedproduct_user_id_product_id_key" ON "savedproduct"("use
 CREATE UNIQUE INDEX "wallet_userId_key" ON "wallet"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "wallettransaction_externalPaymentId_key" ON "wallettransaction"("externalPaymentId");
+
+-- CreateIndex
 CREATE INDEX "wallettransaction_walletId_fkey" ON "wallettransaction"("walletId");
+
+-- CreateIndex
+CREATE INDEX "wallettransaction_externalPaymentId_idx" ON "wallettransaction"("externalPaymentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "productadvertisement_walletTxId_key" ON "productadvertisement"("walletTxId");
@@ -610,6 +647,12 @@ CREATE UNIQUE INDEX "advertisementpricing_adType_key" ON "advertisementpricing"(
 
 -- AddForeignKey
 ALTER TABLE "agency" ADD CONSTRAINT "agency_owner_user_id_fkey" FOREIGN KEY ("owner_user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "review" ADD CONSTRAINT "review_reviewer_user_id_fkey" FOREIGN KEY ("reviewer_user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "review" ADD CONSTRAINT "review_agency_id_fkey" FOREIGN KEY ("agency_id") REFERENCES "agency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "agencyagent" ADD CONSTRAINT "agencyagent_added_by_fkey" FOREIGN KEY ("added_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -696,10 +739,10 @@ ALTER TABLE "productimage" ADD CONSTRAINT "productimage_product_id_fkey" FOREIGN
 ALTER TABLE "productimage" ADD CONSTRAINT "productimage_user_id_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "agencyagent_permission" ADD CONSTRAINT "agentperm_agent_id_fkey" FOREIGN KEY ("agency_agent_id") REFERENCES "agencyagent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "agencyagent_permission" ADD CONSTRAINT "agentperm_agency_id_fkey" FOREIGN KEY ("agency_id") REFERENCES "agency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "agencyagent_permission" ADD CONSTRAINT "agentperm_agency_id_fkey" FOREIGN KEY ("agency_id") REFERENCES "agency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "agencyagent_permission" ADD CONSTRAINT "agentperm_agent_id_fkey" FOREIGN KEY ("agency_agent_id") REFERENCES "agencyagent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "savedproduct" ADD CONSTRAINT "savedproduct_product_fk" FOREIGN KEY ("product_id") REFERENCES "product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

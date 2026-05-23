@@ -10,31 +10,51 @@ datasource db {
 model Agency {
   id                  Int                     @id @default(autoincrement())
   agencyName          String                  @map("agency_name")
-  description         String?                 @db.Text          
-  publicCode          String?                 @unique(map: "agency_public_code_key") @map("public_code")
+  publicCode          String?                 @unique @map("public_code")
   logo                String?
   logoPublicId        String?                 @map("logo_public_id")
-  licenseNumber       String                  @unique(map: "agency_license_number_key") @map("license_number")
+  licenseNumber       String                  @unique @map("license_number")
   agencyEmail         String?                 @map("agency_email")
   phone               String?
-  address             String?                 @db.Text
+  address             String?
   website             String?
   status              AgencyStatus            @default(active)
-  ownerUserId         Int                     @unique(map: "agency_owner_user_id_key") @map("owner_user_id")
+  ownerUserId         Int                     @unique @map("owner_user_id")
   createdAt           DateTime                @default(now()) @map("created_at")
   updatedAt           DateTime?               @updatedAt @map("updated_at")
+  description         String?
   user                User                    @relation(fields: [ownerUserId], references: [id], map: "agency_owner_user_id_fkey")
   agencyAgent         AgencyAgent[]
   permissions         AgencyAgentPermission[]
   product             Product[]
   registrationRequest RegistrationRequest[]
- @@index([agencyName])
- @@index([publicCode])
- @@index([createdAt])
+   reviews                      Review[]
+
+  @@index([agencyName])
+  @@index([publicCode])
+  @@index([createdAt])
   @@index([status])
   @@map("agency")
 }
+model Review {
+  id              Int      @id @default(autoincrement())
+  reviewerUserId  Int      @map("reviewer_user_id")
+  agencyId        Int      @map("agency_id")
+  rating          Int
+  comment         String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt       @map("updated_at")
 
+  reviewer        User     @relation("UserReviews", fields: [reviewerUserId], references: [id], map: "review_reviewer_user_id_fkey")
+  agency          Agency   @relation(fields: [agencyId], references: [id], map: "review_agency_id_fkey")
+
+  @@unique([reviewerUserId, agencyId], map: "review_reviewer_agency_unique")
+  @@index([agencyId],       map: "review_agency_id_idx")
+  @@index([reviewerUserId], map: "review_reviewer_user_id_idx")
+  @@index([createdAt],      map: "review_created_at_idx")
+
+  @@map("review")
+}
 model AgencyAgent {
   id             Int                     @id @default(autoincrement())
   agencyId       Int                     @map("agency_id")
@@ -53,7 +73,7 @@ model AgencyAgent {
   agentUser      User                    @relation("AgencyAgentAgent", fields: [agentId], references: [id], map: "agencyagent_agent_id_fkey")
   permission     AgencyAgentPermission?
 
-  @@unique([agencyId, agentId], map: "agencyagent_agency_id_agent_id_key")
+  @@unique([agencyId, agentId])
   @@index([addedBy], map: "AgencyAgent_added_by_fkey")
   @@index([agentId], map: "AgencyAgent_agent_id_fkey")
   @@index([agencyId], map: "AgencyAgent_agency_id_fkey")
@@ -112,7 +132,7 @@ model AttributeValueTranslation {
 
 model Category {
   id                  Int                   @id @default(autoincrement())
-  slug                String                @unique(map: "category_slug_key")
+  slug                String                @unique
   createdAt           DateTime              @default(now())
   updatedAt           DateTime?             @updatedAt @map("updated_at")
   categoryTranslation CategoryTranslation[]
@@ -175,7 +195,7 @@ model NotificationTranslation {
   id             Int          @id @default(autoincrement())
   notificationId Int
   languageCode   LanguageCode
-  message        String       @db.Text
+  message        String
   notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade, map: "notiftranslation_notif_id_fkey")
 
   @@index([notificationId], map: "NotificationTranslation_notificationId_fkey")
@@ -188,10 +208,10 @@ model RegistrationRequest {
   requestType         RegistrationRequestRequestType    @map("request_type")
   agencyName          String?                           @map("agency_name")
   agencyId            Int?                              @map("agency_id")
-  supportingDocuments String?                           @map("supporting_documents") @db.Text
+  supportingDocuments String?                           @map("supporting_documents")
   status              RegistrationRequestStatus         @default(pending)
   reviewedBy          Int?                              @map("reviewed_by")
-  reviewNotes         String?                           @map("review_notes") @db.Text
+  reviewNotes         String?                           @map("review_notes")
   reviewedAt          DateTime?                         @map("reviewed_at")
   requestedRole       RegistrationRequestRequestedRole? @map("requested_role")
   licenseNumber       String?                           @map("license_number")
@@ -213,7 +233,7 @@ model RegistrationRequest {
 model Subcategory {
   id                     Int                      @id @default(autoincrement())
   categoryId             Int
-  slug                   String                   @unique(map: "subcategory_slug_key")
+  slug                   String                   @unique
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
   attributes             Attribute[]
@@ -239,13 +259,13 @@ model SubcategoryTranslation {
 
 model User {
   id                           Int                    @id @default(autoincrement())
-  username                     String                 @unique(map: "user_username_key")
-  email                        String                 @unique(map: "user_email_key")
- password                      String?
+  username                     String                 @unique
+  email                        String                 @unique
+  password                     String?
   firstName                    String?                @map("first_name")
   lastName                     String?                @map("last_name")
-  aboutMe                      String?                @map("about_me") @db.Text
-  profileImgUrl                String?                @map("profile_img_url") @db.Text
+  aboutMe                      String?                @map("about_me")
+  profileImgUrl                String?                @map("profile_img_url")
   profileImgPublicId           String?                @map("profile_img_public_id")
   phone                        String?
   website                      String?
@@ -269,6 +289,7 @@ model User {
   registrationRequests         RegistrationRequest[]  @relation("RegistrationRequestUser")
   savedProducts                SavedProduct[]
   usernameHistory              UsernameHistory[]
+  reviews                      Review[]                @relation("UserReviews")
   wallet                       Wallet?
 
   @@index([role])
@@ -304,8 +325,8 @@ model City {
 
 model Country {
   id   Int    @id @default(autoincrement())
-  name String @unique(map: "country_name_key")
-  code String @unique(map: "country_code_key")
+  name String @unique
+  code String @unique
   city City[]
 
   @@map("country")
@@ -315,7 +336,7 @@ model Product {
   id                    Int                     @id @default(autoincrement())
   title                 String
   price                 Float
-  description           String?                 @db.Text
+  description           String?
   cityId                Int
   agencyId              Int?
   userId                Int
@@ -345,7 +366,7 @@ model Product {
   @@index([userId], map: "Product_userId_fkey")
   @@index([status])
   @@index([createdAt])
-   @@index([status, clickCount])
+  @@index([status, clickCount])
   @@index([status, createdAt])
   @@index([cityId, status])
   @@index([subcategoryId, status])
@@ -372,8 +393,8 @@ model ProductImage {
   id        Int     @id @default(autoincrement())
   productId Int
   userId    Int
-  imageUrl  String? @map("imageUrl") @db.Text
-  publicId  String? @map("publicId") @db.Text
+  imageUrl  String? @map("imageUrl")
+  publicId  String? @map("publicId")
   product   Product @relation(fields: [productId], references: [id], map: "productimage_product_id_fkey")
   user      User    @relation(fields: [userId], references: [id], map: "productimage_user_id_fkey")
 
@@ -394,8 +415,8 @@ model AgencyAgentPermission {
   canManageAgents    Boolean     @default(false) @map("can_manage_agents")
   createdAt          DateTime    @default(now()) @map("created_at")
   updatedAt          DateTime?   @updatedAt @map("updated_at")
-  agencyAgent        AgencyAgent @relation(fields: [agencyAgentId], references: [id], onDelete: Cascade, map: "agentperm_agent_id_fkey")
   agency             Agency      @relation(fields: [agencyId], references: [id], map: "agentperm_agency_id_fkey")
+  agencyAgent        AgencyAgent @relation(fields: [agencyAgentId], references: [id], onDelete: Cascade, map: "agentperm_agent_id_fkey")
 
   @@index([agencyId], map: "agencyagent_permission_agency_id_fkey")
   @@map("agencyagent_permission")
@@ -406,18 +427,18 @@ model SavedProduct {
   userId    Int      @map("user_id")
   productId Int      @map("product_id")
   savedAt   DateTime @default(now()) @map("saved_at")
-  product   Product  @relation(fields: [productId], references: [id], map: "savedproduct_product_fk")  
+  product   Product  @relation(fields: [productId], references: [id], map: "savedproduct_product_fk")
   user      User     @relation(fields: [userId], references: [id], map: "savedproduct_user_id_fkey")
 
   @@unique([userId, productId])
-  @@index([productId], map: "savedproduct_product_id_fkey") 
+  @@index([productId], map: "savedproduct_product_id_fkey")
   @@map("savedproduct")
 }
 
 model Wallet {
   id           String              @id @default(uuid())
   userId       Int                 @unique
-  balance   Decimal @default(0) @db.Decimal(12, 2)
+  balance      Decimal             @default(0) @db.Decimal(12, 2)
   currency     String              @default("EUR")
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
@@ -431,17 +452,17 @@ model WalletTransaction {
   id                   String                @id @default(uuid())
   walletId             String
   type                 WalletTransactionType
- amount       Decimal @db.Decimal(12, 2)
-  balanceAfter Decimal @map("balanceAfter") @db.Decimal(12, 2)
+  amount               Decimal               @db.Decimal(12, 2)
+  balanceAfter         Decimal               @map("balanceAfter") @db.Decimal(12, 2)
   description          String?
-  externalPaymentId   String?               @unique  
-  externalProvider    String?   
   createdAt            DateTime              @default(now())
+  externalPaymentId    String?               @unique
+  externalProvider     String?
   productAdvertisement ProductAdvertisement?
   wallet               Wallet                @relation(fields: [walletId], references: [id], map: "wallettx_wallet_id_fkey")
 
   @@index([walletId], map: "wallettransaction_walletId_fkey")
-   @@index([externalPaymentId])
+  @@index([externalPaymentId])
   @@map("wallettransaction")
 }
 
@@ -466,9 +487,9 @@ model ProductAdvertisement {
 model AdvertisementPricing {
   id        Int               @id @default(autoincrement())
   adType    AdvertisementType @unique
-   price    Decimal  @db.Decimal(10, 2)
+  price     Decimal           @db.Decimal(10, 2)
   duration  Int
-  discount Decimal? @db.Decimal(5, 2)
+  discount  Decimal?          @db.Decimal(5, 2)
   isActive  Boolean           @default(true)
   updatedAt DateTime          @updatedAt
   createdAt DateTime          @default(now())

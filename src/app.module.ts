@@ -62,6 +62,7 @@ import { WebSocketModule } from './infrastructure/websocket/socket.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { WhopModule } from './infrastructure/whop/whop.module';
+import { ReviewModule } from './modules/review/review.module';
 @Module({
   imports: [
     // ========================================
@@ -122,6 +123,7 @@ WebSocketModule,
     QueueModule,
     CleanupModule,
     WhopModule,
+    ReviewModule,
     // BACKGROUND JOBS
     
   RedisModule,
