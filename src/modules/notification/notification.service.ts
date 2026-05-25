@@ -172,8 +172,7 @@ export class NotificationService {
       });
  
       if (this.notificationGateway.isUserOnline(data.userId)) {
-        // ✅ Send full payload so the client can render the notification
-        // without needing to refetch — previously missing userId, metadata, readAt
+        
         this.notificationSocket.sendNotificationToUser(data.userId, {
           id: notification.id,
           userId: notification.userId,
