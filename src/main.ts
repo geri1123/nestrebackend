@@ -80,7 +80,7 @@ app.enableCors({
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, swaggerDocument);
 
-await app.listen(configService.port, '0.0.0.0');
+await app.listen(configService.port);
   console.log(` Server running on port ${configService.port}`);
   console.log(` Swagger available at http://localhost:${configService.port}/api/docs`);
 }

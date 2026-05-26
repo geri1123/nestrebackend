@@ -19,6 +19,7 @@ import { UpdateReviewUseCase } from '../application/use-cases/update-review.use-
 import { GetAgencyReviewsUseCase } from '../application/use-cases/get-agency-reviews.use-case';
 import { GetAgencyReviewsQueryDto } from '../dto/get-agency-reviews.dto';
 import { ReviewSwagger } from '../responses/review.swagger.response';
+import { Public } from '../../../common/decorators/public.decorator';
 
 @Controller('reviews')
 export class ReviewController {
@@ -89,6 +90,7 @@ export class ReviewController {
 
   // ─── GET /reviews/agency/:agencyId ────────────────────────────────────────
   @ReviewSwagger.GetAgencyReviews()
+  @Public()
   @Get('agency/:agencyId')
   async getAgencyReviews(
     @Param('agencyId', ParseIntPipe) agencyId: number,

@@ -93,4 +93,17 @@ export class AgencyDetailResponse {
     description: 'Creation timestamp',
   })
   createdAt!: Date;
+
+  @ApiProperty({
+    example: 4.3,
+    description: 'Average rating of the agency (rounded to 1 decimal). Null nese s\'ka asnje review.',
+    nullable: true,
+  })
+  averageRating!: number | null;
+
+  @ApiProperty({
+    example: 27,
+    description: 'Total number of reviews for the agency',
+  })
+  totalReviews!: number;
 }

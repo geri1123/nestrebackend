@@ -29,8 +29,6 @@ export class GetAgencyInfoUseCase {
       throw new NotFoundException(t('agencyNotFound', language));
     }
 
-   
-
     return agencyInfo;
   }
 }

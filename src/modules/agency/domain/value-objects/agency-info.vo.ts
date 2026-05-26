@@ -19,4 +19,6 @@ ownerUserProfileImage: string | null;
   ownerName?: string;
   ownerEmail?: string;
   createdAt: Date;
+  averageRating: number | null;
+  totalReviews: number;
 }

@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
@@ -7,23 +7,24 @@ import {
   IsNumberString,
   Length,
   IsUrl,
-  MaxLength
-} from "class-validator";
-import { MaxWords } from "../../../common/helpers/max-words.validator";
+} from 'class-validator';
+
+import { MaxWords } from '../../../common/helpers/max-words.validator';
 
 export class UpdateAgencyDto {
+  
   @ApiPropertyOptional({
     example: 'DreamHomes Agency',
-    description: 'Agency name'
+    description: 'Agency name',
   })
   @IsOptional()
-  @IsString({message:"emailMustBeString"})
-  @IsNotEmpty({message:"agencyNameRequired"})
+  @IsString({ message: 'agencyNameMustBeString' })
+  @IsNotEmpty({ message: 'agencyNameRequired' })
   agencyName?: string;
 
   @ApiPropertyOptional({
     example: 'info@dreamhomes.al',
-    description: 'Agency email'
+    description: 'Agency email',
   })
   @IsOptional()
   @IsEmail({}, { message: 'emailInvalid' })
@@ -31,7 +32,7 @@ export class UpdateAgencyDto {
 
   @ApiPropertyOptional({
     example: '+355691234567',
-    description: 'Phone number'
+    description: 'Phone number',
   })
   @IsOptional()
   @IsNumberString({}, { message: 'phoneMustBeDigits' })
@@ -40,31 +41,28 @@ export class UpdateAgencyDto {
 
   @ApiPropertyOptional({
     example: 'Rruga e Kavajës 120, Tirana',
-    description: 'Agency address'
+    description: 'Agency address',
   })
   @IsOptional()
-  @IsString({message:"addressRequired"})
-  @IsNotEmpty({message:"addressRequired"})
+  @IsString({ message: 'addressMustBeString' })
+  @IsNotEmpty({ message: 'addressRequired' })
   address?: string;
 
   @ApiPropertyOptional({
     example: 'https://dreamhomes.al',
-    description: 'Website URL'
+    description: 'Website URL',
   })
   @IsOptional()
-  @IsUrl()
+  @IsUrl({}, { message: 'websiteInvalid' })
   website?: string;
-   @ApiPropertyOptional({
-    example: 'We are a leading real estate agency in Tirana specializing in luxury apartments and commercial properties.',
-    description: 'Agency description (max 500 characters)',
-    maxLength: 500
+
+  @ApiPropertyOptional({
+    example:
+      'We are a leading real estate agency in Tirana specializing in luxury apartments and commercial properties.',
+    description: 'Agency description (max 100 words)',
   })
- @ApiPropertyOptional({
-  example: 'Leading real estate agency in Tirana specializing in luxury apartments.',
-  description: 'Agency description (max 100 words)'
-})
-@IsOptional()
-@IsString({ message: 'descriptionMustBeString' })
-@MaxWords(100, { message: 'descriptionTooManyWords' })
-description?: string;
+  @IsOptional()
+  @IsString({ message: 'descriptionMustBeString' })
+  @MaxWords(100, { message: 'descriptionTooManyWords' })
+  description?: string;
 }

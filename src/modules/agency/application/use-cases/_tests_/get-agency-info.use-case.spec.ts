@@ -21,6 +21,8 @@ describe('GetAgencyInfoUseCase', () => {
     address: '123 Test Street',
     phone: '+1234567890',
     website: 'https://testagency.com',
+    averageRating: null,
+    totalReviews: 0,
   } as AgencyInfoVO;
 
   const mockSuspendedAgencyInfo: AgencyInfoVO = {
