@@ -23,10 +23,10 @@ COPY prisma ./prisma
 
 RUN npm ci --omit=dev
 
-RUN npx prisma generate
-
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 EXPOSE 8080
 
-CMD ["node", "dist/src/main"]
+CMD ["node", "dist/main"]
