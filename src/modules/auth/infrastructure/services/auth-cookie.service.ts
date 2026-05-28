@@ -13,12 +13,12 @@ export class AuthCookieService {
   private readonly isProduction = process.env.NODE_ENV === 'production';
 
   // ── Shared base options
-  private readonly baseOptions = {
-    httpOnly: true,
-    secure:   this.isProduction,                          
-    sameSite: (this.isProduction ? 'strict' : 'lax') as 'strict' | 'lax',
-    path:     '/',
-  } as const;
+private readonly baseOptions = {
+  httpOnly: true,
+  secure:   this.isProduction,
+  sameSite: (this.isProduction ? 'none' : 'lax') as 'none' | 'lax',
+  path:     '/',
+} as const;
 
   // ── Access cookie
   setAccessCookie(res: Response, token: string, rememberMe: boolean): void {
