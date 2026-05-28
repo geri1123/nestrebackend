@@ -23,7 +23,9 @@ export class AppConfigService {
   get dbName(): string {
     return this.configService.get<string>('DB_NAME', '');
   }
-
+get emailFrom(): string {
+  return this.configService.get<string>('EMAIL_FROM', '');
+}
   // Server
   get port(): number {
     return Number(this.configService.get<number>('PORT', 8080));
@@ -71,20 +73,21 @@ get corsOrigins(): string[] {
   return origins.split(',').map(o => o.trim());
 }
   // Email
-  get emailUser(): string {
-    return this.configService.get<string>('EMAIL_USER', '');
-  }
-  get emailPass(): string {
-    return this.configService.get<string>('EMAIL_PASS', '');
-  }
-  get emailService(): string {
-    return this.configService.get<string>('EMAIL_SERVICE', 'gmail');
-  }
-
-  get supportEmail(): string {
-    return this.configService.get<string>('SUPPORT_EMAIL', '');
-  }
- 
+ get emailHost(): string {
+  return this.configService.get<string>('EMAIL_HOST', 'smtp-relay.brevo.com');
+}
+get emailPort(): number {
+  return parseInt(this.configService.get<string>('EMAIL_PORT', '587'), 10);
+}
+get emailUser(): string {
+  return this.configService.get<string>('EMAIL_USER', '');
+}
+get emailPass(): string {
+  return this.configService.get<string>('EMAIL_PASS', '');
+}
+get supportEmail(): string {
+  return this.configService.get<string>('SUPPORT_EMAIL', '');
+}
 
 get passwordResetTokenExpiration(): number {
   return Number(this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRATION', 10)); // default 10 minutes

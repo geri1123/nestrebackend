@@ -114,45 +114,7 @@ export class AgencyRepository implements IAgencyDomainRepository {
     };
   }
 
-  // async getAgencyInfoByOwner(agencyId: number): Promise<AgencyInfoVO | null> {
-  //   const agency = await this.prisma.agency.findUnique({
-  //     where: { id: agencyId },
-  //     include: {
-  //       user: {
-  //         select: {
-  //           username: true,
-  //           firstName: true,
-  //           lastName: true,
-  //           email: true,
-  //           profileImgUrl: true,
-  //         },
-  //       },
-  //     },
-  //   });
-
-  //   if (!agency) return null;
-  //   return {
-  //     id: agency.id,
-  //     agencyName: agency.agencyName,
-  //     licenseNumber: agency.licenseNumber,
-  //     address: agency.address,
-  //     status: agency.status,
-  //     publicCode: agency.publicCode,
-  //     agencyEmail: agency.agencyEmail,
-  //     description: agency.description,
-  //     phone: agency.phone,
-  //     website: agency.website,
-  //     logo: agency.logo,
-  //     ownerUserId: agency.ownerUserId,
-  //     ownerUsername: agency.user?.username ?? '',
-  //     ownerUserProfileImage: agency.user?.profileImgUrl ?? null,
-  //     ownerName: agency.user
-  //       ? `${agency.user.firstName} ${agency.user.lastName}`
-  //       : undefined,
-  //     ownerEmail: agency.user?.email ?? undefined,
-  //     createdAt: agency.createdAt,
-  //   };
-  // }
+ 
 
   async findLogoById(agencyId: number): Promise<{ 
     logo: string | null; 
