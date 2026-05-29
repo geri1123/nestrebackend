@@ -211,7 +211,7 @@ async sendAgentRejectedEmail(to: string, name: string) {
       productImage
     );
 
-    return this.sendEmail(recipientEmail, subject, html);
+   return this.sendEmail(recipientEmail, subject, html, senderEmail);
   };
   async sendAgencyMessageEmail(params: {
   senderName: string;
