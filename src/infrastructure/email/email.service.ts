@@ -22,29 +22,64 @@ export class EmailService {
     @Inject(EMAIL_TRANSPORTER) private readonly transporter: Transporter,
     private readonly configService: AppConfigService,
   ) {}
-private async sendEmail(
+  private async sendEmail(
   to: string,
   subject: string,
   html: string,
   replyTo?: string,
 ): Promise<boolean> {
-  const mailOptions = {
-    from: `Real Estate Platform <${this.configService.emailFrom}>`,
-    to,
-    subject,
-    html,
-    ...(replyTo ? { replyTo } : {}),
-  };
-
   try {
-    await this.transporter.sendMail(mailOptions);
-    this.logger.log(`Email "${subject}" sent successfully to ${to}`);
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': (this.transporter as any).apiKey,
+      },
+      body: JSON.stringify({
+        sender: { name: 'Pronasmart', email: this.configService.emailFrom },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+        ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      this.logger.error(`Brevo API error: ${err}`);
+      return false;
+    }
+
+    this.logger.log(`Email "${subject}" sent to ${to}`);
     return true;
   } catch (error) {
-    this.logger.error(`Error sending "${subject}" email to ${to}:`, error);
+    this.logger.error(`Error sending email to ${to}:`, error);
     return false;
   }
 }
+// private async sendEmail(
+//   to: string,
+//   subject: string,
+//   html: string,
+//   replyTo?: string,
+// ): Promise<boolean> {
+//   const mailOptions = {
+//     from: `Real Estate Platform <${this.configService.emailFrom}>`,
+//     to,
+//     subject,
+//     html,
+//     ...(replyTo ? { replyTo } : {}),
+//   };
+
+//   try {
+//     await this.transporter.sendMail(mailOptions);
+//     this.logger.log(`Email "${subject}" sent successfully to ${to}`);
+//     return true;
+//   } catch (error) {
+//     this.logger.error(`Error sending "${subject}" email to ${to}:`, error);
+//     return false;
+//   }
+// }
   // private async sendEmail(to: string, subject: string, html: string): Promise<boolean> {
   //   const mailOptions = {
   //     // from: `Real Estate Platform <${this.configService.emailUser}>`,

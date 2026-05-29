@@ -88,7 +88,9 @@ get emailPass(): string {
 get supportEmail(): string {
   return this.configService.get<string>('SUPPORT_EMAIL', '');
 }
-
+get brevoApiKey(): string {
+  return this.configService.get<string>('BREVO_API_KEY', '');
+}
 get passwordResetTokenExpiration(): number {
   return Number(this.configService.get<number>('PASSWORD_RESET_TOKEN_EXPIRATION', 10)); // default 10 minutes
 }
