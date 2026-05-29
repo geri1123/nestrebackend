@@ -5,7 +5,7 @@ export const verificationEmailTemplate = (name: string, verificationLink: string
     <a href="${verificationLink}" style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px;">
       Verify Email
     </a>
-    <p>${verificationLink}</p>
+  
     <p>If you didn't request this, please ignore this email.</p>
     <p>The link will expire in 10 minutes.</p>
   </div>

@@ -1,6 +1,6 @@
 export const welcomeEmailTemplate = (name: string) => `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>Welcome to Real Estate Platform, ${name}!</h2>
+    <h2>Welcome to PronaSmart, ${name}!</h2>
     <p>Your account has been successfully verified and you can now login.</p>
     <p>Thank you for joining our platform!</p>
   </div>
@@ -8,7 +8,7 @@ export const welcomeEmailTemplate = (name: string) => `
 
 export const AgentWellcomeEmailTemplate = (name: string) => `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>Welcome to Real Estate Platform, ${name}!</h2>
+    <h2>Welcome to PronaSmart, ${name}!</h2>
     <p>Your Request has been successfully approved by Agency  and you can now login as an agent.</p>
     <p>Thank you for joining our platform!</p>
   </div>
