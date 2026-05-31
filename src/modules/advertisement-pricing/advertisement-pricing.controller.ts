@@ -1,5 +1,5 @@
 
-import { Controller, Get, Param} from "@nestjs/common";
+import { Body, Controller, Get, Param , Post} from "@nestjs/common";
 
 import { GetAllPricingUseCase } from "./application/use-cases/get-all-pricing.use-case";
 import { GetPricingUseCase } from "./application/use-cases/get-pricing.use-case";
@@ -7,6 +7,7 @@ import { UpdatePricingUseCase } from "./application/use-cases/update-pricing.use
 import { CreatePricingUseCase } from "./application/use-cases/create-pricing.use-case";
 import { Public } from "../../common/decorators/public.decorator";
 import { AdvertisementPricingSwagger } from "./response/advertisement-pricing.swagger.response";
+import { CreatePricingDto } from "./dto/create-pricing.dto";
 @Public()
 @Controller("advertisement-pricing")
 export class AdvertisementPricingController {
@@ -22,6 +23,12 @@ export class AdvertisementPricingController {
   async getAll() {
     return this.getAllPricing.execute();
   }
+
+ @Post()
+  async create(@Body() dto: CreatePricingDto) {
+    return this.createPricing.execute(dto);
+  }
+
 @AdvertisementPricingSwagger.GetPricingByType()
 
   @Get(":type")
