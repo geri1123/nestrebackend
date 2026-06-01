@@ -4,30 +4,26 @@ import { IsEmail, Equals, IsNotEmpty, MinLength, Matches, IsString, IsDefined, V
 import { Match } from '../../../common/decorators/match-password.decorator';
 
 export class BaseRegistrationDto {
- 
-@ApiProperty({ example: 'user123' })
-@ValidateIf(o => o.username !== '')  
-@Matches(/^\S+$/, { message: 'usernameNoSpaces' })
-@MinLength(4, { message: 'usernameLength' })
-@IsString({ message: 'usernameMustBeString' })
-@IsNotEmpty({ message: 'usernameRequired' })
-@IsDefined({ message: 'usernameRequired' })
-@Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-username!: string;
+
+  @ApiProperty({ example: 'user123' })
+  @Matches(/^\S+$/, { message: 'usernameNoSpaces', each: false })
+  @MinLength(4, { message: 'usernameLength' })
+  @IsString({ message: 'usernameMustBeString' })
+  @IsNotEmpty({ message: 'usernameRequired' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  username!: string;
 
   @ApiProperty({ example: 'user@example.com' })
-@ValidateIf(o => o.email !== '')  
-@IsEmail({}, { message: 'emailInvalid' })
-@IsNotEmpty({ message: 'emailRequired' })
-@Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-email!: string;
+  @IsEmail({}, { message: 'emailInvalid' })
+  @IsNotEmpty({ message: 'emailRequired' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  email!: string;
 
-@ApiProperty({ example: 'P@ssword123' })
-@ValidateIf(o => o.password !== '')  
-@Matches(/^\S+$/, { message: 'passwordNoSpaces' })
-@MinLength(8, { message: 'passwordMin' })
-@IsNotEmpty({ message: 'passwordRequired' })
-password!: string;
+  @ApiProperty({ example: 'P@ssword123' })
+  @Matches(/^\S+$/, { message: 'passwordNoSpaces' })
+  @MinLength(8, { message: 'passwordMin' })
+  @IsNotEmpty({ message: 'passwordRequired' })
+  password!: string;
 
   @ApiProperty({ example: 'P@ssword123' })
   @IsNotEmpty({ message: 'repeatPasswordRequired' })
@@ -37,13 +33,13 @@ password!: string;
   @ApiProperty({ example: 'John' })
   @IsNotEmpty({ message: 'firstNameRequired' })
   @IsString({ message: 'firstNameMustBeString' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)) 
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   firstName!: string;
 
   @ApiProperty({ example: 'Doe' })
   @IsNotEmpty({ message: 'lastNameRequired' })
   @IsString({ message: 'lastNameMustBeString' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)) 
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   lastName!: string;
 
   @ApiProperty({ example: true })
