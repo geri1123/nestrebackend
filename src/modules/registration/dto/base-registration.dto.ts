@@ -1,29 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEmail, Equals, IsNotEmpty, MinLength, Matches, IsString, IsDefined } from 'class-validator';
+import { IsEmail, Equals, IsNotEmpty, MinLength, Matches, IsString, IsDefined, ValidateIf } from 'class-validator';
 import { Match } from '../../../common/decorators/match-password.decorator';
 
 export class BaseRegistrationDto {
-  @ApiProperty({ example: 'user123' })
-  @IsDefined({ message: 'usernameRequired' })
-  @IsNotEmpty({ message: 'usernameRequired' })
-  @IsString({ message: 'usernameMustBeString' })
-  @MinLength(4, { message: 'usernameLength' })
-  @Matches(/^\S+$/, { message: 'usernameNoSpaces' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)) 
-  username!: string;
+ 
+@ApiProperty({ example: 'user123' })
+@ValidateIf(o => o.username !== '')  
+@Matches(/^\S+$/, { message: 'usernameNoSpaces' })
+@MinLength(4, { message: 'usernameLength' })
+@IsString({ message: 'usernameMustBeString' })
+@IsNotEmpty({ message: 'usernameRequired' })
+@IsDefined({ message: 'usernameRequired' })
+@Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+username!: string;
 
   @ApiProperty({ example: 'user@example.com' })
-  @IsNotEmpty({ message: 'emailRequired' })
-  @IsEmail({}, { message: 'emailInvalid' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)) 
-  email!: string;
+@ValidateIf(o => o.email !== '')  
+@IsEmail({}, { message: 'emailInvalid' })
+@IsNotEmpty({ message: 'emailRequired' })
+@Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+email!: string;
 
-  @ApiProperty({ example: 'P@ssword123' })
-  @IsNotEmpty({ message: 'passwordRequired' })
-  @MinLength(8, { message: 'passwordMin' })
-  @Matches(/^\S+$/, { message: 'passwordNoSpaces' })
-  password!: string;
+@ApiProperty({ example: 'P@ssword123' })
+@ValidateIf(o => o.password !== '')  
+@Matches(/^\S+$/, { message: 'passwordNoSpaces' })
+@MinLength(8, { message: 'passwordMin' })
+@IsNotEmpty({ message: 'passwordRequired' })
+password!: string;
 
   @ApiProperty({ example: 'P@ssword123' })
   @IsNotEmpty({ message: 'repeatPasswordRequired' })
