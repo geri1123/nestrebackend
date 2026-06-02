@@ -165,7 +165,7 @@ get payseraSignPassword(): string {
 get payseraCallbackUrl(): string {
   return this.configService.get<string>(
     'PAYSERA_CALLBACK_URL',
-    `https://pronasmart.onrender.com/wallet/webhooks/paysera`,
+    `${this.clientBaseUrl}/wallet/webhooks/paysera`,
   );
 }
  
