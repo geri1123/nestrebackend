@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Req,
+  Query,
   Headers,
   HttpCode,
   BadRequestException,
@@ -11,7 +12,9 @@ import { RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
 import { WhopService } from '../../infrastructure/whop/whop.service';
+import { PayseraService } from '../../infrastructure/paysera/paysera.service';
 import { ProcessWhopPaymentUseCase } from './application/use-cases/process-whop-payment.use-case';
+import { ProcessPayseraPaymentUseCase } from './application/use-cases/process-paysera-payment.use-case';
 
 @Controller('wallet/webhooks')
 export class WalletWebhookController {
@@ -19,8 +22,12 @@ export class WalletWebhookController {
 
   constructor(
     private readonly whop: WhopService,
-    private readonly processPayment: ProcessWhopPaymentUseCase,
+    private readonly paysera: PayseraService,
+    private readonly processWhopPayment: ProcessWhopPaymentUseCase,
+    private readonly processPayseraPayment: ProcessPayseraPaymentUseCase,
   ) {}
+
+  // ─── Whop ────────────────────────────────────────────────────────────────────
 
   @Public()
   @Post('whop')
@@ -41,16 +48,41 @@ export class WalletWebhookController {
       throw new BadRequestException('Invalid signature');
     }
 
-    // Whop API v1 përdor "type", versionet e vjetra "action"
     const eventType = event.type ?? event.action;
-
     this.logger.log(`Whop webhook received: ${eventType}`);
 
     if (eventType === 'payment.succeeded') {
-      await this.processPayment.execute(event.data);
+      await this.processWhopPayment.execute(event.data);
     }
-    // Eventet e tjera mund të injorohen ose log-ohen
 
     return { received: true };
+  }
+
+  // ─── Paysera IPN ─────────────────────────────────────────────────────────────
+  //
+  // Paysera dërgon GET/POST me query params: ?data=BASE64&ss1=MD5SIGN
+  // Duhet t'i kthejmë "OK" si plaintext — çdo gjë tjetër trajtohet si dështim.
+
+  @Public()
+  @Post('paysera')
+  @HttpCode(200)
+  async handlePaysera(@Query() query: Record<string, string>) {
+    let callbackData: ReturnType<PayseraService['verifyCallback']>;
+
+    try {
+      callbackData = this.paysera.verifyCallback(query);
+    } catch (err) {
+      this.logger.warn('Paysera IPN: verifikim i dështuar', err);
+      throw new BadRequestException('Invalid Paysera callback');
+    }
+
+    this.logger.log(
+      `Paysera IPN received: order=${callbackData.orderid} status=${callbackData.status}`,
+    );
+
+    await this.processPayseraPayment.execute(callbackData);
+
+    // Paysera kërkon pikërisht "OK" si body — jo JSON
+    return 'OK';
   }
 }

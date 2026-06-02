@@ -63,6 +63,7 @@ import { RedisModule } from './infrastructure/redis/redis.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { WhopModule } from './infrastructure/whop/whop.module';
 import { ReviewModule } from './modules/review/review.module';
+import { PayseraModule } from './infrastructure/paysera/paysera.module';
 @Module({
   imports: [
     // ========================================
@@ -78,7 +79,7 @@ import { ReviewModule } from './modules/review/review.module';
     AppConfigModule,
    
     // INFRASTRUCTURE
-    
+    PayseraModule,
     PrismaModule,
     DatabaseModule,
     CloudinaryModule,

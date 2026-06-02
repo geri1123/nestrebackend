@@ -1,29 +1,26 @@
+import { Body, Controller, Get, Post, Query, Req, UnauthorizedException } from '@nestjs/common';
+import { type RequestWithUser } from '../../common/types/request-with-user.interface';
+import { t } from '../../locales';
+import { WalletTransactionType } from '@prisma/client';
+import { TopUpDto } from './dto/topup.dto';
 
-
-import { Body, Controller, Get, Post, Query, Req, UnauthorizedException } from "@nestjs/common";
-
-import {type RequestWithUser } from "../../common/types/request-with-user.interface";
-import { t } from "../../locales";
-import { WalletTransactionType } from "@prisma/client";
-import { TopUpDto } from "./dto/topup.dto";
-
-import { CreateWalletUseCase } from "./application/use-cases/crreate-wallet.use-case";
-import { GetWalletUseCase } from "./application/use-cases/get-wallet.use-case";
-import { ChangeWalletBalanceUseCase } from "./application/use-cases/change-wallet-balance.use-case";
-import { CreateWhopTopupCheckoutUseCase } from "./application/use-cases/create-whop-topup-checkout.use-case";
-import { TransferDto } from "./dto/transfer.dto";
-import { TransferMoneyUseCase } from "./application/use-cases/transfer-money.use-case";
+import { CreateWalletUseCase } from './application/use-cases/crreate-wallet.use-case';
+import { GetWalletUseCase } from './application/use-cases/get-wallet.use-case';
+import { ChangeWalletBalanceUseCase } from './application/use-cases/change-wallet-balance.use-case';
+import { CreateWhopTopupCheckoutUseCase } from './application/use-cases/create-whop-topup-checkout.use-case';
+import { CreatePayseraTopupUseCase } from './application/use-cases/create-paysera-topup.use-case';
+import { TransferDto } from './dto/transfer.dto';
+import { TransferMoneyUseCase } from './application/use-cases/transfer-money.use-case';
 
 @Controller('wallet')
 export class WalletController {
   constructor(
-    
-        private readonly createWalletUseCase: CreateWalletUseCase,
+    private readonly createWalletUseCase: CreateWalletUseCase,
     private readonly getWalletUseCase: GetWalletUseCase,
     private readonly changeBalanceUseCase: ChangeWalletBalanceUseCase,
     private readonly createWhopTopupCheckout: CreateWhopTopupCheckoutUseCase,
+    private readonly createPayseraTopup: CreatePayseraTopupUseCase,
     private readonly transferMoneyUseCase: TransferMoneyUseCase,
-
   ) {}
 
   @Post('create')
@@ -31,7 +28,7 @@ export class WalletController {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-      await this.createWalletUseCase.execute(userId, language);
+    await this.createWalletUseCase.execute(userId, language);
 
     return {
       success: true,
@@ -44,46 +41,65 @@ export class WalletController {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-    const limit = 10; 
-   const walletData = await this.getWalletUseCase.execute(
+    const limit = 10;
+    const walletData = await this.getWalletUseCase.execute(
       userId,
       Number(page),
       limit,
-      language
+      language,
     );
-
 
     return {
       success: true,
       data: walletData,
     };
   }
-@Post('topup/checkout')
-async createTopupCheckout(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
-  const { userId, language } = req;
-  if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-  const result = await this.createWhopTopupCheckout.execute({
-    userId,
-    amount: body.amount,
-    language,
-  });
+  // ─── Whop checkout (i vjetri, mbetet si është) ────────────────────────────
 
-  return { success: true, checkoutUrl: result.checkoutUrl };
-}
+  // @Post('topup/checkout')
+  // async createWhopCheckout(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
+  //   const { userId, language } = req;
+  //   if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-  @Post("transfer")
-  async transferMoney(
-    @Req() req: RequestWithUser,
-    @Body() body: TransferDto,
-  ) {
+  //   const result = await this.createWhopTopupCheckout.execute({
+  //     userId,
+  //     amount: body.amount,
+  //     language,
+  //   });
+
+  //   return { success: true, checkoutUrl: result.checkoutUrl };
+  // }
+
+  // ─── Paysera checkout ─────────────────────────────────────────────────────
+  //
+  // Frontend e merr paymentUrl dhe ridrejton userin tek Paysera.
+  // Pas pagesës, Paysera dërgon IPN te /wallet/webhooks/paysera.
+
+  @Post('topup/paysera')
+  async createPayseraCheckout(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
     const { userId, language } = req;
+    if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-    if (!userId) {
-      throw new UnauthorizedException(
-        t("userNotAuthenticated", language),
-      );
-    }
+    const result = await this.createPayseraTopup.execute({
+      userId,
+      amount: body.amount,
+      language,
+    });
+
+    return {
+      success: true,
+      paymentUrl: result.paymentUrl,
+      orderId: result.orderId,
+    };
+  }
+
+  // ─── Transfer ─────────────────────────────────────────────────────────────
+
+  @Post('transfer')
+  async transferMoney(@Req() req: RequestWithUser, @Body() body: TransferDto) {
+    const { userId, language } = req;
+    if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
     await this.transferMoneyUseCase.execute(
       userId,
@@ -94,22 +110,21 @@ async createTopupCheckout(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
 
     return {
       success: true,
-      message: t("moneyTransferredSuccessfully", language),
+      message: t('moneyTransferredSuccessfully', language),
     };
   }
-  // Top-up wallet
+
+  // ─── Manual topup (test/admin) ────────────────────────────────────────────
+
   @Post('topup')
   async topUp(@Req() req: RequestWithUser, @Body() body: TopUpDto) {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
 
-    const amount = body.amount;
-    const type = WalletTransactionType.topup;
-
     const result = await this.changeBalanceUseCase.execute({
       userId,
       type: WalletTransactionType.topup,
-      amount,
+      amount: body.amount,
       language,
     });
 

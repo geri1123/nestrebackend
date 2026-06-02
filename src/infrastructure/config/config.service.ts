@@ -153,4 +153,34 @@ get whopSuccessRedirectUrl(): string {
 get whopCancelRedirectUrl(): string {
   return this.configService.get<string>('WHOP_CANCEL_REDIRECT_URL', `${this.clientBaseUrl}/wallet?topup=cancelled`);
 }
+// Paysera
+get payseraProjectId(): string {
+  return this.configService.get<string>('PAYSERA_PROJECT_ID', '');
+}
+ 
+get payseraSignPassword(): string {
+  return this.configService.get<string>('PAYSERA_SIGN_PASSWORD', '');
+}
+ 
+get payseraCallbackUrl(): string {
+  return this.configService.get<string>(
+    'PAYSERA_CALLBACK_URL',
+    `${this.clientBaseUrl}/wallet/webhooks/paysera`,
+  );
+}
+ 
+get payseraSuccessUrl(): string {
+  return this.configService.get<string>(
+    'PAYSERA_SUCCESS_URL',
+    `${this.clientBaseUrl}/wallet?topup=success`,
+  );
+}
+ 
+get payseraCancelUrl(): string {
+  return this.configService.get<string>(
+    'PAYSERA_CANCEL_URL',
+    `${this.clientBaseUrl}/wallet?topup=cancelled`,
+  );
+}
+ 
 }
