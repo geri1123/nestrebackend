@@ -12,14 +12,28 @@ export class DeleteUserUseCase {
     private readonly deleteRequests: DeleteRegistrationRequestsByUserUseCase,
     private readonly deleteAgency: DeleteAgencyByOwnerUseCase,
   ) {}
+async execute(userId: number): Promise<void> {
+  const user = await this.usersRepo.findById(userId);
+  if (!user) throw new NotFoundException(`User ${userId} not found`);
 
-  async execute(userId: number): Promise<void> {
-    const user = await this.usersRepo.findById(userId);
-    if (!user) throw new NotFoundException(`User ${userId} not found`);
-
-    await this.deleteRequests.execute(userId);
-    await this.deleteAgency.execute(userId);
-
-    await this.usersRepo.deleteById(userId);
+  if (user.role === 'agency_owner') {
+    await this.deleteAgency.execute(userId); // fshi agjencinë
   }
+
+  if (user.role === 'agent') {
+    await this.deleteRequests.execute(userId); 
+  }
+
+
+  await this.usersRepo.deleteById(userId);
+}
+  // async execute(userId: number): Promise<void> {
+  //   const user = await this.usersRepo.findById(userId);
+  //   if (!user) throw new NotFoundException(`User ${userId} not found`);
+
+  //   await this.deleteRequests.execute(userId);
+  //   await this.deleteAgency.execute(userId);
+
+  //   await this.usersRepo.deleteById(userId);
+  // }
 }

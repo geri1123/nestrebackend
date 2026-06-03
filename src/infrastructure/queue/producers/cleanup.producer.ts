@@ -43,7 +43,7 @@ export class CleanupProducer implements OnModuleInit {
       await this.cleanupQueue.upsertJobScheduler(
         CLEANUP_JOBS.EXPIRE_ADS,
         {
-          pattern: '*/10 * * * *', 
+          pattern: '*/2 * * * *', 
         },
         {
           name: CLEANUP_JOBS.EXPIRE_ADS,
