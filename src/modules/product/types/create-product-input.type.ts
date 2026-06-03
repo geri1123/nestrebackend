@@ -9,6 +9,8 @@ export type CreateProductInput = {
   streetAddress?: string;
   area?: number;
   buildYear?: number;
+  latitude?: number;
+  longitude?: number;
   status?: ProductStatus;
   userId: number; 
   agencyId?: number;

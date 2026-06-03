@@ -13,7 +13,6 @@ import { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
 import { WhopService } from '../../infrastructure/whop/whop.service';
 import { PayseraService } from '../../infrastructure/paysera/paysera.service';
-import { ProcessWhopPaymentUseCase } from './application/use-cases/process-whop-payment.use-case';
 import { ProcessPayseraPaymentUseCase } from './application/use-cases/process-paysera-payment.use-case';
 
 @Controller('wallet/webhooks')
@@ -23,40 +22,39 @@ export class WalletWebhookController {
   constructor(
     private readonly whop: WhopService,
     private readonly paysera: PayseraService,
-    private readonly processWhopPayment: ProcessWhopPaymentUseCase,
     private readonly processPayseraPayment: ProcessPayseraPaymentUseCase,
   ) {}
 
   // ─── Whop ────────────────────────────────────────────────────────────────────
 
-  @Public()
-  @Post('whop')
-  @HttpCode(200)
-  async handleWhop(
-    @Req() req: RawBodyRequest<Request>,
-    @Headers() headers: Record<string, string>,
-  ) {
-    if (!req.rawBody) {
-      throw new BadRequestException('Raw body missing');
-    }
+  // @Public()
+  // @Post('whop')
+  // @HttpCode(200)
+  // async handleWhop(
+  //   @Req() req: RawBodyRequest<Request>,
+  //   @Headers() headers: Record<string, string>,
+  // ) {
+  //   if (!req.rawBody) {
+  //     throw new BadRequestException('Raw body missing');
+  //   }
 
-    let event: any;
-    try {
-      event = this.whop.verifyWebhook(req.rawBody.toString('utf8'), headers);
-    } catch (err) {
-      this.logger.warn('Invalid Whop webhook signature', err);
-      throw new BadRequestException('Invalid signature');
-    }
+  //   let event: any;
+  //   try {
+  //     event = this.whop.verifyWebhook(req.rawBody.toString('utf8'), headers);
+  //   } catch (err) {
+  //     this.logger.warn('Invalid Whop webhook signature', err);
+  //     throw new BadRequestException('Invalid signature');
+  //   }
 
-    const eventType = event.type ?? event.action;
-    this.logger.log(`Whop webhook received: ${eventType}`);
+  //   const eventType = event.type ?? event.action;
+  //   this.logger.log(`Whop webhook received: ${eventType}`);
 
-    if (eventType === 'payment.succeeded') {
-      await this.processWhopPayment.execute(event.data);
-    }
+  //   if (eventType === 'payment.succeeded') {
+  //     await this.processWhopPayment.execute(event.data);
+  //   }
 
-    return { received: true };
-  }
+  //   return { received: true };
+  // }
 
   // ─── Paysera IPN ─────────────────────────────────────────────────────────────
   //

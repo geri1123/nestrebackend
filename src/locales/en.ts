@@ -5,6 +5,8 @@ export const en = {
 reviewAlreadyExists: "You have already reviewed this agency.",
 notReviewAuthor: "Only the author of the review can modify it.",
 reviewNotFound: "Review not found.",
+longitudeMustBeValid: "Longitude must be a valid number.",
+latitudeMustBeValid: "Latitude must be a valid number.",
 reviewUpdatedSuccessfully: "Review updated successfully.",
 invalidRating: "Rating must be an integer between 1 and 5.",
 agencyNameAlreadyExists: "Agency name already exists.",

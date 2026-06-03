@@ -25,7 +25,6 @@ import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { SearchFiltersHelper } from '../application/helpers/search-filters.helper';
 import { t } from '../../../locales';
-import { throwValidationErrors } from '../../../common/helpers/validation.helper';
 import type { RequestWithUser } from '../../../common/types/request-with-user.interface';
 import { ProductOwnershipGuard } from '../../../infrastructure/auth/guard/product-ownership.guard';
 import { ApiCreateProduct } from '../decorators/create-product.decorator';
@@ -33,9 +32,6 @@ import { ApiDashboardProducts } from '../decorators/dashboard-products.decorator
 import { ApiUpdateProduct } from '../decorators/update-product.decorator';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
-import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions.guard';
-import { permission } from 'node:process';
-import { Permissions } from '../../../common/decorators/permissions.decorator';
 import { MultipartValidationPipe } from '../../../common/pipes/multipart-validation.pipe';
 import { DeleteProductUseCase } from '../application/use-cases/delete-product.use-case';
 type MulterFile = Express.Multer.File;
@@ -61,7 +57,6 @@ async createProduct(
   @Req() req: RequestWithUser
 ) {
   const { language, userId, agencyId } = req;
-
   if (!userId) {
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }
@@ -87,7 +82,7 @@ async createProduct(
   @Req() req: RequestWithUser
 ) {
   const { language, userId } = req;
-
+ 
   if (!userId) {
     throw new UnauthorizedException(t('userNotAuthenticated', language));
   }

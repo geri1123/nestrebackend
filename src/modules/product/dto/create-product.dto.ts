@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { 
   IsString, 
   IsNumber, 
@@ -23,6 +23,7 @@ export class ProductAttributeValueDto {
   @Min(1, { message: 'attributeValueId' })
   attributeValueId?: number;
 }
+
 export class CreateProductDto {
   @IsString({ message: 'title' })
   @IsNotEmpty({ message: 'title' })
@@ -56,14 +57,14 @@ export class CreateProductDto {
   @IsString()
   address?: string;
 
-  @Type(() => Number)
   @IsOptional()
+  @Type(() => Number)
   @IsInt({ message: 'area' })
   @Min(1, { message: 'area' })
   area?: number;
 
-  @Type(() => Number)
   @IsOptional()
+  @Type(() => Number)
   @IsInt({ message: 'buildYearInt' })
   @Min(1900, { message: 'buildYearMin' })
   @Max(new Date().getFullYear(), { message: 'buildYearMax' })
@@ -79,4 +80,11 @@ export class CreateProductDto {
     message: 'Invalid status',
   })
   status?: 'active' | 'inactive' | 'sold' | 'pending' | 'draft';
+@IsOptional()
+@IsString()
+latitude?: string;
+
+@IsOptional()
+@IsString()
+longitude?: string;
 }

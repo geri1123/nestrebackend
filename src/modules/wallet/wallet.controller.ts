@@ -7,7 +7,6 @@ import { TopUpDto } from './dto/topup.dto';
 import { CreateWalletUseCase } from './application/use-cases/crreate-wallet.use-case';
 import { GetWalletUseCase } from './application/use-cases/get-wallet.use-case';
 import { ChangeWalletBalanceUseCase } from './application/use-cases/change-wallet-balance.use-case';
-import { CreateWhopTopupCheckoutUseCase } from './application/use-cases/create-whop-topup-checkout.use-case';
 import { CreatePayseraTopupUseCase } from './application/use-cases/create-paysera-topup.use-case';
 import { TransferDto } from './dto/transfer.dto';
 import { TransferMoneyUseCase } from './application/use-cases/transfer-money.use-case';
@@ -18,7 +17,6 @@ export class WalletController {
     private readonly createWalletUseCase: CreateWalletUseCase,
     private readonly getWalletUseCase: GetWalletUseCase,
     private readonly changeBalanceUseCase: ChangeWalletBalanceUseCase,
-    private readonly createWhopTopupCheckout: CreateWhopTopupCheckoutUseCase,
     private readonly createPayseraTopup: CreatePayseraTopupUseCase,
     private readonly transferMoneyUseCase: TransferMoneyUseCase,
   ) {}

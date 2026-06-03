@@ -17,7 +17,7 @@ async execute(userId: number): Promise<void> {
   if (!user) throw new NotFoundException(`User ${userId} not found`);
 
   if (user.role === 'agency_owner') {
-    await this.deleteAgency.execute(userId); // fshi agjencinë
+    await this.deleteAgency.execute(userId); 
   }
 
   if (user.role === 'agent') {

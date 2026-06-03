@@ -34,6 +34,8 @@ export class CreateProductUseCase {
         listingTypeId: dto.listingTypeId,
         description: dto.description || '',
         streetAddress: dto.address || '',
+      latitude: dto.latitude ? parseFloat(dto.latitude) : undefined,
+longitude: dto.longitude ? parseFloat(dto.longitude) : undefined,
         area: dto.area ? Number(dto.area) : undefined,
         buildYear: dto.buildYear ? Number(dto.buildYear) : undefined,
         status: dto.status || 'draft',

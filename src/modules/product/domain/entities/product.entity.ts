@@ -13,6 +13,8 @@ export class Product {
     public readonly buildYear?: number,
     public readonly status: 'active' | 'inactive' | 'sold' | 'pending' | 'draft' = 'draft',
     public readonly agencyId?: number,
+    public readonly latitude?: number,
+public readonly longitude?: number,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date
   ) {}
@@ -27,6 +29,8 @@ export class Product {
     userId: number;
     description?: string;
     streetAddress?: string;
+    latitude?: number;
+    longitude?: number;
     area?: number;
     buildYear?: number;
     status?: 'active' | 'inactive' | 'sold' | 'pending' | 'draft';
@@ -48,6 +52,8 @@ export class Product {
       data.buildYear,
       data.status || 'draft',
       data.agencyId,
+      data.latitude,
+      data.longitude,
       data.createdAt,
       data.updatedAt
     );
@@ -59,6 +65,8 @@ export class Product {
     price?: number;
     description?: string;
     streetAddress?: string;
+    latitude?: number;
+    longitude?: number;
     area?: number;
     buildYear?: number;
     status?: 'active' | 'inactive' | 'sold' | 'pending' | 'draft';
@@ -69,6 +77,8 @@ export class Product {
       price: data.price,
       description: data.description,
       streetAddress: data.streetAddress,
+       latitude: data.latitude,
+    longitude: data.longitude,
       area: data.area,
       buildYear: data.buildYear,
       status: data.status

@@ -274,7 +274,19 @@ listingTypeId!: number | null;
     description: 'Street address of the property'
   })
   streetAddress!: string | null;
+@ApiProperty({ 
+  example: 41.3275,
+  nullable: true,
+  description: 'Latitude of the property location'
+})
+latitude!: number | null;
 
+@ApiProperty({ 
+  example: 19.8187,
+  nullable: true,
+  description: 'Longitude of the property location'
+})
+longitude!: number | null;
   @ApiProperty({ 
     example: 2020,
     nullable: true,

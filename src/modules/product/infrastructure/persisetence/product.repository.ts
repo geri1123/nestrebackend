@@ -19,6 +19,8 @@ export class ProductRepository implements IProductRepository {
         listingTypeId: product.listingTypeId,
         description: product.description,
         streetAddress: product.streetAddress,
+        latitude: product.latitude,
+longitude: product.longitude,
         area: product.area,
         buildYear: product.buildYear,
         status: product.status,
@@ -37,6 +39,8 @@ export class ProductRepository implements IProductRepository {
       userId: created.userId,
       description: created.description || '',
       streetAddress: created.streetAddress || '',
+      latitude: created.latitude || undefined,
+      longitude: created.longitude || undefined,
       area: created.area || undefined,
       buildYear: created.buildYear || undefined,
       status: created.status,
@@ -63,6 +67,8 @@ export class ProductRepository implements IProductRepository {
       userId: product.userId,
       description: product.description || '',
       streetAddress: product.streetAddress || '',
+      latitude: product.latitude || undefined, 
+      longitude: product.longitude || undefined,
       area: product.area || undefined,
       buildYear: product.buildYear || undefined,
       status: product.status,
@@ -84,6 +90,9 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       agencyId: true,
       description: true,
       streetAddress: true,
+      latitude: true,
+      longitude: true,
+     
       createdAt: true,
       updatedAt: true,
       buildYear: true,
@@ -230,6 +239,8 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
     if (data.buildYear !== undefined) updateData.buildYear = data.buildYear;
     if (data.status !== undefined) updateData.status = data.status;
 
+if (data.latitude !== undefined) updateData.latitude = data.latitude;
+if (data.longitude !== undefined) updateData.longitude = data.longitude;
     const updated = await this.prisma.product.update({
       where: { id },
       data: updateData,
@@ -245,6 +256,8 @@ async findByIdWithDetails(id: number, language: SupportedLang): Promise<any> {
       userId: updated.userId,
       description: updated.description || '',
       streetAddress: updated.streetAddress || '',
+      latitude: updated.latitude || undefined,
+      longitude: updated.longitude || undefined,
       area: updated.area || undefined,
       buildYear: updated.buildYear || undefined,
       status: updated.status,

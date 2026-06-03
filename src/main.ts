@@ -26,7 +26,7 @@ const app = await NestFactory.create(AppModule, {
   new ValidationPipe({
     transform: true,
     whitelist: true,
-    forbidNonWhitelisted: true,
+      forbidNonWhitelisted: true,
     transformOptions: {
       enableImplicitConversion: true,
     },

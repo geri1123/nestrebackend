@@ -111,7 +111,8 @@ case 'repeatPasswordRequired':return t('repeatPasswordRequired', lang);
 case 'fullnamerequired' :return t("fullnamerequired" , lang);
 case 'messagerequired':return t("messagerequired" , lang);
 case 'phoneformat':return t("phoneformat", lang);
-
+case 'latitudeMustBeValid': return t('latitudeMustBeValid', lang);
+case 'longitudeMustBeValid': return t('longitudeMustBeValid', lang);
 
 default: return code;
   }

@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsString,
   IsNumber,
@@ -83,7 +83,19 @@ export class UpdateProductDto {
   @ValidateNested({ each: true })
   @Type(() => ProductAttributeValueDto)
   attributes?: ProductAttributeValueDto[];
-  @IsOptional()
+
+@IsOptional()
+@Transform(({ value }) => {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+})
 @IsString({ each: true })
 existingImageUrls?: string[];
+@IsOptional()
+@IsString()
+latitude?: string;
+
+@IsOptional()
+@IsString()
+longitude?: string;
 }

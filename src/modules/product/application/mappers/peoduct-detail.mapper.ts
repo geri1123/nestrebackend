@@ -40,6 +40,8 @@ export class ProductDetailMapper {
       updatedAt: product.updatedAt.toISOString(),
       description: product.description ?? null,
       streetAddress: product.streetAddress ?? null,
+      latitude: product.latitude ?? null,
+      longitude: product.longitude ?? null,
       buildYear: product.buildYear ?? null,
       area: product.area ?? null,
       image: images,

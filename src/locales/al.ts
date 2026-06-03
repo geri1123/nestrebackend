@@ -1,3 +1,4 @@
+
 export const al = {
   invalidTopupAmount: "Shuma e top-up duhet të jetë midis 1 dhe 10,000.", 
   cannotTransferToSelf: "Nuk mund të transferoni para vetes.",
@@ -6,6 +7,8 @@ export const al = {
 reviewAlreadyExists: "Ju keni vlerësuar tashmë këtë agjenci.",
 notReviewAuthor: "Vetëm autori i vlerësimit mund ta modifikojë atë.",
 reviewNotFound: "Vlerësimi nuk u gjet.",
+longitudeMustBeValid: "Gjatësia gjeografike duhet të jetë një numër i vlefshëm.",
+latitudeMustBeValid: "Gjerësia gjeografike duhet të jetë një numër i vlefshëm.",
 reviewUpdatedSuccessfully: "Vlerësimi u përditësua me sukses.",
 invalidRating: "Vlerësimi duhet të jetë një numër i plotë nga 1 deri në 5.",
 reviewCreatedSuccessfully: "Vlerësimi u krijua me sukses.",

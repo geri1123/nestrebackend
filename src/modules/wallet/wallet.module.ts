@@ -9,9 +9,6 @@ import { WALLET_REPOSITORY_TOKENS } from './domain/repositories/wallet.repositor
 import { CreateWalletUseCase } from './application/use-cases/crreate-wallet.use-case';
 import { GetWalletUseCase } from './application/use-cases/get-wallet.use-case';
 
-// Whop
-import { ProcessWhopPaymentUseCase } from './application/use-cases/process-whop-payment.use-case';
-import { CreateWhopTopupCheckoutUseCase } from './application/use-cases/create-whop-topup-checkout.use-case';
 
 // Paysera
 import { CreatePayseraTopupUseCase } from './application/use-cases/create-paysera-topup.use-case';
@@ -32,9 +29,7 @@ import { ProcessPayseraPaymentUseCase } from './application/use-cases/process-pa
     TransferMoneyUseCase,
     CreateWalletUseCase,
     GetWalletUseCase,
-    // Whop
-    CreateWhopTopupCheckoutUseCase,
-    ProcessWhopPaymentUseCase,
+ 
     // Paysera
     CreatePayseraTopupUseCase,
     ProcessPayseraPaymentUseCase,
