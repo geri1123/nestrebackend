@@ -345,6 +345,8 @@ model Product {
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
   streetAddress         String?                 @map("streetAddress")
+  latitude      Float?
+longitude     Float?
   area                  Int?
   buildYear             Int?                    @map("buildYear")
   status                ProductStatus           @default(draft)
