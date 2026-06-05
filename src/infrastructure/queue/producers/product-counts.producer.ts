@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap, OnModuleInit } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import {
@@ -13,17 +13,22 @@ import {
 } from '../payloads/product-counts.payloads';
 
 @Injectable()
-export class ProductCountsProducer implements OnModuleInit {
+export class ProductCountsProducer  implements OnApplicationBootstrap {
   private readonly logger = new Logger(ProductCountsProducer.name);
 
   constructor(
     @InjectQueue(QUEUES.PRODUCT_COUNTS) private readonly queue: Queue,
   ) {}
 
-  async onModuleInit() {
-    // Schedule recurring reconciliation + a one-off reconcile-on-boot.
-    // Delayed so the app finishes booting before workers start hitting DB.
-    setTimeout(() => this.setupRecurringJobs(), 5000);
+  // async onModuleInit() {
+  //   // Schedule recurring reconciliation + a one-off reconcile-on-boot.
+  //   // Delayed so the app finishes booting before workers start hitting DB.
+  //   setTimeout(() => this.setupRecurringJobs(), 5000);
+  // }
+
+  async onApplicationBootstrap() {
+    await this.queue.waitUntilReady();
+    await this.setupRecurringJobs();
   }
 
   // ─── Hot-path emitters (called from product use-cases) ───────────────────

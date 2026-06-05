@@ -15,6 +15,7 @@ import {
   EmailWelcomeEvent,
   EmailPendingApprovalEvent,
 } from '../../../../infrastructure/events/email/email.events';
+import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
 
 @Injectable()
 export class VerifyEmailUseCase {
@@ -28,7 +29,7 @@ export class VerifyEmailUseCase {
     private readonly getAgencyWithOwner: GetAgencyWithOwnerByIdUseCase,
     private readonly setUnderReview: SetUnderReviewUseCase,
     private readonly notifications: NotificationService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly emailQueue: EmailQueueService,
   ) {}
 
   async execute(token: string, lang: SupportedLang) {
@@ -93,17 +94,22 @@ export class VerifyEmailUseCase {
 
     const name = user.firstName ?? 'User';
 
+    // if (role === 'agent') {
+    //   this.eventEmitter.emit(
+    //     EMAIL_EVENTS.PENDING_APPROVAL,
+    //     new EmailPendingApprovalEvent(user.email, name),
+    //   );
+    // } else {
+    //   this.eventEmitter.emit(
+    //     EMAIL_EVENTS.WELCOME,
+    //     new EmailWelcomeEvent(user.email, name),
+    //   );
+    // }
     if (role === 'agent') {
-      this.eventEmitter.emit(
-        EMAIL_EVENTS.PENDING_APPROVAL,
-        new EmailPendingApprovalEvent(user.email, name),
-      );
-    } else {
-      this.eventEmitter.emit(
-        EMAIL_EVENTS.WELCOME,
-        new EmailWelcomeEvent(user.email, name),
-      );
-    }
+  await this.emailQueue.sendPendingApprovalEmail(user.email, name);
+} else {
+  await this.emailQueue.sendWelcomeEmail(user.email, name);
+}
 
     if (role === 'agent') {
       await this.handleAgentProcessAfterCommit(user, lang);

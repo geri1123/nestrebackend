@@ -266,15 +266,21 @@ if (data.longitude !== undefined) updateData.longitude = data.longitude;
       updatedAt: updated.updatedAt,
     });
   }
+// async deleteWithRelations(id: number): Promise<void> {
+//   await this.prisma.$transaction(async (tx) => {
+//       await tx.productAdvertisement.deleteMany({ where: { productId: id } });
+//     await tx.savedProduct.deleteMany({ where: { productId: id } });
+//     await tx.productImage.deleteMany({ where: { productId: id } });
+//     await tx.productAttributeValue.deleteMany({ where: { productId: id } });
+//     await tx.product.delete({ where: { id } });
+//   });
+// }
+
 async deleteWithRelations(id: number): Promise<void> {
-  await this.prisma.$transaction(async (tx) => {
-      await tx.productAdvertisement.deleteMany({ where: { productId: id } });
-    await tx.savedProduct.deleteMany({ where: { productId: id } });
-    await tx.productImage.deleteMany({ where: { productId: id } });
-    await tx.productAttributeValue.deleteMany({ where: { productId: id } });
-    await tx.product.delete({ where: { id } });
-  });
+ 
+  await this.prisma.product.delete({ where: { id } });
 }
+
   async delete(id: number): Promise<void> {
     await this.prisma.product.delete({ where: { id } });
   };

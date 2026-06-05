@@ -9,6 +9,7 @@ import {
   EMAIL_EVENTS,
   EmailVerificationRequestedEvent,
 } from '../../../../infrastructure/events/email/email.events';
+import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
  
 export interface RegisterUserData {
   username: string;
@@ -32,7 +33,7 @@ export class RegisterUserUseCase {
     @Inject(USER_REPO)
     private readonly userRepo: IUserDomainRepository,
     private readonly cacheService: CacheService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly emailQueue: EmailQueueService,
   ) {}
  
   async execute(
@@ -75,18 +76,20 @@ export class RegisterUserUseCase {
       tx,
     );
  
-    const token = generateToken();
- 
-    if (!skipEmailSending) {
-      await this.sendVerificationEmail(
-        userId,
-        token,
-        data.email,
-        data.firstName || data.username,
-        role,
-        lang,
-      );
-    }
+
+   
+  const token = generateToken();
+
+if (!skipEmailSending) {
+  await this.sendVerificationEmail(
+    userId,
+    token,
+    data.email,
+    data.firstName || data.username,
+    role,
+    lang,
+  );
+}
  
     return {
       userId,
@@ -97,24 +100,49 @@ export class RegisterUserUseCase {
     };
   }
  
+
+
   async sendVerificationEmail(
-    userId: number,
-    token: string,
-    email: string,
-    firstName: string,
-    role: string,
-    lang: SupportedLang,
-  ): Promise<void> {
-    await this.cacheService.set(
-      `email_verification:${token}`,
-      { userId, role },
-      30 * 60 * 1000,
-    );
- 
-    this.eventEmitter.emit(
-      EMAIL_EVENTS.VERIFICATION_REQUESTED,
-      new EmailVerificationRequestedEvent(email, firstName, token, lang),
-    );
-  }
+  userId: number,
+  token: string,
+  email: string,
+  firstName: string,
+  role: string,
+  lang: SupportedLang,
+): Promise<void> {
+  await this.cacheService.set(
+    `email_verification:${token}`,
+    { userId, role },
+    30 * 60 * 1000,
+  );
+
+  await this.emailQueue.sendVerificationEmail(
+    email,
+    firstName,
+    token,
+    lang,
+  );
 }
+
+}
+//   async sendVerificationEmail(
+//     userId: number,
+//     token: string,
+//     email: string,
+//     firstName: string,
+//     role: string,
+//     lang: SupportedLang,
+//   ): Promise<void> {
+//     await this.cacheService.set(
+//       `email_verification:${token}`,
+//       { userId, role },
+//       30 * 60 * 1000,
+//     );
+ 
+//     this.eventEmitter.emit(
+//       EMAIL_EVENTS.VERIFICATION_REQUESTED,
+//       new EmailVerificationRequestedEvent(email, firstName, token, lang),
+//     );
+//   }
+// }
  

@@ -1,13 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RegisterUserUseCase } from '../register-user.use-case';
 import { USER_REPO } from '../../../../users/domain/repositories/user.repository.interface';
 import { CacheService } from '../../../../../infrastructure/redis/cache.service';
-import {
-  EMAIL_EVENTS,
-  EmailVerificationRequestedEvent,
-} from '../../../../../infrastructure/events/email/email.events';
+import { EmailQueueService } from '../../../../../infrastructure/queue/services/email-queue.service';
 
 describe('RegisterUserUseCase', () => {
   let useCase: RegisterUserUseCase;
@@ -18,25 +14,35 @@ describe('RegisterUserUseCase', () => {
     create: jest.fn(),
   };
 
-  const eventEmitterMock = {
-    emit: jest.fn(),
-  };
-
   const cacheServiceMock = {
     set: jest.fn(),
+  };
+
+  const emailQueueMock = {
+    sendVerificationEmail: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RegisterUserUseCase,
-        { provide: USER_REPO, useValue: userRepoMock },
-        { provide: EventEmitter2, useValue: eventEmitterMock },
-        { provide: CacheService, useValue: cacheServiceMock },
+        {
+          provide: USER_REPO,
+          useValue: userRepoMock,
+        },
+        {
+          provide: CacheService,
+          useValue: cacheServiceMock,
+        },
+        {
+          provide: EmailQueueService,
+          useValue: emailQueueMock,
+        },
       ],
     }).compile();
 
-    useCase = module.get(RegisterUserUseCase);
+    useCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
+
     jest.clearAllMocks();
   });
 
@@ -76,7 +82,7 @@ describe('RegisterUserUseCase', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('registers user successfully and emits verification event', async () => {
+  it('registers user successfully and queues verification email', async () => {
     userRepoMock.usernameExists.mockResolvedValue(false);
     userRepoMock.emailExists.mockResolvedValue(false);
     userRepoMock.create.mockResolvedValue(1);
@@ -93,26 +99,24 @@ describe('RegisterUserUseCase', () => {
     );
 
     expect(userRepoMock.create).toHaveBeenCalled();
+
     expect(cacheServiceMock.set).toHaveBeenCalled();
-    expect(eventEmitterMock.emit).toHaveBeenCalledWith(
-      EMAIL_EVENTS.VERIFICATION_REQUESTED,
-      expect.any(EmailVerificationRequestedEvent),
+
+    expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalledWith(
+      'john@test.com',
+      'John',
+      expect.any(String),
+      'al',
     );
-    expect(eventEmitterMock.emit).toHaveBeenCalledWith(
-      EMAIL_EVENTS.VERIFICATION_REQUESTED,
-      expect.objectContaining({
-        email: 'john@test.com',
-        name: 'John',
-        lang: 'al',
-      }),
-    );
+
     expect(result.userId).toBe(1);
     expect(result.email).toBe('john@test.com');
     expect(result.firstName).toBe('John');
     expect(result.role).toBe('user');
+    expect(result.token).toBeDefined();
   });
 
-  it('registers user without emitting event when skipEmailSending is true', async () => {
+  it('registers user without sending email when skipEmailSending is true', async () => {
     userRepoMock.usernameExists.mockResolvedValue(false);
     userRepoMock.emailExists.mockResolvedValue(false);
     userRepoMock.create.mockResolvedValue(1);
@@ -132,14 +136,19 @@ describe('RegisterUserUseCase', () => {
     );
 
     expect(userRepoMock.create).toHaveBeenCalled();
+
     expect(cacheServiceMock.set).not.toHaveBeenCalled();
-    expect(eventEmitterMock.emit).not.toHaveBeenCalled();
+
+    expect(
+      emailQueueMock.sendVerificationEmail,
+    ).not.toHaveBeenCalled();
+
     expect(result.userId).toBe(1);
     expect(result.token).toBeDefined();
   });
 
   describe('sendVerificationEmail', () => {
-    it('caches token and emits verification event', async () => {
+    it('caches token and queues verification email', async () => {
       await useCase.sendVerificationEmail(
         1,
         'test-token',
@@ -151,18 +160,18 @@ describe('RegisterUserUseCase', () => {
 
       expect(cacheServiceMock.set).toHaveBeenCalledWith(
         'email_verification:test-token',
-        { userId: 1, role: 'user' },
+        {
+          userId: 1,
+          role: 'user',
+        },
         30 * 60 * 1000,
       );
 
-      expect(eventEmitterMock.emit).toHaveBeenCalledWith(
-        EMAIL_EVENTS.VERIFICATION_REQUESTED,
-        expect.objectContaining({
-          email: 'test@example.com',
-          name: 'John',
-          token: 'test-token',
-          lang: 'al',
-        }),
+      expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        'John',
+        'test-token',
+        'al',
       );
     });
   });

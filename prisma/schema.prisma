@@ -100,8 +100,7 @@ model AttributeTranslation {
   language    LanguageCode
   name        String
   slug        String?
-  attribute   Attribute    @relation(fields: [attributeId], references: [id], map: "attr_translation_attr_id_fkey")
-
+attribute Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade, map: "attr_translation_attr_id_fkey")
   @@index([attributeId], map: "attribute_translation_attribute_id_fkey")
   @@map("attribute_translation")
 }
@@ -124,8 +123,7 @@ model AttributeValueTranslation {
   language         LanguageCode
   name             String
   slug             String?
-  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], map: "attr_val_translation_fkey")
-
+attributeValue AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade, map: "attr_val_translation_fkey")
   @@index([attributeValueId], map: "attribute_value_translations_attribute_value_id_fkey")
   @@map("attribute_value_translations")
 }
@@ -147,8 +145,7 @@ model CategoryTranslation {
   language   LanguageCode
   name       String
   slug       String?
-  category   Category     @relation(fields: [categoryId], references: [id], map: "cattranslation_category_id_fkey")
-
+category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, map: "cattranslation_category_id_fkey")
   @@unique([categoryId, language], map: "cattranslation_categoryid_language_key")
   @@map("categorytranslation")
 }
@@ -170,8 +167,7 @@ model ListingTypeTranslation {
   language      LanguageCode
   name          String?
   slug          String?
-  listingType   ListingType  @relation(fields: [listingTypeId], references: [id], map: "listingtype_translation_fkey")
-
+  listingType ListingType @relation(fields: [listingTypeId], references: [id], onDelete: Cascade, map: "listingtype_translation_fkey")
   @@unique([listingTypeId, language], map: "listingtype_translation_unique")
   @@map("listing_type_translation")
 }
@@ -251,8 +247,7 @@ model SubcategoryTranslation {
   language      LanguageCode
   name          String
   slug          String?
-  subcategory   Subcategory  @relation(fields: [subcategoryId], references: [id], map: "subcattranslation_subcat_id_fkey")
-
+subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade, map: "subcattranslation_subcat_id_fkey")
   @@unique([subcategoryId, language], map: "subcattranslation_subcat_language_key")
   @@map("subcategorytranslation")
 }
@@ -278,6 +273,7 @@ model User {
   lastActive                   DateTime?              @map("last_active")
   createdAt                    DateTime               @default(now()) @map("created_at")
   updatedAt                    DateTime?              @updatedAt @map("updated_at")
+    deletedAt   DateTime?  @map("deleted_at") 
   agency                       Agency?
   agencyAgentAddedBy           AgencyAgent[]          @relation("AgencyAgentAddedBy")
   agencyAgentAgent             AgencyAgent[]          @relation("AgencyAgentAgent")
@@ -297,6 +293,7 @@ model User {
   @@index([role, status])
   @@index([createdAt])
   @@index([lastActive])
+    @@index([deletedAt])
   @@map("user")
 }
 
@@ -306,8 +303,7 @@ model UsernameHistory {
   oldUsername        String   @map("old_username")
   newUsername        String   @map("new_username")
   nextUsernameUpdate DateTime @default(now()) @map("next_username_update")
-  user               User     @relation(fields: [userId], references: [id], map: "usernamehistory_user_id_fkey")
-
+user User @relation(fields: [userId], references: [id], onDelete: Cascade, map: "usernamehistory_user_id_fkey")
   @@index([userId], map: "UsernameHistory_user_id_idx")
   @@map("usernamehistory")
 }
@@ -383,8 +379,7 @@ model ProductAttributeValue {
   attributeValueId Int
   attributes       Attribute      @relation(fields: [attributeId], references: [id], map: "prodattrval_attr_id_fkey")
   attributeValues  AttributeValue @relation(fields: [attributeValueId], references: [id], map: "prodattrval_attrval_id_fkey")
-  product          Product        @relation(fields: [productId], references: [id], map: "prodattrval_product_id_fkey")
-
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade, map: "prodattrval_product_id_fkey")
   @@unique([productId, attributeId, attributeValueId], map: "prodattrval_unique")
   @@index([attributeId], map: "ProductAttributeValue_attributeId_fkey")
   @@index([attributeValueId], map: "ProductAttributeValue_attributeValueId_fkey")
@@ -397,7 +392,7 @@ model ProductImage {
   userId    Int
   imageUrl  String? @map("imageUrl")
   publicId  String? @map("publicId")
-  product   Product @relation(fields: [productId], references: [id], map: "productimage_product_id_fkey")
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade, map: "productimage_product_id_fkey")
   user      User    @relation(fields: [userId], references: [id], map: "productimage_user_id_fkey")
 
   @@index([productId], map: "ProductImage_productId_fkey")
@@ -429,9 +424,8 @@ model SavedProduct {
   userId    Int      @map("user_id")
   productId Int      @map("product_id")
   savedAt   DateTime @default(now()) @map("saved_at")
-  product   Product  @relation(fields: [productId], references: [id], map: "savedproduct_product_fk")
-  user      User     @relation(fields: [userId], references: [id], map: "savedproduct_user_id_fkey")
-
+product Product @relation(fields: [productId], references: [id], onDelete: Cascade, map: "savedproduct_product_fk")
+user User @relation(fields: [userId], references: [id], onDelete: Cascade, map: "savedproduct_user_id_fkey")
   @@unique([userId, productId])
   @@index([productId], map: "savedproduct_product_id_fkey")
   @@map("savedproduct")
@@ -448,6 +442,7 @@ model Wallet {
   transactions WalletTransaction[]
 
   @@map("wallet")
+  
 }
 
 model WalletTransaction {
@@ -462,7 +457,7 @@ model WalletTransaction {
   externalProvider     String?
   productAdvertisement ProductAdvertisement?
   wallet               Wallet                @relation(fields: [walletId], references: [id], map: "wallettx_wallet_id_fkey")
-
+ @@index([walletId, createdAt])
   @@index([walletId], map: "wallettransaction_walletId_fkey")
   @@index([externalPaymentId])
   @@map("wallettransaction")
@@ -477,7 +472,7 @@ model ProductAdvertisement {
   endDate    DateTime?
   status     AdvertisementStatus @default(active)
   adType     AdvertisementType   @default(normal)
-  product    Product             @relation(fields: [productId], references: [id], map: "productad_product_id_fkey")
+  product    Product             @relation(fields: [productId], references: [id],   onDelete: Cascade,map: "productad_product_id_fkey")
   user       User                @relation(fields: [userId], references: [id], map: "productad_user_id_fkey")
   walletTx   WalletTransaction?  @relation(fields: [walletTxId], references: [id], map: "productad_wallettx_id_fkey")
 

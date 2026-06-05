@@ -10,14 +10,16 @@ import {
 import { Product } from '../../domain/entities/product.entity';
 import { UpdateProductDto } from '../../dto/update-product.dto';
 import { SupportedLang, t } from '../../../../locales';
-import { DeleteProductImagesByProductIdUseCase } from '../../../product-image/application/use-cases/delete-product-images.use-case';
+import { GetProductImagesUseCase } from '../../../product-image/application/use-cases/get-product-images.use-case';
+import { DeleteProductImagesUseCase } from '../../../product-image/application/use-cases/delete-product-images.use-case';
 import { UploadProductImagesUseCase } from '../../../product-image/application/use-cases/upload-product-images.use-case';
 import { DeleteProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/delete-product-attributes.use-case';
 import { CreateProductAttributeValuesUseCase } from '../../../product-attribute/application/use-cases/create-product-attributes.use-case';
 import { ProductCountsProducer } from '../../../../infrastructure/queue/producers/product-counts.producer';
 import { ProductStatus } from '@prisma/client';
-
+ 
 type MulterFile = Express.Multer.File;
+ 
 interface UpdateProductParams {
   productId: number;
   dto: UpdateProductDto;
@@ -25,19 +27,20 @@ interface UpdateProductParams {
   language: SupportedLang;
   images?: MulterFile[];
 }
-
+ 
 @Injectable()
 export class UpdateProductUseCase {
   constructor(
     @Inject(PRODUCT_REPO)
     private readonly productRepository: IProductRepository,
-    private readonly deleteImagesUseCase: DeleteProductImagesByProductIdUseCase,
-    private readonly uploadImagesUseCase: UploadProductImagesUseCase,
-    private readonly deleteAttributesUseCase: DeleteProductAttributeValuesUseCase,
-    private readonly createAttributesUseCase: CreateProductAttributeValuesUseCase,
+    private readonly getImages: GetProductImagesUseCase,
+    private readonly deleteImages: DeleteProductImagesUseCase,
+    private readonly uploadImages: UploadProductImagesUseCase,
+    private readonly deleteAttributes: DeleteProductAttributeValuesUseCase,
+    private readonly createAttributes: CreateProductAttributeValuesUseCase,
     private readonly productCountsProducer: ProductCountsProducer,
   ) {}
-
+ 
   async execute({
     productId,
     dto,
@@ -53,11 +56,11 @@ export class UpdateProductUseCase {
         errors: { general: t('productNotFound', language) },
       });
     }
-
+ 
     const statusChanged = !!dto.status && dto.status !== product.status;
     const oldStatus = product.status as ProductStatus;
     const newStatus = (dto.status ?? product.status) as ProductStatus;
-
+ 
     const updateData = Product.createForUpdate({
       id: productId,
       title: dto.title,
@@ -67,64 +70,58 @@ export class UpdateProductUseCase {
       area: dto.area,
       buildYear: dto.buildYear,
       status: dto.status,
-       latitude: dto.latitude ? parseFloat(dto.latitude) : undefined,
-longitude: dto.longitude ? parseFloat(dto.longitude) : undefined,
+      latitude: dto.latitude ? parseFloat(dto.latitude) : undefined,
+      longitude: dto.longitude ? parseFloat(dto.longitude) : undefined,
     });
-
+ 
     const updatedProduct = await this.productRepository.update(
       productId,
       updateData,
     );
-
-    // Attributes
+ 
     if (Array.isArray(dto.attributes) && dto.attributes.length > 0) {
-      await this.deleteAttributesUseCase.execute(productId);
-      await this.createAttributesUseCase.execute(
+      await this.deleteAttributes.execute(productId);
+      await this.createAttributes.execute(
         productId,
         product.subcategoryId,
         dto.attributes,
         language,
       );
     }
-
-    // Images
+ 
     let imagesResponse: { id: number; imageUrl: string }[] = [];
-
+ 
     const existingUrlsToKeep: string[] = Array.isArray(dto.existingImageUrls)
       ? dto.existingImageUrls
       : [];
-
+ 
     const hasNewImages = Array.isArray(images) && images.length > 0;
-
-    const allImages = await this.deleteImagesUseCase.findByProductId(productId);
+ 
+    const allImages = await this.getImages.byProductId(productId);
+ 
     const toDelete = allImages.filter(
       (img) => img.imageUrl && !existingUrlsToKeep.includes(img.imageUrl),
     );
-
+ 
     if (toDelete.length > 0) {
-      await this.deleteImagesUseCase.executeByUrls(
-        toDelete.map((img) => img.imageUrl!).filter(Boolean),
-        toDelete
-          .map((img) => img.publicId)
-          .filter((id): id is string => !!id),
-      );
+      await this.deleteImages.byIds(toDelete.map((img) => img.id));
     }
-
+ 
     const keptImages = allImages
       .filter(
         (img) => img.imageUrl && existingUrlsToKeep.includes(img.imageUrl),
       )
       .map((img) => ({ id: img.id, imageUrl: img.imageUrl! }));
-
+ 
     if (hasNewImages) {
       const uploadedImages =
-        (await this.uploadImagesUseCase.execute(
+        (await this.uploadImages.execute(
           images!,
           productId,
           userId,
           language,
         )) ?? [];
-
+ 
       imagesResponse = [
         ...keptImages,
         ...uploadedImages
@@ -134,7 +131,7 @@ longitude: dto.longitude ? parseFloat(dto.longitude) : undefined,
     } else {
       imagesResponse = keptImages;
     }
-
+ 
     if (statusChanged) {
       this.productCountsProducer
         .emitStatusChanged({
@@ -147,7 +144,7 @@ longitude: dto.longitude ? parseFloat(dto.longitude) : undefined,
           console.error('[UpdateProduct] emitStatusChanged failed:', err),
         );
     }
-
+ 
     return {
       success: true,
       message: t('productUpdated', language),

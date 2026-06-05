@@ -7,5 +7,7 @@ export interface IProductImageRepository {
   findByProductId(productId: number): Promise<ProductImage[]>;
   deleteByUrls(urls: string[]): Promise<void>;
   deleteByProductId(productId: number): Promise<void>;
+  deleteByIds(ids: number[]): Promise<void> 
+  findByIds(ids: number[]): Promise<ProductImage[]>;
   delete(id: number): Promise<void>;
 }

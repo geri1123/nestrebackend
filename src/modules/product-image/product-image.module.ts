@@ -1,40 +1,37 @@
 import { Module } from '@nestjs/common';
-
-// Domain Repository (interface)
+ 
+// Domain
 import { PRODUCT_IMAGE_REPO } from './domain/repositories/product-image.repository.interface';
-// Infrastructure Repository (implementation)
-
+ 
+// Infrastructure
 import { ProductImageRepository } from './infrastructure/persistence/product-image.repository';
-
-
-// Application Use Cases
+ 
+// Use Cases
+import { GetProductImagesUseCase } from './application/use-cases/get-product-images.use-case';
+import { DeleteProductImagesUseCase } from './application/use-cases/delete-product-images.use-case';
 import { UploadProductImagesUseCase } from './application/use-cases/upload-product-images.use-case';
-import { DeleteProductImagesByProductIdUseCase } from './application/use-cases/delete-product-images.use-case';
-import { GetImagesByProductUseCase } from './application/use-cases/get-images-by-product.use-case';
-
-// External Services
+ 
+// External
 import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
-
+ 
 @Module({
-  imports:[  CommonModule ,  CloudinaryModule],
+  imports: [CommonModule, CloudinaryModule],
   providers: [
     {
-     provide:PRODUCT_IMAGE_REPO ,
+      provide: PRODUCT_IMAGE_REPO,
       useClass: ProductImageRepository,
     },
-
-    // Use Cases
+    GetProductImagesUseCase,
+    DeleteProductImagesUseCase,
     UploadProductImagesUseCase,
-    DeleteProductImagesByProductIdUseCase,
-    GetImagesByProductUseCase,
-
   ],
   exports: [
-   PRODUCT_IMAGE_REPO,
+    PRODUCT_IMAGE_REPO,
+    GetProductImagesUseCase,
+    DeleteProductImagesUseCase,
     UploadProductImagesUseCase,
-    DeleteProductImagesByProductIdUseCase,
-    GetImagesByProductUseCase,
   ],
 })
 export class ProductImageModule {}
+ 

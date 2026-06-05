@@ -25,7 +25,21 @@ export class ProductImageRepository implements IProductImageRepository {
       publicId: created.publicId || undefined,  
     });
   }
+async findByIds(ids: number[]): Promise<ProductImage[]> {
+  const images = await this.prisma.productImage.findMany({
+    where: { id: { in: ids } },
+  });
 
+  return images.map(img =>
+    ProductImage.create({
+      id: img.id,
+      productId: img.productId,
+      userId: img.userId,
+      imageUrl: img.imageUrl || '',
+      publicId: img.publicId || undefined,
+    }),
+  );
+}
   async findByProductId(productId: number): Promise<ProductImage[]> {
     const images = await this.prisma.productImage.findMany({
       where: { productId },
@@ -44,6 +58,11 @@ export class ProductImageRepository implements IProductImageRepository {
 async deleteByUrls(urls: string[]): Promise<void> {
   await this.prisma.productImage.deleteMany({
     where: { imageUrl: { in: urls } },
+  });
+}
+async deleteByIds(ids: number[]): Promise<void> {
+  await this.prisma.productImage.deleteMany({
+    where: { id: { in: ids } },
   });
 }
   async deleteByProductId(productId: number): Promise<void> {
