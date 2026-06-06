@@ -1,5 +1,6 @@
 import { SavedProductEntity } from "../entities/save-product.entity";
 import { SupportedLang } from "../../../../locales";
+import { Prisma } from "@prisma/client";
 export const SAVED_PRODUCT_REPO = 'ISavedProductRepository';
 
 export interface ISavedProductRepository {
@@ -16,4 +17,5 @@ export interface ISavedProductRepository {
   findSavedIdsByUserId(userId: number): Promise<{ productId: number }[]>;
    countSavesByOwner(ownerUserId: number): Promise<number>;
    countSavesByAgency(agencyId: number): Promise<number>;
+    deleteAllByUserId(userId: number, tx?: Prisma.TransactionClient): Promise<void> 
 }

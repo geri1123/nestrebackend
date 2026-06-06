@@ -3,10 +3,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { USER_REPO, type IUserDomainRepository } from '../../domain/repositories/user.repository.interface';
 import { USERNAME_REPO, type IUsernameHistoryDomainRepository } from '../../domain/repositories/username-history.repository.interface';
 import { t, SupportedLang } from '../../../../locales';
-import { UserUpdatedEvent } from '../events/user-updated.event';
+import { UserUpdatedEvent } from '../../domain/events/user-updated.event';
 import { FindUserByIdUseCase } from './find-user-by-id.use-case'; 
 import { RedisPubSubService } from '../../../../infrastructure/redis/redis-pubsub.service';
-import { UserEventPublisher } from '../events/user-event.publisher';
+import { UserEventPublisher } from '../../../../infrastructure/redis/publishers/user-event.publisher';
 
 @Injectable()
 export class ChangeUsernameUseCase {

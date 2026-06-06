@@ -6,6 +6,7 @@ import { CacheService } from './cache.service';
 import { CacheController } from './cache.controller';
 import { UserCacheInvalidationListener } from './user-cache-invalidation.listener';
 import { RedisPubSubService } from './redis-pubsub.service';
+import { UserEventPublisher } from './publishers/user-event.publisher';
 
 // Re-export so existing consumers can still do
 //   import { REDIS_CLIENT } from '.../redis.module'
@@ -33,8 +34,9 @@ export { REDIS_CLIENT };
     RedisPubSubService,
     CacheService,
     UserCacheInvalidationListener,
+    UserEventPublisher
   ],
   controllers: [CacheController],
-  exports: [REDIS_CLIENT, CacheService, RedisPubSubService],
+  exports: [REDIS_CLIENT, CacheService, RedisPubSubService , UserEventPublisher],
 })
 export class RedisModule {}

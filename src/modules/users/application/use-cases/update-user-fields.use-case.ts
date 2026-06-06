@@ -7,7 +7,7 @@ import {
 import { SupportedLang } from "../../../../locales";
 import { FindUserByIdUseCase } from "./find-user-by-id.use-case";
 import { Prisma } from "@prisma/client";
-import { UserEventPublisher } from "../events/user-event.publisher";
+import { UserEventPublisher } from "../../../../infrastructure/redis/publishers/user-event.publisher";
 
 @Injectable()
 export class UpdateUserFieldsUseCase {

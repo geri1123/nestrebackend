@@ -11,7 +11,6 @@ import {
 import { RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '../../common/decorators/public.decorator';
-import { WhopService } from '../../infrastructure/whop/whop.service';
 import { PayseraService } from '../../infrastructure/paysera/paysera.service';
 import { ProcessPayseraPaymentUseCase } from './application/use-cases/process-paysera-payment.use-case';
 
@@ -20,7 +19,6 @@ export class WalletWebhookController {
   private readonly logger = new Logger(WalletWebhookController.name);
 
   constructor(
-    private readonly whop: WhopService,
     private readonly paysera: PayseraService,
     private readonly processPayseraPayment: ProcessPayseraPaymentUseCase,
   ) {}

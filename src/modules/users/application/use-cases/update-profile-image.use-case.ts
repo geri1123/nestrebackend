@@ -15,7 +15,7 @@ import { ImageUtilsService } from '../../../../common/utils/image-utils.service'
 import { SupportedLang, t } from '../../../../locales';
 import { CloudinaryUploadResult } from '../../../../infrastructure/cloudinary/types/cloudinary-upload.result';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserEventPublisher } from '../events/user-event.publisher';
+import { UserEventPublisher } from '../../../../infrastructure/redis/publishers/user-event.publisher';
 
 @Injectable()
 export class UploadProfileImageUseCase {

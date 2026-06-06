@@ -36,7 +36,7 @@ import { AuthContextModule } from '../../infrastructure/auth/modules/auth-contex
     AuthCookieService,
   ],
   controllers: [AuthController],
-  exports: [RefreshTokenUseCase],
+  exports: [RefreshTokenUseCase , AuthCookieService],
 })
 export class AuthModule {}
 

@@ -21,7 +21,7 @@ import { AGENT_REPOSITORY_TOKENS } from '../../domain/repositories/agent.reposit
 import { AGENCY_REPO } from '../../../agency/domain/repositories/agency.repository.interface';
 import { PRODUCT_REPO } from '../../../product/domain/repositories/product.repository.interface'; // token-i yt
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
-import { UserEventPublisher } from '../../../users/application/events/user-event.publisher';
+import { UserEventPublisher } from '../../../../infrastructure/redis/publishers/user-event.publisher';
 
 export interface BaseUserInfo {
   id: number;

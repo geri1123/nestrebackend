@@ -35,5 +35,5 @@ findPendingRequestByUserId(userId: number): Promise<RegistrationRequestEntity | 
   ): Promise<RegistrationRequestEntity>;
 
   countRequests(agencyId: number, status?: RegistrationRequestStatus , search?: string,): Promise<number>;
-   deleteByUserId(userId: number): Promise<number>;
+   deleteByUserId(userId: number , tx?: Prisma.TransactionClient): Promise<number>;
 }

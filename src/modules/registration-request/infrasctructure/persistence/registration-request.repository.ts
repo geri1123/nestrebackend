@@ -274,8 +274,9 @@ async countRequests(
     return this.mapToEntity(updated);
   }
 
-  async deleteByUserId(userId: number): Promise<number> {
-    const result = await this.prisma.registrationRequest.deleteMany({
+  async deleteByUserId(userId: number , tx?: Prisma.TransactionClient): Promise<number> {
+    const client = tx ?? this.prisma;
+    const result = await client.registrationRequest.deleteMany({
       where: { userId: userId },
     });
     return result.count;

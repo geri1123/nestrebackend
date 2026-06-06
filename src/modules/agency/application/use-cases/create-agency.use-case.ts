@@ -4,7 +4,7 @@ import { AgencyStatus, Prisma } from '@prisma/client';
 import { SupportedLang, t } from '../../../../locales';
 import { throwValidationErrors } from '../../../../common/helpers/validation.helper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserEventPublisher } from '../../../users/application/events/user-event.publisher';
+import { UserEventPublisher } from '../../../../infrastructure/redis/publishers/user-event.publisher';
 export interface CreateAgencyData {
   agencyName: string;
   licenseNumber: string;

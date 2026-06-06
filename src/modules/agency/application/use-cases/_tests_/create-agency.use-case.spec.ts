@@ -3,7 +3,7 @@ import { CreateAgencyUseCase } from '../create-agency.use-case';
 import { AGENCY_REPO } from '../../../domain/repositories/agency.repository.interface';
 import { AgencyStatus } from '@prisma/client';
 import { BadRequestException } from '@nestjs/common';
-import { UserEventPublisher } from '../../../../users/application/events/user-event.publisher';
+import { UserEventPublisher } from '../../../../../infrastructure/redis/publishers/user-event.publisher';
 
 describe('CreateAgencyUseCase', () => {
   let useCase: CreateAgencyUseCase;

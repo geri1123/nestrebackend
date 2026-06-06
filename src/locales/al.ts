@@ -3,6 +3,7 @@ export const al = {
   invalidTopupAmount: "Shuma e top-up duhet të jetë midis 1 dhe 10,000.", 
   cannotTransferToSelf: "Nuk mund të transferoni para vetes.",
   moneyTransferredSuccessfully: "Paratë u transferuan me sukses",
+  userdeleted: "Ky përdorues është fshirë",
   cannotReviewOwnAgency: "Nuk mund të vlerësoni një agjenci ku jeni anëtar.",
 reviewAlreadyExists: "Ju keni vlerësuar tashmë këtë agjenci.",
 notReviewAuthor: "Vetëm autori i vlerësimit mund ta modifikojë atë.",

@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { ChangeUsernameUseCase } from '../change-username.use-case';
 import { FindUserByIdUseCase } from '../find-user-by-id.use-case';
-import { UserEventPublisher } from '../../events/user-event.publisher';
+import { UserEventPublisher } from '../../../../../infrastructure/redis/publishers/user-event.publisher';
 
 describe('ChangeUsernameUseCase', () => {
   let useCase: ChangeUsernameUseCase;

@@ -6,6 +6,7 @@ export const it = {
 reviewAlreadyExists: "Hai già recensito questa agenzia.",
 invalidRating: "La valutazione deve essere un numero intero tra 1 e 5.",
 reviewNotFound: "Recensione non trovata.",
+userdeleted: "Questo utente è stato eliminato",
 longitudeMustBeValid: "La longitudine deve essere un numero valido.",
 latitudeMustBeValid: "La latitudine deve essere un numero valido.",
 reviewUpdatedSuccessfully: "Recensione aggiornata con successo.",

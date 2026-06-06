@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 import { ISavedProductRepository } from '../../domain/repositories/Isave-product.repository';
 import { SavedProductEntity } from '../../domain/entities/save-product.entity';
-import { LanguageCode, ProductStatus } from '@prisma/client';
+import { LanguageCode, Prisma, ProductStatus } from '@prisma/client';
 import { SupportedLang } from '../../../../locales';
 
 @Injectable()
@@ -148,5 +148,9 @@ async findSavedIdsByUserId(userId: number): Promise<{ productId: number }[]> {
   return this.prisma.savedProduct.count({
     where: { product: { agencyId } },
   });
+}
+async deleteAllByUserId(userId: number, tx?: Prisma.TransactionClient): Promise<void> {
+  const client = tx ?? this.prisma;
+  await client.savedProduct.deleteMany({ where: { userId } });
 }
 }

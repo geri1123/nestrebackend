@@ -29,26 +29,23 @@ import { ProfileController } from './controllers/profile.controller';
 import { PasswordController } from './controllers/password-recovery.controller';
 import { ProfilePictureController } from './controllers/profile-picture.controller';
 
-// Tokens & other
 import { USER_REPO } from './domain/repositories/user.repository.interface';
 import { USERNAME_REPO } from './domain/repositories/username-history.repository.interface';
 import { CommonModule } from '../../common/common.module';
 import { CloudinaryModule } from '../../infrastructure/cloudinary/cloudinary.module';
-// import { UserCacheInvalidationListener } from './application/listeners/user-cache-invalidation.listener';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { UserEventPublisher } from './application/events/user-event.publisher';
+import { UserEventPublisher } from '../../infrastructure/redis/publishers/user-event.publisher';
 import { GetPublicUserProfileUseCase } from './application/use-cases/get-public-user.use-case';
 
-// NOTE: AGENT_PROFILE_PORT and AGENCY_OWNER_PROFILE_PORT are provided by
-// AgencyContextModule (@Global), so they are available without importing here.
-// AgencyContextModule is imported by GuardsModule which is global.
+
 
 @Module({
-  imports: [ CommonModule, CloudinaryModule],
+  imports: [ CommonModule, CloudinaryModule  ],
   controllers: [ProfileController, PasswordController, ProfilePictureController],
   providers: [
     { provide: USER_REPO, useClass: UserRepository },
     { provide: USERNAME_REPO, useClass: UsernameHistoryRepository },
+    // DeleteUserUseCase,
     UserEventPublisher,
     EventEmitterModule,
     ChangePasswordUseCase,

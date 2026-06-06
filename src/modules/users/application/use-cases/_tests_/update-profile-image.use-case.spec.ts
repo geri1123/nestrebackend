@@ -1,6 +1,6 @@
 import {NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { UploadProfileImageUseCase } from '../update-profile-image.use-case';
-import { UserEventPublisher } from '../../events/user-event.publisher';
+import { UserEventPublisher } from '../../../../../infrastructure/redis/publishers/user-event.publisher';
 
 describe('UploadProfileImageUseCase', () => {
   let useCase: UploadProfileImageUseCase;

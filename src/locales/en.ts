@@ -4,6 +4,7 @@ export const en = {
   cannotReviewOwnAgency: "You cannot review an agency you belong to.",
 reviewAlreadyExists: "You have already reviewed this agency.",
 notReviewAuthor: "Only the author of the review can modify it.",
+userdeleted: "This user has been deleted",
 reviewNotFound: "Review not found.",
 longitudeMustBeValid: "Longitude must be a valid number.",
 latitudeMustBeValid: "Latitude must be a valid number.",

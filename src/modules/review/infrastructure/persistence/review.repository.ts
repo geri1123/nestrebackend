@@ -132,4 +132,9 @@ async getAverageRating(agencyId: number) {
     totalReviews,
   };
 }
+
+async deleteByUserId(userId: number , tx?:Prisma.TransactionClient): Promise<void> {
+  const client = tx ?? this.prisma;
+  await client.review.deleteMany({ where: { reviewerUserId: userId } }); 
+}
 }

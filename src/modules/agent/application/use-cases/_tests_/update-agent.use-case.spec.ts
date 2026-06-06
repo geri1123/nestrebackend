@@ -9,7 +9,7 @@ import { USER_REPO } from '../../../../users/domain/repositories/user.repository
 import { AGENCY_REPO } from '../../../../agency/domain/repositories/agency.repository.interface';
 import { PRODUCT_REPO } from '../../../../product/domain/repositories/product.repository.interface';
 import { PrismaService } from '../../../../../infrastructure/prisma/prisma.service';
-import { UserEventPublisher } from '../../../../users/application/events/user-event.publisher';
+import { UserEventPublisher } from '../../../../../infrastructure/redis/publishers/user-event.publisher';
 import * as classValidator from 'class-validator';
 
 jest.mock('class-validator', () => ({

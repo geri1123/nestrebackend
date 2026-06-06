@@ -24,15 +24,18 @@ import { CommonModule } from '../../common/common.module';
 
 // Controller
 import { AgencyController } from './controllers/agency.controller';
+import { RedisModule } from '../../infrastructure/redis/redis.module';
+import { UsersModule } from '../users/users.module';
 
 // Extra utils
-import { UsersModule } from '../users/users.module';
+// import { UsersModule } from '/../users/users.module';
 
 @Module({
   imports: [
     PrismaModule, 
+    RedisModule,
+    CommonModule ,
     UsersModule,
-    CommonModule
   ],
 
   controllers: [AgencyController],
@@ -78,6 +81,7 @@ import { UsersModule } from '../users/users.module';
     CheckLicenseExistsUseCase,
     GetAgencyByOwnerUseCase,
     AGENCY_REPO , 
+  
   ],
 })
 export class AgencyModule {}

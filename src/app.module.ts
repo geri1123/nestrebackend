@@ -50,9 +50,6 @@ import { RegistrationModule } from './modules/registration/registration.module';
 import { EmailVerificationModule } from './modules/email-verification/email-verification.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { CleanupModule } from './modules/cleanup/cleanup.module';
-
-
-import { AgencyContextGuard } from './infrastructure/auth/guard/agency-context.guard';
 import { AgencyContextModule } from './infrastructure/auth/modules/agency-context.module';
 import { QueueModule } from './infrastructure/queue/queue.module';
 
@@ -61,7 +58,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WebSocketModule } from './infrastructure/websocket/socket.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
-import { WhopModule } from './infrastructure/whop/whop.module';
 import { ReviewModule } from './modules/review/review.module';
 import { PayseraModule } from './infrastructure/paysera/paysera.module';
 @Module({
@@ -123,7 +119,6 @@ WebSocketModule,
     ContactModule,
     QueueModule,
     CleanupModule,
-    WhopModule,
     ReviewModule,
     // BACKGROUND JOBS
     
