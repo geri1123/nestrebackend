@@ -83,6 +83,9 @@ Defines the contract for saved product data operations.
 - `findByUserPaginated(userId, language, skip, take)`: Retrieves paginated saved products with full details
   - Returns: `Promise<any[]>` (includes product details, images, categories, etc.)
 
+- `findSavedIdsByUserId(userId)`: Returns lightweight list of saved records (only productId needed)
+  - Returns: `Promise<{ productId: number }[]>`
+
 ---
 
 ### Use Cases
@@ -104,14 +107,14 @@ execute(userId: number, productId: number, language: SupportedLang): Promise<Sav
 ```
 
 **Business Logic:**
-1. Checks if the product is already saved by the user
-2. Throws `ForbiddenException` if already saved
+1. Fetches the product and checks if the user owns it — throws `ForbiddenException` if the user is saving their own product
+2. Checks if the product is already saved by the user — throws `ForbiddenException` if already saved
 3. Creates new saved product entity
 4. Persists to database
 5. Returns the saved entity
 
 **Throws:**
-- `ForbiddenException`: Product already saved or save operation failed
+- `ForbiddenException`: User tries to save their own product, product already saved, or save operation failed
 
 ---
 
@@ -165,6 +168,23 @@ execute(userId: number, productId: number, language: SupportedLang): Promise<voi
 
 **Throws:**
 - `NotFoundException`: Product not found in saved collection
+
+---
+
+### GetSavedProductIdsUseCase
+
+Returns the list of product IDs the user has saved. Used by the frontend to mark saved/unsaved state on listing cards without fetching full product details.
+
+**Dependencies:** `ISavedProductRepository`
+
+**Method:**
+```typescript
+execute(userId: number): Promise<number[]>
+```
+
+**Flow:**
+1. Calls `savedProductRepo.findSavedIdsByUserId(userId)`
+2. Maps results to an array of `productId` numbers
 
 ---
 
@@ -309,6 +329,19 @@ Retrieves user's saved products with pagination.
 - Sorted by most recently saved
 - Only includes active products
 - Language-specific category/listing type names
+
+---
+
+### GET /save-product/saved-ids
+
+Returns the array of product IDs the authenticated user has saved. Lightweight endpoint used to populate saved/unsaved toggle state on listing cards.
+
+**Authentication:** Required (returns `{ savedIds: [] }` if userId is not present rather than throwing)
+
+**Response:**
+```json
+{ "savedIds": [123, 456, 789] }
+```
 
 ---
 

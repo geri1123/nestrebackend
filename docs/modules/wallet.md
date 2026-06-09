@@ -4,36 +4,36 @@
 
 ### Overview
 
-The Wallet module manages user digital wallets within the system. It provides functionality for creating wallets, managing balances, processing transactions (top-ups, withdrawals, purchases), transferring money between users, and tracking transaction history. The module implements Domain-Driven Design principles with rich domain entities that encapsulate business logic.
+The Wallet module manages user digital wallets within the system. It provides functionality for creating wallets, managing balances, processing transactions (top-ups via Paysera, withdrawals, purchases), transferring money between users, and tracking transaction history. The module implements Domain-Driven Design principles and uses idempotent payment processing to prevent duplicate charges.
 
 ---
 
 ### Architecture
 
-This module follows Domain-Driven Design (DDD) with a focus on domain logic encapsulation:
-
 ```
 wallet/
 ├── application/
-│   └── use-cases/              # Business use cases
-├── controller/
-│   └── wallet.controller.ts
+│   └── use-cases/
+│       ├── crreate-wallet.use-case.ts
+│       ├── get-wallet.use-case.ts
+│       ├── change-wallet-balance.use-case.ts
+│       ├── transfer-money.use-case.ts
+│       ├── create-paysera-topup.use-case.ts
+│       └── process-paysera-payment.use-case.ts
 ├── domain/
-│   ├── entities/               # Rich domain entities
-│   └── repositories/           # Repository interfaces
-├── dto/                        # Data transfer objects
+│   ├── entities/
+│   └── repositories/
+├── dto/
 ├── infrastructure/
-│   └── persistence/            # Data persistence layer
+│   └── persistence/
+├── wallet.controller.ts
+├── wallet-webhook.controller.ts
 └── wallet.module.ts
 ```
 
 ---
 
 ### Domain Model
-
----
-
-### Entities
 
 ---
 
@@ -47,38 +47,19 @@ A rich domain entity that encapsulates wallet business logic and rules.
 - `balance`: Current wallet balance (private)
 - `createdAt`: Wallet creation timestamp
 - `updatedAt`: Last update timestamp
-- `currency`: Wallet currency (e.g., "EUR")
+- `currency`: Wallet currency (default: "EUR")
 
 **Business Rules Methods:**
 
 - `canWithdraw(amount)`: Validates if withdrawal is possible
-  - Returns: `boolean`
-  - Rules: Balance must be sufficient and amount must be positive
-
-- `topup(amount)`: Adds money to the wallet
-  - Returns: `number` (new balance)
-  - Throws: Error if amount is not positive
-  - Business Rule: Amount must be > 0
-
-- `withdraw(amount)`: Removes money from the wallet
-  - Returns: `number` (new balance)
-  - Throws: Error if insufficient balance or invalid amount
-  - Business Rules: Amount must be positive, balance must be sufficient
-
+- `topup(amount)`: Adds money to the wallet (amount must be > 0)
+- `withdraw(amount)`: Removes money (validates positive amount and sufficient balance)
 - `purchase(amount)`: Processes a purchase (alias for withdraw)
-  - Returns: `number` (new balance)
-  - Same rules as withdraw
-
 - `getBalance()`: Returns current balance
-  - Returns: `number`
 
 **Factory Methods:**
-
 - `static fromPrisma(data)`: Creates domain entity from database record
 - `toPrisma()`: Converts domain entity to database format
-
-**Key Design Pattern:**
-This entity follows the **Rich Domain Model** pattern where business logic lives in the entity rather than in services. This ensures that wallet rules (like "can't withdraw more than balance") are enforced at the domain level.
 
 ---
 
@@ -88,47 +69,31 @@ This entity follows the **Rich Domain Model** pattern where business logic lives
 
 ### IWalletRepository
 
-Defines the contract for wallet data operations.
-
 **Methods:**
 
-- `createWallet(userId, currency)`: Creates a new wallet
-  - Returns: `Promise<WalletDomainEntity>`
-
-- `updateWalletBalanceTx(tx, walletId, newBalance)`: Updates balance within transaction
-  - Parameters: Transaction client, wallet ID, new balance
-  - Returns: `Promise<void>`
-
-- `getWalletByUser(userId)`: Retrieves wallet by user ID
-  - Returns: `Promise<WalletDomainEntity | null>`
-
-- `getWalletForTx(tx, userId)`: Retrieves wallet within transaction context
-  - Returns: `Promise<WalletDomainEntity | null>`
+- `createWallet(userId, currency)`: Creates a new wallet → `Promise<WalletDomainEntity>`
+- `getWalletByUser(userId)`: Retrieves wallet by user ID → `Promise<WalletDomainEntity | null>`
+- `findByUserIdTx(tx, userId)`: Retrieves wallet within a transaction → `Promise<WalletDomainEntity | null>`
+- `incrementBalanceTx(tx, walletId, amount)`: Atomically adds to balance → `Promise<number>`
+- `decrementBalanceIfSufficientTx(tx, walletId, amount)`: Atomically deducts balance if sufficient, returns null if not → `Promise<number | null>`
 
 ---
 
 ### IWalletTransactionRepository
 
-Defines the contract for transaction history operations.
-
 **Methods:**
 
-- `createTransactionTx(tx, walletId, type, amount, balanceAfter, description?)`: Records a transaction
-  - Parameters: Transaction client, wallet ID, transaction type, amount, balance after, optional description
-  - Returns: `Promise<WalletTransaction>`
-
-- `getTransactions(walletId, page, limit)`: Retrieves paginated transaction history
-  - Returns: `Promise<WalletTransaction[]>`
-
-- `countTransaction(walletId)`: Counts total transactions for a wallet
-  - Returns: `Promise<number>`
+- `createTransactionTx(tx, data)`: Records a transaction within a DB transaction → `Promise<WalletTransaction>`
+- `findByExternalPaymentIdTx(tx, externalPaymentId)`: Checks for duplicate external payment → `Promise<WalletTransaction | null>`
+- `getTransactions(walletId, page, limit)`: Retrieves paginated transaction history → `Promise<WalletTransaction[]>`
+- `countTransaction(walletId)`: Counts total transactions → `Promise<number>`
 
 ---
 
 ### Transaction Types
 
 ```typescript
-enum wallet_transaction_type {
+enum WalletTransactionType {
   topup     // Adding money to wallet
   withdraw  // Removing money from wallet
   purchase  // Spending money (treated as withdrawal)
@@ -143,42 +108,13 @@ enum wallet_transaction_type {
 
 ### CreateWalletUseCase
 
-Creates a new wallet for a user.
-
-**Purpose:** Initialize a wallet when a user joins the platform.
-
-**Dependencies:**
-- `IWalletRepository`
-
-**Method:**
-```typescript
-execute(userId: number, language: SupportedLang): Promise<WalletDomainEntity>
-```
-
-**Business Logic:**
-1. Checks if wallet already exists for user
-2. Throws `BadRequestException` if wallet exists
-3. Creates new wallet with 0 balance and EUR currency
-
-**Throws:**
-- `BadRequestException`: Wallet already exists
+Creates a new wallet for a user. Throws `BadRequestException` if a wallet already exists. Default currency is EUR with 0 balance.
 
 ---
 
 ### GetWalletUseCase
 
-Retrieves wallet information with paginated transaction history.
-
-**Purpose:** Display wallet balance and transaction history to users.
-
-**Dependencies:**
-- `IWalletRepository`
-- `IWalletTransactionRepository`
-
-**Method:**
-```typescript
-execute(userId: number, page: number, limit: number, lang: SupportedLang): Promise<WalletWithTransactions>
-```
+Retrieves wallet information with paginated transaction history. Fetches wallet and transaction count in parallel for performance.
 
 **Returns:**
 ```typescript
@@ -191,102 +127,80 @@ execute(userId: number, page: number, limit: number, lang: SupportedLang): Promi
 }
 ```
 
-**Business Logic:**
-1. Fetches wallet by user ID
-2. Throws `NotFoundException` if wallet doesn't exist
-3. Fetches transactions and count in parallel for performance
-4. Calculates pagination metadata
-
-**Throws:**
-- `NotFoundException`: Wallet not found
-
 ---
 
 ### ChangeWalletBalanceUseCase
 
-Modifies wallet balance for top-ups, withdrawals, or purchases.
-
-**Purpose:** Handle all balance modification operations with proper transaction management.
-
-**Dependencies:**
-- `IWalletRepository`
-- `IWalletTransactionRepository`
-- `PrismaService`
+Handles all balance modification operations with idempotency support and proper transaction management.
 
 **Input:**
 ```typescript
 interface ChangeBalanceInput {
   userId: number;
-  type: wallet_transaction_type;
+  type: WalletTransactionType;
   amount: number;
   language: SupportedLang;
+  externalPaymentId?: string;   // For deduplication (e.g. Paysera order ID)
+  externalProvider?: string;    // e.g. "paysera"
+  description?: string;
 }
 ```
 
-**Method:**
+**Returns:**
 ```typescript
-execute(input: ChangeBalanceInput, tx?: any): Promise<{ balance: number; transactionId: string }>
+{ balance: number; transactionId: string; alreadyProcessed?: boolean }
 ```
 
-**Business Logic:**
-1. Retrieves wallet (within transaction if provided)
-2. Applies business rules via domain entity methods:
-   - **topup**: Adds amount to balance
-   - **withdraw**: Removes amount if sufficient balance
-   - **purchase**: Same as withdraw
-3. Records transaction in history
-4. Updates wallet balance
-5. Returns new balance and transaction ID
+**Idempotency:** If `externalPaymentId` is provided, the use case first checks whether that payment ID already exists in the transaction log. If it does, it returns the current balance and sets `alreadyProcessed: true` — no double-charge.
 
-**Transaction Handling:**
-- If `tx` parameter provided: Uses existing transaction
-- If no `tx`: Creates new transaction automatically
-- Ensures atomicity: both balance update and transaction record succeed or fail together
+**Balance Operations:** Uses atomic DB-level increment/decrement (not read-then-write) to prevent race conditions:
+- `topup` → `incrementBalanceTx`
+- `withdraw` / `purchase` → `decrementBalanceIfSufficientTx` (returns null → throws `BadRequestException`)
 
-**Throws:**
-- `NotFoundException`: Wallet not found
-- `BadRequestException`: Insufficient balance or invalid transaction type
-
-**Key Feature:** Supports nested transactions via optional `tx` parameter, allowing this use case to be part of larger transactional workflows.
+**Transaction Safety:** Accepts an optional `tx` parameter. If provided, runs within the caller's transaction; otherwise creates its own (timeout: 15s).
 
 ---
 
 ### TransferMoneyUseCase
 
-Transfers money between two users' wallets.
-
-**Purpose:** Enable peer-to-peer money transfers.
-
-**Dependencies:**
-- `IWalletRepository`
-- `IWalletTransactionRepository`
-- `PrismaService`
-
-**Method:**
-```typescript
-execute(senderId: number, receiverId: number, amount: number, language: SupportedLang): Promise<void>
-```
-
-**Business Logic:**
-1. Fetches both sender and receiver wallets in parallel
-2. Validates both wallets exist
-3. Uses domain entity methods to:
-   - Withdraw from sender (validates sufficient balance)
-   - Top-up receiver wallet
-4. Executes atomic database transaction:
-   - Updates both wallet balances
-   - Creates transaction records for both wallets
-5. If any step fails, entire operation rolls back
+Transfers money between two users' wallets atomically. Both wallets are fetched in parallel, then a Prisma transaction updates both balances and creates transaction records for both sides.
 
 **Transaction Records Created:**
-- Sender: "withdraw" transaction with description "Transfer to user {receiverId}"
-- Receiver: "topup" transaction with description "Transfer from user {senderId}"
+- Sender: `withdraw` — description "Transfer to user {receiverId}"
+- Receiver: `topup` — description "Transfer from user {senderId}"
 
-**Throws:**
-- `NotFoundException`: One or both wallets not found
-- `BadRequestException`: Insufficient balance
+---
 
-**Critical Feature:** Uses Prisma transaction to ensure atomicity - either both wallets are updated or neither is.
+### CreatePayseraTopupUseCase
+
+Initiates a Paysera payment for wallet top-up. Validates amount (1–10,000 EUR), verifies wallet exists, generates a unique `orderId` with format `paysera_{userId}_{uuid}`, and returns a Paysera redirect URL.
+
+**Input:**
+```typescript
+{ userId: number; amount: number; language: SupportedLang }
+```
+
+**Returns:**
+```typescript
+{ paymentUrl: string; orderId: string }
+```
+
+**Validation:**
+- Amount must be between 1 and 10,000 EUR
+- User must have a wallet
+
+---
+
+### ProcessPayseraPaymentUseCase
+
+Handles incoming Paysera IPN callbacks. Parses the `orderId` to extract `userId`, converts amount from cents to EUR, and calls `ChangeWalletBalanceUseCase` with `externalPaymentId` for idempotency.
+
+**Flow:**
+1. Receives `PayseraCallbackData` from the webhook controller
+2. Ignores non-successful statuses (`status !== '1'`)
+3. Parses `orderId` format `paysera_{userId}_{uuid}` to extract userId
+4. Converts amount from centimes (e.g. `5000` → `50.00` EUR)
+5. Calls `ChangeWalletBalanceUseCase` — if `alreadyProcessed`, logs and skips
 
 ---
 
@@ -296,39 +210,19 @@ execute(senderId: number, receiverId: number, amount: number, language: Supporte
 
 ### WalletRepository
 
-Implements `IWalletRepository` using Prisma ORM.
-
-**Key Features:**
-- Creates wallets with default EUR currency and 0 balance
-- Supports transaction-aware operations via `tx` parameter
-- Maps Prisma models to domain entities
-- Updates wallet balance within transaction context
-
-**Implementation Notes:**
-- `getWalletForTx`: Used within transactions to ensure isolation
-- `updateWalletBalanceTx`: Updates balance in transaction context
-- Always returns domain entities, never Prisma models
+Implements `IWalletRepository` using Prisma. Key feature: uses `incrementBalanceTx` and `decrementBalanceIfSufficientTx` for atomic, race-condition-free balance updates. Always returns domain entities, never Prisma models.
 
 ---
 
 ### WalletTransactionRepository
 
-Implements `IWalletTransactionRepository` using Prisma ORM.
-
-**Key Features:**
-- Records all balance changes as transactions
-- Stores balance after each transaction for audit trail
-- Supports pagination for transaction history
-- Orders transactions by creation date (most recent first)
-
-**Implementation Notes:**
-- All transaction creation happens within Prisma transactions
-- Includes amount, type, balance after, and optional description
-- Skip/take pagination for efficient large dataset handling
+Implements `IWalletTransactionRepository`. Stores `externalPaymentId` and `externalProvider` for idempotency. All transaction creation runs inside Prisma transactions. Supports pagination (most recent first).
 
 ---
 
 ### API Endpoints
+
+Two controllers are registered: `WalletController` (authenticated routes) and `WalletWebhookController` (public webhook).
 
 ---
 
@@ -340,51 +234,27 @@ Creates a new wallet for the authenticated user.
 
 **Response:**
 ```json
-{
-  "success": true,
-  "message": "Wallet successfully created"
-}
+{ "success": true, "message": "Wallet successfully created" }
 ```
-
-**Errors:**
-- `401 Unauthorized`: User not authenticated
-- `400 Bad Request`: Wallet already exists
 
 ---
 
 ### GET /wallet/get
 
-Retrieves wallet information with transaction history.
+Retrieves wallet balance and paginated transaction history (10 per page, most recent first).
 
 **Authentication:** Required
 
 **Query Parameters:**
-- `page` (optional): Page number for transaction history (default: 1)
+- `page` (optional, default: 1)
 
 **Response:**
 ```json
 {
   "success": true,
   "data": {
-    "wallet": {
-      "id": "wallet_123",
-      "userId": 456,
-      "balance": 150.50,
-      "currency": "EUR",
-      "createdAt": "2024-01-15T10:00:00Z",
-      "updatedAt": "2024-01-20T14:30:00Z"
-    },
-    "transactions": [
-      {
-        "id": "tx_789",
-        "walletId": "wallet_123",
-        "type": "topup",
-        "amount": 100,
-        "balanceAfter": 150.50,
-        "description": "topup 100 EUR",
-        "createdAt": "2024-01-20T14:30:00Z"
-      }
-    ],
+    "wallet": { "id": "...", "userId": 1, "balance": 150.00, "currency": "EUR", ... },
+    "transactions": [...],
     "page": 1,
     "totalPages": 3,
     "totalCount": 25
@@ -392,359 +262,152 @@ Retrieves wallet information with transaction history.
 }
 ```
 
-**Features:**
-- 10 transactions per page
-- Transactions ordered by most recent first
-- Includes pagination metadata
+---
 
-**Errors:**
-- `401 Unauthorized`: User not authenticated
-- `404 Not Found`: Wallet not found
+### POST /wallet/topup/paysera
+
+Initiates a Paysera payment. Frontend receives `paymentUrl` and redirects the user to Paysera. After payment, Paysera calls the IPN webhook.
+
+**Authentication:** Required
+
+**Request Body:** `{ "amount": 50 }` (min: 1, max: 10000)
+
+**Response:**
+```json
+{ "success": true, "paymentUrl": "https://bank.paysera.com/...", "orderId": "paysera_123_uuid" }
+```
 
 ---
 
-### POST /wallet/topup
+### POST /wallet/webhooks/paysera
 
-Adds money to user's wallet.
+Paysera IPN endpoint. Receives GET/POST with `?data=BASE64&ss1=MD5SIGN` query params. Must return plain text `"OK"`. **Public** (no auth).
+
+**Flow:**
+1. Verifies callback signature via `PayseraService.verifyCallback()`
+2. Passes `callbackData` to `ProcessPayseraPaymentUseCase`
+3. Returns `"OK"` as plain text (required by Paysera protocol)
+
+**Error:** Returns `400 Bad Request` if signature verification fails.
+
+---
+
+### POST /wallet/transfer
+
+Transfers money to another user's wallet by `receiverWalletId`.
 
 **Authentication:** Required
 
 **Request Body:**
 ```json
-{
-  "amount": 50.00
-}
+{ "receiverWalletId": "wallet_abc", "amount": 30 }
 ```
 
-**Validation:**
-- `amount`: Must be a number, minimum 0.01
+**Validation:** `amount` minimum 1, `receiverWalletId` must be a string.
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Amount added successfully",
-  "balance": 200.50,
-  "transactionId": "tx_abc123"
-}
-```
+---
 
-**Errors:**
-- `401 Unauthorized`: User not authenticated
-- `400 Bad Request`: Invalid amount
-- `404 Not Found`: Wallet not found
+### POST /wallet/topup
+
+Manual top-up (test/admin). Directly adds funds without Paysera.
+
+**Authentication:** Required
+
+**Request Body:** `{ "amount": 50 }` (min: 0.01)
 
 ---
 
 ### DTOs
 
----
+**TopUpDto:** `amount: number` (min: 0.01)
 
-### TopUpDto
-
-Validates top-up requests.
-
-**Properties:**
-- `amount`: number (min: 0.01)
-
-**Validation:**
-- Must be a number
-- Must be at least 0.01
+**TransferDto:** `receiverWalletId: string`, `amount: number` (min: 1)
 
 ---
 
 ### Module Configuration
 
----
+**Controllers:** `WalletController`, `WalletWebhookController`
 
-### Dependencies
-- `PrismaModule`: For database access (implicit)
+**Providers:**
+- `WalletRepository` (token: `WALLET_REPOSITORY_TOKENS.WALLET_REPOSITORY`)
+- `WalletTransactionRepository` (token: `WALLET_REPOSITORY_TOKENS.WALLET_TRANSACTION_REPOSITORY`)
+- `CreateWalletUseCase`, `GetWalletUseCase`, `ChangeWalletBalanceUseCase`, `TransferMoneyUseCase`
+- `CreatePayseraTopupUseCase`, `ProcessPayseraPaymentUseCase`
 
----
-
-### Providers
-- `WalletRepository`: Implements `IWalletRepository`
-- `WalletTransactionRepository`: Implements `IWalletTransactionRepository`
-- `CreateWalletUseCase`: Wallet creation logic
-- `GetWalletUseCase`: Wallet retrieval logic
-- `ChangeWalletBalanceUseCase`: Balance modification logic
-- `TransferMoneyUseCase`: Money transfer logic
+**Exports:** `ChangeWalletBalanceUseCase`, `TransferMoneyUseCase`, `GetWalletUseCase`
 
 ---
 
-### Exports
-The following use cases are exported for use in other modules:
-- `ChangeWalletBalanceUseCase` (for product purchases, payments)
-- `TransferMoneyUseCase` (for peer-to-peer transfers)
-- `GetWalletUseCase` (for wallet information)
+### Paysera Integration Flow
 
----
-
-### Database Schema Considerations
-
----
-
-### Wallet Table
-
-**Fields:**
-- `id` (primary key, UUID/string)
-- `userId` (unique, foreign key)
-- `balance` (decimal/float)
-- `currency` (string, default "EUR")
-- `createdAt` (timestamp)
-- `updatedAt` (timestamp)
-
-**Constraints:**
-- Unique constraint on `userId` (one wallet per user)
-
----
-
-### WalletTransaction Table
-
-**Fields:**
-- `id` (primary key)
-- `walletId` (foreign key)
-- `type` (enum: topup, withdraw, purchase)
-- `amount` (decimal/float)
-- `balanceAfter` (decimal/float)
-- `description` (string, optional)
-- `createdAt` (timestamp)
-
-**Indexes:**
-- `walletId` for efficient transaction history queries
-
----
-
-### Usage Examples
-
----
-
-### Create a Wallet
-```typescript
-await createWalletUseCase.execute(userId: 123, language: 'en');
+```
+User → POST /wallet/topup/paysera
+         ↓
+     CreatePayseraTopupUseCase
+     - Validates wallet exists
+     - Generates orderId: "paysera_{userId}_{uuid}"
+     - Calls PayseraService.createPaymentUrl()
+         ↓
+     Returns { paymentUrl, orderId }
+         ↓
+Frontend redirects user to paymentUrl
+         ↓
+User completes payment on Paysera
+         ↓
+Paysera → POST /wallet/webhooks/paysera?data=...&ss1=...
+         ↓
+     WalletWebhookController
+     - Verifies signature
+     - Calls ProcessPayseraPaymentUseCase
+         ↓
+     ProcessPayseraPaymentUseCase
+     - Checks status === '1'
+     - Parses userId from orderId
+     - Converts amount (cents → EUR)
+     - Calls ChangeWalletBalanceUseCase (with externalPaymentId)
+         ↓
+     ChangeWalletBalanceUseCase
+     - Idempotency check (findByExternalPaymentIdTx)
+     - incrementBalanceTx (atomic)
+     - createTransactionTx
+         ↓
+     Returns "OK" to Paysera
 ```
 
 ---
 
-### Top-up Wallet
-```typescript
-const result = await changeWalletBalanceUseCase.execute({
-  userId: 123,
-  type: wallet_transaction_type.topup,
-  amount: 50.00,
-  language: 'en'
-});
+### Idempotency Design
 
-console.log(`New balance: ${result.balance}`);
-console.log(`Transaction ID: ${result.transactionId}`);
-```
-
----
-
-### Process a Purchase
-```typescript
-try {
-  await changeWalletBalanceUseCase.execute({
-    userId: 123,
-    type: wallet_transaction_type.purchase,
-    amount: 25.99,
-    language: 'en'
-  });
-} catch (error) {
-  // Handle insufficient balance
-}
-```
-
----
-
-### Transfer Money Between Users
-```typescript
-await transferMoneyUseCase.execute(
-  senderId: 123,
-  receiverId: 456,
-  amount: 30.00,
-  language: 'en'
-);
-```
-
----
-
-### Get Wallet with Transaction History
-```typescript
-const walletData = await getWalletUseCase.execute(
-  userId: 123,
-  page: 1,
-  limit: 10,
-  language: 'en'
-);
-
-console.log(`Balance: ${walletData.wallet.balance}`);
-console.log(`Total transactions: ${walletData.totalCount}`);
-```
-
----
-
-### Using Within a Transaction (Advanced)
-```typescript
-await prisma.$transaction(async (tx) => {
-  // Part of larger business operation
-  await changeWalletBalanceUseCase.execute({
-    userId: 123,
-    type: wallet_transaction_type.purchase,
-    amount: 10.00,
-    language: 'en'
-  }, tx);
-  
-  // Other operations...
-});
-```
-
----
-
-### Design Patterns
-
----
-
-### Rich Domain Model
-
-The `WalletDomainEntity` encapsulates business logic:
-- **Validation**: Checks amount positivity
-- **Business Rules**: Enforces sufficient balance
-- **Encapsulation**: Balance is private, modified only through methods
-- **Invariants**: Ensures wallet is always in valid state
-
-**Benefits:**
-- Business rules enforced at domain level
-- Cannot bypass rules by direct property access
-- Easy to test business logic in isolation
-- Single source of truth for wallet behavior
-
----
-
-### Repository Pattern
-
-Separates domain logic from data access:
-- Domain entities don't know about database
-- Repositories handle persistence concerns
-- Easy to swap implementations (e.g., different ORMs)
-
----
-
-### Transaction Script Pattern
-
-Use cases orchestrate operations:
-- Each use case represents a business transaction
-- Handles cross-entity operations
-- Manages database transactions
-- Coordinates between repositories
-
----
-
-### Best Practices
-
-1. **Always Use Domain Entity Methods**: Never modify balance directly
-   ```typescript
-   //  Bad
-   wallet.balance += 50;
-   
-
-   wallet.topup(50);
-   ```
-
-2. **Transaction Safety**: Use Prisma transactions for multi-step operations
-   ```typescript
-   await prisma.$transaction(async (tx) => {
-     // Multiple operations that must succeed together
-   });
-   ```
-
-3. **Balance Updates**: Always record transaction before updating balance
-
-4. **Nested Transactions**: Pass `tx` parameter when use case is part of larger transaction
-
-5. **Error Handling**: Let domain entity throw errors, catch at use case level
-
-6. **Audit Trail**: Every balance change creates a transaction record
-
-7. **Immutability**: Domain entity ID, userId, currency should never change
-
-8. **Currency**: Currently hardcoded to EUR, consider parameterizing for multi-currency
+Every Paysera payment carries a unique `orderId` stored as `externalPaymentId` on the `WalletTransaction` record. If Paysera sends the same IPN twice (network retry), `findByExternalPaymentIdTx` finds the existing record and the use case returns `alreadyProcessed: true` without modifying the balance. The unique constraint on `externalPaymentId` at the DB level provides a second safety net.
 
 ---
 
 ### Security Considerations
 
-1. **User Isolation**: Users can only access their own wallets
-2. **Transaction Atomicity**: All balance changes are atomic
-3. **Audit Trail**: Complete history of all transactions
-4. **Balance Validation**: Cannot withdraw more than available balance
-5. **Positive Amounts**: All amounts must be positive numbers
-6. **Authentication Required**: All endpoints require authentication
+1. **Paysera Signature Verification:** All IPN callbacks are verified via `PayseraService.verifyCallback()` before processing
+2. **Idempotency:** Duplicate IPN callbacks cannot cause double top-ups
+3. **Atomic Balance Updates:** `incrementBalanceTx` / `decrementBalanceIfSufficientTx` prevent race conditions
+4. **User Isolation:** Users can only access their own wallets
+5. **Positive Amounts:** All amounts validated before processing
+6. **Authentication:** All user-facing endpoints require JWT auth; only the webhook is public
 
 ---
 
-### Performance Considerations
+### Database Schema
 
-1. **Parallel Queries**: GetWalletUseCase fetches wallet and transactions in parallel
-2. **Pagination**: Transaction history supports pagination (10 per page default)
-3. **Indexed Queries**: WalletId indexed for fast transaction lookups
-4. **Transaction Ordering**: Most recent transactions first (DESC order)
+**Wallet table:** `id`, `userId` (unique), `balance`, `currency` (default "EUR"), `createdAt`, `updatedAt`
 
----
-
-### Error Scenarios
-
----
-
-### Insufficient Balance
-```typescript
-// Throws BadRequestException
-await changeWalletBalanceUseCase.execute({
-  userId: 123,
-  type: 'withdraw',
-  amount: 1000,  // User only has 50
-  language: 'en'
-});
-```
-
----
-
-### Wallet Not Found
-```typescript
-// Throws NotFoundException
-await getWalletUseCase.execute(
-  userId: 999,  // No wallet exists
-  page: 1,
-  limit: 10,
-  language: 'en'
-);
-```
-
----
-
-### Duplicate Wallet
-```typescript
-// Throws BadRequestException
-await createWalletUseCase.execute(
-  userId: 123,  // Already has wallet
-  language: 'en'
-);
-```
+**WalletTransaction table:** `id`, `walletId`, `type` (enum), `amount`, `balanceAfter`, `description`, `externalPaymentId` (unique, nullable), `externalProvider` (nullable), `createdAt`
 
 ---
 
 ### Future Considerations
 
-- **Multi-currency Support**: Allow wallets in different currencies
-- **Exchange Rates**: Handle currency conversions
-- **Transaction Fees**: Implement fee calculation and deduction
-- **Withdrawal Limits**: Daily/monthly withdrawal limits
-- **Pending Transactions**: Hold funds during pending operations
-- **Recurring Payments**: Schedule automatic transactions
-- **Transaction Categories**: Add categories/tags to transactions
-- **Export Functionality**: Export transaction history to CSV/PDF
-- **Refunds**: Handle refund transactions
-- **Dispute Management**: Track disputed transactions
-- **KYC Integration**: Wallet limits based on verification level
-- **Notifications**: Alert users of low balance, large transactions
-- **Analytics**: Spending patterns, balance trends
+- Multi-currency support
+- Withdrawal to bank account
+- Transaction fees
+- Daily/monthly limits
+- Pending transaction states
+- Refunds and dispute management
+- KYC-based wallet limits

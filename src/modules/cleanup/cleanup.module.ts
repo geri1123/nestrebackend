@@ -14,6 +14,7 @@ import { ReviewModule } from "../review/review.module";
 import { AuthContextModule } from "../../infrastructure/auth/modules/auth-context.module";
 import { AuthModule } from "../auth/auth.module";
 import { SaveProductModule } from "../saved-product/save-product.module";
+import { NotificationModule } from "../notification/notification.module";
 @Module({
   imports: [
     UsersModule,
@@ -26,6 +27,7 @@ import { SaveProductModule } from "../saved-product/save-product.module";
     AuthContextModule,
     AuthModule,
     SaveProductModule,
+    NotificationModule
   ],
   controllers: [  CleanupController],
   providers: [DeleteUserByIdUseCase , CleanupService , DeleteUserUseCase],

@@ -1,139 +1,69 @@
-### Registration Request Module Documentation
+### Registration Request Module
 
 ---
 
 ### Overview
 
-The Registration Request module manages the lifecycle of agent registration requests within the system. It handles the creation, review, approval/rejection, and tracking of requests from users who want to become agents affiliated with agencies.
+The Registration Request module manages the lifecycle of agent join requests to agencies. When an agent registers, a request is created and put `under_review`. Agency owners see the request, approve or reject it, and the system handles role changes, notifications, and welcome emails accordingly. The module also handles "quick requests" — a shortcut flow where an already-registered user applies to join an agency using only the agency's public code.
 
 ---
 
 ### Architecture
 
-This module follows Domain-Driven Design (DDD) principles with clear separation between domain logic, application use cases, and infrastructure:
-
 ```
 registration-request/
 ├── application/
-│   └── use-cases/          # Business use cases
+│   └── use-cases/
+│       ├── check-agent-data.use-case.ts
+│       ├── create-agent-request.use-case.ts
+│       ├── delete-requests-by-user.use-case.ts
+│       ├── find-request-by-id.use-case.ts
+│       ├── find-requests-by-user-id.use-case.ts
+│       ├── get-request-count.use-case.ts
+│       ├── get-request.use-case.ts
+│       ├── send-quick-request.use-case.ts
+│       ├── set-under-review.use-case.ts
+│       └── update-request-status.use-case.ts
 ├── domain/
-│   ├── entities/           # Domain entities
-│   ├── repositories/       # Repository interfaces
-│   ├── types/              # Type definitions
-│   └── value-objects/      # Value objects
-├── infrastructure/
-│   └── persistence/        # Data persistence layer
-└── registration-request.controller.ts
+│   ├── entities/
+│   │   └── registration-request.entity.ts
+│   └── repositories/
+│       └── registration-request.repository.interface.ts
+├── dto/
+│   ├── registration-request-response.dto.ts
+│   ├── active-request-response.dto.ts
+│   └── paginated-registration-request-response.dto.ts
+└── registration-request.module.ts
 ```
 
 ---
 
-### Domain Model
-
----
-
-### Entities
-
----
+### Domain Entity
 
 ### RegistrationRequestEntity
 
-Represents a registration request from a user to become an agent.
+Represents an agent's request to join an agency.
 
-**Properties:**
-- `id`: Unique identifier (nullable for new entities)
-- `userId`: ID of the requesting user
-- `agencyId`: ID of the target agency (nullable)
-- `requestType`: Type of request (e.g., "agent_license_verification")
-- `status`: Current status of the request
-- `requestedRole`: Role being requested (e.g., "agent")
-- `createdAt`: Timestamp of creation
-- `reviewedBy`: ID of the reviewing user (nullable)
-- `reviewedNotes`: Review notes (nullable)
-- `reviewedAt`: Timestamp of review (nullable)
-- `user`: User information as RequestUserVO (nullable)
+**Properties:** `id`, `userId`, `agencyId`, `requestedRole`, `requestType`, `status` (enum: `pending | under_review | approved | rejected`), `reviewedBy`, `reviewNotes`, `createdAt`, `updatedAt`
 
-**Methods:**
-- `setStatus(status)`: Updates the request status
-- `isReviewable()`: Returns true if the request can be reviewed (not approved/rejected)
-- `static createNew(data)`: Factory method to create a new registration request
-
----
-
-### Value Objects
-
----
-
-### RequestUserVO
-
-Contains basic user information associated with a registration request.
-
-**Properties:**
-- `email`: User's email address
-- `firstName`: User's first name (nullable)
-- `lastName`: User's last name (nullable)
-- `role`: User's current role
-- `status`: User's account status
-
----
-
-### Types
-
----
-
-### Registration Request Status
-- `pending`: Initial state, awaiting review
-- `under_review`: Currently being reviewed
-- `approved`: Request has been approved
-- `rejected`: Request has been rejected
-
----
-
-### Request Type
-- `agent_license_verification`: Standard agent verification request
-
----
-
-### Requested Role
-- `agent`: User requesting agent role
+**Factory:** `RegistrationRequestEntity.createNew(data)` — creates a new request with `status: 'pending'` by default (or supplied status for quick requests).
 
 ---
 
 ### Repository Interface
 
----
-
 ### IRegistrationRequestRepository
 
-Defines the contract for data persistence operations.
-
-**Methods:**
-
-- `create(request, tx?)`: Creates a new registration request
-  - Parameters: `RegistrationRequestEntity`, optional transaction client
-  - Returns: `Promise<number>` (ID of created request)
-
-- `findByUserId(userId)`: Retrieves all requests for a specific user
-  - Returns: `Promise<RegistrationRequestEntity[]>`
-
-- `findById(id)`: Retrieves a single request by ID
-  - Returns: `Promise<RegistrationRequestEntity | null>`
-
-- `findByAgencyIdAndStatus(agencyId, status?, skip?, take?)`: Retrieves paginated requests for an agency
-  - Parameters: agency ID, optional status filter, pagination params
-  - Returns: `Promise<RegistrationRequestEntity[]>`
-
-- `setLatestUnderReview(userId, tx?)`: Sets the latest request for a user to "under_review" status
-  - Returns: `Promise<boolean>` (true if successful)
-
-- `updateStatus(id, status, reviewedBy?, reviewNotes?, tx?)`: Updates the status of a request
-  - Returns: `Promise<RegistrationRequestEntity>`
-
-- `countRequests(agencyId, status?)`: Counts requests for an agency, optionally filtered by status
-  - Returns: `Promise<number>`
-
-- `deleteByUserId(userId)`: Deletes all requests for a user
-  - Returns: `Promise<number>` (count of deleted records)
+- `create(entity, tx?)` → creates a new request
+- `findById(id)` → single request
+- `findByUserId(userId)` → all requests for a user
+- `findActiveRequestByUserId(userId)` → the most recent non-rejected request for a user
+- `findPendingRequestByUserId(userId)` → pending-only check (for duplicate prevention)
+- `findByAgencyIdAndStatus(agencyId, status?, skip, take, search?)` → paginated list for agency dashboard
+- `countRequests(agencyId, status?, search?)` → count for pagination
+- `updateStatus(requestId, status, reviewedBy?, reviewNotes?)` → update status
+- `setLatestUnderReview(userId, tx?)` → sets the most recent request to `under_review`
+- `deleteByUserId(userId)` → cleanup on user deletion
 
 ---
 
@@ -141,311 +71,119 @@ Defines the contract for data persistence operations.
 
 ---
 
-### CheckAgentDataUseCase
-
-Validates agent registration data before submission.
-
-**Purpose:** Ensures the provided public code and ID card are valid and unique.
-
-**Dependencies:**
-- `IRegistrationRequestRepository`
-- `GetAgencyByPublicCodeUseCase`
-- `EnsureIdCardUniqueUseCase`
-
-**Method:**
-```typescript
-execute(publicCode: string, idCard: string, lang: SupportedLang): Promise<Record<string, string[]>>
-```
-
----
-
 ### CreateAgentRequestUseCase
 
-Creates a new agent registration request.
+Creates an agent registration request as part of the agent registration transaction.
 
-**Purpose:** Instantiates and persists a new registration request entity.
+**Input:** `userId`, `dto: RegisterAgentDto`, `agency: { id, agencyName }`, `lang`, `tx?`
 
-**Dependencies:**
-- `IRegistrationRequestRepository`
-
-**Method:**
-```typescript
-execute(userId: number, dto: RegisterAgentDto, agency: { id: number; agencyName: string }, lang: SupportedLang, tx?: Prisma.TransactionClient): Promise<void>
-```
-
----
-
-### DeleteRegistrationRequestsByUserUseCase
-
-Deletes all registration requests for a specific user.
-
-**Purpose:** Clean up requests when a user account is deleted or needs reset.
-
-**Method:**
-```typescript
-execute(userId: number): Promise<void>
-```
-
----
-
-### FindRequestByIdUseCase
-
-Retrieves a single registration request by its ID.
-
-**Purpose:** Get detailed information about a specific request.
-
-**Method:**
-```typescript
-execute(id: number, lang: SupportedLang): Promise<RegistrationRequestEntity>
-```
-
-**Throws:** `NotFoundException` if request not found.
-
----
-
-### FindRequestsByUserIdUseCase
-
-Retrieves all registration requests for a specific user.
-
-**Purpose:** Display a user's registration history.
-
-**Method:**
-```typescript
-execute(userId: number, lang: SupportedLang): Promise<RegistrationRequestEntity[]>
-```
-
-**Throws:** `NotFoundException` if no requests found.
-
----
-
-### GetRequestCountUseCase
-
-Counts registration requests for an agency.
-
-**Purpose:** Provide statistics and pagination support.
-
-**Method:**
-```typescript
-execute(agencyId: number, status?: registrationrequest_status): Promise<number>
-```
-
----
-
-### GetRequestsUseCase
-
-Retrieves paginated registration requests for an agency.
-
-**Purpose:** List and manage requests in agency dashboard.
-
-**Method:**
-```typescript
-execute(agencyId: number, page: number, take: number, status?: registrationrequest_status): Promise<RegistrationRequestEntity[]>
-```
+Creates a `RegistrationRequestEntity` with `requestType: 'agent_license_verification'` and persists it inside the caller's transaction.
 
 ---
 
 ### SendQuickRequestUseCase
 
-Sends a quick registration request and notifies the agency owner.
+Allows a registered user (not yet an agent) to request to join an agency using only the agency's `publicCode`. No license verification needed — simpler fast-track flow.
 
-**Purpose:** Allow users to quickly request agent status without full form submission.
-
-**Dependencies:**
-- `IRegistrationRequestRepository`
-- `GetAgencyWithOwnerByIdUseCase`
-- `NotificationService`
-- `NotificationTemplateService`
-
-**Method:**
-```typescript
-execute(userId: number, agencyId: number, username: string, lang: SupportedLang): Promise<void>
-```
-
-**Behavior:**
-- Creates request with "under_review" status
-- Sends notification to agency owner
-- Throws `BadRequestException` if agency not found
+**Flow:**
+1. Check for existing pending request — throws `BadRequestException` if one exists
+2. Fetch agency by public code — throws if not found
+3. Create request entity with `status: 'under_review'` (skips the `pending` phase)
+4. Persist request
+5. Notify agency owner: `user_send_request` notification with `{ username }` in metadata
 
 ---
 
-### SetUnderReviewUseCase
+### CheckAgentDataUseCase
 
-Sets the latest request for a user to "under_review" status.
+Pre-validation for agent registration — checks public code validity and ID card uniqueness before committing anything.
 
-**Purpose:** Move pending request to review stage.
+**Flow:**
+1. `getAgencyByPublicCode.execute(publicCode)` — adds to errors if invalid
+2. `ensureIdCardUnique.execute(idCard)` — throws if duplicate
 
-**Method:**
-```typescript
-execute(userId: number, lang: SupportedLang, tx?: Prisma.TransactionClient): Promise<void>
-```
+---
 
-**Throws:** `BadRequestException` if update fails.
+### GetAgencyRequestsUseCase
+
+Returns paginated registration requests for an agency.
+
+**Input:** `agencyId`, `page`, `status?`, `search?`
+
+**Page size:** 6 per page. Runs `getRequestCount` and `getRequests` in parallel. Returns `PaginatedRegistrationRequestResponseDto`.
 
 ---
 
 ### UpdateRequestStatusUseCase
 
-Updates the status of a registration request with review information.
-
-**Purpose:** Handle approval/rejection of requests.
-
-**Input:**
-```typescript
-interface UpdateRequestStatusInput {
-  requestId: number;
-  status: registrationrequest_status;
-  reviewedBy?: number;
-  reviewNotes?: string;
-}
-```
-
-**Method:**
-```typescript
-execute(input: UpdateRequestStatusInput): Promise<RegistrationRequestEntity>
-```
+Updates a request's status (approve/reject/reset). Delegates directly to `repo.updateStatus`.
 
 ---
 
-### Infrastructure
+### SetUnderReviewUseCase
+
+Sets the most recent request for a user to `under_review`. Called after email verification for agents. Throws if no request found.
 
 ---
 
-### RegistrationRequestRepository
+### DeleteRegistrationRequestsByUserUseCase
 
-Implements `IRegistrationRequestRepository` using Prisma ORM.
-
-**Key Features:**
-- Transaction support via optional `tx` parameter
-- Automatic entity mapping from database records
-- Includes user data via join when retrieving by ID
-- Pagination support for agency requests
-- Optimized queries with proper indexing
-
-**Data Mapping:**
-The `mapToEntity` method transforms Prisma query results into domain entities, including nested user data.
+Deletes all requests for a user. Called during user cleanup.
 
 ---
 
-### API Endpoints
+### FindRequestByUserIdUseCase
+
+Returns the active (non-rejected) request for a user. Returns `null` if none found (no throw — callers handle `null`).
 
 ---
 
-### POST /registration-request/quick-request/:agencyId
+### FindRequestByIdUseCase
 
-Sends a quick registration request to an agency.
+Returns a single request by ID. Throws `NotFoundException` if not found.
 
-**Authentication:** Required (user role)
+---
 
-**Parameters:**
-- `agencyId` (path): ID of the target agency
+### DTOs
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Request sent successfully"
-}
-```
+**RegistrationRequestResponseDto:** Full request data formatted for the agency dashboard view (includes user info — name, email, profile image, id card number)
 
-**Errors:**
-- `401 Unauthorized`: User not authenticated
-- `400 Bad Request`: Invalid agency ID
+**ActiveRequestResponseDto:** Lightweight DTO returned to the agent showing their current request status
+
+**PaginatedRegistrationRequestResponseDto:** `{ page, limit, total, totalPages, requests[] }`
 
 ---
 
 ### Module Configuration
 
----
+**Imports:** Exported from `RegistrationRequestModule`; consumed by `AgencyRequestsModule`, `AuthModule`, `EmailVerificationModule`, `RegistrationModule`, `CleanupModule`
 
-### Dependencies
-- `NotificationModule`: For sending notifications
-- `AgencyModule`: For agency-related operations
-- `AgentModule`: For agent-related operations
-- `PrismaModule`: For database access
+**Providers:** All use cases + `RegistrationRequestRepository` (token: `REG_REQ_TOKEN.REG_REQ_REPOSITORY`)
+
+**Exports:** All use cases + repository token
 
 ---
 
-### Exports
-All use cases and the repository token are exported for use in other modules.
+### Request Lifecycle
 
----
-
-### Database Schema Considerations
-
-The module expects a `registrationrequest` table with the following key fields:
-- `id` (primary key)
-- `user_id` (foreign key)
-- `agency_id` (foreign key)
-- `request_type`
-- `status`
-- `requested_role`
-- `created_at`
-- `reviewed_by`
-- `review_notes`
-- `reviewed_at`
-
-**Relationships:**
-- Many-to-one with `user` table
-- Many-to-one with `agency` table
-
----
-
-### Usage Examples
-
----
-
-### Creating a New Request
-```typescript
-const entity = RegistrationRequestEntity.createNew({
-  userId: 123,
-  agencyId: 456,
-  requestType: "agent_license_verification",
-  requestedRole: "agent"
-});
-
-const requestId = await registrationRequestRepo.create(entity);
 ```
+Agent registers
+  └── CreateAgentRequestUseCase → status: 'pending'
+        ↓
+Email verified (VerifyEmailUseCase)
+  └── SetUnderReviewUseCase → status: 'under_review'
+  └── Notify agency owner: agent_email_confirmed
+        ↓
+Agency owner reviews (AgencyRequestsController)
+  ├── Approve → ApproveAgencyRequestUseCase
+  │     ├── Create/update AgencyAgent record
+  │     ├── Update user role → 'agent', status → 'active'
+  │     ├── Set permissions
+  │     └── Send welcome email + agency_confirm_agent notification
+  └── Reject → RejectAgencyRequestUseCase
+        └── Update status → 'rejected'
 
----
-
-### Reviewing a Request
-```typescript
-await updateRequestStatusUseCase.execute({
-  requestId: 789,
-  status: "approved",
-  reviewedBy: 100,
-  reviewNotes: "Application looks good"
-});
+Quick Request (existing user)
+  └── SendQuickRequestUseCase → status: 'under_review' (directly)
+  └── Notify agency owner: user_send_request
 ```
-
----
-
-### Getting Agency Requests
-```typescript
-const requests = await getRequestsUseCase.execute(
-  agencyId: 456,
-  page: 1,
-  take: 10,
-  status: "pending"
-);
-```
-
----
-
-### Best Practices
-
-1. **Transaction Support**: Use the optional `tx` parameter when operations need to be atomic
-2. **Error Handling**: All use cases throw appropriate HTTP exceptions with localized messages
-3. **Status Management**: Always use the entity's `setStatus` method or `updateStatus` repository method
-4. **Pagination**: Use `GetRequestsUseCase` with proper page/take parameters for large datasets
-5. **Notifications**: Quick requests automatically notify agency owners
-
----
-
-### Future Considerations
-
-- Add bulk approval/rejection capabilities
-- Implement request expiration mechanism
-- Add audit logging for status changes
-- Support for request amendments
-- Enhanced filtering and search capabilities

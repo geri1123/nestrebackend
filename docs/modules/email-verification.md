@@ -1,157 +1,173 @@
-# Email Verification Module
-
-## Purpose
-
-This module manages **email verification and verification token workflows** for all user roles.
-
-It ensures:
-
-- newly-registered users verify their email address
-- verification tokens are secure and time-limited
-- verified users receive the correct account status
-- related business logic runs safely inside a DB transaction
-
-The module supports:
-
-- verifying an email via `token`
-- resending a verification email
-- agent-specific onboarding workflows
+### Email Verification Module
 
 ---
 
-## Endpoints
+### Overview
 
-### `GET /auth/verify-email?token=...`
+The Email Verification module handles the complete email confirmation flow for newly registered users. It supports three user roles with different post-verification behaviors: standard users are activated immediately, agency owners have their agency activated, and agents are set to `pending` status awaiting agency approval. A resend endpoint allows users with expired or lost verification links to request a new one.
 
-Verifies a user email using a verification token.
-
-Flow:
-1. Validate token input
-2. Look up the token in cache
-3. Load user & run workflow inside a DB transaction
-4. Update user email verification status
-5. Apply role-specific logic
-6. Delete the token
-7. Send confirmation email
-
-Responses:
-- `200 OK — Email verified successfully`
-- `400 Bad Request — token invalid/expired`
-- `400 Bad Request — user or role invalid`
+All endpoints are `@Public()`.
 
 ---
 
-### `POST /auth/resend-verification`
+### Architecture
 
-Resends a verification email to an unverified account.
-
-Input:
-{ "identifier": "email OR username" }
-
-Rules:
-- User must exist
-- User must NOT already be verified
-- Status must be `pending` or `inactive`
-
-A new token is issued and stored in cache for **30 minutes**.
-
----
-
-## Verification Token Handling
-
-Tokens are stored in cache under:
-email_verification:<token>
-
-Stored data includes:
-
-- userId
-- user role
-
-TTL: **30 minutes**
-
-Tokens are deleted after use.
+```
+email-verification/
+├── application/
+│   └── use-cases/
+│       ├── verify-email.use-case.ts
+│       └── resend-verification-email.use-case.ts
+├── controllers/
+│   └── email-verification.controller.ts
+├── dto/
+│   ├── verify-email.dto.ts
+│   └── resend-verification.dto.ts
+├── responses/
+│   └── email-verification.response.ts
+└── email-verification.module.ts
+```
 
 ---
 
-## Role-Specific Behavior
+### How Verification Tokens Work
 
-### Normal users
-Status after verification:
-
-active
-
-They immediately gain access.
-
-### Agents
-Status after verification:
-pending
-
-
-Automated actions:
-- agent registration request is moved **Under Review**
-- agency owner receives a notification
-- user receives **pending approval email**
-
-### Agency Owners
-Upon verifying email:
-
-- their agency is automatically activated
-
-Status becomes:
-active
-
-
-
-## Internal Use Cases
-
-| Use Case | Responsibility |
-|---------|----------------|
-| `VerifyEmailUseCase` | Full email verification workflow |
-| `ResendVerificationEmailUseCase` | Issues new verification token + sends email |
+1. On registration, `RegisterUserUseCase` generates a `generateToken()` (random hex string) and stores it in Redis under the key `email_verification:{token}` with a 30-minute TTL. The value is `{ userId, role }`.
+2. The token is embedded in a verification link sent to the user's email via the `EmailQueueService`.
+3. The user clicks the link → `GET /auth/verify-email?token=...`
+4. The use case reads the token from Redis, processes role-specific logic, then deletes the active key and writes a `email_verification_used:{token}` key (24h TTL) to handle graceful double-click.
 
 ---
 
-## Side Effects (Important)
-
-This module may:
-
-✔ change user status  
-✔ activate agencies  
-✔ trigger notifications  
-✔ send email  
-✔ create audit-style messaging for owners  
-
-All DB changes run inside a **Prisma transaction**, so failures roll back safely.
+### Use Cases
 
 ---
 
-## Security Considerations
+### VerifyEmailUseCase
 
-- Tokens are random + short-lived
-- Tokens are verified server-side
-- Verified users cannot request new verification tokens
-- Only allowed statuses may request resend
-- Token reuse is blocked
+Processes a verification token and activates the user account.
+
+**Dependencies:** `PrismaService`, `CacheService`, `FindUserByIdUseCase`, `FindRequestByUserIdUseCase`, `VerifyUserEmailUseCase`, `ActivateAgencyByOwnerUseCase`, `GetAgencyWithOwnerByIdUseCase`, `SetUnderReviewUseCase`, `NotificationService`, `EmailQueueService`
+
+**Flow:**
+
+1. Validate token presence
+2. Read `email_verification:{token}` from Redis
+3. **If key missing:** check `email_verification_used:{token}` — if found and user is already verified, return `{ alreadyVerified: true }`. Otherwise throw `400 BadRequestException` (expired/invalid token)
+4. Fetch user — if already verified, clean up Redis keys and return `{ alreadyVerified: true }`
+5. Run inside a **Prisma transaction:**
+   - `agency_owner`: `activateAgencyByOwner.execute(userId, lang, tx)` — sets agency status to `active`
+   - All roles: `verifyEmail.execute(userId, newStatus, tx)` where `newStatus` is `'active'` for users/owners and `'pending'` for agents
+   - `agent`: `setUnderReview.execute(userId, lang, tx)` — marks registration request as `under_review`
+6. Delete Redis active key, write used key (24h)
+7. Send email via `EmailQueueService`:
+   - `agent` → `sendPendingApprovalEmail` (notifies them they're under review)
+   - others → `sendWelcomeEmail`
+8. `agent` only (post-commit): notify agency owner via `NotificationService` with type `agent_email_confirmed`
+
+**Returns:** `{ alreadyVerified: boolean }`
 
 ---
 
-## Module Location
+### Role-Specific Post-Verification Behavior
 
-src/modules/email-verification
-
-
-Exports for reuse:
-- `VerifyEmailUseCase`
-- `ResendVerificationEmailUseCase`
+| Role | User Status | Agency | Registration Request | Email Sent |
+|---|---|---|---|---|
+| `user` | `active` | — | — | Welcome email |
+| `agency_owner` | `active` | Activated (`active`) | — | Welcome email |
+| `agent` | `pending` | — | Set to `under_review` | Pending approval email |
 
 ---
 
-## Why This Exists
+### ResendVerificationEmailUseCase
 
-This solves:
+Generates a new verification token and re-sends the email.
 
-- account fraud prevention
-- onboarding gating by role
-- smooth UX for resending verification emails
-- transactional safety for multi-step onboarding flows
-- centralizing all email verification logic
+**Dependencies:** `FindUserForVerificationUseCase`, `CacheService`, `EventEmitter2`
+
+**Flow:**
+1. Find user by `identifier` (username or email) via `FindUserForVerificationUseCase`
+2. Throw `BadRequestException` if email is already verified
+3. Throw `BadRequestException` if user status is not `pending` or `inactive` (only valid statuses for resend)
+4. Generate new token, store in Redis with 30-minute TTL
+5. Emit `EMAIL_EVENTS.VERIFICATION_REQUESTED` event with the new token
+
+**Note:** Each resend generates a fresh token; old tokens become stale in Redis when they expire naturally.
+
+---
+
+### API Endpoints
+
+---
+
+### GET /auth/verify-email?token=...
+
+Verifies the user's email address using the token from the verification email.
+
+**Authentication:** Not required (`@Public()`)
+
+**Query Parameters:**
+- `token` (string, required): Verification token from email link
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Email verified successfully",
+  "alreadyVerified": false
+}
+```
+
+If the email was already verified:
+```json
+{
+  "success": true,
+  "message": "Email already verified",
+  "alreadyVerified": true
+}
+```
+
+**Errors:**
+- `400 Bad Request`: Token missing, expired, or invalid
+
+---
+
+### POST /auth/resend-verification
+
+Re-sends a verification email.
+
+**Authentication:** Not required (`@Public()`)
+
+**Request Body:**
+```json
+{ "identifier": "user@example.com" }
+```
+
+`identifier` can be username or email.
+
+**Response:**
+```json
+{ "success": true, "message": "Verification email resent" }
+```
+
+**Errors:**
+- `400 Bad Request`: Email already verified, or user status doesn't allow resend
+
+---
+
+### Module Configuration
+
+**Imports:** `UsersModule`, `AgencyModule`, `RegistrationRequestModule`, `NotificationModule`
+
+**Providers:** `VerifyEmailUseCase`, `ResendVerificationEmailUseCase`
+
+**Controller:** `EmailVerificationController` (mounted at `/auth`)
+
+---
+
+### Security Considerations
+
+1. Tokens are random and stored only in Redis (not in the database) — no enumeration risk
+2. 30-minute TTL prevents stale link abuse
+3. Used-token detection prevents double-activation bugs from users clicking the link twice
+4. Only `pending`/`inactive` users can request a resend — prevents abuse for active accounts

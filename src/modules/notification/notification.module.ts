@@ -27,6 +27,6 @@ import { WebSocketModule } from '../../infrastructure/websocket/socket.module';
       useClass: NotificationRepository,
     },
   ],
-  exports: [NotificationService, NotificationTemplateService],
+  exports: [NotificationService, NotificationTemplateService , NOTIFICATION_REPO],
 })
 export class NotificationModule {}

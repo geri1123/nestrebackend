@@ -5,7 +5,7 @@ import {
   NotificationData,
   GetNotificationsParams,
 } from '../../domain/repository/notification.repository.interface';
-import { LanguageCode, NotificationStatus } from '@prisma/client';
+import { LanguageCode, NotificationStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class NotificationRepository implements INotificationRepository {
@@ -106,7 +106,12 @@ async countByStatus(userId: number, status: NotificationStatus): Promise<number>
       where: { id: notificationId },
     });
   }
-
+  async deleteNotificationsByUserId(userId: number , tx?:Prisma.TransactionClient ) {
+    const client= tx ? tx : this.prisma;
+    return client.notification.deleteMany({
+      where: { userId },
+    });
+  }
   async getNotificationById(notificationId: number) {
     return this.prisma.notification.findUnique({
       where: { id: notificationId },

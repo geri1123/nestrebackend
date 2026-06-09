@@ -53,7 +53,27 @@ agent_updated_by_agent: {
     `The advertisement for product with id ${data.productId} has expired.`,
   [LanguageCode.it]: (data) => 
     `La pubblicità per il prodotto con id ${data.productId} è scaduta.`,
-}
+} ,
+agent_delete_profile: {
+  [LanguageCode.al]: (data) =>
+    `${data.agentName} ka fshirë profilin. Të gjitha pronat e këtij agjenti janë transferuar në agjencinë tuaj.`,
+
+  [LanguageCode.en]: (data) =>
+    `${data.agentName} has deleted their profile. All properties associated with this agent have been transferred to your agency.`,
+
+  [LanguageCode.it]: (data) =>
+    `${data.agentName} ha eliminato il proprio profilo. Tutte le proprietà associate a questo agente sono state trasferite alla tua agenzia.`,
+},
+agency_deleted: {
+  [LanguageCode.al]: (data) =>
+    `Agjencia ${data.agencyName} është fshirë. Roli juaj është ndryshuar në përdorues.`,
+
+  [LanguageCode.en]: (data) =>
+    `The agency ${data.agencyName} has been deleted. Your role has been changed to user.`,
+
+  [LanguageCode.it]: (data) =>
+    `L'agenzia ${data.agencyName} è stata eliminata. Il tuo ruolo è stato modificato in utente.`,
+},
 
   };
 

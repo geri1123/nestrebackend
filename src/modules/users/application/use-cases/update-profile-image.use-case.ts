@@ -101,15 +101,7 @@ export class UploadProfileImageUseCase {
         `Profile image upload completed successfully for user ${userId}`,
       );
 await this.userEventPublisher.userUpdated(userId);
-//       this.eventEmitter.emit(
-//   'user.updated',
-//   {
-//     userId,
-//     payload: {
-//       profileImgUrl: uploadResult.url,
-//     },
-//   }
-// );
+
       return {
         url: uploadResult.url,
         publicId: uploadResult.publicId,

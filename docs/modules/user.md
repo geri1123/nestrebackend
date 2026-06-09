@@ -640,6 +640,19 @@ The module exports the following for use by other modules:
 - `UserRepository`
 - `FindUserForAuthUseCase`
 
+
+## UserEventPublisher
+
+The `UserEventPublisher` service publishes Redis Pub/Sub messages when user data changes. Other services (e.g. auth context cache) subscribe to these channels to invalidate stale data.
+
+**Method:** `userUpdated(userId: number)` — publishes to `CHANNELS.USER_UPDATED` with `{ userId }`
+
+**Triggered by:**
+- `ChangeUsernameUseCase` — after a successful username change
+- `CreateAgencyUseCase` — after an agency owner's agency is created (role/status updates)
+
+This replaces the previous `EventEmitter2`-based approach and uses Redis Pub/Sub directly via `RedisPubSubService` for cross-process invalidation in clustered deployments.
+
 ## Future Considerations
 
 ### Potential Enhancements
@@ -749,4 +762,3 @@ Body: {
 ```
 
 ---
-

@@ -20,19 +20,18 @@ Key use cases:
 - `ApproveAgencyRequestUseCase`
   - Validates that:
     - user exists and email is verified
-    - user is not already an agent (or handled by `findExistingAgent`)
+    - user is not already an active/inactive agent (handled by `findExistingAgent` — throws if active, returns terminated agent or null)
   - Inside a DB transaction:
-    - creates agency agent record (agency + user)
-    - sets agent status to `active`
-    - updates user role/status to `agent` / `active`
-    - assigns agent permissions
+    - **Re-joining (terminated agent):** updates existing `AgencyAgent` record (role, commission, status → active, endDate → null). Updates existing permissions or creates new ones.
+    - **New agent:** creates new `AgencyAgent` record + permissions via `createAgent` + `addPermissions`
+    - Updates user role → `agent`, status → `active` (if changed)
   - After transaction:
-    - sends agent welcome email
-    - sends notification (`agency_confirm_agent`) with metadata (agencyId, approvedBy)
+    - Emits `EMAIL_EVENTS.AGENT_WELCOME` event (welcome email via EventEmitter2)
+    - Sends `agency_confirm_agent` notification to agent
 
 - `RejectAgencyRequestUseCase`
-  - Resets user role/status back to `user` / `active`
-  - Sends rejection email to user
+  - Resets user role → `user`, status → `active` via `UpdateUserFieldsUseCase`
+  - Emits `EMAIL_EVENTS.AGENT_REJECTED` event (rejection email via EventEmitter2)
 
 - `UpdateAgencyRequestStatusUseCase`
   - Orchestrates the workflow:

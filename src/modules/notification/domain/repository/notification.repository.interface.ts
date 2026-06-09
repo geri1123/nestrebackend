@@ -1,4 +1,4 @@
-import { LanguageCode, NotificationStatus } from '@prisma/client';
+import { LanguageCode, NotificationStatus, Prisma } from '@prisma/client';
 import { SupportedLang } from '../../../../locales';
 
 export const NOTIFICATION_REPO = 'NOTIFICATION_REPO';
@@ -38,6 +38,6 @@ export interface INotificationRepository {
   markAllAsReadForUser(userId: number): Promise<{ count: number }>;
   countByStatus(userId: number, status: NotificationStatus): Promise<number> ;
   deleteNotification(notificationId: number): Promise<any>;
-  
+  deleteNotificationsByUserId(userId: number , tx?:Prisma.TransactionClient ): Promise<any>;
   getNotificationById(notificationId: number): Promise<any>;
 }

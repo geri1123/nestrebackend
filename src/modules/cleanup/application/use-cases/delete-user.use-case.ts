@@ -12,6 +12,8 @@ import { IRegistrationRequestRepository } from '../../../registration-request/do
 import { IReviewRepository, REVIEW_REPO } from '../../../review/domain/repositories/review-repository.interface';
 import { AuthContextService } from '../../../../infrastructure/auth/services/auth-context.service';
 import { ISavedProductRepository, SAVED_PRODUCT_REPO } from '../../../saved-product/domain/repositories/Isave-product.repository';
+import { INotificationRepository, NOTIFICATION_REPO } from '../../../notification/domain/repository/notification.repository.interface';
+import { NotificationService } from '../../../notification/notification.service';
 
 @Injectable()
 export class DeleteUserByIdUseCase{
@@ -39,8 +41,10 @@ export class DeleteUserByIdUseCase{
     private readonly reviewRepo: IReviewRepository,
     @Inject(SAVED_PRODUCT_REPO)
     private readonly savedProductRepo: ISavedProductRepository,
-    
+    @Inject(NOTIFICATION_REPO)
+    private readonly notificationRepo: INotificationRepository,
     private readonly authContextService:AuthContextService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -55,7 +59,11 @@ export class DeleteUserByIdUseCase{
     // ── 2. Mblidh publicIds për Cloudinary PARA TX ──────────────────────────
     //    (pas TX të dhënat ndryshojnë — produktet fshihen, user soft-deleted)
     const cloudinaryPublicIds = await this.collectCloudinaryIds(userId, user.role, user.profileImgPublicId);
-
+const notifications: Array<{
+    userId: number;
+    type: string;
+    templateData: any;
+  }> = [];
    try {
     await this.prisma.$transaction(async (tx) => {
 
@@ -74,10 +82,22 @@ export class DeleteUserByIdUseCase{
           // Gjej ownerId për të transferuar produktet
           const ownerUserId = await this.agencyRepo.findOwnerUserId(agencyId);
 
-          if (ownerUserId) {
-            // Produktet e agjentit → tek agency owner
-            await this.productRepo.transferAgentProducts(userId, agencyId, ownerUserId, tx);
-          }
+        if (ownerUserId) {
+  await this.productRepo.transferAgentProducts(
+    userId,
+    agencyId,
+    ownerUserId,
+    tx,
+  );
+
+  notifications.push({
+    userId: ownerUserId,
+    type: 'agent_delete_profile',
+    templateData: {
+      agentName: `${user.firstName} ${user.lastName}`,
+    },
+  });
+}
 
           // Fshi AgencyAgent record
           // AgencyAgentPermission fshihet automatikisht (onDelete: Cascade)
@@ -89,44 +109,54 @@ export class DeleteUserByIdUseCase{
       }
 
       // ── ROLE: agency_owner ────────────────────────────────────────────────
-      if (user.role === 'agency_owner') {
-        const agency = await this.agencyRepo.findByOwnerUserId(userId);
+    if (user.role === 'agency_owner') {
+  const agency = await this.agencyRepo.findByOwnerUserId(userId);
 
-        if (agency) {
-          // Gjej të gjithë agjentët e kësaj agjence
-          const agentRecords = await tx.agencyAgent.findMany({
-            where: { agencyId: agency.id },
-            select: { agentId: true },
-          });
+  if (agency) {
+    const agentRecords = await tx.agencyAgent.findMany({
+      where: { agencyId: agency.id },
+      select: { agentId: true },
+    });
 
-          // Kthe agjentët në role 'user'
-          if (agentRecords.length > 0) {
-            await tx.user.updateMany({
-              where: { id: { in: agentRecords.map((a) => a.agentId) } },
-              data: { role: 'user' },
-            });
-          }
+    if (agentRecords.length > 0) {
+      await tx.user.updateMany({
+        where: { id: { in: agentRecords.map((a) => a.agentId) } },
+        data: { role: 'user' },
+      });
 
-          // Hiq agencyId nga TË GJITHA produktet e agjencisë
-          // (produktet e agjentëve + produktet e owner-it)
-          await tx.product.updateMany({
-            where: { agencyId: agency.id },
-            data: { agencyId: null },
-          });
+      notifications.push(
+        ...agentRecords.map((agent) => ({
+          userId: agent.agentId,
+          type: 'agency_deleted',
+          templateData: { agencyName: agency.agencyName },
+        })),
+      );
+    }
 
-          // Fshi të gjithë AgencyAgent records
-          // AgencyAgentPermission fshihet automatikisht (onDelete: Cascade)
-          await tx.agencyAgent.deleteMany({ where: { agencyId: agency.id } });
+    await tx.product.updateMany({
+      where: {
+        agencyId: agency.id,
+        userId: { not: userId }, 
+      },
+      data: { agencyId: null },
+    });
 
-          // Fshi agjencine
-          // Reviews fshihen automatikisht (onDelete: Cascade)
-          await tx.agency.delete({ where: { id: agency.id } });
-        }
+  
+    await tx.product.deleteMany({
+      where: {
+        agencyId: agency.id,
+        userId: userId, 
+      },
+    });
 
-        // Fshi kërkesat e regjistrimit
-        await this.regReqRepo.deleteByUserId(userId, tx);
-      }
+    await tx.agencyAgent.deleteMany({ where: { agencyId: agency.id } });
 
+    await tx.agency.delete({ where: { id: agency.id } });
+  }
+
+  // Fshi kërkesat e regjistrimit
+  await this.regReqRepo.deleteByUserId(userId, tx);
+}
       // ── TË PËRBASHKËTA PËR TË GJITHA ROLET ──────────────────────────────
 // Fshi produktet e saved
 await this.savedProductRepo.deleteAllByUserId(userId, tx);
@@ -134,6 +164,9 @@ await this.savedProductRepo.deleteAllByUserId(userId, tx);
       await tx.usernameHistory.deleteMany({ where: { userId } });
       //Fshi reviews
       await this.reviewRepo.deleteByUserId(userId, tx);
+
+      //fshi notifications
+      await this.notificationRepo.deleteNotificationsByUserId(userId, tx);
       // Soft delete: anonimizo email + username, set deletedAt
       // Kjo lëshon email/username origjinal për regjistrim të ri
       await tx.user.update({
@@ -155,7 +188,15 @@ await this.savedProductRepo.deleteAllByUserId(userId, tx);
       message: 'Failed to delete user. Please try again.',
     });
   }
-
+ await Promise.all(
+    notifications.map((notification) =>
+      this.notificationService.sendNotification({
+        userId: notification.userId,
+        type: notification.type,
+        templateData: notification.templateData,
+      }),
+    ),
+  );
 await this.authContextService.invalidateContext(userId);
     await this.deleteFromCloudinary(cloudinaryPublicIds);
   }
@@ -164,35 +205,42 @@ await this.authContextService.invalidateContext(userId);
   // PRIVATE: Mblidh publicIds sipas rolit
   // ─────────────────────────────────────────────────────────────────────────
 
-  private async collectCloudinaryIds(
-    userId: number,
-    role: string,
-    profileImgPublicId: string | null | undefined,
-  ): Promise<string[]> {
-    const ids: string[] = [];
+private async collectCloudinaryIds(
+  userId: number,
+  role: string,
+  profileImgPublicId: string | null | undefined,
+): Promise<string[]> {
+  const ids: string[] = [];
 
-    // Profile image — për TË GJITHA rolet
-    if (profileImgPublicId) {
-      ids.push(profileImgPublicId);
-    }
-
-    // Imazhet e produkteve — VETËM për role 'user'
-    // Për agent: produktet transferohen → imazhet mbeten
-    // Për agency_owner: agencyId bëhet null → imazhet mbeten
-    if (role === 'user') {
-      const images = await this.prisma.productImage.findMany({
-        where: { userId },
-        select: { publicId: true },
-      });
-
-      for (const img of images) {
-        if (img.publicId) ids.push(img.publicId);
-      }
-    }
-
-    return ids;
+  if (profileImgPublicId) {
+    ids.push(profileImgPublicId);
   }
 
+  // Imazhet e produkteve — për 'user' dhe 'agency_owner'
+  if (role === 'user' || role === 'agency_owner') {
+    const images = await this.prisma.productImage.findMany({
+      where: { userId },
+      select: { publicId: true },
+    });
+
+    for (const img of images) {
+      if (img.publicId) ids.push(img.publicId);
+    }
+  }
+
+  if (role === 'agency_owner') {
+    const agency = await this.prisma.agency.findUnique({
+      where: { ownerUserId: userId },
+      select: { logoPublicId: true },
+    });
+
+    if (agency?.logoPublicId) {
+      ids.push(agency.logoPublicId);
+    }
+  }
+
+  return ids;
+}
   // ─────────────────────────────────────────────────────────────────────────
   // PRIVATE: Fshi nga Cloudinary me chunk + error handling
   // ─────────────────────────────────────────────────────────────────────────
