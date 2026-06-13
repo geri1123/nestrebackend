@@ -11,7 +11,8 @@ import {
   AgentRejectedEmailTemplate,
   passwordRecoveryTemplate,
   contactMessageTemplate,
-  contactPlatformTemplate
+  contactPlatformTemplate,
+  agencyOutreachTemplate
 } from './tamplates';
 
 @Injectable()
@@ -269,5 +270,11 @@ async sendMessageToUserEmail(params: {
   `;
 
 return this.sendEmail(recipientEmail, subject, html, senderEmail);
+}
+
+async sendAgencyOutreachEmail(to: string, agencyName: string): Promise<boolean> {
+  const subject = 'Bashkohuni me PronaSmart - Platforma kryesore e pasurive të paluajtshme';
+  const html = agencyOutreachTemplate(agencyName);
+  return this.sendEmail(to, subject, html);
 }
 }
