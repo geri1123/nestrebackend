@@ -1,13 +1,12 @@
 import { Injectable, BadRequestException, ForbiddenException, Inject } from "@nestjs/common";
 
 import { SupportedLang , t } from "../../../../locales";
-import { AdvertisementType, WalletTransactionType } from "@prisma/client";
+import { AdvertisementType, Prisma, WalletTransactionType } from "@prisma/client";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
 import {ADVERTISE_REPO, type IProductAdvertisementRepository } from "../../domain/repositories/Iporiduct-advertisement.repository";
 import { ChangeWalletBalanceUseCase } from "../../../wallet/application/use-cases/change-wallet-balance.use-case";
 import { FindProductByIdUseCase } from "../../../product/application/use-cases/find-product-by-id.use-case";
 import { GetPricingUseCase } from "../../../advertisement-pricing/application/use-cases/get-pricing.use-case";
-
 @Injectable()
 export class AdvertiseProductUseCase {
   constructor(
@@ -19,15 +18,12 @@ export class AdvertiseProductUseCase {
     private readonly getPricingUseCase: GetPricingUseCase
   ) {}
 
+  // validate() nuk kontrollon më getActiveAd — kjo bëhet brenda tx
   private async validate(productId: number, userId: number, language: SupportedLang) {
     const product = await this.findProduct.execute(productId, language);
     if (!product) throw new BadRequestException(t("productNotFound", language));
     if (product.userId !== userId) throw new ForbiddenException(t("noPermissionToAdvertise", language));
     if (product.status !== "active") throw new BadRequestException(t("productNotActive", language));
-
-    const existingAd = await this.adRepo.getActiveAd(productId);
-    if (existingAd) throw new BadRequestException(t("productAlreadyAdvertised", language));
-
     return product;
   }
 
@@ -35,7 +31,6 @@ export class AdvertiseProductUseCase {
     const product = await this.validate(productId, userId, language);
 
     const pricing = await this.getPricingUseCase.execute(adType);
-
     if (!pricing.isActive) {
       throw new BadRequestException(t("advertisementTypeNotActive", language));
     }
@@ -48,6 +43,17 @@ export class AdvertiseProductUseCase {
 
     try {
       return await this.prisma.$transaction(async (tx) => {
+        const existingAd = await tx.productAdvertisement.findFirst({
+          where: {
+            productId,
+            status: "active",
+            endDate: { gt: new Date() },
+          },
+        });
+        if (existingAd) {
+          throw new BadRequestException(t("productAlreadyAdvertised", language));
+        }
+
         const { transactionId } = await this.changeWalletBalanceUseCase.execute(
           {
             userId,
@@ -58,6 +64,7 @@ export class AdvertiseProductUseCase {
           tx
         );
 
+      
         return this.adRepo.createAdvertisementTx(
           tx,
           product.id,
@@ -69,8 +76,15 @@ export class AdvertiseProductUseCase {
         );
       });
     } catch (error: any) {
-      if (error.message === "Insufficient balance") {
-        throw new BadRequestException(t("insufficientBalance", language));
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new BadRequestException(t("productAlreadyAdvertised", language));
+      }
+      if (error?.message === "Insufficient balance" || 
+          error instanceof BadRequestException) {
+        throw error;
       }
       throw error;
     }

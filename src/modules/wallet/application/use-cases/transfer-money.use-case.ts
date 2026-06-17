@@ -23,7 +23,6 @@ export class TransferMoneyUseCase {
     language: SupportedLang,
   ): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
-      // gjej wallet-in e receiver
       const receiverWallet = await tx.wallet.findUnique({
         where: {
           id: receiverWalletId,
@@ -36,7 +35,6 @@ export class TransferMoneyUseCase {
         );
       }
 
-      // mos lejo transfer te vetja
       if (receiverWallet.userId === senderUserId) {
         throw new BadRequestException(
           t("cannotTransferToSelf", language),

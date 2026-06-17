@@ -38,7 +38,9 @@ get emailFrom(): string {
   get jwtSecret(): string {
     return this.configService.get<string>('JWT_SECRET', '');
   }
-
+ get adminJwtSecret(): string {
+    return this.configService.get<string>('ADMIN_JWT_SECRET', '');
+  }
   get jwtAccessSecret(): string {
     const secret = this.configService.get<string>('JWT_ACCESS_SECRET');
     if (!secret || secret.length < 32) {

@@ -472,15 +472,15 @@ model ProductAdvertisement {
   endDate    DateTime?
   status     AdvertisementStatus @default(active)
   adType     AdvertisementType   @default(normal)
-  product    Product             @relation(fields: [productId], references: [id],   onDelete: Cascade,map: "productad_product_id_fkey")
+  product    Product             @relation(fields: [productId], references: [id], onDelete: Cascade, map: "productad_product_id_fkey")
   user       User                @relation(fields: [userId], references: [id], map: "productad_user_id_fkey")
   walletTx   WalletTransaction?  @relation(fields: [walletTxId], references: [id], map: "productad_wallettx_id_fkey")
 
   @@index([productId])
   @@index([userId])
+  @@index([status, endDate])  
   @@map("productadvertisement")
 }
-
 model AdvertisementPricing {
   id        Int               @id @default(autoincrement())
   adType    AdvertisementType @unique
@@ -493,7 +493,23 @@ model AdvertisementPricing {
 
   @@map("advertisementpricing")
 }
+model AdminUser {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      AdminRole @default(admin)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
+  @@map("admin_user")
+}
+enum AdminRole {
+  admin
+  super_admin
+
+  @@map("admin_role")
+}
 enum AdvertisementType {
   cheap
   normal
@@ -575,7 +591,6 @@ enum UserRole {
   user
   agency_owner
   agent
-
   @@map("user_role")
 }
 

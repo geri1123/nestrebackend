@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
 
-import { IUserDomainRepository, CreateUserData, UpdateUserFields } from '../../domain/repositories/user.repository.interface';
+import { IUserDomainRepository, CreateUserData, UpdateUserFields, AdminUserFilters, PaginatedUsers } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { NavbarUser } from '../../domain/value-objects/navbar-user.vo';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserStatus } from '@prisma/client';
 
 @Injectable()
 export class UserRepository implements IUserDomainRepository {
@@ -319,7 +319,7 @@ export class UserRepository implements IUserDomainRepository {
   return this.prisma.user.findUnique({
     where: { 
       id: userId, 
-      status: 'active',  // ✅ only active users
+      status: 'active',  
     },
     select: {
       id: true,
@@ -358,5 +358,70 @@ export class UserRepository implements IUserDomainRepository {
     }
   });
 }
+async findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers> {
+  const {
+    status = 'active',
+    search,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+    page,
+    limit,
+  } = filters;
 
+  // ── Filter nga status ──────────────────────────
+  const where: Prisma.UserWhereInput = {};
+
+  if (status === 'active') {
+    where.deletedAt = null;
+  } else if (status === 'deleted') {
+    where.deletedAt = { not: null };
+  }
+  // 'all' → pa filter
+
+  // ── Search (username, email, firstName, lastName) ──
+  if (search?.trim()) {
+    where.OR = [
+      { username:  { contains: search, mode: 'insensitive' } },
+      { email:     { contains: search, mode: 'insensitive' } },
+      { firstName: { contains: search, mode: 'insensitive' } },
+      { lastName:  { contains: search, mode: 'insensitive' } },
+    ];
+  }
+
+  const [users, total] = await this.prisma.$transaction([
+    this.prisma.user.findMany({
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        status: true,
+        deletedAt: true,
+        createdAt: true,
+        lastLogin: true,
+      },
+    }),
+    this.prisma.user.count({ where }),
+  ]);
+
+  return { users, total };
+}
+async updateStatus(
+  userId: number,
+  status: UserStatus,
+): Promise<void> {
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      status,
+      updatedAt: new Date(),
+    },
+  });
+}
 }

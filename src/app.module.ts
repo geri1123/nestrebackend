@@ -61,6 +61,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { ReviewModule } from './modules/review/review.module';
 import { PayseraModule } from './infrastructure/paysera/paysera.module';
 import { OutreachModule } from './infrastructure/email/outreach.module';
+import { AdminModule } from './modules/admin/admin.module';
 @Module({
   imports: [
     // ========================================
@@ -125,6 +126,9 @@ WebSocketModule,
     // BACKGROUND JOBS
     
   RedisModule,
+
+  //adminModule
+  AdminModule
   ],
 
   controllers: [AppController],
@@ -132,7 +136,7 @@ WebSocketModule,
   providers: [
     AppService,
     
-    // GLOBAL GUARDS (Order matters!)
+  
   
     {
       provide: APP_GUARD,

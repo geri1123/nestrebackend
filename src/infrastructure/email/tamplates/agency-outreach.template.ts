@@ -13,17 +13,14 @@ export const agencyOutreachTemplate = (agencyName: string) => `
         <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
 
           <!-- HEADER -->
-<tr>
-  <td style="background:linear-gradient(135deg,#1a3c5e 0%,#2563eb 100%);padding:40px 48px;text-align:center;">
-    <img src="https://pronasmart.onrender.com/logo.png" alt="PronaSmart" width="160" style="display:block;margin:0 auto 12px;" />
-    <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">
-      PronaSmart
-    </h1>
-    <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:15px;">
-      Platforma kryesore e pasurive të paluajtshme në Shqipëri
-    </p>
-  </td>
-</tr>
+          <tr>
+            <td style="background:linear-gradient(135deg,#1a3c5e 0%,#2563eb 100%);padding:40px 48px;text-align:center;">
+              <img src="https://pronasmart.onrender.com/logo.png" alt="PronaSmart" width="200" style="display:block;margin:0 auto 16px;border-radius:8px;" />
+              <p style="margin:0;color:rgba(255,255,255,0.85);font-size:15px;">
+                Platforma kryesore e pasurive të paluajtshme në Shqipëri
+              </p>
+            </td>
+          </tr>
 
           <!-- BODY -->
           <tr>
@@ -42,50 +39,45 @@ export const agencyOutreachTemplate = (agencyName: string) => `
               <!-- BENEFITS -->
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                 <tr>
-                  <td style="padding:12px 16px;background:#f0f7ff;border-radius:8px;margin-bottom:8px;display:block;">
-                    <span style="color:#2563eb;font-size:18px;">✅</span>
-                    <strong style="color:#1e3a5f;font-size:14px;"> Listoni pronat tuaja</strong>
-                    <p style="margin:4px 0 0 26px;color:#4b5563;font-size:13px;">
+                  <td style="padding:14px 18px;background:#f0f7ff;border-radius:8px;border-left:4px solid #2563eb;">
+                    <strong style="color:#1e3a5f;font-size:14px;">Listoni pronat tuaja</strong>
+                    <p style="margin:4px 0 0;color:#4b5563;font-size:13px;">
                       Publikoni apartamente, vila, tokë dhe lokale tregëtare pa kufizim.
                     </p>
                   </td>
                 </tr>
-                <tr><td style="height:8px;"></td></tr>
+                <tr><td style="height:10px;"></td></tr>
                 <tr>
-                  <td style="padding:12px 16px;background:#f0fdf4;border-radius:8px;">
-                    <span style="color:#16a34a;font-size:18px;">📊</span>
-                    <strong style="color:#1e3a5f;font-size:14px;"> Panel i dedikuar për agjenci</strong>
-                    <p style="margin:4px 0 0 26px;color:#4b5563;font-size:13px;">
+                  <td style="padding:14px 18px;background:#f0fdf4;border-radius:8px;border-left:4px solid #16a34a;">
+                    <strong style="color:#1e3a5f;font-size:14px;">Panel i dedikuar për agjenci</strong>
+                    <p style="margin:4px 0 0;color:#4b5563;font-size:13px;">
                       Menaxhoni agjentët tuaj, shikoni statistikat e klikimeve dhe menaxhoni gjithçka nga një vend.
                     </p>
                   </td>
                 </tr>
-                <tr><td style="height:8px;"></td></tr>
+                <tr><td style="height:10px;"></td></tr>
                 <tr>
-                  <td style="padding:12px 16px;background:#fefce8;border-radius:8px;">
-                    <span style="color:#ca8a04;font-size:18px;">🔍</span>
-                    <strong style="color:#1e3a5f;font-size:14px;"> Dukshmëri e lartë në kërkim</strong>
-                    <p style="margin:4px 0 0 26px;color:#4b5563;font-size:13px;">
+                  <td style="padding:14px 18px;background:#fefce8;border-radius:8px;border-left:4px solid #ca8a04;">
+                    <strong style="color:#1e3a5f;font-size:14px;">Dukshmëri e lartë në kërkim</strong>
+                    <p style="margin:4px 0 0;color:#4b5563;font-size:13px;">
                       Profilet e agjencive shfaqen direkt në rezultatet e kërkimit — klientët gjejnë ju, jo konkurrentin.
                     </p>
                   </td>
                 </tr>
-                <tr><td style="height:8px;"></td></tr>
+                <tr><td style="height:10px;"></td></tr>
                 <tr>
-                  <td style="padding:12px 16px;background:#fdf4ff;border-radius:8px;">
-                    <span style="color:#9333ea;font-size:18px;">💬</span>
-                    <strong style="color:#1e3a5f;font-size:14px;"> Kontakt direkt me klientët</strong>
-                    <p style="margin:4px 0 0 26px;color:#4b5563;font-size:13px;">
+                  <td style="padding:14px 18px;background:#fdf4ff;border-radius:8px;border-left:4px solid #9333ea;">
+                    <strong style="color:#1e3a5f;font-size:14px;">Kontakt direkt me klientët</strong>
+                    <p style="margin:4px 0 0;color:#4b5563;font-size:13px;">
                       Merrni kërkesa dhe mesazhe direkt nga blerësit dhe qiramarrësit e interesuar.
                     </p>
                   </td>
                 </tr>
-                <tr><td style="height:8px;"></td></tr>
+                <tr><td style="height:10px;"></td></tr>
                 <tr>
-                  <td style="padding:12px 16px;background:#fff1f2;border-radius:8px;">
-                    <span style="color:#e11d48;font-size:18px;">⭐</span>
-                    <strong style="color:#1e3a5f;font-size:14px;"> Vlerësime dhe reputacion</strong>
-                    <p style="margin:4px 0 0 26px;color:#4b5563;font-size:13px;">
+                  <td style="padding:14px 18px;background:#fff1f2;border-radius:8px;border-left:4px solid #e11d48;">
+                    <strong style="color:#1e3a5f;font-size:14px;">Vlerësime dhe reputacion</strong>
+                    <p style="margin:4px 0 0;color:#4b5563;font-size:13px;">
                       Ndërtoni besueshmërinë e agjencisë suaj përmes vlerësimeve nga klientët e kënaqur.
                     </p>
                   </td>
@@ -98,13 +90,13 @@ export const agencyOutreachTemplate = (agencyName: string) => `
                   <td align="center" style="padding:8px 0 32px;">
                     <a href="https://pronasmart.com/signup"
                        style="display:inline-block;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#ffffff;text-decoration:none;padding:16px 40px;border-radius:8px;font-size:16px;font-weight:700;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(37,99,235,0.35);">
-                      🚀 Regjistrohuni Falas Tani
+                      Regjistrohuni Falas Tani
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <p style="margin:0 0 0;color:#6b7280;font-size:14px;line-height:1.6;">
+              <p style="margin:0;color:#6b7280;font-size:14px;line-height:1.6;">
                 Regjistrimi është <strong>falas</strong> dhe i shpejtë. Nëse keni pyetje ose dëshironi
                 një demonstrim të platformës, mos hezitoni të na kontaktoni duke i'u përgjigjur këtij emaili.
               </p>

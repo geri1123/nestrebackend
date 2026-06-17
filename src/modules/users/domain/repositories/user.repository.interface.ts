@@ -1,8 +1,34 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma, UserRole, UserStatus } from "@prisma/client";
 import { User } from "../entities/user.entity";
 import { NavbarUser } from "../value-objects/navbar-user.vo";
 import { userStatus } from "../types/user-status.type";
 export const USER_REPO = Symbol('USER_REPO');
+
+export interface AdminUserFilters {
+  status?: 'active' | 'deleted' | 'all';
+  search?: string;
+  sortBy?: 'createdAt' | 'lastLogin';
+  sortOrder?: 'asc' | 'desc';
+  page: number;
+  limit: number;
+}
+
+export interface AdminUserResult {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  status: string;
+  deletedAt: Date | null;
+  createdAt: Date;
+  lastLogin: Date | null;
+}
+
+export interface PaginatedUsers {
+  users: AdminUserResult[];
+  total: number;
+}
+
 export interface IUserDomainRepository {
   findById(userId: number): Promise<User | null>;
   findByIdentifier(identifier: string): Promise<User | null>;
@@ -63,6 +89,11 @@ findPublicById(userId: number): Promise<{
     agency: { id: number; agencyName: string; logo: string | null };
   }[];
 } | null>;
+findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers>;
+updateStatus(
+  userId: number,
+  status: UserStatus,
+): Promise<void>;
 }
 
 export interface CreateUserData {
