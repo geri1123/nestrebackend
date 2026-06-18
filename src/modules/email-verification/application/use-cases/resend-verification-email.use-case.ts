@@ -1,20 +1,76 @@
+// import { BadRequestException, Injectable } from '@nestjs/common';
+// import { EventEmitter2 } from '@nestjs/event-emitter';
+// import { CacheService } from '../../../../infrastructure/redis/cache.service';
+// import { SupportedLang, t } from '../../../../locales';
+// import { generateToken } from '../../../../common/utils/hash';
+// import { FindUserForVerificationUseCase } from '../../../users/application/use-cases/find-user-for-verification.use-case';
+// import {
+//   EMAIL_EVENTS,
+//   EmailVerificationRequestedEvent,
+// } from '../../../../infrastructure/events/email/email.events';
+// import { CacheTTL } from '../../../../common/constants/cache-ttl.constants';
+
+// @Injectable()
+// export class ResendVerificationEmailUseCase {
+//   constructor(
+//     private readonly finduserforverification: FindUserForVerificationUseCase,
+//     private readonly cache: CacheService,
+//     private readonly eventEmitter: EventEmitter2,
+//   ) {}
+
+//   async execute(identifier: string, lang: SupportedLang) {
+//     const user = await this.finduserforverification.execute(identifier, lang);
+
+//     if (user.email_verified) {
+//       throw new BadRequestException({
+//         errors: { email: [t('emailAlreadyVerified', lang)] },
+//       });
+//     }
+
+//     if (!['pending', 'inactive'].includes(user.status)) {
+//       throw new BadRequestException({
+//         errors: { status: [t('cannotResendTokenForCurrentStatus', lang)] },
+//       });
+//     }
+
+//     const token = generateToken();
+
+//     // await this.cache.set(
+//     //   `email_verification:${token}`,
+//     //   { userId: user.id, role: user.role },
+//     //   30 * 60 * 1000,
+//     // );
+//  await this.cache.set(
+//       `email_verification:${token}`,
+//       { userId: user.id, role: user.role },
+//       CacheTTL.EMAIL_VERIFICATION, 
+//     );
+//     this.eventEmitter.emit(
+//       EMAIL_EVENTS.VERIFICATION_REQUESTED,
+//       new EmailVerificationRequestedEvent(
+//         user.email,
+//         user.first_name ?? 'User',
+//         token,
+//         lang,
+//       ),
+//     );
+//   }
+// }
+
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CacheService } from '../../../../infrastructure/redis/cache.service';
 import { SupportedLang, t } from '../../../../locales';
 import { generateToken } from '../../../../common/utils/hash';
 import { FindUserForVerificationUseCase } from '../../../users/application/use-cases/find-user-for-verification.use-case';
-import {
-  EMAIL_EVENTS,
-  EmailVerificationRequestedEvent,
-} from '../../../../infrastructure/events/email/email.events';
+import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
+import { CacheTTL } from '../../../../common/constants/cache-ttl.constants';
 
 @Injectable()
 export class ResendVerificationEmailUseCase {
   constructor(
     private readonly finduserforverification: FindUserForVerificationUseCase,
     private readonly cache: CacheService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly emailQueue: EmailQueueService,
   ) {}
 
   async execute(identifier: string, lang: SupportedLang) {
@@ -37,17 +93,14 @@ export class ResendVerificationEmailUseCase {
     await this.cache.set(
       `email_verification:${token}`,
       { userId: user.id, role: user.role },
-      30 * 60 * 1000,
+      CacheTTL.EMAIL_VERIFICATION,
     );
 
-    this.eventEmitter.emit(
-      EMAIL_EVENTS.VERIFICATION_REQUESTED,
-      new EmailVerificationRequestedEvent(
-        user.email,
-        user.first_name ?? 'User',
-        token,
-        lang,
-      ),
+    await this.emailQueue.sendVerificationEmail(
+      user.email,
+      user.first_name ?? 'User',
+      token,
+      lang,
     );
   }
 }

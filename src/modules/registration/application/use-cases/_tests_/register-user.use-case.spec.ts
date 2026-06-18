@@ -4,6 +4,7 @@ import { RegisterUserUseCase } from '../register-user.use-case';
 import { USER_REPO } from '../../../../users/domain/repositories/user.repository.interface';
 import { CacheService } from '../../../../../infrastructure/redis/cache.service';
 import { EmailQueueService } from '../../../../../infrastructure/queue/services/email-queue.service';
+import { CacheTTL } from '../../../../../common/constants/cache-ttl.constants';
 
 describe('RegisterUserUseCase', () => {
   let useCase: RegisterUserUseCase;
@@ -42,7 +43,6 @@ describe('RegisterUserUseCase', () => {
     }).compile();
 
     useCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
-
     jest.clearAllMocks();
   });
 
@@ -62,6 +62,10 @@ describe('RegisterUserUseCase', () => {
         'al',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(userRepoMock.create).not.toHaveBeenCalled();
+    expect(cacheServiceMock.set).not.toHaveBeenCalled();
+    expect(emailQueueMock.sendVerificationEmail).not.toHaveBeenCalled();
   });
 
   it('throws if email exists', async () => {
@@ -80,6 +84,30 @@ describe('RegisterUserUseCase', () => {
         'al',
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(userRepoMock.create).not.toHaveBeenCalled();
+    expect(cacheServiceMock.set).not.toHaveBeenCalled();
+    expect(emailQueueMock.sendVerificationEmail).not.toHaveBeenCalled();
+  });
+
+  it('throws if both username and email exist', async () => {
+    userRepoMock.usernameExists.mockResolvedValue(true);
+    userRepoMock.emailExists.mockResolvedValue(true);
+
+    await expect(
+      useCase.execute(
+        {
+          username: 'john',
+          email: 'john@test.com',
+          password: '12345678',
+          firstName: 'John',
+          lastName: 'Doe',
+        },
+        'al',
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(userRepoMock.create).not.toHaveBeenCalled();
   });
 
   it('registers user successfully and queues verification email', async () => {
@@ -99,9 +127,11 @@ describe('RegisterUserUseCase', () => {
     );
 
     expect(userRepoMock.create).toHaveBeenCalled();
-
-    expect(cacheServiceMock.set).toHaveBeenCalled();
-
+    expect(cacheServiceMock.set).toHaveBeenCalledWith(
+      expect.stringMatching(/^email_verification:/),
+      { userId: 1, role: 'user' },
+      CacheTTL.EMAIL_VERIFICATION,
+    );
     expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalledWith(
       'john@test.com',
       'John',
@@ -114,6 +144,56 @@ describe('RegisterUserUseCase', () => {
     expect(result.firstName).toBe('John');
     expect(result.role).toBe('user');
     expect(result.token).toBeDefined();
+  });
+
+  it('uses username as firstName fallback when firstName is null', async () => {
+    userRepoMock.usernameExists.mockResolvedValue(false);
+    userRepoMock.emailExists.mockResolvedValue(false);
+    userRepoMock.create.mockResolvedValue(2);
+
+    const result = await useCase.execute(
+      {
+        username: 'johndoe',
+        email: 'john@test.com',
+        password: '12345678',
+        firstName: null,
+        lastName: null,
+      },
+      'al',
+    );
+
+    expect(result.firstName).toBe('johndoe');
+    expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalledWith(
+      'john@test.com',
+      'johndoe',
+      expect.any(String),
+      'al',
+    );
+  });
+
+  it('registers user as agent role', async () => {
+    userRepoMock.usernameExists.mockResolvedValue(false);
+    userRepoMock.emailExists.mockResolvedValue(false);
+    userRepoMock.create.mockResolvedValue(3);
+
+    const result = await useCase.execute(
+      {
+        username: 'agent1',
+        email: 'agent@test.com',
+        password: '12345678',
+        firstName: 'Agent',
+        lastName: 'One',
+      },
+      'al',
+      'agent',
+    );
+
+    expect(result.role).toBe('agent');
+    expect(cacheServiceMock.set).toHaveBeenCalledWith(
+      expect.stringMatching(/^email_verification:/),
+      { userId: 3, role: 'agent' },
+      CacheTTL.EMAIL_VERIFICATION,
+    );
   });
 
   it('registers user without sending email when skipEmailSending is true', async () => {
@@ -136,15 +216,29 @@ describe('RegisterUserUseCase', () => {
     );
 
     expect(userRepoMock.create).toHaveBeenCalled();
-
     expect(cacheServiceMock.set).not.toHaveBeenCalled();
-
-    expect(
-      emailQueueMock.sendVerificationEmail,
-    ).not.toHaveBeenCalled();
-
+    expect(emailQueueMock.sendVerificationEmail).not.toHaveBeenCalled();
     expect(result.userId).toBe(1);
     expect(result.token).toBeDefined();
+  });
+
+  it('normalizes username to lowercase and removes spaces', async () => {
+    userRepoMock.usernameExists.mockResolvedValue(false);
+    userRepoMock.emailExists.mockResolvedValue(false);
+    userRepoMock.create.mockResolvedValue(1);
+
+    await useCase.execute(
+      {
+        username: 'John Doe',
+        email: 'john@test.com',
+        password: '12345678',
+        firstName: 'John',
+        lastName: 'Doe',
+      },
+      'al',
+    );
+
+    expect(userRepoMock.usernameExists).toHaveBeenCalledWith('johndoe');
   });
 
   describe('sendVerificationEmail', () => {
@@ -160,18 +254,31 @@ describe('RegisterUserUseCase', () => {
 
       expect(cacheServiceMock.set).toHaveBeenCalledWith(
         'email_verification:test-token',
-        {
-          userId: 1,
-          role: 'user',
-        },
-        30 * 60 * 1000,
+        { userId: 1, role: 'user' },
+        CacheTTL.EMAIL_VERIFICATION,
       );
-
       expect(emailQueueMock.sendVerificationEmail).toHaveBeenCalledWith(
         'test@example.com',
         'John',
         'test-token',
         'al',
+      );
+    });
+
+    it('caches token with agency_owner role', async () => {
+      await useCase.sendVerificationEmail(
+        5,
+        'owner-token',
+        'owner@test.com',
+        'Owner',
+        'agency_owner',
+        'en',
+      );
+
+      expect(cacheServiceMock.set).toHaveBeenCalledWith(
+        'email_verification:owner-token',
+        { userId: 5, role: 'agency_owner' },
+        CacheTTL.EMAIL_VERIFICATION,
       );
     });
   });

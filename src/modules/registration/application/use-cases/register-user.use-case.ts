@@ -10,6 +10,7 @@ import {
   EmailVerificationRequestedEvent,
 } from '../../../../infrastructure/events/email/email.events';
 import { EmailQueueService } from '../../../../infrastructure/queue/services/email-queue.service';
+import { CacheTTL } from '../../../../common/constants/cache-ttl.constants';
  
 export interface RegisterUserData {
   username: string;
@@ -110,12 +111,16 @@ if (!skipEmailSending) {
   role: string,
   lang: SupportedLang,
 ): Promise<void> {
+  // await this.cacheService.set(
+  //   `email_verification:${token}`,
+  //   { userId, role },
+  //   30 * 60 * 1000,
+  // );
   await this.cacheService.set(
-    `email_verification:${token}`,
-    { userId, role },
-    30 * 60 * 1000,
-  );
-
+      `email_verification:${token}`,
+      { userId, role },
+      CacheTTL.EMAIL_VERIFICATION, 
+    );
   await this.emailQueue.sendVerificationEmail(
     email,
     firstName,
