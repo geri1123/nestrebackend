@@ -13,6 +13,7 @@ import { EmailEventsListener } from './listeners/email-events.listener';
 import { ProductCountsProducer } from './producers/product-counts.producer';
 import { ProductCountsProcessor } from './processors/product-counts.processor';
 import { FiltersModule } from '../../modules/filters/filters.module';
+// import { QueueAdminController } from './queue-admin.controller';
 
 @Global()
 @Module({
@@ -62,6 +63,7 @@ import { FiltersModule } from '../../modules/filters/filters.module';
     // which the processor needs for reconciliation and delta application.
     FiltersModule,
   ],
+  // controllers:[QueueAdminController],
   providers: [
     CleanupProcessor,
     CleanupProducer,
@@ -71,6 +73,6 @@ import { FiltersModule } from '../../modules/filters/filters.module';
     ProductCountsProducer,
     ProductCountsProcessor,
   ],
-  exports: [CleanupProducer, EmailQueueService, ProductCountsProducer],
+  exports: [CleanupProducer, EmailQueueService, ProductCountsProducer ],
 })
 export class QueueModule {}

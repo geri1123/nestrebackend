@@ -84,7 +84,7 @@ export class AuthController {
   // ── Register user 
   @AuthSwagger.RegisterUser()
   @Post('register/user')
-   @Throttle({ default: { limit: 3, ttl: 600 } })
+   @Throttle({ default: { limit: 10, ttl: 600 } })
   @HttpCode(HttpStatus.CREATED)
   async registerUser(
     @Body() dto: BaseRegistrationDto,
@@ -98,7 +98,7 @@ export class AuthController {
   // ── Register agency owner 
   @AuthSwagger.RegisterAgencyOwner()
   @Post('register/agency_owner')
- @Throttle({ default: { limit: 3, ttl: 600 } })
+ @Throttle({ default: { limit: 10, ttl: 600 } })
   
   @HttpCode(HttpStatus.CREATED)
   async registerAgencyOwner(
@@ -113,7 +113,7 @@ export class AuthController {
   @AuthSwagger.RegisterAgent()
   @Post('register/agent')
 
-  @Throttle({ default: { limit: 3, ttl: 600 } })
+  @Throttle({ default: { limit: 10, ttl: 600 } })
   @HttpCode(HttpStatus.CREATED)
   async registerAgent(
     @Body() dto: RegisterAgentDto,
@@ -126,7 +126,7 @@ export class AuthController {
   // ── Google OAuth login 
   @AuthSwagger.GoogleLogin()
   @Post('google')
-  @Throttle({ default: { limit: 3, ttl: 600 } })
+  @Throttle({ default: { limit: 10, ttl: 600 } })
   @HttpCode(HttpStatus.OK)
   async googleLogin(
     @Body('idToken') idToken: string,
@@ -137,7 +137,7 @@ export class AuthController {
 
 
   @Post('refresh')
-   @Throttle({ default: { limit: 3, ttl: 600 } })
+   @Throttle({ default: { limit: 10, ttl: 600 } })
  
   @HttpCode(HttpStatus.OK)
   async refresh(

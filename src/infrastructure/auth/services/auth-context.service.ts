@@ -10,7 +10,7 @@ export interface AuthContext {
   userId: number;
 }
 
-const AUTH_CONTEXT_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const AUTH_CONTEXT_CACHE_TTL_MS = 5 * 60 * 1000; 
 
 @Injectable()
 export class AuthContextService {
