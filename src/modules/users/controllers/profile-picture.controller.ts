@@ -21,8 +21,10 @@ import { DeleteProfileImageUseCase } from '../application/use-cases/delete-profi
 import { UploadProfileImageUseCase } from '../application/use-cases/update-profile-image.use-case';
 import { ApiProfilePictureDelete, ApiProfilePictureUpload } from '../decorators/profile-picture.decorators';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 
 @Controller('profile-image')
+
 @ApiTags('Profile')
 export class ProfilePictureController {
   constructor(
@@ -31,6 +33,7 @@ export class ProfilePictureController {
   ) {}
 
   @Patch()
+  @Throttle(10, 3600)
   @ApiProfilePictureUpload()
   @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
@@ -89,6 +92,7 @@ export class ProfilePictureController {
   }
 
   @Delete()
+  @Throttle(20, 300)
   @ApiProfilePictureDelete()
   async deleteProfilePicture(@Req() req: RequestWithUser) {
     try {

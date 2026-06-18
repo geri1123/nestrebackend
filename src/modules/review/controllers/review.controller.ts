@@ -20,6 +20,7 @@ import { GetAgencyReviewsUseCase } from '../application/use-cases/get-agency-rev
 import { GetAgencyReviewsQueryDto } from '../dto/get-agency-reviews.dto';
 import { ReviewSwagger } from '../responses/review.swagger.response';
 import { Public } from '../../../common/decorators/public.decorator';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 
 @Controller('reviews')
 export class ReviewController {
@@ -32,6 +33,7 @@ export class ReviewController {
   // ─── POST /reviews ────────────────────────────────────────────────────────
   @ReviewSwagger.CreateReview()
   @Post()
+  @Throttle(5, 3600)
   async createReview(@Body() dto: CreateReviewDto, @Req() req: RequestWithUser) {
     const { userId, language } = req;
     if (!userId) throw new UnauthorizedException(t('userNotAuthenticated', language));
@@ -60,6 +62,7 @@ export class ReviewController {
   // ─── PATCH /reviews/:id ──────────────────────────────────────────────────
   @ReviewSwagger.UpdateReview()
   @Patch(':id')
+  @Throttle(10, 3600)
   async updateReview(
     @Param('id') id: string,
     @Body() dto: UpdateReviewDto,
@@ -92,6 +95,7 @@ export class ReviewController {
   @ReviewSwagger.GetAgencyReviews()
   @Public()
   @Get('agency/:agencyId')
+  @Throttle(120, 60)
   async getAgencyReviews(
     @Param('agencyId', ParseIntPipe) agencyId: number,
     @Query() query: GetAgencyReviewsQueryDto,

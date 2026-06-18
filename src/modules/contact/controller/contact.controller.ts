@@ -11,6 +11,7 @@ import { SendMessageToAgencyUseCase } from "../application/use-cases/send-agency
 import { SendMessageToUserUseCase } from "../application/use-cases/sent-user-message.use-case";
 import { SupportedLang } from "../../../locales";
 import { SendSupportMessageUseCase } from "../application/use-cases/send-support-message.use-case";
+import { Throttle } from "../../../common/decorators/throttle.decorator";
 @ApiTags('Contact')
 @Public()
 @Controller('contact')
@@ -33,6 +34,7 @@ async send(@Body() dto: CreateContactDto, @Req() req: RequestWithUser  ) {
 
 //SUPPORT EMAILS
 @Post('/support')
+@Throttle(5, 3600)
 @ApiBadRequestResponse()
 @ApiSuccessResponse('Message send successfully')
 async sendToSupport(@Body() dto: ContactPlatformDto, @Req() req: Request) {
@@ -42,6 +44,7 @@ async sendToSupport(@Body() dto: ContactPlatformDto, @Req() req: Request) {
 
 //
 @Post("/agency/message")
+@Throttle(5, 3600)
 @ApiBadRequestResponse()
 @ApiSuccessResponse('Message send successfully')
 async sendToAgency(@Body() dto:SendMessageToAgencyDto, @Req() req:RequestWithUser){
@@ -49,6 +52,7 @@ async sendToAgency(@Body() dto:SendMessageToAgencyDto, @Req() req:RequestWithUse
 }
 
 @Post("user/message")
+@Throttle(5, 3600)
 @ApiBadRequestResponse()
 @ApiSuccessResponse('Message send successfully')
 async sendToUser(@Body() dto: SendMessageToUserDto, @Req() req: RequestWithUser) {

@@ -2,7 +2,7 @@
 import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ThrottlerModule } from '@nestjs/throttler';
+// import { ThrottlerModule } from '@nestjs/throttler';
 
 // Controllers & Services
 import { AppController } from './app.controller';
@@ -64,21 +64,7 @@ import { OutreachModule } from './infrastructure/email/outreach.module';
 import { AdminModule } from './modules/admin/admin.module';
 @Module({
   imports: [
-    // ========================================
-    // CORE CONFIGURATION
-    // ========================================
-    // ThrottlerModule.forRoot({
-    //   throttlers: [{ limit: 100, ttl: 60 }],
-    // }),
-    ThrottlerModule.forRoot({
-  throttlers: [{ limit: 100, ttl: 60 }],
-  getTracker: (req) => {
-    const ip =
-      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
-      req.ip;
-    return ip;
-  },
-}),
+  
     EventEmitterModule.forRoot({
       global: true, 
     }),

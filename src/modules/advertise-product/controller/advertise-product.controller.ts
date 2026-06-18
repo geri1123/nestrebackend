@@ -5,12 +5,14 @@ import { t } from "../../../locales";
 import { AdvertisementType } from "@prisma/client";
 import { AdvertiseProductUseCase } from "../application/use-cases/advertise-product.use-case";
 import { ApiAdvertiseDecorators } from "../decorators/advertise.decorator";
+import { Throttle } from "../../../common/decorators/throttle.decorator";
 
 @Controller("advertise")
 export class AdvertiseProductController {
   constructor(private readonly advertiseUsecase: AdvertiseProductUseCase) {}
 
   @Post()
+ @Throttle(5, 300)
   @ApiAdvertiseDecorators.AdvertiseProduct()
   async advertise(@Req() req: RequestWithUser, @Body() body: AdvertiseDto) {
     const { userId, language } = req;

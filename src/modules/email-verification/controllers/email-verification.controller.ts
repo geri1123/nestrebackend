@@ -14,6 +14,7 @@ import { t } from '../../../locales';
 import { VerifyEmailUseCase } from '../application/use-cases/verify-email.use-case';
 import { ResendVerificationEmailUseCase } from '../application/use-cases/resend-verification-email.use-case';
 import { EmailVerificationSwagger } from '../responses/email-verification.response';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 
 @Controller('auth')
 @Public()
@@ -25,6 +26,7 @@ export class EmailVerificationController {
 
   @EmailVerificationSwagger.VerifyEmail()
   @Get('verify-email')
+  @Throttle(60, 60)
   @HttpCode(200)
   async verifyEmail(
     @Query() query: Record<string, any>,
@@ -49,6 +51,7 @@ export class EmailVerificationController {
 
   @EmailVerificationSwagger.ResendVerificationEmail()
   @Post('resend-verification')
+  @Throttle(60, 60)
   async resendVerificationEmail(
     @Body() body: Record<string, any>,
     @Req() req: RequestWithLang

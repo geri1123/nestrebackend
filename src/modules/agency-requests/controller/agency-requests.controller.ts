@@ -18,6 +18,7 @@ import { RequireAgencyContext } from "../../../common/decorators/require-agency-
 import { PermissionsGuard } from "../../../infrastructure/auth/guard/permissions.guard";
 import { AgencyContextGuard } from "../../../infrastructure/auth/guard/agency-context.guard";
 import { RolesGuard } from "../../../infrastructure/auth/guard/role-guard";
+import { Throttle } from "../../../common/decorators/throttle.decorator";
 
 @UseGuards(AgencyContextGuard, RolesGuard, PermissionsGuard)
 @Controller('agencies')
@@ -29,6 +30,7 @@ export class AgencyRequestsController {
     
 @RequireAgencyContext()
 @Get('registration-requests')
+@Throttle(100, 60)
 @Roles('agent', 'agency_owner')
 @Permissions('can_approve_requests')
 @ApiAgencyRequestsDecorators.GetRegistrationRequests()
@@ -50,6 +52,7 @@ async getRegistrationRequests(
 
 @RequireAgencyContext()  
 @Patch('registration-requests/:id/status')
+@Throttle(5, 60)
 @Roles('agent', 'agency_owner')
 @Permissions("can_approve_requests")
 @ApiAgencyRequestsDecorators.UpdateRequestStatus()

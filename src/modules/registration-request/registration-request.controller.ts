@@ -7,6 +7,7 @@ import { SendQuickRequestUseCase } from "./application/use-cases/send-quick-requ
 import { ApiGetActiveRequest, ApiSendQuickRequest } from "./decorators/registration-request.decorators";
 import { RolesGuard } from "../../infrastructure/auth/guard/role-guard";
 import { FindRequestByUserIdUseCase } from "./application/use-cases/find-requests-by-user-id.use-case";
+import { Throttle } from "../../common/decorators/throttle.decorator";
 @UseGuards(RolesGuard)
 @Controller('registration-request')
 
@@ -22,6 +23,7 @@ export class RegistrationRequestController{
     @UseGuards(RolesGuard)
     @ApiSendQuickRequest()
 @Post('quick-request/:agencyId')
+@Throttle(1, 300)
 async sendQuickRequest(
   @Req() req: RequestWithUser,
   @Param('agencyId', ParseIntPipe) agencyId: number,
@@ -43,6 +45,7 @@ return{
 }
 @ApiGetActiveRequest()
 @Get('my-active-request')
+@Throttle(30, 60)
 async getActiveRequest(@Req() req: RequestWithUser) {
   const request = await this.findActiveRequest.execute(req.userId, req.language);
   return {

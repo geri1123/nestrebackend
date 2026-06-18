@@ -32,6 +32,7 @@ import { PermissionsGuard } from '../../../infrastructure/auth/guard/permissions
 import { AgentBelongsToAgencyGuard } from '../../../infrastructure/auth/guard/agent-belongs-to-agency.guard';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { Public } from '../../../common/decorators/public.decorator';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 
 
 
@@ -45,6 +46,7 @@ export class AgentController {
   ) {}
 @Public()
   @Get('public/:agencyId')
+ @Throttle(120, 60)
   @ApiAgentDecorators.GetPublicAgents()
 async getPublicAgents(
   @Param('agencyId', ParseIntPipe) agencyId: number,
@@ -69,6 +71,7 @@ async getPublicAgents(
  
   @ApiAgentDecorators.GetPrivateAgents()
   @Get('dashboard')
+  @Throttle(100, 60)
   async getPrivateAgents(
     @Req() req: RequestWithUser,
     @Query() filters: FilterAgentsDto,
@@ -90,7 +93,8 @@ async getPublicAgents(
 
   @RequireAgencyContext()
   @Patch('update/:id')
- 
+   @Throttle(10, 300)
+
   @UseGuards(AgencyContextGuard, PermissionsGuard, AgentBelongsToAgencyGuard)
 @Permissions('can_manage_agents')
   
@@ -142,6 +146,7 @@ async updateAgencyAgents(
  @UseGuards(AgencyContextGuard, RolesGuard)
 
 @Get('me')
+@Throttle(60, 60)
 async getAgentMe(@Req() req: RequestWithUser) {
   if (!req.userId) {
     throw new ForbiddenException(t('userNotAuthenticated', req.language));
@@ -156,6 +161,7 @@ async getAgentMe(@Req() req: RequestWithUser) {
 @Roles('agent', 'agency_owner')
  @UseGuards(AgencyContextGuard, RolesGuard)
 @Get(':id')
+@Throttle(120, 60)
 @ApiAgentDecorators.GetAgentById()
 async getAgentById(
   @Param('id', ParseIntPipe) agencyAgentId: number,

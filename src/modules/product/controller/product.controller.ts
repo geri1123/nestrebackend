@@ -18,13 +18,13 @@ import { ApiProductsMostClickResponse } from '../decorators/most-clicks.decorato
 import { GetRelatedProductsUseCase } from '../application/use-cases/get-related.use-case';
 import { ApiGetRelatedProducts } from '../decorators/related-products.decorator';
 import { ApiTags } from '@nestjs/swagger';
-import { SkipThrottle } from '@nestjs/throttler';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
 import { filter } from 'rxjs';
 import { GetAgencyCityCountsUseCase } from '../application/use-cases/get-agency-city-counts.usecase';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 @ApiTags('Products')
-@SkipThrottle()
+
 @Controller('products')
   
 export class SearchProductsController {
@@ -43,6 +43,7 @@ export class SearchProductsController {
   @Public()
 
   @Get('search')
+  @Throttle(100, 60)
   @ApiSearchProducts()
   async searchAll(
     @Req() req: RequestWithLang,
@@ -62,6 +63,7 @@ export class SearchProductsController {
 
   @Public()
  @Get('agency/:agencyId')
+ @Throttle(60, 60)
 @ApiSearchAgencyProducts()
 async getAgencyProducts(
   @Param('agencyId') agencyId: number,
@@ -79,6 +81,7 @@ async getAgencyProducts(
 }
 @Public()
 @Get('agency/:agencyId/city-counts')
+@Throttle(30, 60)
 async getCityCounts(
   @Param('agencyId') agencyId: string,
   @Req() req: RequestWithLang,
@@ -114,6 +117,7 @@ async getCityCounts(
 
   @Public()
   @Get('public/:id')
+ @Throttle(300, 300)
 @ApiGetPublicProduct()
   async getPublicProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
     await this.softAuth.attachUserIfExists(req);
@@ -137,6 +141,7 @@ async getCityCounts(
 @RequireAgencyContext()
 @UseGuards(AgencyContextGuard)
   @Get('protected/:id')
+  @Throttle(60, 60)
   @ApiGetProtectedProduct()
   async getProtectedProduct(@Param('id') id: number, @Req() req: RequestWithUser) {
     const product = await this.getProductByIdUseCase.execute(id, req.language, true, req);
@@ -146,6 +151,7 @@ async getCityCounts(
   }
    @Public()
   @Get('most-clicks')
+  @Throttle(60, 60)
   @ApiProductsMostClickResponse()
   async getMostClicksProducts(
     @Req() req: RequestWithLang,
@@ -164,6 +170,7 @@ async getCityCounts(
 
   @Public()
 @Get('public/:id/related')
+@Throttle(60, 60)
   @ApiGetRelatedProducts()
 async getRelatedProducts(
   @Param('id') id: number,
@@ -195,6 +202,7 @@ async getRelatedProducts(
 };
 @Public()
 @Get('user/:userId')
+@Throttle(60, 60)
 async getUserProducts(
   @Param('userId') userId: number,
   @Req() req: RequestWithLang,

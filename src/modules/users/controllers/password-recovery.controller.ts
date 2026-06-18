@@ -9,6 +9,7 @@ import { t } from "../../../locales";
 import { RecoverPasswordDto } from "../dto/recover-password.dto";
 import { Public } from "../../../common/decorators/public.decorator";
 import { ApiForgotPassword, ApiResetPassword } from "../decorators/password.decoretors";
+import { Throttle } from "../../../common/decorators/throttle.decorator";
 
 @Controller('password')
 export class PasswordController {
@@ -19,6 +20,7 @@ export class PasswordController {
 
   @Public()
   @Post('reset-password')
+  @Throttle(5, 3600) 
   @ApiResetPassword()
   async resetPassword(@Body() body: ResetPasswordDto, @Req() req: RequestWithLang) {
     const lang = req.language || 'al';
@@ -30,6 +32,7 @@ export class PasswordController {
 
   @Public()
   @Post('forgot-password')
+  @Throttle(3, 900)
   @ApiForgotPassword()
   async forgotPassword(@Body() body: RecoverPasswordDto, @Req() req: RequestWithLang) {
     const lang = req.language || 'al';

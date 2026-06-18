@@ -19,6 +19,7 @@ import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {type RequestWithUser } from '../../common/types/request-with-user.interface';
 import { t } from '../../locales';
+import { Throttle } from '../../common/decorators/throttle.decorator';
 
 @ApiTags('Notifications')
 @Controller('notifications')
@@ -28,6 +29,7 @@ export class NotificationController {
   // ── Static routes FIRST ────────────────────────────────
 
   @Get('unread-count')
+  @Throttle(150, 60)
   async countMyUnread(@Req() req: RequestWithUser) {
     const userId = req.userId;
     const count = await this.notificationService.countUnreadNotifications(userId);
@@ -35,6 +37,7 @@ export class NotificationController {
   }
 
   @Get('online-status')
+  @Throttle(300, 60)
   async checkOnlineStatus(@Req() req: RequestWithUser) {
     const userId = req.userId;
     const isOnline = await this.notificationService.isUserOnline(userId);
@@ -42,12 +45,14 @@ export class NotificationController {
   }
 
   @Patch('mark-all-read')
+  @Throttle(10, 60)
   @HttpCode(HttpStatus.OK)
   async markAllAsRead(@Req() req: RequestWithLang) {
     const userId = req['userId'];
     return this.notificationService.markAllAsRead(userId);
   }
 @Get()
+@Throttle(120, 60)
 async getMyNotifications(
   @Req() req: RequestWithUser,
   @Query('page', new ParseIntPipe({ optional: true })) page = 1,
@@ -73,6 +78,7 @@ async getMyNotifications(
   };
 }
   @Post()
+  @Throttle(20, 60)
   async createNotification(@Body() data: CreateNotificationDto) {
     return this.notificationService.sendNotification(data);
   }
@@ -80,12 +86,16 @@ async getMyNotifications(
   // ── Dynamic :id routes LAST ────────────────────────────
 
   @Patch(':id/read')
+  @Throttle(60, 60)
+  
+
   async markAsRead(@Param('id', ParseIntPipe) id: number, @Req() req: RequestWithUser) {
     await this.notificationService.markNotificationAsRead(id);
     return { success: true, message: t("notificationMarkedAsRead", req.language) };
   }
 
   @Delete(':id')
+  @Throttle(30, 60)
   async deleteNotification(@Param('id', ParseIntPipe) id: number, @Req() req: RequestWithUser) {
     await this.notificationService.deleteNotification(id);
     return { success: true, message: t("notificationDeletedSuccessfully", req.language) };

@@ -4,6 +4,7 @@ import { FiltersService } from './filters.service';
 import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { Public } from '../../common/decorators/public.decorator';
 import { ApiGetAttributes, ApiGetCities, ApiGetCountries, ApiGetFilters } from './decorators/filters-swagger.decorators';
+import { Throttle } from '../../common/decorators/throttle.decorator';
 
 @ApiTags('Filters')
 @Controller('filters')
@@ -26,6 +27,9 @@ export class FiltersController {
 
   @ApiGetAttributes()
   @Get('attributes/:subcategoryId')
+
+@Throttle(200, 60)
+
   @HttpCode(HttpStatus.OK)
   async getAttributes(
     @Param('subcategoryId') subcategoryId: string,
@@ -50,6 +54,7 @@ export class FiltersController {
   }
 @ApiGetCities()
   @Get('cities/:countryCode')
+  @Throttle(300, 60)
   @HttpCode(HttpStatus.OK)
   async getCities(@Param('countryCode') countryCode: string) {
     const cities = await this.filtersService.getCities(countryCode);

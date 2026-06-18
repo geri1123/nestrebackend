@@ -34,6 +34,7 @@ import { RequireAgencyContext } from '../../../common/decorators/require-agency-
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
 import { MultipartValidationPipe } from '../../../common/pipes/multipart-validation.pipe';
 import { DeleteProductUseCase } from '../application/use-cases/delete-product.use-case';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 type MulterFile = Express.Multer.File;
 
 @ApiTags('Products')
@@ -49,6 +50,7 @@ export class ManageProductController {
   @RequireAgencyContext()
 @UseGuards(AgencyContextGuard)
 @Post('add')
+@Throttle(20, 3600)
 @ApiCreateProduct()
 @UseInterceptors(FilesInterceptor('images', 7))
 async createProduct(
@@ -73,6 +75,7 @@ async createProduct(
 
   @UseGuards(AgencyContextGuard, ProductOwnershipGuard)
   @Patch('update/:id')
+  @Throttle(50, 3600)
   @ApiUpdateProduct()
   @UseInterceptors(FilesInterceptor('images', 7))
  async updateProduct(
@@ -98,6 +101,7 @@ async createProduct(
 @RequireAgencyContext()
 @UseGuards(AgencyContextGuard)
   @Get('dashboard/products')
+  @Throttle(100, 60) 
   @ApiDashboardProducts()
   async getDashboardProducts(
     @Req() req: RequestWithUser,
@@ -132,7 +136,7 @@ async createProduct(
     return this.searchProductsUseCase.execute(filters, language, isProtectedRoute);
   }
 @Delete(':id')
-
+@Throttle(20, 3600)
 @RequireAgencyContext()  
 @UseGuards( AgencyContextGuard, ProductOwnershipGuard)
 async deleteProduct(

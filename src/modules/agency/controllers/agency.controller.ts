@@ -41,6 +41,7 @@ import { validate } from 'class-validator';
 import { AgencyContextGuard } from '../../../infrastructure/auth/guard/agency-context.guard';
 import { RolesGuard } from '../../../infrastructure/auth/guard/role-guard';
 import { RequireAgencyContext } from '../../../common/decorators/require-agency-context.decorator';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 
 @Controller('agencies')
 export class AgencyController {
@@ -58,6 +59,7 @@ export class AgencyController {
   @Public()
   @ApiGetPaginatedAgencies()
   @Get()
+  @Throttle(120, 60)
   async getAllAgencies(@Query('page') page = 1, @Query('search') search?: string) {
     return this.getPaginatedAgencies.execute(Number(page), 12, search);
   }
@@ -87,6 +89,7 @@ export class AgencyController {
   @Public()
   @ApiGetAgencyInfoPublic()
   @Get(':id/detail')
+ @Throttle(150, 60)
   async getAgencyInfoPublic(
     @Param('id') id: string,
     @Req() req: RequestWithUser,
@@ -104,6 +107,7 @@ export class AgencyController {
 @UseGuards(AgencyContextGuard, RolesGuard)
   
   @Patch('update-fields')
+  @Throttle(10, 300)
   @ApiUpdateAgencyFields()
   async updateFields(
     @Req() req: RequestWithUser,
@@ -132,6 +136,7 @@ export class AgencyController {
   @Roles("agency_owner")
   @UseGuards(AgencyContextGuard , RolesGuard)
   @Patch('upload-logo')
+  @Throttle(10, 300)
   @ApiUploadAgencyLogo()
   @UseInterceptors(FileInterceptor('file'))
   async uploadAgencyLogoRoute(
@@ -160,6 +165,7 @@ export class AgencyController {
   @UseGuards(AgencyContextGuard , RolesGuard)
   @Roles('agency_owner')
   @Delete('logo')
+  @Throttle(10, 300)
   @ApiDeleteAgencyLogo()
   async deleteLogo(@Req() req: RequestWithUser) {
     if (!req.agencyId) {
@@ -179,6 +185,7 @@ export class AgencyController {
   @Roles('user')
   @UseGuards(RolesGuard)
   @Post('create-agency')
+  @Throttle(10, 300)
   @ApiCreateAgency()
   async createAgency(
     @Req() req: RequestWithUser,

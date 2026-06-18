@@ -15,7 +15,6 @@ import {
 import type { Response } from 'express';
 import type { RequestWithLang } from '../../middlewares/language.middleware';
 import { SupportedLang, t } from '../../locales';
-import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator';
 import { AuthSwagger } from './responses/auth-swagger.response';
 
@@ -34,6 +33,7 @@ import { GoogleLoginUseCase } from './application/use-cases/google-login.use-cas
 import { AuthContextService } from '../../infrastructure/auth/services/auth-context.service';
 import {type RequestWithUser } from '../../common/types/request-with-user.interface';
 import { CustomThrottlerGuard } from '../../common/guard/Throttler.guard';
+import { Throttle } from '../../common/decorators/throttle.decorator';
 
 @Public()
 @Controller('auth')
@@ -53,7 +53,7 @@ export class AuthController {
   @AuthSwagger.Login()
   
   @Post('login')
- @Throttle({ default: { limit: 5, ttl: 240 } })
+  @Throttle(5, 240)
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() dto: LoginDto,
@@ -84,7 +84,7 @@ export class AuthController {
   // ── Register user 
   @AuthSwagger.RegisterUser()
   @Post('register/user')
-   @Throttle({ default: { limit: 10, ttl: 600 } })
+  @Throttle(10, 600)
   @HttpCode(HttpStatus.CREATED)
   async registerUser(
     @Body() dto: BaseRegistrationDto,
@@ -98,7 +98,7 @@ export class AuthController {
   // ── Register agency owner 
   @AuthSwagger.RegisterAgencyOwner()
   @Post('register/agency_owner')
- @Throttle({ default: { limit: 10, ttl: 600 } })
+ @Throttle(10, 600)
   
   @HttpCode(HttpStatus.CREATED)
   async registerAgencyOwner(
@@ -113,7 +113,7 @@ export class AuthController {
   @AuthSwagger.RegisterAgent()
   @Post('register/agent')
 
-  @Throttle({ default: { limit: 10, ttl: 600 } })
+  @Throttle(10, 600)
   @HttpCode(HttpStatus.CREATED)
   async registerAgent(
     @Body() dto: RegisterAgentDto,
@@ -126,7 +126,7 @@ export class AuthController {
   // ── Google OAuth login 
   @AuthSwagger.GoogleLogin()
   @Post('google')
-  @Throttle({ default: { limit: 10, ttl: 600 } })
+ @Throttle(10, 600)
   @HttpCode(HttpStatus.OK)
   async googleLogin(
     @Body('idToken') idToken: string,
@@ -137,7 +137,7 @@ export class AuthController {
 
 
   @Post('refresh')
-   @Throttle({ default: { limit: 10, ttl: 600 } })
+   @Throttle(5, 240)
  
   @HttpCode(HttpStatus.OK)
   async refresh(

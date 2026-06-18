@@ -28,6 +28,7 @@ import { ApiChangePassword } from '../decorators/password.decoretors';
 import { Public } from '../../../common/decorators/public.decorator';
 import { RequestWithLang } from '../../../middlewares/language.middleware';
 import { GetPublicUserProfileUseCase } from '../application/use-cases/get-public-user.use-case';
+import { Throttle } from '../../../common/decorators/throttle.decorator';
 
 @Controller('profile')
 export class ProfileController {
@@ -42,6 +43,7 @@ export class ProfileController {
 
 
   @Get('me')
+  @Throttle(100, 60)
 @ApiGetUserProfile()
 async getUserInfo(@Req() req: RequestWithUser) {
   // Ensure user is authenticated
@@ -74,6 +76,7 @@ async getNavbar(@Req() req: RequestWithUser) {
   };
 }
  @Patch('update')
+ @Throttle(20, 300)
 @ApiUpdateProfile()
 async updateProfile(
   @Req() req: RequestWithUser,
@@ -96,7 +99,7 @@ async updateProfile(
 }
 
   @Patch('username')
-
+@Throttle(10, 3600)
  @ApiChangeUsername()
   @HttpCode(HttpStatus.OK)
  async changeUsername(
@@ -114,6 +117,7 @@ async updateProfile(
   );
 }
  @Patch('change-password')
+ @Throttle(5, 300)
  @ApiChangePassword() 
 async changePassword(
   @Req() req: RequestWithUser,
@@ -136,6 +140,7 @@ async changePassword(
 }
 
 @Get(':id')
+@Throttle(100, 60)
 @Public()
 @ApiGetPublicProfile()
 async getPublicProfile(@Param('id') id: string, @Req() req: RequestWithLang) {
