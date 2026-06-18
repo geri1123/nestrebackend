@@ -67,9 +67,18 @@ import { AdminModule } from './modules/admin/admin.module';
     // ========================================
     // CORE CONFIGURATION
     // ========================================
+    // ThrottlerModule.forRoot({
+    //   throttlers: [{ limit: 100, ttl: 60 }],
+    // }),
     ThrottlerModule.forRoot({
-      throttlers: [{ limit: 100, ttl: 60 }],
-    }),
+  throttlers: [{ limit: 100, ttl: 60 }],
+  getTracker: (req) => {
+    const ip =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+      req.ip;
+    return ip;
+  },
+}),
     EventEmitterModule.forRoot({
       global: true, 
     }),
