@@ -27,4 +27,5 @@ export interface IProductAdvertisementRepository {
 
   getActiveAd(productId: number): Promise<ProductAdvertisement | null>;
   expireAds(now: Date): Promise<number> ;
+    expireAndReturnAds(now: Date): Promise<{ id: number; userId: number; productId: number }[]>;
 }

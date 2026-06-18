@@ -22,11 +22,40 @@ import { FiltersModule } from '../../modules/filters/filters.module';
       useFactory: getBullConfig,
       inject: [ConfigService],
     }),
-    BullModule.registerQueue(
-      { name: QUEUES.CLEANUP },
-      { name: QUEUES.EMAIL },
-      { name: QUEUES.PRODUCT_COUNTS },
-    ),
+    // BullModule.registerQueue(
+    //   { name: QUEUES.CLEANUP },
+    //   { name: QUEUES.EMAIL },
+    //   { name: QUEUES.PRODUCT_COUNTS },
+    // ),
+ BullModule.registerQueue(
+  { 
+    name: QUEUES.CLEANUP,
+    defaultJobOptions: {
+      removeOnComplete: 10,
+      removeOnFail: 20,
+      attempts: 1,        
+      backoff: { type: 'exponential', delay: 5000 }
+    }
+  },
+  { 
+    name: QUEUES.EMAIL,
+    defaultJobOptions: {
+      removeOnComplete: true,
+      removeOnFail: 10, 
+      attempts: 3,
+      backoff: { type: 'exponential', delay: 5000 }
+    }
+  },
+  { 
+    name: QUEUES.PRODUCT_COUNTS,
+    defaultJobOptions: {
+      removeOnComplete: true,
+      removeOnFail: 20,
+      attempts: 3,       
+      backoff: { type: 'exponential', delay: 3000 }
+    }
+  },
+),
     CleanupModule,
     EmailModule,
     // FiltersModule exports CATEGORY_REPO, LISTING_TYPE_REPO and PRODUCT_COUNTS_REPO,

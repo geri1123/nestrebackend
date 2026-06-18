@@ -6,6 +6,7 @@ import { AdminUserModule } from './users/admin-user.module';
   imports: [
     AdminAuthModule,
     AdminUserModule,
+    
   ],
 })
 export class AdminModule {}

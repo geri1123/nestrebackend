@@ -15,8 +15,7 @@ describe('ExpireProductAdsUseCase', () => {
         {
           provide: ADVERTISE_REPO,
           useValue: {
-            findExpiredAds: jest.fn(), 
-            expireAds: jest.fn(),
+            expireAndReturnAds: jest.fn(),
             getActiveAd: jest.fn(),
             createAdvertisementTx: jest.fn(),
           },
@@ -49,14 +48,12 @@ describe('ExpireProductAdsUseCase', () => {
       { id: 2, userId: 20, productId: 200 },
     ];
 
-    adRepo.findExpiredAds.mockResolvedValue(mockExpiredAds);
-    adRepo.expireAds.mockResolvedValue(2);
+    adRepo.expireAndReturnAds.mockResolvedValue(mockExpiredAds);
     notificationService.sendNotification.mockResolvedValue({} as any);
 
     const result = await useCase.execute();
 
-    expect(adRepo.findExpiredAds).toHaveBeenCalledWith(expect.any(Date));
-    expect(adRepo.expireAds).toHaveBeenCalledWith(expect.any(Date));
+    expect(adRepo.expireAndReturnAds).toHaveBeenCalledWith(expect.any(Date));
     expect(notificationService.sendNotification).toHaveBeenCalledTimes(2);
     expect(notificationService.sendNotification).toHaveBeenCalledWith({
       userId: 10,
@@ -64,12 +61,17 @@ describe('ExpireProductAdsUseCase', () => {
       templateData: { productId: 100 },
       metadata: { productId: 100, advertisementId: 1 },
     });
+    expect(notificationService.sendNotification).toHaveBeenCalledWith({
+      userId: 20,
+      type: 'advertisement_expire',
+      templateData: { productId: 200 },
+      metadata: { productId: 200, advertisementId: 2 },
+    });
     expect(result).toBe(2);
   });
 
   it('should return 0 when no ads to expire', async () => {
-    adRepo.findExpiredAds.mockResolvedValue([]);
-    adRepo.expireAds.mockResolvedValue(0);
+    adRepo.expireAndReturnAds.mockResolvedValue([]);
 
     const result = await useCase.execute();
 
@@ -77,9 +79,43 @@ describe('ExpireProductAdsUseCase', () => {
     expect(notificationService.sendNotification).not.toHaveBeenCalled();
   });
 
+  it('should handle notification failure and continue — Promise.allSettled', async () => {
+    const mockExpiredAds = [
+      { id: 1, userId: 10, productId: 100 },
+      { id: 2, userId: 20, productId: 200 },
+    ];
+
+    adRepo.expireAndReturnAds.mockResolvedValue(mockExpiredAds);
+    notificationService.sendNotification
+      .mockRejectedValueOnce(new Error('notification failed')) // i pari dështon
+      .mockResolvedValueOnce({} as any);                      // i dyti kalon
+
+    // nuk duhet të hedhë error
+    const result = await useCase.execute();
+    expect(result).toBe(2);
+    expect(notificationService.sendNotification).toHaveBeenCalledTimes(2);
+  });
+
   it('should handle repository errors', async () => {
-    adRepo.findExpiredAds.mockRejectedValue(new Error('Database error'));
+    adRepo.expireAndReturnAds.mockRejectedValue(new Error('Database error'));
 
     await expect(useCase.execute()).rejects.toThrow('Database error');
+  });
+
+  it('should process ads in batches of 20', async () => {
+    // gjenero 25 ads — duhet 2 batch (20 + 5)
+    const mockExpiredAds = Array.from({ length: 25 }, (_, i) => ({
+      id: i + 1,
+      userId: i + 10,
+      productId: i + 100,
+    }));
+
+    adRepo.expireAndReturnAds.mockResolvedValue(mockExpiredAds);
+    notificationService.sendNotification.mockResolvedValue({} as any);
+
+    const result = await useCase.execute();
+
+    expect(result).toBe(25);
+    expect(notificationService.sendNotification).toHaveBeenCalledTimes(25);
   });
 });

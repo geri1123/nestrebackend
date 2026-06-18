@@ -80,4 +80,32 @@ async findExpiredAds(now: Date) {
   });
   return result.count;
 }
+async expireAndReturnAds(now: Date) {
+  return this.prisma.$transaction(async (tx) => {
+    // gjej dhe ekspiro në 1 transaction — pa race condition
+    const expired = await tx.productAdvertisement.findMany({
+      where: {
+        endDate: { lte: now },
+        status: 'active',
+      },
+      select: {
+        id: true,
+        userId: true,
+        productId: true,
+      },
+    });
+
+    if (expired.length === 0) return [];
+
+    await tx.productAdvertisement.updateMany({
+      where: {
+        endDate: { lte: now },
+        status: 'active',
+      },
+      data: { status: 'expired' },
+    });
+
+    return expired;
+  });
+}
 }

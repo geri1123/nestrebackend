@@ -14,7 +14,7 @@ export class DeleteUserUseCase {
   ) {}
 async execute(userId: number): Promise<void> {
   const user = await this.usersRepo.findById(userId);
-  if (!user) throw new NotFoundException(`User ${userId} not found`);
+  if (!user) return; 
 
   if (user.role === 'agency_owner') {
     await this.deleteAgency.execute(userId); 
@@ -24,16 +24,7 @@ async execute(userId: number): Promise<void> {
     await this.deleteRequests.execute(userId); 
   }
 
-
   await this.usersRepo.deleteById(userId);
 }
-  // async execute(userId: number): Promise<void> {
-  //   const user = await this.usersRepo.findById(userId);
-  //   if (!user) throw new NotFoundException(`User ${userId} not found`);
-
-  //   await this.deleteRequests.execute(userId);
-  //   await this.deleteAgency.execute(userId);
-
-  //   await this.usersRepo.deleteById(userId);
-  // }
+  
 }

@@ -10,30 +10,30 @@ export class ExpireProductAdsUseCase {
     private readonly notificationService: NotificationService,
   ) {}
 
-  async execute(): Promise<number> {
-    const now = new Date();
-    
-    // 1. Find expired ads BEFORE updating
-    const expiredAds = await this.adRepo.findExpiredAds(now);
-    
-    // 2. Expire them
-    const count = await this.adRepo.expireAds(now);
-    
-    // 3. Send notifications
-    await Promise.all(
-      expiredAds.map(ad =>
+ async execute(): Promise<number> {
+  const now = new Date();
+
+  const expiredAds = await this.adRepo.expireAndReturnAds(now);
+  if (expiredAds.length === 0) return 0;
+
+  const batchSize = 20;
+  for (let i = 0; i < expiredAds.length; i += batchSize) {
+    const batch = expiredAds.slice(i, i + batchSize);
+    await Promise.allSettled(
+      batch.map(ad =>
         this.notificationService.sendNotification({
           userId: ad.userId,
           type: 'advertisement_expire',
           templateData: { productId: ad.productId },
-          metadata: { 
+          metadata: {
             productId: ad.productId,
             advertisementId: ad.id,
           },
         })
       )
     );
-    
-    return count;
   }
+
+  return expiredAds.length;
+}
 }

@@ -36,7 +36,7 @@ export class CleanupProducer implements OnApplicationBootstrap {
       await this.cleanupQueue.upsertJobScheduler(
         CLEANUP_JOBS.DELETE_INACTIVE_USERS,
         {
-          pattern: '*/5 * * * *', // every 5 minutes
+          pattern: '*/1 * * * *', // every 5 minutes
         },
         {
           name: CLEANUP_JOBS.DELETE_INACTIVE_USERS,
@@ -49,7 +49,7 @@ export class CleanupProducer implements OnApplicationBootstrap {
       await this.cleanupQueue.upsertJobScheduler(
         CLEANUP_JOBS.EXPIRE_ADS,
         {
-          pattern: '*/2 * * * *', // every 2 minutes
+          pattern: '*/1 * * * *', // every 2 minutes
         },
         {
           name: CLEANUP_JOBS.EXPIRE_ADS,

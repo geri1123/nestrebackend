@@ -12,11 +12,20 @@ export class CleanupService {
   ) {}
 
   // Cleanup inactive unverified users
-  async deleteInactiveUnverifiedUsersBefore(date: Date): Promise<number> {
-    const users = await this.findUnverifiedUsers.execute(date);
-    await Promise.all(users.map(u => this.deleteUser.execute(u.id)));
-    return users.length;
+ async deleteInactiveUnverifiedUsersBefore(date: Date): Promise<number> {
+  const users = await this.findUnverifiedUsers.execute(date);
+  if (users.length === 0) return 0;
+
+  const batchSize = 10;
+  for (let i = 0; i < users.length; i += batchSize) {
+    const batch = users.slice(i, i + batchSize);
+    await Promise.allSettled(
+      batch.map(u => this.deleteUser.execute(u.id))
+    );
   }
+
+  return users.length;
+}
 
   // Cleanup expired advertisements
   async expireExpiredAdvertisements(): Promise<number> {
