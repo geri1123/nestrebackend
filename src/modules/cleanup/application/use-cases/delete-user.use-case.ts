@@ -178,6 +178,7 @@ await this.savedProductRepo.deleteAllByUserId(userId, tx);
           username:  `deleted_${userId}_${user.username}`,
           profileImgUrl:      null,   
           profileImgPublicId: null, 
+           google_id:          null,
         },
       });
 
