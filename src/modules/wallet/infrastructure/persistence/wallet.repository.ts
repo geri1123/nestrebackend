@@ -19,7 +19,7 @@ export class WalletRepository implements IWalletRepository {
     const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
     return wallet ? WalletDomainEntity.fromPrisma(wallet) : null;
   }
-
+ 
   async findByUserIdTx(
     tx: Prisma.TransactionClient,
     userId: number,
@@ -55,4 +55,57 @@ export class WalletRepository implements IWalletRepository {
   const fresh = await tx.wallet.findUniqueOrThrow({ where: { id: walletId } });
   return fresh.balance.toNumber(); 
   }
+  async getAllWallets(params?: {
+  userId?: number;
+  username?: string;
+  page?: number;
+  limit?: number;
+}):  Promise<{
+  id: string;
+  userId: number;
+  username?: string;
+  balance: number;
+  currency: string;
+  createdAt: Date;
+}[]> {
+  const { userId, username, page = 1, limit = 20 } = params || {};
+
+  const wallets = await this.prisma.wallet.findMany({
+    where: {
+      ...(userId ? { userId } : {}),
+      ...(username
+        ? {
+            user: {
+              username: {
+                contains: username,
+                mode: "insensitive",
+              },
+            },
+          }
+        : {}),
+    },
+   include: {
+  user: {
+    select: {
+      id: true,
+      username: true,
+    },
+  },
+},
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+ return wallets.map(w => ({
+  id: w.id,
+  userId: w.userId,
+  username: w.user?.username,
+  balance: w.balance.toNumber(),
+  currency: w.currency,
+  createdAt: w.createdAt,
+}));
+}
 }

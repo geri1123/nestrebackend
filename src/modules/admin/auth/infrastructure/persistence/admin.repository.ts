@@ -19,14 +19,8 @@ export class AdminRepository implements IAdminRepository {
         });
         return adminUser ? AdminUserDomainEntity.fromPrisma(adminUser) : null;
     }
-   async createAdmin(data: CreateAdmin): Promise<void> {
-  await this.prismaService.adminUser.create({
-    data: {
-      email:    data.email,
-      name:     data.name,
-      password: data.password,
-      role:     data.role, 
-    },
-  });
+  async createAdmin(data: CreateAdmin): Promise<AdminUserDomainEntity> {
+  const created = await this.prismaService.adminUser.create({ data });
+  return AdminUserDomainEntity.fromPrisma(created);
 }
 }

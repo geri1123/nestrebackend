@@ -35,8 +35,40 @@ export class WalletTransactionRepository implements IWalletTransactionRepository
       take: limit,
     });
   }
+private readonly userInclude = {
+  wallet: {
+    include: {
+      user: { select: { id: true, username: true, email: true } },
+    },
+  },
+} satisfies Prisma.WalletTransactionInclude;
 
-  countTransaction(walletId: string): Promise<number> {
-    return this.prisma.walletTransaction.count({ where: { walletId } });
-  }
+getAllTransactions(page: number, sortBy: "date" | "amount", order: "asc" | "desc") {
+  return this.prisma.walletTransaction.findMany({
+    include: this.userInclude,
+    orderBy: sortBy === "date" ? { createdAt: order } : { amount: order },
+    skip: (page - 1) * 20,
+    take: 20,
+  });
+}
+
+countAllTransactions(): Promise<number> {
+  return this.prisma.walletTransaction.count();
+}
+
+getUserTransactions(userId: number, page: number, sortBy: "date" | "amount", order: "asc" | "desc") {
+  return this.prisma.walletTransaction.findMany({
+    where: { wallet: { userId } },
+    include: this.userInclude,
+    orderBy: sortBy === "date" ? { createdAt: order } : { amount: order },
+    skip: (page - 1) * 20,
+    take: 20,
+  });
+}
+countTransaction(walletId: string): Promise<number> {
+  return this.prisma.walletTransaction.count({ where: { walletId } });
+}
+countUserTransactions(userId: number): Promise<number> {
+  return this.prisma.walletTransaction.count({ where: { wallet: { userId } } });
+}
 }

@@ -9,5 +9,5 @@ export interface CreateAdmin {
   export interface IAdminRepository {
     findAdminByEmail(email: string): Promise<AdminUserDomainEntity | null>;
     findAdminById(id: number): Promise<AdminUserDomainEntity | null>;
-    createAdmin(data: CreateAdmin): Promise<void>
+    createAdmin(data: CreateAdmin): Promise<AdminUserDomainEntity>
   }

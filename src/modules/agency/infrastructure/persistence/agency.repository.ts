@@ -355,4 +355,94 @@ export class AgencyRepository implements IAgencyDomainRepository {
     });
     return result.count;
   }
+
+
+
+async getAllAgenciesAdminPaginated(
+  skip: number,
+  limit: number,
+  search?: string,
+  status?: AgencyStatus,
+  sortBy?: 'createdAt' | 'agencyName',
+  sortOrder?: 'asc' | 'desc',
+): Promise<{
+  id: number;
+  agency_name: string;
+  logo: string | null;
+  address: string | null;
+  phone: string | null;
+  agency_email: string | null;
+  public_code: string | null;
+  status: AgencyStatus;
+  owner_user_id: number;
+  created_at: Date;
+}[]> {
+  const words =
+    search && search.trim().length >= 3
+      ? search.trim().toLowerCase().split(/\s+/)
+      : undefined;
+
+  const results = await this.prisma.agency.findMany({
+    where: {
+      ...(status ? { status } : {}),
+      ...(words && {
+        AND: words.map(word => ({
+          OR: [
+            { agencyName: { contains: word } },
+            { address: { contains: word } },
+          ],
+        })),
+      }),
+    },
+    select: {
+      id: true,
+      agencyName: true,
+      logo: true,
+      address: true,
+      phone: true,
+      agencyEmail: true,
+      publicCode: true,
+      status: true,
+      ownerUserId: true,
+      createdAt: true,
+    },
+    orderBy: { [sortBy ?? 'createdAt']: sortOrder ?? 'desc' },
+    skip,
+    take: limit,
+  });
+
+  return results.map(r => ({
+    id: r.id,
+    agency_name: r.agencyName,
+    logo: r.logo,
+    address: r.address,
+    phone: r.phone,
+    agency_email: r.agencyEmail,
+    public_code: r.publicCode,
+    status: r.status,
+    owner_user_id: r.ownerUserId,
+    created_at: r.createdAt,
+  }));
+}
+
+async countAgenciesAdmin(search?: string, status?: AgencyStatus): Promise<number> {
+  const words =
+    search && search.trim().length >= 3
+      ? search.trim().split(/\s+/)
+      : undefined;
+
+  return this.prisma.agency.count({
+    where: {
+      ...(status ? { status } : {}),
+      ...(words && {
+        AND: words.map(word => ({
+          OR: [
+            { agencyName: { contains: word } },
+            { address: { contains: word } },
+          ],
+        })),
+      }),
+    },
+  });
+}
 }

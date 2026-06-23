@@ -17,7 +17,19 @@ export interface IWalletRepository {
     walletId: string,
     amount: number,
   ): Promise<number>;
-
+getAllWallets(params?: {
+  userId?: number;
+  username?: string;
+  page?: number;
+  limit?: number;
+}):  Promise<{
+  id: string;
+  userId: number;
+  username?: string;
+  balance: number;
+  currency: string;
+  createdAt: Date;
+}[]> 
   /**
    * Dekrementon balancën VETËM nëse balanca >= amount (atomik, në një SQL).
    * Kthen balancën e re, ose `null` nëse balanca është e pamjaftueshme.

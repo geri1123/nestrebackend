@@ -58,47 +58,6 @@ export class EmailService {
     return false;
   }
 }
-// private async sendEmail(
-//   to: string,
-//   subject: string,
-//   html: string,
-//   replyTo?: string,
-// ): Promise<boolean> {
-//   const mailOptions = {
-//     from: `Real Estate Platform <${this.configService.emailFrom}>`,
-//     to,
-//     subject,
-//     html,
-//     ...(replyTo ? { replyTo } : {}),
-//   };
-
-//   try {
-//     await this.transporter.sendMail(mailOptions);
-//     this.logger.log(`Email "${subject}" sent successfully to ${to}`);
-//     return true;
-//   } catch (error) {
-//     this.logger.error(`Error sending "${subject}" email to ${to}:`, error);
-//     return false;
-//   }
-// }
-  // private async sendEmail(to: string, subject: string, html: string): Promise<boolean> {
-  //   const mailOptions = {
-  //     // from: `Real Estate Platform <${this.configService.emailUser}>`,
-  //     from: `Real Estate Platform <${this.configService.emailFrom}>`,
-  //     to,
-  //     subject,
-  //     html,
-  //   };
-
-  //   try {
-  //     await this.transporter.sendMail(mailOptions);
-  //     this.logger.log(` Email "${subject}" sent successfully to ${to}`);
-  //     return true;
-  //   } catch (error) {
-  //     this.logger.error(`Error sending "${subject}" email to ${to}:`, error);
-  //     return false;
-  //   }
-  // }
 
   // EMAIL FUNCTIONS
  async sendContactPlatformEmail(params: {
