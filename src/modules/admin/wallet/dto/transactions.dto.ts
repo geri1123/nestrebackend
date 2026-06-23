@@ -1,5 +1,6 @@
-import { IsOptional, IsInt, IsIn, Min } from "class-validator";
+import { IsOptional, IsInt, IsIn, Min, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
+import { WalletTransactionType } from "@prisma/client";
  
 export class TransactionPaginationDto {
   @IsOptional()
@@ -15,5 +16,8 @@ export class TransactionPaginationDto {
   @IsOptional()
   @IsIn(["asc", "desc"])
   order?: "asc" | "desc" = "desc";
+   @IsOptional()
+  @IsEnum(WalletTransactionType)
+  type?: WalletTransactionType;
 }
  

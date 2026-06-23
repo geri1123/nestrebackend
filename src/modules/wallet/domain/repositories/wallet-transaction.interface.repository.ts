@@ -30,8 +30,8 @@ export interface IWalletTransactionRepository {
   getTransactions(walletId: string, page?: number, limit?: number): Promise<WalletTransaction[]>;
   countTransaction(walletId: string): Promise<number>;
 
-  getAllTransactions(page: number, sortBy: "date" | "amount", order: "asc" | "desc"): Promise<TransactionWithUser[]>;
-  countAllTransactions(): Promise<number>;
+  getAllTransactions(page: number, sortBy: "date" | "amount", order: "asc" | "desc" ,  type?: WalletTransactionType): Promise<TransactionWithUser[]>;
+  countAllTransactions(type?: WalletTransactionType): Promise<number>;
 
   getUserTransactions(userId: number, page: number, sortBy: "date" | "amount", order: "asc" | "desc"): Promise<TransactionWithUser[]>;
   countUserTransactions(userId: number): Promise<number>;

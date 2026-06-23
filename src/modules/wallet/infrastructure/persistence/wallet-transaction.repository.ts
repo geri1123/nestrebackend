@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../infrastructure/prisma/prisma.service";
-import { Prisma, WalletTransaction } from "@prisma/client";
+import { Prisma, WalletTransaction, WalletTransactionType } from "@prisma/client";
 import {
   IWalletTransactionRepository,
   CreateTransactionData,
@@ -43,8 +43,11 @@ private readonly userInclude = {
   },
 } satisfies Prisma.WalletTransactionInclude;
 
-getAllTransactions(page: number, sortBy: "date" | "amount", order: "asc" | "desc") {
+getAllTransactions(page: number, sortBy: "date" | "amount", order: "asc" | "desc", type?: WalletTransactionType) {
   return this.prisma.walletTransaction.findMany({
+    where: {
+      ...(type ? { type } : {}),
+    },
     include: this.userInclude,
     orderBy: sortBy === "date" ? { createdAt: order } : { amount: order },
     skip: (page - 1) * 20,
@@ -52,8 +55,10 @@ getAllTransactions(page: number, sortBy: "date" | "amount", order: "asc" | "desc
   });
 }
 
-countAllTransactions(): Promise<number> {
-  return this.prisma.walletTransaction.count();
+countAllTransactions(type?: WalletTransactionType): Promise<number> {
+  return this.prisma.walletTransaction.count({
+    where: { ...(type ? { type } : {}) },
+  });
 }
 
 getUserTransactions(userId: number, page: number, sortBy: "date" | "amount", order: "asc" | "desc") {

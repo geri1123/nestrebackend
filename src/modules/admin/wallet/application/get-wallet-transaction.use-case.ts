@@ -18,8 +18,8 @@ export class GetAllTransactionsUseCase {
     const order = dto.order ?? "desc";
 
     const [data, total] = await Promise.all([
-      this.walletTransactionRepo.getAllTransactions(page, sortBy, order),
-      this.walletTransactionRepo.countAllTransactions(),
+      this.walletTransactionRepo.getAllTransactions(page, sortBy, order , dto.type),
+      this.walletTransactionRepo.countAllTransactions(dto.type),
     ]);
 
     return {
