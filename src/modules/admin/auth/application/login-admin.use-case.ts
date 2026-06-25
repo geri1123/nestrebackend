@@ -21,18 +21,30 @@ export class LoginAdmin {
 
   async execute(dto: LoginAdminDto, res: Response) {
     // 1. Kontrollo nese ekziston admini
-    const admin = await this.adminRepo.findAdminByEmail(dto.email);
+    // const admin = await this.adminRepo.findAdminByEmail(dto.email);
 
-    if (!admin) {
-      throw new UnauthorizedException({
-        success: false,
-        message: "Email ose fjalëkalimi është i gabuar",
-      });
-    }
+    // if (!admin) {
+    //   throw new UnauthorizedException({
+    //     success: false,
+    //     message: "Email ose fjalëkalimi është i gabuar",
+    //   });
+    // }
 
-    // 2. Verifiko passwordin përmes domain entity
-    const isPasswordValid = await admin.verifyPassword(dto.password);
+    // // 2. Verifiko passwordin përmes domain entity
+    // const isPasswordValid = await admin.verifyPassword(dto.password);
+  
+  
+  const admin = await this.adminRepo.findAdminByEmail(dto.email);
+ 
 
+  if (!admin) {
+    throw new UnauthorizedException({
+      success: false,
+      message: "Email ose fjalëkalimi është i gabuar",
+    });
+  }
+
+  const isPasswordValid = await admin.verifyPassword(dto.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException({
         success: false,

@@ -89,6 +89,8 @@ GetMostClickedProductsUseCase,
     GetProductByIdUseCase,
     GetProductForPermissionUseCase,
     FindProductByIdUseCase,
+    SearchFiltersHelper,
+    SearchProductsUseCase
   ],
 })
 export class ProductModule {}

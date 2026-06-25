@@ -14,7 +14,13 @@ export class AdminAuthController {
     private readonly createAdmin: CreateAdminUseCase,
     private readonly loginAdmin:LoginAdmin
 ) {}
-
+ @Post('login')
+  async login(
+    @Body() dto: LoginAdminDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.loginAdmin.execute(dto, res);
+  }
 @UseGuards(AdminJwtGuard)
   @Post('create')
 
@@ -32,11 +38,5 @@ export class AdminAuthController {
     };
   }
 
-  @Post('login')
-  async login(
-    @Body() dto: LoginAdminDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return await this.loginAdmin.execute(dto, res);
-  }
+ 
 }
