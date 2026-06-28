@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EmailService } from '../email.service';
-import { OutreachAgencyDto } from '../dto/outreach.dto';
+import { EmailService } from '../../../infrastructure/email/email.service';
+import { OutreachAgencyDto } from '../../../infrastructure/email/dto/outreach.dto';
 
 export interface OutreachResult {
   email: string;

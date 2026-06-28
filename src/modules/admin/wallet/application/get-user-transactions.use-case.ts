@@ -16,10 +16,10 @@ export class GetUserTransactionsUseCase {
     const page = dto.page ?? 1;
     const sortBy = dto.sortBy ?? "date";
     const order = dto.order ?? "desc";
- 
+   const type = dto.type ?? undefined;
     const [data, total] = await Promise.all([
-      this.walletTransactionRepo.getUserTransactions(userId, page, sortBy, order),
-      this.walletTransactionRepo.countUserTransactions(userId),
+      this.walletTransactionRepo.getUserTransactions(userId, page, sortBy, order ,type , LIMIT),
+      this.walletTransactionRepo.countUserTransactions(userId  , type),
     ]);
  
     return {

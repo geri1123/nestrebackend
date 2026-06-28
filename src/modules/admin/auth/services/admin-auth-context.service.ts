@@ -2,8 +2,8 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { AdminTokenService } from './admin-auth-token.service'; // ← AdminTokenService
 import { CacheService } from '../../../../infrastructure/redis/cache.service';
 import { AuthAdmin } from '../types/auth-admin.interface';
-import { ADMIN_REPOSITORY_TOKENS } from '../domain/repositories/admin.repository.tokens';
-import { IAdminRepository } from '../domain/repositories/admin.repository.interface';
+import { ADMIN_REPOSITORY_TOKENS } from '../../admin-core/domain/repositories/admin.repository.tokens';
+import { IAdminRepository } from '../../admin-core/domain/repositories/admin.repository.interface';
 
 export interface AdminAuthContext {
   admin: AuthAdmin;

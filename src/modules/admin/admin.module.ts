@@ -7,10 +7,14 @@ import { EarningModule } from './earning/earning.module';
 import { AdminWalletModule } from './wallet/wallet.module';
 import { ProductsAdminModule } from './products/product-admin.module';
 import { AccountModule } from './account/account.module';
+import { AdminCoreModule } from './admin-core/admin-core.module';
+import { OutreachModule } from './outreach/outreach.module';
 
 @Module({
   
   imports: [
+    AdminCoreModule,
+    OutreachModule,
     QueueModule,
     AdminAuthModule,
     AdminUserModule,

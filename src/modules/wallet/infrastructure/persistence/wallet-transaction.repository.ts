@@ -61,19 +61,22 @@ countAllTransactions(type?: WalletTransactionType): Promise<number> {
   });
 }
 
-getUserTransactions(userId: number, page: number, sortBy: "date" | "amount", order: "asc" | "desc") {
+getUserTransactions(userId: number,   page: number, sortBy: "date" | "amount", order: "asc" | "desc" ,type?: WalletTransactionType ,  limit: number = 20  ) {
   return this.prisma.walletTransaction.findMany({
-    where: { wallet: { userId } },
+    where: {
+       wallet: { userId } ,
+      ...(type ? { type } : {}),
+      },
     include: this.userInclude,
     orderBy: sortBy === "date" ? { createdAt: order } : { amount: order },
-    skip: (page - 1) * 20,
-    take: 20,
+    skip: (page - 1) * limit,
+    take: limit,
   });
 }
 countTransaction(walletId: string): Promise<number> {
   return this.prisma.walletTransaction.count({ where: { walletId } });
 }
-countUserTransactions(userId: number): Promise<number> {
-  return this.prisma.walletTransaction.count({ where: { wallet: { userId } } });
+countUserTransactions(userId: number , type?:WalletTransactionType): Promise<number> {
+  return this.prisma.walletTransaction.count({ where: { wallet: { userId } , ...(type ? { type } : {}),}   });
 }
 }

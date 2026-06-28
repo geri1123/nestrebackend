@@ -55,57 +55,60 @@ export class WalletRepository implements IWalletRepository {
   const fresh = await tx.wallet.findUniqueOrThrow({ where: { id: walletId } });
   return fresh.balance.toNumber(); 
   }
-  async getAllWallets(params?: {
+async getAllWallets(params?: {
   userId?: number;
   username?: string;
   page?: number;
   limit?: number;
-}):  Promise<{
-  id: string;
-  userId: number;
-  username?: string;
-  balance: number;
-  currency: string;
-  createdAt: Date;
-}[]> {
+}): Promise<{
+  data: {
+    id: string;
+    userId: number;
+    username?: string;
+    balance: number;
+    currency: string;
+    createdAt: Date;
+  }[];
+  total: number;
+  page: number;
+  totalPages: number;
+}> {
   const { userId, username, page = 1, limit = 20 } = params || {};
 
-  const wallets = await this.prisma.wallet.findMany({
-    where: {
-      ...(userId ? { userId } : {}),
-      ...(username
-        ? {
-            user: {
-              username: {
-                contains: username,
-                mode: "insensitive",
-              },
-            },
-          }
-        : {}),
-    },
-   include: {
-  user: {
-    select: {
-      id: true,
-      username: true,
-    },
-  },
-},
-    skip: (page - 1) * limit,
-    take: limit,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const where = {
+    ...(userId ? { userId } : {}),
+    ...(username ? {
+      user: {
+        username: { contains: username, mode: "insensitive" as const },
+      },
+    } : {}),
+  };
 
- return wallets.map(w => ({
-  id: w.id,
-  userId: w.userId,
-  username: w.user?.username,
-  balance: w.balance.toNumber(),
-  currency: w.currency,
-  createdAt: w.createdAt,
-}));
+  const [wallets, total] = await Promise.all([
+    this.prisma.wallet.findMany({
+      where,
+      include: {
+        user: { select: { id: true, username: true } },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    }),
+    this.prisma.wallet.count({ where }),
+  ]);
+
+  return {
+    data: wallets.map((w) => ({
+      id: w.id,
+      userId: w.userId,
+      username: w.user?.username,
+      balance: w.balance.toNumber(),
+      currency: w.currency,
+      createdAt: w.createdAt,
+    })),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 }

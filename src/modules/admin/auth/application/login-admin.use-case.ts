@@ -1,6 +1,6 @@
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
-import { ADMIN_REPOSITORY_TOKENS } from "../domain/repositories/admin.repository.tokens";
-import { IAdminRepository } from "../domain/repositories/admin.repository.interface";
+import { ADMIN_REPOSITORY_TOKENS } from "../../admin-core/domain/repositories/admin.repository.tokens";
+import { IAdminRepository } from "../../admin-core/domain/repositories/admin.repository.interface";
 import { AdminTokenService } from "../services/admin-auth-token.service";
 import { AdminAuthCookieService } from "../services/admin-cookie.service";
 import { LoginAdminDto } from "../dto/login-admin.dto";

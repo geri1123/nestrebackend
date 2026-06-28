@@ -5,12 +5,11 @@ import { AppConfigService } from '../../../infrastructure/config/config.service'
 import { AdminTokenService } from './services/admin-auth-token.service';
 import { AdminAuthCookieService } from './services/admin-cookie.service';
 import { AdminAuthController } from './admin-auth.controller';
-import { ADMIN_REPOSITORY_TOKENS } from './domain/repositories/admin.repository.tokens';
-import { AdminRepository } from './infrastructure/persistence/admin.repository';
 import { CreateAdminUseCase } from './application/create-admin.use-case';
 import { LoginAdmin } from './application/login-admin.use-case';
 import { AdminAuthContextService } from './services/admin-auth-context.service';
 import { AdminJwtGuard } from './guard/admin-jwt.guard';
+import { AdminCoreModule } from '../admin-core/admin-core.module';
 
 @Module({
   imports: [
@@ -23,13 +22,10 @@ import { AdminJwtGuard } from './guard/admin-jwt.guard';
       }),
       inject: [AppConfigService],
     }),
+    AdminCoreModule,
   ],
   controllers: [AdminAuthController],
   providers: [
-    {
-      provide: ADMIN_REPOSITORY_TOKENS.ADMIN_REPOSITORY,
-      useClass: AdminRepository,
-    },
     CreateAdminUseCase,
     LoginAdmin,
     AdminAuthContextService,
@@ -37,10 +33,6 @@ import { AdminJwtGuard } from './guard/admin-jwt.guard';
     AdminTokenService,
     AdminAuthCookieService,
   ],
-  exports: [
-    AdminJwtGuard,
-    AdminAuthContextService,
-    AdminTokenService,
-  ],
+  exports: [AdminJwtGuard, AdminAuthContextService, AdminTokenService],
 })
 export class AdminAuthModule {}

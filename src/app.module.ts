@@ -60,7 +60,7 @@ import { RedisModule } from './infrastructure/redis/redis.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { ReviewModule } from './modules/review/review.module';
 import { PayseraModule } from './infrastructure/paysera/paysera.module';
-import { OutreachModule } from './infrastructure/email/outreach.module';
+import { OutreachModule } from './modules/admin/outreach/outreach.module';
 import { AdminModule } from './modules/admin/admin.module';
 @Module({
   imports: [

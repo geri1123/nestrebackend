@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { ADMIN_REPOSITORY_TOKENS } from "../domain/repositories/admin.repository.tokens";
-import { IAdminRepository } from "../domain/repositories/admin.repository.interface";
+import { ADMIN_REPOSITORY_TOKENS } from "../../admin-core/domain/repositories/admin.repository.tokens";
+import { IAdminRepository } from "../../admin-core/domain/repositories/admin.repository.interface";
 import { hashPassword } from "../../../../common/utils/hash";
 
 interface RegisterAdmin {

@@ -22,14 +22,19 @@ getAllWallets(params?: {
   username?: string;
   page?: number;
   limit?: number;
-}):  Promise<{
-  id: string;
-  userId: number;
-  username?: string;
-  balance: number;
-  currency: string;
-  createdAt: Date;
-}[]> 
+}): Promise<{
+  data: {
+    id: string;
+    userId: number;
+    username?: string;
+    balance: number;
+    currency: string;
+    createdAt: Date;
+  }[];
+  total: number;
+  page: number;
+  totalPages: number;
+}>;
   /**
    * Dekrementon balancën VETËM nëse balanca >= amount (atomik, në një SQL).
    * Kthen balancën e re, ose `null` nëse balanca është e pamjaftueshme.
