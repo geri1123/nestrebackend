@@ -5,6 +5,7 @@ import { Agency } from '../../domain/entities/agency.entity';
 import { AgencyInfoVO } from '../../domain/value-objects/agency-info.vo';
 import { AgencyStatus, Prisma } from '@prisma/client';
 import { generatePublicCode } from '../../../../common/utils/hash';
+import { AgencyAdminListItem, AgencyAdminPaginatedQuery } from '../../domain/types/agency-query.types';
 
 @Injectable()
 export class AgencyRepository implements IAgencyDomainRepository {
@@ -359,30 +360,15 @@ export class AgencyRepository implements IAgencyDomainRepository {
 
 
 async getAllAgenciesAdminPaginated(
-  skip: number,
-  limit: number,
-  search?: string,
-  status?: AgencyStatus,
-  sortBy?: 'createdAt' | 'agencyName',
-  sortOrder?: 'asc' | 'desc',
-): Promise<{
-  id: number;
-  agency_name: string;
-  logo: string | null;
-  address: string | null;
-  phone: string | null;
-  agency_email: string | null;
-  public_code: string | null;
-  status: AgencyStatus;
-  owner_user_id: number;
-  created_at: Date;
-}[]> {
+  query: AgencyAdminPaginatedQuery,
+): Promise<AgencyAdminListItem[]> {
+  const { skip, limit, search, status, sortBy, sortOrder } = query;
   const words =
     search && search.trim().length >= 3
       ? search.trim().toLowerCase().split(/\s+/)
       : undefined;
 
-  const results = await this.prisma.agency.findMany({
+  return this.prisma.agency.findMany({
     where: {
       ...(status ? { status } : {}),
       ...(words && {
@@ -405,24 +391,17 @@ async getAllAgenciesAdminPaginated(
       status: true,
       ownerUserId: true,
       createdAt: true,
+       user: {
+        select: {
+          username: true,
+          email: true,
+        },
+      },
     },
     orderBy: { [sortBy ?? 'createdAt']: sortOrder ?? 'desc' },
     skip,
     take: limit,
   });
-
-  return results.map(r => ({
-    id: r.id,
-    agency_name: r.agencyName,
-    logo: r.logo,
-    address: r.address,
-    phone: r.phone,
-    agency_email: r.agencyEmail,
-    public_code: r.publicCode,
-    status: r.status,
-    owner_user_id: r.ownerUserId,
-    created_at: r.createdAt,
-  }));
 }
 
 async countAgenciesAdmin(search?: string, status?: AgencyStatus): Promise<number> {

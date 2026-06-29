@@ -1,5 +1,5 @@
 import { SupportedLang } from '../../../locales';
-import { AgencyMessagePayload, ContactMessagePayload, SupportMessagePayload, UserMessagePayload } from '../../queue/payloads/email-payloads.type';
+import { AgencyMessagePayload, ContactMessagePayload, StatusChangePayload, SupportMessagePayload, UserMessagePayload } from '../../queue/payloads/email-payloads.type';
 
 
 export const EMAIL_EVENTS = {
@@ -13,6 +13,7 @@ export const EMAIL_EVENTS = {
   CONTACT_MESSAGE:          'email.contact-message',
   AGENCY_MESSAGE:           'email.agency-message',
   USER_MESSAGE:             'email.user-message',
+  STATUS_USER_MESSAGE:     'email.status-message'
 } as const;
 
 export class EmailVerificationRequestedEvent {
@@ -76,4 +77,8 @@ export class EmailAgencyMessageEvent {
 
 export class EmailUserMessageEvent {
   constructor(public readonly payload: UserMessagePayload) {}
+}
+
+export class EmailStatusChangeEvent{
+  constructor(public readonly payload:StatusChangePayload){}
 }

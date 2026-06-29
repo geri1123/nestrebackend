@@ -14,6 +14,7 @@ import {
   contactPlatformTemplate,
   agencyOutreachTemplate
 } from './tamplates';
+import { userStatusChangedTemplate } from './tamplates/user-status-updated.template';
 
 @Injectable()
 export class EmailService {
@@ -112,6 +113,13 @@ export class EmailService {
   async sendRejectionEmail(to: string, name: string) {
     return this.sendEmail(to, 'Request Rejected', AgentRejectedEmailTemplate(name));
   }
+async sendUserStatusChange(to: string, name: string, status: string) {
+  const subject = 'Account Status Updated';
+
+  const html = userStatusChangedTemplate(name, status);
+
+  return this.sendEmail(to, subject, html);
+}
 async sendAgentRejectedEmail(to: string, name: string) {
   const subject = 'Agent Request Rejected';
   const html = AgentRejectedEmailTemplate(name); 

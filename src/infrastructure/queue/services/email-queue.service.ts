@@ -3,7 +3,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { JobsOptions, Queue } from 'bullmq';
 import { EMAIL_JOBS, QUEUES } from '../constants/queue-names.constant';
 import { SupportedLang } from '../../../locales';
-import { AgencyMessagePayload, ContactMessagePayload, SupportMessagePayload, UserMessagePayload } from '../payloads/email-payloads.type';
+import { AgencyMessagePayload, ContactMessagePayload, StatusChangePayload, SupportMessagePayload, UserMessagePayload } from '../payloads/email-payloads.type';
 
 
 /** Shared retry options for transactional emails. */
@@ -107,5 +107,13 @@ export class EmailQueueService {
       payload,
       RETRY_OPTS,
     );
+  }
+
+  sendStatusChangeEmail(payload:StatusChangePayload){
+    return this.emailQueue.add(
+      EMAIL_JOBS.SEND_USER_STATUS_CHANGED,
+      payload,
+      RETRY_OPTS
+    )
   }
 }

@@ -46,3 +46,8 @@ export type SupportMessagePayload = {
   subject: string;
   message: string;
 };
+export type StatusChangePayload={
+  email:string;  
+  name:string; 
+  status:string;
+}

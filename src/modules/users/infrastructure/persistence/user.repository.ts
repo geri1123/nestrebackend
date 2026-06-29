@@ -360,7 +360,8 @@ export class UserRepository implements IUserDomainRepository {
 }
 async findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers> {
   const {
-    status = 'active',
+    status = 'all',
+    role,
     search,
     sortBy = 'createdAt',
     sortOrder = 'desc',
@@ -368,17 +369,21 @@ async findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers> {
     limit,
   } = filters;
 
-  // ── Filter nga status ──────────────────────────
   const where: Prisma.UserWhereInput = {};
 
-  if (status === 'active') {
-    where.deletedAt = null;
-  } else if (status === 'deleted') {
+  if (status === 'deleted') {
     where.deletedAt = { not: null };
+  } else if (status === 'all') {
+    // pa filter
+  } else {
+    where.deletedAt = null;
+    where.status = status; // UserStatus enum
   }
-  // 'all' → pa filter
 
-  // ── Search (username, email, firstName, lastName) ──
+  if (role) {
+    where.role = role;
+  }
+
   if (search?.trim()) {
     where.OR = [
       { username:  { contains: search, mode: 'insensitive' } },
@@ -400,11 +405,19 @@ async findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers> {
         email: true,
         firstName: true,
         lastName: true,
+        phone:true,
+        website:true,
+        profileImgUrl:true,
         role: true,
         status: true,
+        emailVerified:true,
+        googleUser:true,
         deletedAt: true,
+        lastActive:true,
         createdAt: true,
         lastLogin: true,
+        updatedAt:true,
+        
       },
     }),
     this.prisma.user.count({ where }),

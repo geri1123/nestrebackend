@@ -1,17 +1,9 @@
-// admin/application/use-cases/get-all-users.use-case.ts
 
 import { Inject, Injectable } from '@nestjs/common';
+import { IUserDomainRepository, USER_REPO } from '../../../users/domain/repositories/user.repository.interface';
+import { GetAllUsersAdminQuery } from '../types/user-query.types';
 
-import {IUserDomainRepository, USER_REPO } from '../../../users/domain/repositories/user.repository.interface';
-
-const ADMIN_USERS_PER_PAGE = 20; // ← këtu e kontrollon backend-i
-interface GetAllUsersInput {
-  status?: 'active' | 'deleted' | 'all';
-  search?: string;
-  sortBy?: 'createdAt' | 'lastLogin';
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-}
+const ADMIN_USERS_PER_PAGE = 20;
 
 @Injectable()
 export class GetAllUsersAdminUseCase {
@@ -20,22 +12,23 @@ export class GetAllUsersAdminUseCase {
     private readonly userRepo: IUserDomainRepository,
   ) {}
 
-  async execute(input: GetAllUsersInput) {
+  async execute(input: GetAllUsersAdminQuery) {
     const page = Math.max(1, input.page ?? 1);
 
-    const { users, total } =
-      await this.userRepo.findAllForAdmin({
-        ...input,
-        page,
-        limit: ADMIN_USERS_PER_PAGE,
-      });
-
-    return {
-      users,
-      total,
+    const { users, total } = await this.userRepo.findAllForAdmin({
+      ...input,
       page,
       limit: ADMIN_USERS_PER_PAGE,
-      totalPages: Math.ceil(total / ADMIN_USERS_PER_PAGE),
+    });
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit: ADMIN_USERS_PER_PAGE,
+        totalPages: Math.ceil(total / ADMIN_USERS_PER_PAGE),
+      },
     };
   }
 }

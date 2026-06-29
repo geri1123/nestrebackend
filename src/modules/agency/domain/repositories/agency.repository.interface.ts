@@ -2,6 +2,7 @@
 import { AgencyStatus, Prisma } from '@prisma/client';
 import { Agency } from '../entities/agency.entity';
 import { AgencyInfoVO } from '../value-objects/agency-info.vo';
+import { AgencyAdminListItem, AgencyAdminPaginatedQuery } from '../types/agency-query.types';
 
 export const AGENCY_REPO = Symbol('AGENCY_REPO');
 
@@ -59,25 +60,9 @@ findOwnerUserId(agencyId: number): Promise<number | null>;
   activateAgency(agencyId: number, tx?: Prisma.TransactionClient): Promise<void>;
   deleteLogo(agencyId: number): Promise<void>;
   deleteByOwnerUserId(ownerUserId: number): Promise<number>;
-  getAllAgenciesAdminPaginated(
-  skip: number,
-  limit: number,
-  search?: string,
-  status?: AgencyStatus,
-  sortBy?: 'createdAt' | 'agencyName',
-  sortOrder?: 'asc' | 'desc',
-): Promise<{
-  id: number;
-  agency_name: string;
-  logo: string | null;
-  address: string | null;
-  phone: string | null;
-  agency_email: string | null;
-  public_code: string | null;
-  status: AgencyStatus;
-  owner_user_id: number;
-  created_at: Date;
-}[]>;
+ getAllAgenciesAdminPaginated(
+   query: AgencyAdminPaginatedQuery,
+ ): Promise<AgencyAdminListItem[]>
 
 countAgenciesAdmin(search?: string, status?: AgencyStatus): Promise<number>;
 }

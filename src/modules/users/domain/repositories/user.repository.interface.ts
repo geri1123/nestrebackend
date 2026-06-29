@@ -5,7 +5,8 @@ import { userStatus } from "../types/user-status.type";
 export const USER_REPO = Symbol('USER_REPO');
 
 export interface AdminUserFilters {
-  status?: 'active' | 'deleted' | 'all';
+ status?: UserStatus | 'deleted' | 'all';
+  role?: UserRole;
   search?: string;
   sortBy?: 'createdAt' | 'lastLogin';
   sortOrder?: 'asc' | 'desc';
@@ -17,13 +18,24 @@ export interface AdminUserResult {
   id: number;
   username: string;
   email: string;
+
+  phone: string | null;
+  website: string | null;
+  profileImgUrl: string | null;
+
   role: string;
   status: string;
+
+  emailVerified: boolean;
+  googleUser: boolean;
+
   deletedAt: Date | null;
+  lastActive: Date | null;
+
   createdAt: Date;
   lastLogin: Date | null;
+  updatedAt: Date | null;
 }
-
 export interface PaginatedUsers {
   users: AdminUserResult[];
   total: number;
@@ -89,7 +101,7 @@ findPublicById(userId: number): Promise<{
     agency: { id: number; agencyName: string; logo: string | null };
   }[];
 } | null>;
-findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers>;
+findAllForAdmin(filters: AdminUserFilters): Promise<PaginatedUsers> ;
 updateStatus(
   userId: number,
   status: UserStatus,

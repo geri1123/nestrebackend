@@ -9,6 +9,7 @@ import {
   EmailContactMessageEvent,
   EmailPasswordResetRequestedEvent,
   EmailPendingApprovalEvent,
+  EmailStatusChangeEvent,
   EmailSupportMessageEvent,
   EmailUserMessageEvent,
   EmailVerificationRequestedEvent,
@@ -147,6 +148,18 @@ export class EmailEventsListener {
     } catch (err) {
       this.logger.error(
         `Failed to enqueue user-message email to ${event.payload.recipientEmail}`,
+        err as Error,
+      );
+    }
+  }
+  @OnEvent(EMAIL_EVENTS.STATUS_USER_MESSAGE, {async:true})
+
+  async onStatusChangeMessage(event:EmailStatusChangeEvent){
+    try{
+      await this.emailQueue.sendStatusChangeEmail(event.payload)
+    }catch(err){
+      this.logger.error(
+        `Failed to enqueue user-message email to ${event.payload.email}`,
         err as Error,
       );
     }

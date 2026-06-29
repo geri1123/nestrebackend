@@ -21,6 +21,7 @@ export const EMAIL_JOBS = {
   SEND_CONTACT_MESSAGE:   'send-contact-message',
   SEND_AGENCY_MESSAGE:    'send-agency-message',
   SEND_MESSAGE_TO_USER:   'send-message-to-user',
+   SEND_USER_STATUS_CHANGED: 'send-user-status-changed',
 } as const;
 
 export const PRODUCT_COUNTS_JOBS = {

@@ -36,6 +36,8 @@ export class EmailProcessor extends WorkerHost {
         return this.sendAgencyMessage(job);
       case EMAIL_JOBS.SEND_MESSAGE_TO_USER:
         return this.sendMessageToUser(job);
+      case EMAIL_JOBS.SEND_USER_STATUS_CHANGED:
+        return this.sendUserStatusChange(job);
       default:
         this.logger.warn(`Unknown email job: ${job.name}`);
         return { success: false };
@@ -106,7 +108,11 @@ export class EmailProcessor extends WorkerHost {
     await this.emailService.sendMessageToUserEmail(job.data);
     return { success: true };
   }
-
+  private async sendUserStatusChange(job:Job){
+     const { email, name, status } = job.data;
+    await this.emailService.sendUserStatusChange(email , name, status);
+    return {success:true};
+  }
   // ── Worker events ────────────────────────────────────────────────────────────
 
   @OnWorkerEvent('completed')
